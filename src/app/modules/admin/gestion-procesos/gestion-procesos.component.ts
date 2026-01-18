@@ -1,0 +1,432 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+  ViewEncapsulation,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { ProcessService } from '@app/core/services/process/process.service';
+import { Process, ProcessFilter, ProcessResponseMeta, CreateProcessResponse } from '@app/core/models/process/process.model';
+import { DataTableComponent, DataTableColumn } from '@app/shared/components/data-table/data-table.component';
+import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
+
+@Component({
+  selector: 'app-gestion-procesos',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, TranslocoPipe, DataTableComponent, DateRangePickerComponent],
+  templateUrl: './gestion-procesos.component.html',
+  styleUrls: ['./gestion-procesos.component.scss'],
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class GestionProcesosComponent {
+  private _processService = inject(ProcessService);
+  private _router = inject(Router);
+  private _activatedRoute = inject(ActivatedRoute);
+  private _fb = inject(FormBuilder);
+
+  // State
+  public processes = signal<Process[]>([]);
+  public loading = signal<boolean>(false);
+  public pagination = signal<ProcessResponseMeta | null>(null);
+
+  // Modal state
+  public isModalOpen = signal<boolean>(false);
+  public submitting = signal<boolean>(false);
+  public error = signal<string | null>(null);
+  
+  // Info modal state (for multiple instances or private processes)
+  public isInfoModalOpen = signal<boolean>(false);
+  public infoModalData = signal<CreateProcessResponse | null>(null);
+
+  // Add process form
+  public addProcessForm: FormGroup = this._fb.group({
+    process_number: ['', [Validators.required, this.validateProcessNumber]],
+  });
+
+  // Filter form
+  public filterForm: FormGroup = this._fb.group({
+    process_number: [''],
+    status: [''],
+    is_private: [null as boolean | null],
+    has_multiple_instances: [null as boolean | null],
+    process_date_range: [null as DateRange | null],
+    created_at_range: [null as DateRange | null],
+  });
+
+  // Table columns
+  public columns: DataTableColumn[] = [
+    {
+      key: 'process_number',
+      label: 'gestionProcesos.table.processNumber',
+      width: '240px',
+      align: 'left',
+      sortable: true,
+    },
+    {
+      key: 'court',
+      label: 'gestionProcesos.table.court',
+      sortable: true,
+    },
+    {
+      key: 'department',
+      label: 'gestionProcesos.table.department',
+      width: '150px',
+      sortable: true,
+    },
+    {
+      key: 'process_type',
+      label: 'gestionProcesos.table.processType',
+      width: '150px',
+      sortable: true,
+    },
+    {
+      key: 'process_class',
+      label: 'gestionProcesos.table.processClass',
+      width: '200px',
+    },
+    {
+      key: 'process_date',
+      label: 'gestionProcesos.table.processDate',
+      width: '120px',
+      align: 'center',
+    },
+    {
+      key: 'last_activity_date',
+      label: 'gestionProcesos.table.lastActivityDate',
+      width: '120px',
+      align: 'center',
+    },
+    {
+      key: 'location',
+      label: 'gestionProcesos.table.location',
+      width: '120px',
+    },
+    {
+      key: 'status_label',
+      label: 'gestionProcesos.table.status',
+      width: '120px',
+      align: 'center',
+    },
+    {
+      key: 'has_multiple_instances',
+      label: 'gestionProcesos.table.multipleInstances',
+      width: '150px',
+      align: 'center',
+      render: (value: boolean) => value ? 'Sí' : 'No',
+    },
+  ];
+
+  constructor() {
+    this._loadFiltersFromQueryParams();
+    this.loadProcesses();
+  }
+
+  /**
+   * Load filters from query params
+   */
+  private _loadFiltersFromQueryParams(): void {
+    const queryParams = this._activatedRoute.snapshot.queryParams;
+
+    // Helper to check if a value is valid (not null, not "null" string, not empty)
+    const isValidValue = (value: any): boolean => {
+      return value !== null && value !== undefined && value !== '' && value !== 'null';
+    };
+
+    // Apply query params to form - only if they have valid values
+    if (isValidValue(queryParams['process_number'])) {
+      this.filterForm.patchValue({ process_number: queryParams['process_number'] });
+    }
+    if (isValidValue(queryParams['status'])) {
+      this.filterForm.patchValue({ status: queryParams['status'] });
+    }
+    if (isValidValue(queryParams['is_private'])) {
+      this.filterForm.patchValue({ is_private: queryParams['is_private'] === 'true' });
+    }
+    if (isValidValue(queryParams['has_multiple_instances'])) {
+      this.filterForm.patchValue({ has_multiple_instances: queryParams['has_multiple_instances'] === 'true' });
+    }
+    // Load date ranges from query params - only if they have valid values
+    if (isValidValue(queryParams['process_date_from']) || isValidValue(queryParams['process_date_to'])) {
+      const dateRange: DateRange = {
+        from: isValidValue(queryParams['process_date_from']) ? queryParams['process_date_from'] : null,
+        to: isValidValue(queryParams['process_date_to']) ? queryParams['process_date_to'] : null,
+      };
+      this.filterForm.patchValue({ process_date_range: dateRange });
+    }
+    if (isValidValue(queryParams['created_at_from']) || isValidValue(queryParams['created_at_to'])) {
+      const dateRange: DateRange = {
+        from: isValidValue(queryParams['created_at_from']) ? queryParams['created_at_from'] : null,
+        to: isValidValue(queryParams['created_at_to']) ? queryParams['created_at_to'] : null,
+      };
+      this.filterForm.patchValue({ created_at_range: dateRange });
+    }
+  }
+
+  /**
+   * Update query params with current filters
+   */
+  private _updateQueryParams(filters: ProcessFilter, includePage: boolean = false, page: number = 1): void {
+    const queryParams: Record<string, string> = {};
+
+    // Only add params if they have actual values (not null, not empty, not undefined)
+    if (filters.process_number && filters.process_number.trim()) {
+      queryParams['process_number'] = filters.process_number;
+    }
+    if (filters.status && filters.status.trim()) {
+      queryParams['status'] = filters.status;
+    }
+    if (filters.is_private !== undefined && filters.is_private !== null) {
+      queryParams['is_private'] = filters.is_private.toString();
+    }
+    if (filters.has_multiple_instances !== undefined && filters.has_multiple_instances !== null) {
+      queryParams['has_multiple_instances'] = filters.has_multiple_instances.toString();
+    }
+    if (filters.process_date_from && filters.process_date_from.trim()) {
+      queryParams['process_date_from'] = filters.process_date_from;
+    }
+    if (filters.process_date_to && filters.process_date_to.trim()) {
+      queryParams['process_date_to'] = filters.process_date_to;
+    }
+    if (filters.created_at_from && filters.created_at_from.trim()) {
+      queryParams['created_at_from'] = filters.created_at_from;
+    }
+    if (filters.created_at_to && filters.created_at_to.trim()) {
+      queryParams['created_at_to'] = filters.created_at_to;
+    }
+
+    if (includePage && page > 1) {
+      queryParams['page'] = page.toString();
+    }
+
+    // Build final params - only include params with actual values
+    // When we pass only the params we want, Angular Router will replace ALL query params
+    // This means params not in this object will be automatically removed
+    const finalParams: Record<string, string> = { ...queryParams };
+    
+    // Add page if needed
+    if (includePage && page > 1) {
+      finalParams['page'] = page.toString();
+    }
+
+    // Navigate - Angular Router will replace all query params with only those in finalParams
+    // This automatically removes any params not in finalParams (including "null" strings)
+    this._router.navigate([], {
+      relativeTo: this._activatedRoute,
+      queryParams: finalParams,
+      replaceUrl: true,
+    });
+  }
+
+  /**
+   * Load processes with current filters
+   */
+  loadProcesses(page: number = 1, perPage: number = 20): void {
+    this.loading.set(true);
+
+    const formValue = this.filterForm.value;
+    const processDateRange: DateRange | null = formValue.process_date_range;
+    const createdAtRange: DateRange | null = formValue.created_at_range;
+
+    const filters: ProcessFilter = {
+      process_number: formValue.process_number?.trim() || undefined,
+      status: formValue.status?.trim() || undefined,
+      is_private: formValue.is_private !== null && formValue.is_private !== '' ? formValue.is_private : undefined,
+      has_multiple_instances: formValue.has_multiple_instances !== null && formValue.has_multiple_instances !== '' ? formValue.has_multiple_instances : undefined,
+      process_date_from: processDateRange?.from || undefined,
+      process_date_to: processDateRange?.to || undefined,
+      created_at_from: createdAtRange?.from || undefined,
+      created_at_to: createdAtRange?.to || undefined,
+      page,
+      per_page: perPage,
+    };
+
+    Object.keys(filters).forEach((key) => {
+      const value = filters[key as keyof ProcessFilter];
+      if (value === '' || value === null || value === undefined) {
+        delete filters[key as keyof ProcessFilter];
+      }
+    });
+
+    this._updateQueryParams(filters, false);
+
+    this._processService.getProcesses(filters).subscribe({
+      next: (response) => {
+        this.processes.set(response.data);
+        this.pagination.set({
+          current_page: response.current_page,
+          per_page: response.per_page,
+          total: response.total,
+          last_page: response.last_page,
+          from: response.from,
+          to: response.to,
+        });
+        this.loading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading processes:', error);
+        this.loading.set(false);
+      },
+    });
+  }
+
+  /**
+   * Handle search
+   */
+  onSearch(): void {
+    this.loadProcesses(1, this.pagination()?.per_page || 20);
+  }
+
+  /**
+   * Handle filter reset
+   */
+  onResetFilters(): void {
+    this.filterForm.reset();
+
+    // Navigate with empty query params (no null values, just empty object)
+    this._router.navigate([], {
+      relativeTo: this._activatedRoute,
+      queryParams: {},
+      replaceUrl: true,
+    });
+    this.loadProcesses(1, this.pagination()?.per_page || 20);
+  }
+
+  /**
+   * Handle page change
+   */
+  onPageChange(event: { page: number; perPage: number }): void {
+    this.loadProcesses(event.page, event.perPage);
+  }
+
+  /**
+   * Handle row click
+   */
+  onRowClick(process: Process): void {
+    // TODO: Navigate to process detail when detail page is created
+    console.log('Process clicked:', process);
+  }
+
+  /**
+   * Custom validator for process number (23 digits, numeric only)
+   */
+  validateProcessNumber(control: AbstractControl): ValidationErrors | null {
+    const value = control.value;
+    if (!value) {
+      return null; // Let required validator handle empty values
+    }
+    
+    // Check if it's exactly 23 digits
+    const numericRegex = /^\d{23}$/;
+    if (!numericRegex.test(value)) {
+      return { invalidProcessNumber: true };
+    }
+    
+    return null;
+  }
+
+  /**
+   * Open add process modal
+   */
+  openAddProcessModal(): void {
+    this.isModalOpen.set(true);
+    this.error.set(null);
+    this.addProcessForm.reset();
+  }
+
+  /**
+   * Close add process modal
+   */
+  closeAddProcessModal(): void {
+    this.isModalOpen.set(false);
+    this.error.set(null);
+    this.addProcessForm.reset();
+  }
+
+  /**
+   * Submit add process form
+   */
+  onSubmitAddProcess(): void {
+    if (this.addProcessForm.invalid) {
+      this.addProcessForm.markAllAsTouched();
+      return;
+    }
+
+    this.submitting.set(true);
+    this.error.set(null);
+
+    const processNumber = this.addProcessForm.get('process_number')?.value?.trim();
+
+    this._processService.createProcess(processNumber).subscribe({
+      next: (response) => {
+        this.submitting.set(false);
+        this.closeAddProcessModal();
+        
+        // Always reload processes table
+        this.loadProcesses(1, this.pagination()?.per_page || 20);
+        
+        // Show info modal if has_multiple_instances is true or private_count >= 1
+        if (response.has_multiple_instances === true || response.private_count >= 1) {
+          this.infoModalData.set(response);
+          this.isInfoModalOpen.set(true);
+        }
+      },
+      error: (error) => {
+        this.submitting.set(false);
+        
+        // Handle error response
+        if (error.error && error.error.messages && Array.isArray(error.error.messages)) {
+          // Join all error messages
+          this.error.set(error.error.messages.join('. '));
+        } else if (error.error && error.error.message) {
+          this.error.set(error.error.message);
+        } else {
+          this.error.set('gestionProcesos.addProcess.error.generic');
+        }
+      },
+    });
+  }
+
+  /**
+   * Close info modal
+   */
+  closeInfoModal(): void {
+    this.isInfoModalOpen.set(false);
+    this.infoModalData.set(null);
+  }
+
+  /**
+   * Get error message for process number field
+   */
+  getProcessNumberError(): string {
+    const control = this.addProcessForm.get('process_number');
+    if (control?.hasError('required') && control?.touched) {
+      return 'gestionProcesos.addProcess.errors.required';
+    }
+    if (control?.hasError('invalidProcessNumber') && control?.touched) {
+      return 'gestionProcesos.addProcess.errors.invalidFormat';
+    }
+    return '';
+  }
+
+  /**
+   * Only allow numeric input
+   */
+  onProcessNumberInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.value;
+    // Remove any non-numeric characters
+    const numericValue = value.replace(/\D/g, '');
+    // Limit to 23 digits
+    const limitedValue = numericValue.slice(0, 23);
+    
+    if (value !== limitedValue) {
+      input.value = limitedValue;
+      this.addProcessForm.patchValue({ process_number: limitedValue }, { emitEvent: false });
+    }
+  }
+}
