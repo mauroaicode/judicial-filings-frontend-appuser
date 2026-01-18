@@ -69,6 +69,7 @@
   },
   "navigation": {
     "dashboard": "Dashboard",
+    "gestionProcesos": "Process Management",
     "toggleSidebar": "Toggle sidebar"
   },
   "header": {
@@ -83,6 +84,102 @@
   },
   "dashboard": {
     "title": "Dashboard"
+  },
+  "gestionProcesos": {
+    "title": "Process Management",
+    "description": "Manage and consult all judicial processes",
+    "addProcess": {
+      "button": "Add Process",
+      "title": "Add New Process",
+      "processNumberLabel": "Process Number",
+      "processNumberPlaceholder": "Enter the process number (23 digits)",
+      "cancel": "Cancel",
+      "submit": "Add",
+      "submitting": "Adding...",
+      "close": "Close",
+      "recommendations": {
+        "title": "Recommendations",
+        "rule1": "The process number must contain exactly 23 digits",
+        "rule2": "Only integers are allowed (0-9)",
+        "rule3": "Spaces, letters or special characters are not allowed"
+      },
+      "errors": {
+        "required": "Process number is required",
+        "invalidFormat": "The process number must have exactly 23 numeric digits",
+        "generic": "Error adding process. Please try again."
+      },
+      "error": {
+        "generic": "Error adding process. Please try again."
+      }
+    },
+    "filters": {
+      "title": "Search Filters",
+      "processNumber": "Process Number",
+      "processNumberPlaceholder": "Ex: 76001333301320170009301",
+      "court": "Court",
+      "courtPlaceholder": "Court name",
+      "department": "Department",
+      "departmentPlaceholder": "Ex: VALLE DEL CAUCA",
+      "processType": "Process Type",
+      "processTypePlaceholder": "Ex: ADMINISTRATIVO",
+      "processClass": "Process Class",
+      "processClassPlaceholder": "Ex: ACCION DE REPARACION DIRECTA",
+      "location": "Location",
+      "locationPlaceholder": "Ex: CALI",
+      "status": "Status",
+      "statusPlaceholder": "Select status",
+      "statusActive": "Active",
+      "statusInactive": "Inactive",
+      "isPrivate": "Is Private",
+      "hasMultipleInstances": "Multiple Instances",
+      "processDateRange": "Process Date Range",
+      "processDateRangePlaceholder": "Select date range",
+      "createdAtRange": "Created At Date Range",
+      "createdAtRangePlaceholder": "Select date range",
+      "all": "All",
+      "yes": "Yes",
+      "no": "No",
+      "reset": "Clear Filters",
+      "search": "Search"
+    },
+    "table": {
+      "empty": "No processes available",
+      "processNumber": "Process Number",
+      "court": "Court",
+      "department": "Department",
+      "processType": "Type",
+      "processClass": "Class",
+      "processDate": "Process Date",
+      "lastActivityDate": "Last Activity",
+      "location": "Location",
+      "status": "Status",
+      "multipleInstances": "Multiple Instances"
+    },
+    "infoModal": {
+      "title": "Registered Process Information",
+      "close": "Close",
+      "multipleInstances": {
+        "title": "Multiple Instances Detected",
+        "message": "This process number has multiple instances. All related processes have been registered."
+      },
+      "privateProcesses": {
+        "title": "Private Processes Detected",
+        "message": "Found",
+        "messageCount": "private process(es) that were not registered."
+      },
+      "processDetails": {
+        "title": "Process Details",
+        "totalProcesses": "Total Processes",
+        "registeredCount": "Registered Processes"
+      }
+    }
+  },
+  "table": {
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "results": "results",
+    "perPage": "per page"
   }
 }
 

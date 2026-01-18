@@ -68,6 +68,7 @@
   },
   "navigation": {
     "dashboard": "Dashboard",
+    "gestionProcesos": "Gestión de Procesos",
     "toggleSidebar": "Alternar menú lateral"
   },
   "header": {
@@ -82,6 +83,102 @@
   },
   "dashboard": {
     "title": "Dashboard"
+  },
+  "gestionProcesos": {
+    "title": "Gestión de Procesos",
+    "description": "Gestiona y consulta todos los procesos judiciales",
+    "addProcess": {
+      "button": "Agregar Radicado",
+      "title": "Agregar Nuevo Radicado",
+      "processNumberLabel": "Número de Radicado",
+      "processNumberPlaceholder": "Ingrese el número de radicado (23 dígitos)",
+      "cancel": "Cancelar",
+      "submit": "Agregar",
+      "submitting": "Agregando...",
+      "close": "Cerrar",
+      "recommendations": {
+        "title": "Recomendaciones",
+        "rule1": "El número de radicado debe contener exactamente 23 dígitos",
+        "rule2": "Solo se permiten números enteros (0-9)",
+        "rule3": "No se permiten espacios, letras o caracteres especiales"
+      },
+      "errors": {
+        "required": "El número de radicado es requerido",
+        "invalidFormat": "El número de radicado debe tener exactamente 23 dígitos numéricos",
+        "generic": "Error al agregar el radicado. Por favor, intente nuevamente."
+      },
+      "error": {
+        "generic": "Error al agregar el radicado. Por favor, intente nuevamente."
+      }
+    },
+    "filters": {
+      "title": "Filtros de Búsqueda",
+      "processNumber": "Número de Radicado",
+      "processNumberPlaceholder": "Ej: 76001333301320170009301",
+      "court": "Juzgado",
+      "courtPlaceholder": "Nombre del juzgado",
+      "department": "Departamento",
+      "departmentPlaceholder": "Ej: VALLE DEL CAUCA",
+      "processType": "Tipo de Proceso",
+      "processTypePlaceholder": "Ej: ADMINISTRATIVO",
+      "processClass": "Clase de Proceso",
+      "processClassPlaceholder": "Ej: ACCION DE REPARACION DIRECTA",
+      "location": "Ubicación",
+      "locationPlaceholder": "Ej: CALI",
+      "status": "Estado",
+      "statusPlaceholder": "Seleccionar estado",
+      "statusActive": "Activo",
+      "statusInactive": "Inactivo",
+      "isPrivate": "Es Privado",
+      "hasMultipleInstances": "Múltiples Instancias",
+      "processDateRange": "Rango de Fecha de Proceso",
+      "processDateRangePlaceholder": "Seleccionar rango de fechas",
+      "createdAtRange": "Rango de Fecha de Creación",
+      "createdAtRangePlaceholder": "Seleccionar rango de fechas",
+      "all": "Todos",
+      "yes": "Sí",
+      "no": "No",
+      "reset": "Limpiar Filtros",
+      "search": "Buscar"
+    },
+    "table": {
+      "empty": "No hay procesos disponibles",
+      "processNumber": "Número de Radicado",
+      "court": "Juzgado",
+      "department": "Departamento",
+      "processType": "Tipo",
+      "processClass": "Clase",
+      "processDate": "Fecha de Proceso",
+      "lastActivityDate": "Última Actividad",
+      "location": "Ubicación",
+      "status": "Estado",
+      "multipleInstances": "Múltiples Instancias"
+    },
+    "infoModal": {
+      "title": "Información del Proceso Registrado",
+      "close": "Cerrar",
+      "multipleInstances": {
+        "title": "Múltiples Instancias Detectadas",
+        "message": "Este radicado tiene múltiples instancias. Se han registrado todos los procesos relacionados."
+      },
+      "privateProcesses": {
+        "title": "Procesos Privados Detectados",
+        "message": "Se encontraron",
+        "messageCount": "proceso(s) privado(s) que no se han registrado."
+      },
+      "processDetails": {
+        "title": "Detalles del Proceso",
+        "totalProcesses": "Total de Procesos",
+        "registeredCount": "Procesos Registrados"
+      }
+    }
+  },
+  "table": {
+    "showing": "Mostrando",
+    "to": "a",
+    "of": "de",
+    "results": "resultados",
+    "perPage": "por página"
   }
 }
 

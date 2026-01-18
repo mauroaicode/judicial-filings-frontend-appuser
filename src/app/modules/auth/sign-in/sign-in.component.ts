@@ -190,7 +190,7 @@ export class SignInComponent implements OnInit {
     }
 
     setTimeout(() => {
-      this._router.navigate([ROUTES_ADMIN.DASHBOARD]);
+      this._router.navigate([ROUTES_ADMIN.GESTION_PROCESOS]);
     }, 1000);
   }
 }

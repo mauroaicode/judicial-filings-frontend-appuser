@@ -1,11 +1,17 @@
 import { Routes } from '@angular/router';
 
 export default [
-  // Dashboard
+  // Dashboard (commented - not deleted, may be needed later)
+  // {
+  //   path: 'dashboard',
+  //   loadChildren: () =>
+  //     import('./dashboard/dashboard.routes').then((m) => m.default),
+  // },
+  // Gestión de Procesos
   {
-    path: 'dashboard',
+    path: 'gestion-procesos',
     loadChildren: () =>
-      import('./dashboard/dashboard.routes').then((m) => m.default),
+      import('./gestion-procesos/gestion-procesos.routes').then((m) => m.default),
   },
   // More admin routes will be added here as modules are created
   // Example structure for future modules with role guards:

@@ -91,21 +91,20 @@
                   [class.bg-accent]="isItemActive(item)"
                   [class.text-accent-content]="isItemActive(item)"
                 >
-                  @if (item.icon) {
+                  @if (item.icon && getIconPath(item)) {
                     <span class="flex-shrink-0 flex items-center justify-center">
-                      <!-- Icon placeholder - will be replaced with actual icon component -->
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         class="h-5 w-5"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
+                        stroke-width="2"
                       >
                         <path
                           stroke-linecap="round"
                           stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M4 6h16M4 12h16M4 18h16"
+                          [attr.d]="getIconPath(item)"
                         />
                       </svg>
                     </span>
@@ -142,7 +141,7 @@
                         class="flex items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors hover:bg-neutral-focus font-medium"
                         (click)="closeSidebar()"
                       >
-                        @if (child.icon) {
+                        @if (child.icon && getIconPath(child)) {
                           <span class="flex-shrink-0">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -150,12 +149,12 @@
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
+                              stroke-width="2"
                             >
                               <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16"
+                                [attr.d]="getIconPath(child)"
                               />
                             </svg>
                           </span>
@@ -182,21 +181,20 @@
                 [class.px-2]="!isOpen()"
                 (click)="navigateTo(item)"
               >
-                @if (item.icon) {
+                @if (item.icon && getIconPath(item)) {
                   <span class="flex-shrink-0 flex items-center justify-center">
-                    <!-- Icon placeholder -->
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       class="h-5 w-5"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
+                      stroke-width="2"
                     >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M4 6h16M4 12h16M4 18h16"
+                        [attr.d]="getIconPath(item)"
                       />
                     </svg>
                   </span>
