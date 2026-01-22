@@ -132,11 +132,54 @@ export class DataTableComponent {
 
   /**
    * Format date
-   * Handles date strings in format YYYY-MM-DD without timezone conversion issues
+   * Handles date strings in format YYYY-MM-DD or YYYY-MM-DD HH:mm:ss AM/PM without timezone conversion issues
    */
   formatDate(dateString: string): string {
     if (!dateString) return '';
 
+    // Handle date with time format: YYYY-MM-DD HH:mm:ss AM/PM
+    const dateWithAmPmMatch = dateString.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}):(\d{2}):(\d{2}) (AM|PM)$/);
+    if (dateWithAmPmMatch) {
+      const [, datePart, hoursStr, minutesStr, secondsStr, amPm] = dateWithAmPmMatch;
+      const [year, month, day] = datePart.split('-').map(Number);
+      let hours = parseInt(hoursStr, 10);
+      const minutes = parseInt(minutesStr, 10);
+      
+      // Convert to 24-hour format
+      if (amPm === 'PM' && hours !== 12) {
+        hours += 12;
+      } else if (amPm === 'AM' && hours === 12) {
+        hours = 0;
+      }
+      
+      const date = new Date(year, month - 1, day, hours, minutes);
+      return date.toLocaleString('es-ES', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      });
+    }
+
+    // Handle date with time format: YYYY-MM-DD HH:mm:ss (24-hour format)
+    if (dateString.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)) {
+      const [datePart, timePart] = dateString.split(' ');
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hours, minutes] = timePart.split(':').map(Number);
+      const date = new Date(year, month - 1, day, hours, minutes);
+      return date.toLocaleString('es-ES', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      });
+    }
+
+    // Handle date only format: YYYY-MM-DD
     if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
       const [year, month, day] = dateString.split('-').map(Number);
       const date = new Date(year, month - 1, day);
@@ -149,6 +192,22 @@ export class DataTableComponent {
 
     // Fallback for other date formats
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    
+    // Check if the date has time component
+    const hasTime = dateString.includes(':');
+    
+    if (hasTime) {
+      return date.toLocaleString('es-ES', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      });
+    }
+    
     return date.toLocaleDateString('es-ES', {
       year: 'numeric',
       month: '2-digit',
@@ -172,8 +231,9 @@ export class DataTableComponent {
 
   /**
    * Get sticky cell style
+   * Note: background-color is handled by CSS to allow hover effects
    */
   getStickyCellStyle(): string {
-    return 'position: -webkit-sticky !important; position: sticky !important; left: 0 !important; z-index: 500 !important; background-color: #ffffff !important; background: #ffffff !important; min-width: 240px !important; max-width: 240px !important; width: 240px !important; box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important; white-space: nowrap !important; overflow: visible !important; will-change: transform !important;';
+    return 'position: -webkit-sticky !important; position: sticky !important; left: 0 !important; z-index: 500 !important; min-width: 240px !important; max-width: 240px !important; width: 240px !important; box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important; white-space: nowrap !important; overflow: visible !important; will-change: transform !important;';
   }
 }

@@ -36,8 +36,8 @@
   <div class="card bg-base-100 shadow-sm">
     <div class="card-body">
       <h2 class="card-title text-lg mb-4">{{ 'gestionProcesos.filters.title' | transloco }}</h2>
-      <form [formGroup]="filterForm" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" autocomplete="off">
-        <!-- Row 1: Process Number, Status, Is Private -->
+      <form [formGroup]="filterForm" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" autocomplete="off">
+        <!-- Row 1: Process Number, Court, Process Class, Plaintiff -->
         <!-- Process Number Filter -->
         <div class="form-control">
           <label class="label">
@@ -52,6 +52,63 @@
             autocomplete="one-time-code"
             data-form-type="other"
             inputmode="numeric"
+          />
+        </div>
+
+        <!-- Court Filter -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">{{ 'gestionProcesos.filters.court' | transloco }}</span>
+          </label>
+          <input
+            type="text"
+            formControlName="court"
+            class="input input-bordered input-sm"
+            [placeholder]="'gestionProcesos.filters.courtPlaceholder' | transloco"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- Process Class Filter -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">{{ 'gestionProcesos.filters.processClass' | transloco }}</span>
+          </label>
+          <input
+            type="text"
+            formControlName="process_class"
+            class="input input-bordered input-sm"
+            [placeholder]="'gestionProcesos.filters.processClassPlaceholder' | transloco"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- Plaintiff Filter -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">{{ 'gestionProcesos.filters.plaintiff' | transloco }}</span>
+          </label>
+          <input
+            type="text"
+            formControlName="plaintiff"
+            class="input input-bordered input-sm"
+            [placeholder]="'gestionProcesos.filters.plaintiffPlaceholder' | transloco"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- Row 2: Defendant, Status, Has Multiple Instances, Process Date -->
+        <!-- Defendant Filter -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">{{ 'gestionProcesos.filters.defendant' | transloco }}</span>
+          </label>
+          <input
+            type="text"
+            formControlName="defendant"
+            class="input input-bordered input-sm"
+            [placeholder]="'gestionProcesos.filters.defendantPlaceholder' | transloco"
+            autocomplete="off"
           />
         </div>
 
@@ -70,22 +127,6 @@
           </select>
         </div>
 
-        <!-- Is Private Filter -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">{{ 'gestionProcesos.filters.isPrivate' | transloco }}</span>
-          </label>
-          <select
-            formControlName="is_private"
-            class="select select-bordered select-sm w-full"
-          >
-            <option [value]="null">{{ 'gestionProcesos.filters.all' | transloco }}</option>
-            <option [value]="true">{{ 'gestionProcesos.filters.yes' | transloco }}</option>
-            <option [value]="false">{{ 'gestionProcesos.filters.no' | transloco }}</option>
-          </select>
-        </div>
-
-        <!-- Row 2: Has Multiple Instances, Process Date Range, Created At Range -->
         <!-- Has Multiple Instances Filter -->
         <div class="form-control">
           <label class="label">
@@ -101,23 +142,34 @@
           </select>
         </div>
 
-        <!-- Process Date Range Filter -->
-        <div class="form-control">
-          <app-date-range-picker
-            [label]="'gestionProcesos.filters.processDateRange' | transloco"
-            [placeholder]="'gestionProcesos.filters.processDateRangePlaceholder' | transloco"
-            [size]="'sm'"
-            formControlName="process_date_range"
-          ></app-date-range-picker>
-        </div>
-
-        <!-- Created At Range Filter -->
+        <!-- Row 3: Process Date Range (Radicación), Created At Range, Last API Update Range -->
+        <!-- Process Date Range Filter (Fecha de Radicación) -->
         <div class="form-control">
           <app-date-range-picker
             [label]="'gestionProcesos.filters.createdAtRange' | transloco"
             [placeholder]="'gestionProcesos.filters.createdAtRangePlaceholder' | transloco"
             [size]="'sm'"
+            formControlName="process_date_range"
+          ></app-date-range-picker>
+        </div>
+
+        <!-- Created At Range Filter (Fecha de Creación del Registro) -->
+        <div class="form-control">
+          <app-date-range-picker
+            [label]="'gestionProcesos.filters.processDateRange' | transloco"
+            [placeholder]="'gestionProcesos.filters.processDateRangePlaceholder' | transloco"
+            [size]="'sm'"
             formControlName="created_at_range"
+          ></app-date-range-picker>
+        </div>
+
+        <!-- Last API Update Range Filter -->
+        <div class="form-control">
+          <app-date-range-picker
+            [label]="'gestionProcesos.filters.lastApiUpdateRange' | transloco"
+            [placeholder]="'gestionProcesos.filters.lastApiUpdateRangePlaceholder' | transloco"
+            [size]="'sm'"
+            formControlName="last_api_update_range"
           ></app-date-range-picker>
         </div>
       </form>
@@ -377,12 +429,6 @@
                   <div class="flex justify-between">
                     <span class="font-semibold text-base-content/70">{{ 'gestionProcesos.table.court' | transloco }}:</span>
                     <span class="text-base-content">{{ infoModalData()!.process.court }}</span>
-                  </div>
-                }
-                @if (infoModalData()!.process.department) {
-                  <div class="flex justify-between">
-                    <span class="font-semibold text-base-content/70">{{ 'gestionProcesos.table.department' | transloco }}:</span>
-                    <span class="text-base-content">{{ infoModalData()!.process.department }}</span>
                   </div>
                 }
                 <div class="flex justify-between">
