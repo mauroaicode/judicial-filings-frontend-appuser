@@ -112,13 +112,19 @@ export class DateRangePickerComponent implements ControlValueAccessor, AfterView
       },
     });
 
-    // Apply initial value if exists
-    if (this._currentValue) {
-      if (this._currentValue.from && this._currentValue.to) {
-        this.flatpickrInstance.setDate([this._currentValue.from, this._currentValue.to], false);
-      } else if (this._currentValue.from) {
-        this.flatpickrInstance.setDate([this._currentValue.from], false);
+    // Apply initial value if exists (check both _currentValue and form control value)
+    const initialValue = this._currentValue;
+    if (initialValue) {
+      if (initialValue.from && initialValue.to) {
+        this.flatpickrInstance.setDate([initialValue.from, initialValue.to], false);
+      } else if (initialValue.from) {
+        this.flatpickrInstance.setDate([initialValue.from], false);
+      } else {
+        this.flatpickrInstance.clear();
       }
+    } else {
+      // Ensure input is cleared if no value
+      this.flatpickrInstance.clear();
     }
 
     // Apply disabled state
@@ -138,7 +144,13 @@ export class DateRangePickerComponent implements ControlValueAccessor, AfterView
       } else if (value && value.from) {
         this.flatpickrInstance.setDate([value.from], false);
       } else {
+        // Clear the date picker when value is null or empty
         this.flatpickrInstance.clear();
+        // Also clear the input element display
+        const inputElement = this.inputElement()?.nativeElement;
+        if (inputElement) {
+          inputElement.value = '';
+        }
       }
     }
   }

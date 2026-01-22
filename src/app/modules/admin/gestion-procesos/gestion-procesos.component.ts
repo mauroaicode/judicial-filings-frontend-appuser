@@ -51,15 +51,25 @@ export class GestionProcesosComponent {
   // Filter form
   public filterForm: FormGroup = this._fb.group({
     process_number: [''],
+    court: [''],
+    process_class: [''],
+    plaintiff: [''],
+    defendant: [''],
     status: [''],
-    is_private: [null as boolean | null],
     has_multiple_instances: [null as boolean | null],
     process_date_range: [null as DateRange | null],
     created_at_range: [null as DateRange | null],
+    last_api_update_range: [null as DateRange | null],
   });
 
   // Table columns
   public columns: DataTableColumn[] = [
+    {
+      key: 'index',
+      label: 'gestionProcesos.table.index',
+      width: '60px',
+      align: 'center',
+    },
     {
       key: 'process_number',
       label: 'gestionProcesos.table.processNumber',
@@ -73,24 +83,35 @@ export class GestionProcesosComponent {
       sortable: true,
     },
     {
-      key: 'department',
-      label: 'gestionProcesos.table.department',
-      width: '150px',
-      sortable: true,
-    },
-    {
-      key: 'process_type',
-      label: 'gestionProcesos.table.processType',
-      width: '150px',
-      sortable: true,
-    },
-    {
       key: 'process_class',
       label: 'gestionProcesos.table.processClass',
       width: '200px',
     },
     {
-      key: 'process_date',
+      key: 'status_label',
+      label: 'gestionProcesos.table.status',
+      width: '120px',
+      align: 'center',
+    },
+    {
+      key: 'plaintiff',
+      label: 'gestionProcesos.table.plaintiff',
+      width: '200px',
+    },
+    {
+      key: 'defendant',
+      label: 'gestionProcesos.table.defendant',
+      width: '200px',
+    },
+    {
+      key: 'has_multiple_instances',
+      label: 'gestionProcesos.table.multipleInstances',
+      width: '150px',
+      align: 'center',
+      render: (value: boolean) => value ? 'Sí' : 'No',
+    },
+    {
+      key: 'created_at',
       label: 'gestionProcesos.table.processDate',
       width: '120px',
       align: 'center',
@@ -100,24 +121,6 @@ export class GestionProcesosComponent {
       label: 'gestionProcesos.table.lastActivityDate',
       width: '120px',
       align: 'center',
-    },
-    {
-      key: 'location',
-      label: 'gestionProcesos.table.location',
-      width: '120px',
-    },
-    {
-      key: 'status_label',
-      label: 'gestionProcesos.table.status',
-      width: '120px',
-      align: 'center',
-    },
-    {
-      key: 'has_multiple_instances',
-      label: 'gestionProcesos.table.multipleInstances',
-      width: '150px',
-      align: 'center',
-      render: (value: boolean) => value ? 'Sí' : 'No',
     },
   ];
 
@@ -141,11 +144,20 @@ export class GestionProcesosComponent {
     if (isValidValue(queryParams['process_number'])) {
       this.filterForm.patchValue({ process_number: queryParams['process_number'] });
     }
+    if (isValidValue(queryParams['court'])) {
+      this.filterForm.patchValue({ court: queryParams['court'] });
+    }
+    if (isValidValue(queryParams['process_class'])) {
+      this.filterForm.patchValue({ process_class: queryParams['process_class'] });
+    }
+    if (isValidValue(queryParams['plaintiff'])) {
+      this.filterForm.patchValue({ plaintiff: queryParams['plaintiff'] });
+    }
+    if (isValidValue(queryParams['defendant'])) {
+      this.filterForm.patchValue({ defendant: queryParams['defendant'] });
+    }
     if (isValidValue(queryParams['status'])) {
       this.filterForm.patchValue({ status: queryParams['status'] });
-    }
-    if (isValidValue(queryParams['is_private'])) {
-      this.filterForm.patchValue({ is_private: queryParams['is_private'] === 'true' });
     }
     if (isValidValue(queryParams['has_multiple_instances'])) {
       this.filterForm.patchValue({ has_multiple_instances: queryParams['has_multiple_instances'] === 'true' });
@@ -165,6 +177,13 @@ export class GestionProcesosComponent {
       };
       this.filterForm.patchValue({ created_at_range: dateRange });
     }
+    if (isValidValue(queryParams['last_api_update_from']) || isValidValue(queryParams['last_api_update_to'])) {
+      const dateRange: DateRange = {
+        from: isValidValue(queryParams['last_api_update_from']) ? queryParams['last_api_update_from'] : null,
+        to: isValidValue(queryParams['last_api_update_to']) ? queryParams['last_api_update_to'] : null,
+      };
+      this.filterForm.patchValue({ last_api_update_range: dateRange });
+    }
   }
 
   /**
@@ -177,11 +196,20 @@ export class GestionProcesosComponent {
     if (filters.process_number && filters.process_number.trim()) {
       queryParams['process_number'] = filters.process_number;
     }
+    if (filters.court && filters.court.trim()) {
+      queryParams['court'] = filters.court;
+    }
+    if (filters.process_class && filters.process_class.trim()) {
+      queryParams['process_class'] = filters.process_class;
+    }
+    if (filters.plaintiff && filters.plaintiff.trim()) {
+      queryParams['plaintiff'] = filters.plaintiff;
+    }
+    if (filters.defendant && filters.defendant.trim()) {
+      queryParams['defendant'] = filters.defendant;
+    }
     if (filters.status && filters.status.trim()) {
       queryParams['status'] = filters.status;
-    }
-    if (filters.is_private !== undefined && filters.is_private !== null) {
-      queryParams['is_private'] = filters.is_private.toString();
     }
     if (filters.has_multiple_instances !== undefined && filters.has_multiple_instances !== null) {
       queryParams['has_multiple_instances'] = filters.has_multiple_instances.toString();
@@ -197,6 +225,12 @@ export class GestionProcesosComponent {
     }
     if (filters.created_at_to && filters.created_at_to.trim()) {
       queryParams['created_at_to'] = filters.created_at_to;
+    }
+    if (filters.last_api_update_from && filters.last_api_update_from.trim()) {
+      queryParams['last_api_update_from'] = filters.last_api_update_from;
+    }
+    if (filters.last_api_update_to && filters.last_api_update_to.trim()) {
+      queryParams['last_api_update_to'] = filters.last_api_update_to;
     }
 
     if (includePage && page > 1) {
@@ -231,20 +265,27 @@ export class GestionProcesosComponent {
     const formValue = this.filterForm.value;
     const processDateRange: DateRange | null = formValue.process_date_range;
     const createdAtRange: DateRange | null = formValue.created_at_range;
+    const lastApiUpdateRange: DateRange | null = formValue.last_api_update_range;
 
     const filters: ProcessFilter = {
       process_number: formValue.process_number?.trim() || undefined,
+      court: formValue.court?.trim() || undefined,
+      process_class: formValue.process_class?.trim() || undefined,
+      plaintiff: formValue.plaintiff?.trim() || undefined,
+      defendant: formValue.defendant?.trim() || undefined,
       status: formValue.status?.trim() || undefined,
-      is_private: formValue.is_private !== null && formValue.is_private !== '' ? formValue.is_private : undefined,
       has_multiple_instances: formValue.has_multiple_instances !== null && formValue.has_multiple_instances !== '' ? formValue.has_multiple_instances : undefined,
-      process_date_from: processDateRange?.from || undefined,
-      process_date_to: processDateRange?.to || undefined,
-      created_at_from: createdAtRange?.from || undefined,
-      created_at_to: createdAtRange?.to || undefined,
+      process_date_from: processDateRange?.from && processDateRange.from.trim() ? processDateRange.from : undefined,
+      process_date_to: processDateRange?.to && processDateRange.to.trim() ? processDateRange.to : undefined,
+      created_at_from: createdAtRange?.from && createdAtRange.from.trim() ? createdAtRange.from : undefined,
+      created_at_to: createdAtRange?.to && createdAtRange.to.trim() ? createdAtRange.to : undefined,
+      last_api_update_from: lastApiUpdateRange?.from && lastApiUpdateRange.from.trim() ? lastApiUpdateRange.from : undefined,
+      last_api_update_to: lastApiUpdateRange?.to && lastApiUpdateRange.to.trim() ? lastApiUpdateRange.to : undefined,
       page,
       per_page: perPage,
     };
 
+    // Remove empty values, but keep date range params if at least one is set
     Object.keys(filters).forEach((key) => {
       const value = filters[key as keyof ProcessFilter];
       if (value === '' || value === null || value === undefined) {
@@ -285,7 +326,18 @@ export class GestionProcesosComponent {
    * Handle filter reset
    */
   onResetFilters(): void {
-    this.filterForm.reset();
+    this.filterForm.reset({
+      process_number: '',
+      court: '',
+      process_class: '',
+      plaintiff: '',
+      defendant: '',
+      status: '',
+      has_multiple_instances: null,
+      process_date_range: null,
+      created_at_range: null,
+      last_api_update_range: null,
+    });
 
     // Navigate with empty query params (no null values, just empty object)
     this._router.navigate([], {

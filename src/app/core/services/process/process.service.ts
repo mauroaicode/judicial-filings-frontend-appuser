@@ -38,23 +38,17 @@ export class ProcessService {
     if (filters.court) {
       params = params.set('court', filters.court);
     }
-    if (filters.department) {
-      params = params.set('department', filters.department);
-    }
-    if (filters.process_type) {
-      params = params.set('process_type', filters.process_type);
-    }
     if (filters.process_class) {
       params = params.set('process_class', filters.process_class);
     }
-    if (filters.location) {
-      params = params.set('location', filters.location);
+    if (filters.plaintiff) {
+      params = params.set('plaintiff', filters.plaintiff);
+    }
+    if (filters.defendant) {
+      params = params.set('defendant', filters.defendant);
     }
     if (filters.status) {
       params = params.set('status', filters.status);
-    }
-    if (filters.is_private !== undefined && filters.is_private !== null) {
-      params = params.set('is_private', filters.is_private.toString());
     }
     if (filters.has_multiple_instances !== undefined && filters.has_multiple_instances !== null) {
       params = params.set('has_multiple_instances', filters.has_multiple_instances.toString());
@@ -70,6 +64,12 @@ export class ProcessService {
     }
     if (filters.created_at_to) {
       params = params.set('created_at_to', filters.created_at_to);
+    }
+    if (filters.last_api_update_from) {
+      params = params.set('last_api_update_from', filters.last_api_update_from);
+    }
+    if (filters.last_api_update_to) {
+      params = params.set('last_api_update_to', filters.last_api_update_to);
     }
 
     const url = `${environment.apiBaseUrl}/processes`;

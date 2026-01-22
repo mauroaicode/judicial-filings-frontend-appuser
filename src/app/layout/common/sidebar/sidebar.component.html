@@ -11,13 +11,13 @@
 
 <!-- Sidebar -->
 <aside
-  class="fixed left-0 top-0 z-40 h-screen bg-neutral text-neutral-content transition-all duration-300 ease-in-out shadow-lg"
+  class="fixed left-0 top-0 z-40 h-screen max-h-screen bg-neutral text-neutral-content transition-all duration-300 ease-in-out shadow-lg overflow-hidden"
   [class.-translate-x-full]="!isOpen() && isMobile()"
   [class.translate-x-0]="isOpen() || !isMobile()"
   [class.w-64]="isOpen()"
   [class.w-16]="!isOpen() && !isMobile()"
 >
-  <div class="flex h-full flex-col overflow-hidden">
+  <div class="flex h-full max-h-screen flex-col overflow-hidden">
     <!-- Sidebar Header -->
     <div
       class="flex h-16 items-center text-center border-b border-neutral/20 transition-all"
@@ -62,9 +62,10 @@
     </div>
 
     <!-- Navigation Items -->
-    <nav class="flex-1 overflow-y-auto transition-all"
+    <nav class="flex-1 overflow-y-auto overflow-x-hidden transition-all"
          [class.p-4]="isOpen()"
-         [class.p-2]="!isOpen()">
+         [class.p-2]="!isOpen()"
+         style="max-height: calc(100vh - 4rem);">
       <ul class="space-y-1">
         @for (item of navigation().default; track item.id) {
           @if (item.type === 'divider') {

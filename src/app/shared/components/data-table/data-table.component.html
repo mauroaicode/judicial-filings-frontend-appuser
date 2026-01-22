@@ -44,7 +44,7 @@
       <tbody>
         @for (row of data(); track row.id) {
           <tr
-            class="cursor-pointer"
+            class="cursor-pointer group"
             (click)="onRowClick(row)"
           >
             @for (column of columns(); track column.key) {
@@ -54,6 +54,7 @@
                 [class.text-right]="column.align === 'right'"
                 [class.sticky-cell]="column.key === 'process_number'"
                 [class.whitespace-nowrap]="column.key === 'process_number'"
+                [class.group-hover:bg-[rgba(0,211,187,0.2)]]="column.key === 'process_number'"
                 [attr.style]="column.key === 'process_number' ? getStickyCellStyle() : null"
               >
                 @if (column.key === 'status_label') {
@@ -65,8 +66,20 @@
                   >
                     {{ row.status_label }}
                   </span>
-                } @else if ((column.key === 'process_date' || column.key === 'last_activity_date' || column.key === 'created_at') && row[column.key]) {
+                } @else if (column.key === 'last_activity_date') {
+                  @if (row[column.key]) {
+                    {{ formatDate(row[column.key]) }}
+                  } @else {
+                    <span class="text-base-content/50">-</span>
+                  }
+                } @else if ((column.key === 'process_date' || column.key === 'created_at') && row[column.key]) {
                   {{ formatDate(row[column.key]) }}
+                } @else if (column.key === 'plaintiff' || column.key === 'defendant') {
+                  @if (row[column.key]) {
+                    {{ getCellValue(row, column) }}
+                  } @else {
+                    <span class="text-base-content/50">-</span>
+                  }
                 } @else if (column.key === 'process_number') {
                   <span class="whitespace-nowrap inline-block relative z-10" [title]="getCellValue(row, column)" style="max-width: 100%; overflow: visible;">
                     {{ getCellValue(row, column) }}
@@ -84,9 +97,9 @@
 
   <!-- Pagination -->
   @if (pagination(); as paginationInfo) {
-    <div class="flex flex-col items-center gap-4 mt-6 px-4 pb-4 sm:flex-row sm:justify-between">
+    <div class="pagination-container">
       <!-- Results info -->
-      <div class="text-sm text-base-content/70">
+      <div class="pagination-results-info">
         @let range = getShowingRange();
         {{ 'table.showing' | transloco }}
         <span class="font-semibold">{{ range.from }}</span>
@@ -98,7 +111,7 @@
       </div>
 
       <!-- Pagination controls -->
-      <div class="join">
+      <div class="pagination-controls join">
         <!-- First page -->
         <button
           class="join-item btn btn-sm"
@@ -148,7 +161,7 @@
       </div>
 
       <!-- Page size selector -->
-      <div class="form-control">
+      <div class="pagination-page-size">
         <select
           class="select select-bordered select-sm"
           [value]="paginationInfo.per_page"

@@ -2,20 +2,20 @@
  * Process Model - Based on API response
  */
 export interface Process {
+  index: number;
   id: string;
   process_number: string;
   court: string;
-  department: string;
-  process_type: string;
   process_class: string;
   subclass_process: string;
   process_date: string;
-  last_activity_date: string;
-  location: string;
+  last_activity_date: string | null;
   is_private: boolean;
   has_multiple_instances: boolean;
   status_label: string;
   created_at: string;
+  plaintiff: string | null;
+  defendant: string | null;
 }
 
 /**
@@ -24,17 +24,17 @@ export interface Process {
 export interface ProcessFilter {
   process_number?: string;
   court?: string;
-  department?: string;
-  process_type?: string;
   process_class?: string;
-  location?: string;
+  plaintiff?: string;
+  defendant?: string;
   status?: string; // 'active' | 'inactive'
-  is_private?: boolean;
   has_multiple_instances?: boolean;
   process_date_from?: string;
   process_date_to?: string;
   created_at_from?: string;
   created_at_to?: string;
+  last_api_update_from?: string;
+  last_api_update_to?: string;
   page?: number;
   per_page?: number;
 }
