@@ -359,8 +359,7 @@ export class GestionProcesosComponent {
    * Handle row click
    */
   onRowClick(process: Process): void {
-    // TODO: Navigate to process detail when detail page is created
-    console.log('Process clicked:', process);
+    this._router.navigate(['/admin/gestion-procesos', process.id]);
   }
 
   /**

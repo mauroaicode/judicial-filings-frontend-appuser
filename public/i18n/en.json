@@ -175,6 +175,64 @@
       }
     }
   },
+  "processDetail": {
+    "title": "Process Detail",
+    "back": "Back",
+    "generalInfo": "General Information",
+    "processNumber": "Process Number",
+    "processId": "Process ID",
+    "court": "Court",
+    "department": "Department",
+    "processType": "Process Type",
+    "processClass": "Process Class",
+    "subclassProcess": "Subclass Process",
+    "processDate": "Filing Date",
+    "lastActivityDate": "Last Activity Date",
+    "location": "Location",
+    "status": "Status",
+    "isPrivate": "Is Private",
+    "hasMultipleInstances": "Has Multiple Instances",
+    "lastUpdate": "Last Update",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At",
+    "yes": "Yes",
+    "no": "No",
+    "subjects": {
+      "title": "Process Subjects",
+      "empty": "No process subjects available",
+      "table": {
+        "subjectType": "Subject Type",
+        "name": "Name or Business Name",
+        "identification": "Identification",
+        "isCited": "Is Cited"
+      }
+    },
+    "actions": {
+      "title": "Actions",
+      "empty": "No actions available",
+      "filters": {
+        "title": "Search Filters",
+        "actionDateRange": "Action Date Range",
+        "actionDateRangePlaceholder": "Select date range",
+        "registrationDateRange": "Registration Date Range",
+        "registrationDateRangePlaceholder": "Select date range",
+        "search": "Search",
+        "searchPlaceholder": "Search in action or annotation",
+        "reset": "Clear Filters"
+      },
+      "table": {
+        "actionDate": "Action Date",
+        "registrationDate": "Registration Date",
+        "action": "Action",
+        "annotation": "Annotation",
+        "court": "Court"
+      }
+    },
+    "error": {
+      "idNotFound": "Process ID not found in route params",
+      "loadError": "Error loading process detail"
+    }
+  },
   "table": {
     "showing": "Showing",
     "to": "to",

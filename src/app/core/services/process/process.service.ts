@@ -8,6 +8,9 @@ import {
   ProcessResponse,
   ProcessResponseMeta,
   CreateProcessResponse,
+  ProcessDetailResponse,
+  ActionFilter,
+  ActionResponse,
 } from '@app/core/models/process/process.model';
 
 @Injectable({
@@ -104,5 +107,53 @@ export class ProcessService {
     return this._http.post<CreateProcessResponse>(url, {
       process_number: processNumber,
     });
+  }
+
+  /**
+   * Get process detail by ID
+   *
+   * @param id - Process ID
+   * @returns Observable with process detail response
+   */
+  getProcessDetail(id: string): Observable<ProcessDetailResponse> {
+    const url = `${environment.apiBaseUrl}/processes/${id}`;
+    return this._http.get<ProcessDetailResponse>(url);
+  }
+
+  /**
+   * Get process actions with filters and pagination
+   *
+   * @param id - Process ID
+   * @param filters - Filter options
+   * @returns Observable with actions response
+   */
+  getProcessActions(id: string, filters: ActionFilter = {}): Observable<ActionResponse> {
+    let params = new HttpParams();
+
+    if (filters.page) {
+      params = params.set('page', filters.page.toString());
+    }
+    if (filters.per_page) {
+      params = params.set('per_page', filters.per_page.toString());
+    }
+
+    if (filters.action_date_from) {
+      params = params.set('action_date_from', filters.action_date_from);
+    }
+    if (filters.action_date_to) {
+      params = params.set('action_date_to', filters.action_date_to);
+    }
+    if (filters.registration_date_from) {
+      params = params.set('registration_date_from', filters.registration_date_from);
+    }
+    if (filters.registration_date_to) {
+      params = params.set('registration_date_to', filters.registration_date_to);
+    }
+    if (filters.search) {
+      params = params.set('search', filters.search);
+    }
+
+    const url = `${environment.apiBaseUrl}/processes/${id}/actions`;
+    return this._http.get<ActionResponse>(url, { params });
   }
 }
