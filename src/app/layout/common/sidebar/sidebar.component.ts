@@ -14,6 +14,7 @@ import { NavigationService } from '@app/core/navigation/navigation.service';
 import { NavigationItem } from '@app/core/models/navigation/navigation-item.model';
 import { STORAGE } from '@app/core/constants/storage.constant';
 import { environment } from '@app/core/config/environment.config';
+import { IconService } from '@app/core/services/icon/icon.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -28,6 +29,7 @@ export class SidebarComponent {
   private _navigationService = inject(NavigationService);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
+  private _iconService = inject(IconService);
 
   // Sidebar state - load from localStorage or default to true
   public isOpen = signal<boolean>(this._loadSidebarState());
@@ -181,6 +183,16 @@ export class SidebarComponent {
     } catch (error) {
       console.error('Error saving sidebar state:', error);
     }
+  }
+
+  /**
+   * Get icon path for a navigation item
+   * @param item - Navigation item
+   * @returns SVG path string
+   */
+  getIconPath(item: NavigationItem): string {
+    if (!item.icon) return '';
+    return this._iconService.getIconPath(item.icon);
   }
 }
 

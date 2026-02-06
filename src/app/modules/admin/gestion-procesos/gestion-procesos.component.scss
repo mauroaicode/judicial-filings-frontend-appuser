@@ -1,0 +1,49 @@
+// Gestión de Procesos component styles
+
+// Ensure form controls always have labels above inputs, regardless of screen size
+form {
+  .form-control {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100%;
+    
+    .label {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      justify-content: flex-start !important;
+      padding-bottom: 0.5rem !important;
+      margin-bottom: 0 !important;
+      width: 100% !important;
+      
+      .label-text {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: hsl(var(--bc) / 0.8);
+        display: block;
+        width: 100%;
+        text-align: left;
+      }
+    }
+    
+    // Ensure inputs, selects, and date pickers take full width
+    .input,
+    .select,
+    app-date-range-picker {
+      width: 100% !important;
+      margin-top: 0 !important;
+    }
+    
+    // Ensure date range picker component maintains vertical layout
+    app-date-range-picker {
+      display: flex !important;
+      flex-direction: column !important;
+      
+      .form-control {
+        display: flex !important;
+        flex-direction: column !important;
+      }
+    }
+  }
+}

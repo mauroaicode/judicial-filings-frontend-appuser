@@ -1,0 +1,328 @@
+<div class="w-full">
+  <!-- Page Header -->
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-base-content md:text-3xl">
+        {{ 'processDetail.title' | transloco }}
+      </h1>
+      @if (process()) {
+        <p class="mt-1 text-sm text-base-content/70">
+          {{ process()!.process_number }}
+        </p>
+      }
+    </div>
+    @if (process() && process()!.last_api_update) {
+      <div class="text-right">
+        <h2 class="text-2xl font-bold text-base-content md:text-3xl">
+          {{ 'processDetail.lastUpdate' | transloco }}
+        </h2>
+        <p class="mt-1 text-sm text-base-content/70">
+          {{ formatDateSafe(process()!.last_api_update, 'short') }}
+        </p>
+      </div>
+    }
+  </div>
+
+  <!-- Content -->
+  <div class="space-y-6">
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error() && !loading()) {
+    <div class="alert alert-error">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m6-8a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <span>{{ error() | transloco }}</span>
+    </div>
+  }
+
+  <!-- Process Detail -->
+  @if (process() && !loading()) {
+    <div class="space-y-4">
+      <!-- General Information -->
+      <div class="collapse collapse-arrow bg-base-100 border border-base-300">
+        <input type="radio" name="process-accordion" checked="checked" />
+        <div class="collapse-title text-xl font-medium">
+          {{ 'processDetail.generalInfo' | transloco }}
+        </div>
+        <div class="collapse-content">
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.processNumber' | transloco }}:</span>
+              <p class="text-base-content">{{ process()!.process_number }}</p>
+            </div>
+            <div>
+              <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.processId' | transloco }}:</span>
+              <p class="text-base-content">{{ process()!.process_id }}</p>
+            </div>
+            <div>
+              <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.court' | transloco }}:</span>
+              <p class="text-base-content">{{ process()!.court }}</p>
+            </div>
+            @if (process()!.department) {
+              <div>
+                <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.department' | transloco }}:</span>
+                <p class="text-base-content">{{ process()!.department }}</p>
+              </div>
+            }
+            <div>
+              <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.processType' | transloco }}:</span>
+              <p class="text-base-content">{{ process()!.process_type }}</p>
+            </div>
+            <div>
+              <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.processClass' | transloco }}:</span>
+              <p class="text-base-content">{{ process()!.process_class }}</p>
+            </div>
+            <div>
+              <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.subclassProcess' | transloco }}:</span>
+              <p class="text-base-content">{{ process()!.subclass_process }}</p>
+            </div>
+            <div>
+              <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.processDate' | transloco }}:</span>
+              <p class="text-base-content">{{ formatDateSafe(process()!.process_date, 'shortDate') }}</p>
+            </div>
+            @if (process()!.last_activity_date) {
+              <div>
+                <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.lastActivityDate' | transloco }}:</span>
+                <p class="text-base-content">{{ formatDateSafe(process()!.last_activity_date, 'short') }}</p>
+              </div>
+            }
+            <div>
+              <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.location' | transloco }}:</span>
+              <p class="text-base-content">{{ process()!.location }}</p>
+            </div>
+            <div>
+              <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.status' | transloco }}:</span>
+              <p class="text-base-content">
+                <span [class]="'badge ' + getStatusClass(process()!.status_label)">
+                  {{ process()!.status_label }}
+                </span>
+              </p>
+            </div>
+            <div>
+              <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.isPrivate' | transloco }}:</span>
+              <p class="text-base-content">
+                <span [class]="'badge ' + (process()!.is_private ? 'badge-warning' : 'badge-success')">
+                  {{ process()!.is_private ? ('processDetail.yes' | transloco) : ('processDetail.no' | transloco) }}
+                </span>
+              </p>
+            </div>
+            <div>
+              <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.hasMultipleInstances' | transloco }}:</span>
+              <p class="text-base-content">
+                <span [class]="'badge ' + (process()!.has_multiple_instances ? 'badge-warning' : 'badge-success')">
+                  {{ process()!.has_multiple_instances ? ('processDetail.yes' | transloco) : ('processDetail.no' | transloco) }}
+                </span>
+              </p>
+            </div>
+            <div>
+              <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.createdAt' | transloco }}:</span>
+              <p class="text-base-content">{{ formatDateSafe(process()!.created_at, 'short') }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subjects Section -->
+      <div class="collapse collapse-arrow bg-base-100 border border-base-300 shadow-sm">
+        <input type="radio" name="process-accordion" />
+        <div class="collapse-title text-xl font-medium">
+          {{ 'processDetail.subjects.title' | transloco }}
+        </div>
+        <div class="collapse-content">
+          @if (subjects().length === 0) {
+            <div class="text-center py-8">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-16 w-16 mx-auto text-base-content/30 mb-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              <p class="text-base-content/70">{{ 'processDetail.subjects.empty' | transloco }}</p>
+            </div>
+          } @else {
+            <div class="overflow-x-auto">
+              <table class="table table-zebra w-full">
+                <thead>
+                  <tr>
+                    <th>{{ 'processDetail.subjects.table.subjectType' | transloco }}</th>
+                    <th>{{ 'processDetail.subjects.table.name' | transloco }}</th>
+                    <th>{{ 'processDetail.subjects.table.identification' | transloco }}</th>
+                    <th>{{ 'processDetail.subjects.table.isCited' | transloco }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (subject of subjects(); track subject.id) {
+                    <tr>
+                      <td>
+                        <span [class]="'badge ' + (subject.subject_type === 'Demandante' ? 'badge-primary' : 'badge-secondary')">
+                          {{ subject.subject_type }}
+                        </span>
+                      </td>
+                      <td>{{ subject.name_or_business_name }}</td>
+                      <td>
+                        @if (subject.identification) {
+                          {{ subject.identification }}
+                        } @else {
+                          <span class="text-base-content/50">-</span>
+                        }
+                      </td>
+                      <td>
+                        <span [class]="'badge ' + (subject.is_cited ? 'badge-success' : 'badge-warning')">
+                          {{ subject.is_cited ? ('processDetail.yes' | transloco) : ('processDetail.no' | transloco) }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Actions Section -->
+      <div class="collapse collapse-arrow bg-base-100 border border-base-300 shadow-sm">
+        <input type="radio" name="process-accordion" />
+        <div class="collapse-title text-xl font-medium">
+          {{ 'processDetail.actions.title' | transloco }}
+        </div>
+        <div class="collapse-content">
+          <!-- Filters -->
+          <div class="card bg-base-100 shadow-sm mb-4">
+            <div class="card-body">
+              <h3 class="card-title text-lg mb-4">{{ 'processDetail.actions.filters.title' | transloco }}</h3>
+              <form [formGroup]="actionFilterForm" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" autocomplete="off">
+                <!-- Action Date Range Filter -->
+                <div class="form-control">
+                  <app-date-range-picker
+                    [label]="'processDetail.actions.filters.actionDateRange' | transloco"
+                    [placeholder]="'processDetail.actions.filters.actionDateRangePlaceholder' | transloco"
+                    [size]="'sm'"
+                    formControlName="action_date_range"
+                  ></app-date-range-picker>
+                </div>
+
+                <!-- Registration Date Range Filter -->
+                <div class="form-control">
+                  <app-date-range-picker
+                    [label]="'processDetail.actions.filters.registrationDateRange' | transloco"
+                    [placeholder]="'processDetail.actions.filters.registrationDateRangePlaceholder' | transloco"
+                    [size]="'sm'"
+                    formControlName="registration_date_range"
+                  ></app-date-range-picker>
+                </div>
+
+                <!-- Search Filter -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text">{{ 'processDetail.actions.filters.search' | transloco }}</span>
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="search"
+                    class="input input-bordered input-sm"
+                    [placeholder]="'processDetail.actions.filters.searchPlaceholder' | transloco"
+                    autocomplete="off"
+                  />
+                </div>
+              </form>
+
+              <!-- Filter Actions -->
+              <div class="card-actions justify-end mt-4">
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-sm"
+                  (click)="onResetActionFilters()"
+                >
+                  {{ 'processDetail.actions.filters.reset' | transloco }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  (click)="onSearchActions()"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  {{ 'processDetail.actions.filters.search' | transloco }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions Table -->
+          @if (actions().length === 0 && !loadingActions()) {
+            <div class="text-center py-8">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-16 w-16 mx-auto text-base-content/30 mb-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              <p class="text-base-content/70">{{ 'processDetail.actions.empty' | transloco }}</p>
+            </div>
+          } @else {
+            <div class="card bg-base-100 shadow-sm">
+              <div class="card-body p-0">
+                <app-data-table
+                  [columns]="actionColumns"
+                  [data]="actions()"
+                  [pagination]="actionsPagination()"
+                  [loading]="loadingActions()"
+                  [emptyMessage]="'processDetail.actions.empty' | transloco"
+                  (pageChange)="onActionsPageChange($event)"
+                ></app-data-table>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+  </div>
+</div>

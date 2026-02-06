@@ -10,8 +10,8 @@ export const COLORS = {
   // Primary colors
   primary: '#161326',
   
-  // Accent colors
-  yellowGreen: '#C0FAA0',
+  // Accent colors (yellowGreen usado como accent en tema; versión más oscura para mejor legibilidad)
+  yellowGreen: '#7CB855',
   orchid: '#C388F7',
   khaki: '#ECFF79',
   lightSkyBlue: '#AFC0FF',

@@ -6,11 +6,11 @@ import { NavigationItem } from '@app/core/models/navigation/navigation-item.mode
  */
 export const DEFAULT_NAVIGATION: NavigationItem[] = [
   {
-    id: 'dashboard',
-    title: 'navigation.dashboard',
+    id: 'gestion-procesos',
+    title: 'navigation.gestionProcesos',
     type: 'basic',
-    icon: 'dashboard',
-    link: '/admin/dashboard',
+    icon: 'gestion-procesos',
+    link: '/admin/gestion-procesos',
   },
   // More items will be added here as needed
 ];

@@ -68,6 +68,7 @@
   },
   "navigation": {
     "dashboard": "Dashboard",
+    "gestionProcesos": "Gestión de Procesos",
     "toggleSidebar": "Alternar menú lateral"
   },
   "header": {
@@ -81,7 +82,224 @@
     "signOut": "Cerrar Sesión"
   },
   "dashboard": {
-    "title": "Dashboard"
+    "title": "Dashboard",
+    "stats": {
+      "title": "Estadísticas del dashboard",
+      "totalProcesses": "Total de procesos",
+      "activeProcesses": "Procesos activos",
+      "inactiveProcesses": "Procesos inactivos",
+      "notifications": {
+        "actuacion": "Notificaciones por actuación",
+        "sujetoProcesal": "Notificaciones por sujeto procesal",
+        "actuacionAlerta": "Alertas de actuación"
+      },
+      "viewDetail": "Ver detalle",
+      "empty": "No hay estadísticas disponibles"
+    }
+  },
+  "notificationsDrawer": {
+    "title": {
+      "actuacion": "Notificaciones por actuación",
+      "sujeto_procesal": "Notificaciones por sujeto procesal",
+      "actuacion_alerta": "Alertas de actuación"
+    },
+    "description": {
+      "actuacion": "Listado de notificaciones asociadas a actuaciones judiciales.",
+      "sujeto_procesal": "Listado de notificaciones asociadas a sujetos procesales.",
+      "actuacion_alerta": "Listado de alertas prioritarias de actuaciones (consulta, apelación, doble instancia)."
+    },
+    "close": "Cerrar",
+    "loading": "Cargando notificaciones...",
+    "scrollForMore": "Desplaza hacia abajo para cargar más",
+    "emptyWatermark": "Sin datos",
+    "emptyTitle": "No hay datos para mostrar",
+    "emptyDescription": {
+      "actuacion": "No existen notificaciones por actuación en este momento.",
+      "sujeto_procesal": "No existen notificaciones por sujeto procesal en este momento.",
+      "actuacion_alerta": "No existen alertas de actuación en este momento."
+    },
+    "markAllAsViewed": "Marcar todas como vistas",
+    "markSelectedAsViewed": "Marcar seleccionadas como vistas",
+    "markSelectedAsViewedWithCount": "Marcar seleccionadas como vistas ({{count}})",
+    "markedCountSuccess": "Se marcaron {{count}} como vistas",
+    "confirm": {
+      "markAllTitle": "Marcar todas como vistas",
+      "markAllMessage": "¿Desea marcar las {{total}} notificaciones como vistas?",
+      "markSelectedTitle": "Marcar como vistas",
+      "markSelectedMessage": "¿Desea marcar las {{count}} notificaciones seleccionadas como vistas?",
+      "confirmButton": "Confirmar",
+      "cancelButton": "Cancelar"
+    },
+    "table": {
+      "processNumber": "Número de radicado",
+      "action": "Actuación",
+      "annotation": "Anotación",
+      "actionDate": "Fecha de actuación",
+      "registrationDate": "Fecha de registro",
+      "notifiedWhen": "Notificado",
+      "subjects": "Sujetos procesales",
+      "seeMoreSubjects": "Ver más ({{count}})",
+      "seeLess": "Ver menos",
+      "subjectType": "Tipo de sujeto",
+      "nameOrBusinessName": "Nombre o razón social",
+      "identification": "Identificación",
+      "empty": "No hay notificaciones"
+    }
+  },
+  "gestionProcesos": {
+    "title": "Gestión de Procesos",
+    "description": "Gestiona y consulta todos los procesos judiciales",
+    "addProcess": {
+      "button": "Agregar Radicado",
+      "title": "Agregar Nuevo Radicado",
+      "processNumberLabel": "Número de Radicado",
+      "processNumberPlaceholder": "Ingrese el número de radicado (23 dígitos)",
+      "cancel": "Cancelar",
+      "submit": "Agregar",
+      "submitting": "Agregando...",
+      "close": "Cerrar",
+      "recommendations": {
+        "title": "Recomendaciones",
+        "rule1": "El número de radicado debe contener exactamente 23 dígitos",
+        "rule2": "Solo se permiten números enteros (0-9)",
+        "rule3": "No se permiten espacios, letras o caracteres especiales"
+      },
+      "errors": {
+        "required": "El número de radicado es requerido",
+        "invalidFormat": "El número de radicado debe tener exactamente 23 dígitos numéricos",
+        "generic": "Error al agregar el radicado. Por favor, intente nuevamente."
+      },
+      "error": {
+        "generic": "Error al agregar el radicado. Por favor, intente nuevamente."
+      }
+    },
+    "filters": {
+      "title": "Filtros de Búsqueda",
+      "processNumber": "Número de Radicado",
+      "processNumberPlaceholder": "Ej: 76001333301320170009301",
+      "court": "Despacho",
+      "courtPlaceholder": "Ej: 006",
+      "processClass": "Clase de Proceso",
+      "processClassPlaceholder": "Ej: Ejecutivo",
+      "plaintiff": "Demandante",
+      "plaintiffPlaceholder": "Ej: JUAN PEREZ",
+      "defendant": "Demandado",
+      "defendantPlaceholder": "Ej: EMPRESA ABC",
+      "status": "Estado",
+      "statusPlaceholder": "Seleccionar estado",
+      "statusActive": "Activo",
+      "statusInactive": "Inactivo",
+      "hasMultipleInstances": "Múltiples Instancias",
+      "processDate": "Fecha de Registro",
+      "processDateRange": "Rango de Fecha de Registro",
+      "processDateRangePlaceholder": "Seleccionar rango de fechas",
+      "createdAt": "Fecha de Creación",
+      "createdAtRange": "Rango de Fecha de Radicación",
+      "createdAtRangePlaceholder": "Seleccionar rango de fechas",
+      "lastApiUpdateRange": "Rango de Última Actualización Rama Judicial",
+      "lastApiUpdateRangePlaceholder": "Seleccionar rango de fechas",
+      "all": "Todos",
+      "yes": "Sí",
+      "no": "No",
+      "reset": "Limpiar Filtros",
+      "search": "Buscar"
+    },
+    "table": {
+      "empty": "No hay procesos disponibles",
+      "index": "#",
+      "processNumber": "Número de Radicación",
+      "court": "Despacho",
+      "processClass": "Clase de Proceso",
+      "status": "Estado",
+      "plaintiff": "Demandante (s)",
+      "defendant": "Demandados (s)",
+      "multipleInstances": "Múltiples instancias",
+      "processDate": "Fecha de Registro",
+      "lastActivityDate": "Fecha Ultima Actuación"
+    },
+    "infoModal": {
+      "title": "Información del Proceso Registrado",
+      "close": "Cerrar",
+      "multipleInstances": {
+        "title": "Múltiples Instancias Detectadas",
+        "message": "Este radicado tiene múltiples instancias. Se han registrado todos los procesos relacionados."
+      },
+      "privateProcesses": {
+        "title": "Procesos Privados Detectados",
+        "message": "Se encontraron",
+        "messageCount": "proceso(s) privado(s) que no se han registrado."
+      },
+      "processDetails": {
+        "title": "Detalles del Proceso",
+        "totalProcesses": "Total de Procesos",
+        "registeredCount": "Procesos Registrados"
+      }
+    }
+  },
+  "processDetail": {
+    "title": "Detalle del Proceso",
+    "back": "Volver",
+    "generalInfo": "Información General",
+    "processNumber": "Número de Radicado",
+    "processId": "ID del Proceso",
+    "court": "Despacho",
+    "department": "Departamento",
+    "processType": "Tipo de Proceso",
+    "processClass": "Clase de Proceso",
+    "subclassProcess": "Subclase de Proceso",
+    "processDate": "Fecha de Radicación",
+    "lastActivityDate": "Fecha de Última Actuación",
+    "location": "Ubicación",
+    "status": "Estado",
+    "isPrivate": "Es Privado",
+    "hasMultipleInstances": "Tiene Múltiples Instancias",
+    "lastUpdate": "Última Actualización",
+    "createdAt": "Fecha de Creación",
+    "updatedAt": "Fecha de Actualización",
+    "yes": "Sí",
+    "no": "No",
+    "subjects": {
+      "title": "Sujetos Procesales",
+      "empty": "No hay sujetos procesales disponibles",
+      "table": {
+        "subjectType": "Tipo de Sujeto",
+        "name": "Nombre o Razón Social",
+        "identification": "Identificación",
+        "isCited": "Citado"
+      }
+    },
+    "actions": {
+      "title": "Actuaciones",
+      "empty": "No hay actuaciones disponibles",
+      "filters": {
+        "title": "Filtros de Búsqueda",
+        "actionDateRange": "Rango de Fecha de Actuación",
+        "actionDateRangePlaceholder": "Seleccionar rango de fechas",
+        "registrationDateRange": "Rango de Fecha de Registro",
+        "registrationDateRangePlaceholder": "Seleccionar rango de fechas",
+        "search": "Buscar",
+        "searchPlaceholder": "Buscar en acción o anotación",
+        "reset": "Limpiar Filtros"
+      },
+      "table": {
+        "actionDate": "Fecha de Actuación",
+        "registrationDate": "Fecha de Registro",
+        "action": "Actuación",
+        "annotation": "Anotación",
+        "court": "Despacho"
+      }
+    },
+    "error": {
+      "idNotFound": "ID del proceso no encontrado en los parámetros de la ruta",
+      "loadError": "Error al cargar el detalle del proceso"
+    }
+  },
+  "table": {
+    "showing": "Mostrando",
+    "to": "a",
+    "of": "de",
+    "results": "resultados",
+    "perPage": "por página"
   }
 }
 
