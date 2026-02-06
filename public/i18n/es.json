@@ -82,7 +82,69 @@
     "signOut": "Cerrar Sesión"
   },
   "dashboard": {
-    "title": "Dashboard"
+    "title": "Dashboard",
+    "stats": {
+      "title": "Estadísticas del dashboard",
+      "totalProcesses": "Total de procesos",
+      "activeProcesses": "Procesos activos",
+      "inactiveProcesses": "Procesos inactivos",
+      "notifications": {
+        "actuacion": "Notificaciones por actuación",
+        "sujetoProcesal": "Notificaciones por sujeto procesal",
+        "actuacionAlerta": "Alertas de actuación"
+      },
+      "viewDetail": "Ver detalle",
+      "empty": "No hay estadísticas disponibles"
+    }
+  },
+  "notificationsDrawer": {
+    "title": {
+      "actuacion": "Notificaciones por actuación",
+      "sujeto_procesal": "Notificaciones por sujeto procesal",
+      "actuacion_alerta": "Alertas de actuación"
+    },
+    "description": {
+      "actuacion": "Listado de notificaciones asociadas a actuaciones judiciales.",
+      "sujeto_procesal": "Listado de notificaciones asociadas a sujetos procesales.",
+      "actuacion_alerta": "Listado de alertas prioritarias de actuaciones (consulta, apelación, doble instancia)."
+    },
+    "close": "Cerrar",
+    "loading": "Cargando notificaciones...",
+    "scrollForMore": "Desplaza hacia abajo para cargar más",
+    "emptyWatermark": "Sin datos",
+    "emptyTitle": "No hay datos para mostrar",
+    "emptyDescription": {
+      "actuacion": "No existen notificaciones por actuación en este momento.",
+      "sujeto_procesal": "No existen notificaciones por sujeto procesal en este momento.",
+      "actuacion_alerta": "No existen alertas de actuación en este momento."
+    },
+    "markAllAsViewed": "Marcar todas como vistas",
+    "markSelectedAsViewed": "Marcar seleccionadas como vistas",
+    "markSelectedAsViewedWithCount": "Marcar seleccionadas como vistas ({{count}})",
+    "markedCountSuccess": "Se marcaron {{count}} como vistas",
+    "confirm": {
+      "markAllTitle": "Marcar todas como vistas",
+      "markAllMessage": "¿Desea marcar las {{total}} notificaciones como vistas?",
+      "markSelectedTitle": "Marcar como vistas",
+      "markSelectedMessage": "¿Desea marcar las {{count}} notificaciones seleccionadas como vistas?",
+      "confirmButton": "Confirmar",
+      "cancelButton": "Cancelar"
+    },
+    "table": {
+      "processNumber": "Número de radicado",
+      "action": "Actuación",
+      "annotation": "Anotación",
+      "actionDate": "Fecha de actuación",
+      "registrationDate": "Fecha de registro",
+      "notifiedWhen": "Notificado",
+      "subjects": "Sujetos procesales",
+      "seeMoreSubjects": "Ver más ({{count}})",
+      "seeLess": "Ver menos",
+      "subjectType": "Tipo de sujeto",
+      "nameOrBusinessName": "Nombre o razón social",
+      "identification": "Identificación",
+      "empty": "No hay notificaciones"
+    }
   },
   "gestionProcesos": {
     "title": "Gestión de Procesos",

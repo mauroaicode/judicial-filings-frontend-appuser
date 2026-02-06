@@ -17,7 +17,7 @@
           {{ 'processDetail.lastUpdate' | transloco }}
         </h2>
         <p class="mt-1 text-sm text-base-content/70">
-          {{ process()!.last_api_update | date: 'short' }}
+          {{ formatDateSafe(process()!.last_api_update, 'short') }}
         </p>
       </div>
     }
@@ -96,12 +96,12 @@
             </div>
             <div>
               <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.processDate' | transloco }}:</span>
-              <p class="text-base-content">{{ process()!.process_date | date: 'shortDate' }}</p>
+              <p class="text-base-content">{{ formatDateSafe(process()!.process_date, 'shortDate') }}</p>
             </div>
             @if (process()!.last_activity_date) {
               <div>
                 <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.lastActivityDate' | transloco }}:</span>
-                <p class="text-base-content">{{ process()!.last_activity_date | date: 'short' }}</p>
+                <p class="text-base-content">{{ formatDateSafe(process()!.last_activity_date, 'short') }}</p>
               </div>
             }
             <div>
@@ -134,7 +134,7 @@
             </div>
             <div>
               <span class="text-sm font-semibold text-base-content/70">{{ 'processDetail.createdAt' | transloco }}:</span>
-              <p class="text-base-content">{{ process()!.created_at | date: 'short' }}</p>
+              <p class="text-base-content">{{ formatDateSafe(process()!.created_at, 'short') }}</p>
             </div>
           </div>
         </div>

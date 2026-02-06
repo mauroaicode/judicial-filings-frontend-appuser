@@ -205,3 +205,12 @@ app-date-range-picker .flatpickr-time,
   border-top: 1px solid hsl(var(--b3)) !important;
   padding: 0.5rem !important;
 }
+
+/* Keyword highlight in annotations (alert_highlights from API) */
+.alert-highlight {
+  background-color: rgba(251, 191, 36, 0.5);
+  color: #78350f;
+  font-weight: 600;
+  padding: 0 0.15em;
+  border-radius: 2px;
+}

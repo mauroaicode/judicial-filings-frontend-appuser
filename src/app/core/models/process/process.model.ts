@@ -137,6 +137,15 @@ export interface ProcessDetailResponse {
 }
 
 /**
+ * Range to highlight inside annotation (keyword match from API)
+ */
+export interface AlertHighlight {
+  start: number;
+  end: number;
+  text: string;
+}
+
+/**
  * Action - Process action/actuación
  */
 export interface Action {
@@ -148,6 +157,8 @@ export interface Action {
   court: string;
   created_at: string;
   updated_at: string;
+  /** Optional: ranges to highlight in annotation (e.g. keywords like "Sentencia") */
+  alert_highlights?: AlertHighlight[] | null;
 }
 
 /**

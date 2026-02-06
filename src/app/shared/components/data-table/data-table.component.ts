@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { SafeHtmlPipe } from '@app/shared/pipes/safe-html.pipe';
 
 /**
  * Column definition for data table
@@ -17,7 +18,10 @@ export interface DataTableColumn {
   sortable?: boolean;
   width?: string;
   align?: 'left' | 'center' | 'right';
+  /** Custom render: (value, row) => string */
   render?: (value: any, row: any) => string;
+  /** When true, cell value is rendered as HTML (use with SafeHtml pipe). Only for app-generated HTML. */
+  html?: boolean;
 }
 
 /**
@@ -35,7 +39,7 @@ export interface PaginationInfo {
 @Component({
   selector: 'app-data-table',
   standalone: true,
-  imports: [CommonModule, TranslocoPipe],
+  imports: [CommonModule, TranslocoPipe, SafeHtmlPipe],
   templateUrl: './data-table.component.html',
   styleUrls: ['./data-table.component.scss'],
   encapsulation: ViewEncapsulation.None,
