@@ -213,6 +213,27 @@
           {{ 'processDetail.actions.title' | transloco }}
         </div>
         <div class="collapse-content">
+          <!-- Alert keyword stats (conteo por palabra clave) -->
+          @if (alertKeywordStats().length > 0) {
+            <div class="mb-4">
+              <p class="text-sm font-medium text-base-content/70 mb-2">
+                {{ 'processDetail.actions.keywordStatsTitle' | transloco }}
+              </p>
+              <div class="flex flex-wrap gap-2">
+                @for (stat of alertKeywordStats(); track stat.id) {
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-base-300 bg-base-100 hover:bg-primary/10 hover:border-primary/50 hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                    (click)="applyAlertFilter(stat.slug)"
+                  >
+                    <span class="text-base-content">{{ stat.name }}</span>
+                    <span class="badge badge-sm badge-secondary badge-outline">{{ stat.count }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
           <!-- Filters -->
           <div class="card bg-base-100 shadow-sm mb-4">
             <div class="card-body">
@@ -236,6 +257,22 @@
                     [size]="'sm'"
                     formControlName="registration_date_range"
                   ></app-date-range-picker>
+                </div>
+
+                <!-- Alert keyword filter (palabra clave) -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text">{{ 'processDetail.actions.filters.alertKeyword' | transloco }}</span>
+                  </label>
+                  <select
+                    formControlName="alert_slug"
+                    class="select select-bordered select-sm w-full"
+                  >
+                    <option [ngValue]="null">{{ 'processDetail.actions.filters.alertKeywordPlaceholder' | transloco }}</option>
+                    @for (keyword of alertKeywords(); track keyword.id) {
+                      <option [ngValue]="keyword.slug">{{ keyword.name }}</option>
+                    }
+                  </select>
                 </div>
 
                 <!-- Search Filter -->

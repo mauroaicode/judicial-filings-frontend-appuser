@@ -11,6 +11,8 @@ import {
   ProcessDetailResponse,
   ActionFilter,
   ActionResponse,
+  AlertKeywordsResponse,
+  AlertKeywordStatsResponse,
 } from '@app/core/models/process/process.model';
 
 @Injectable({
@@ -121,6 +123,28 @@ export class ProcessService {
   }
 
   /**
+   * Get alert keywords for a process (for filtering actions by keyword)
+   *
+   * @param processId - Process ID
+   * @returns Observable with list of alert keywords
+   */
+  getAlertKeywords(processId: string): Observable<AlertKeywordsResponse> {
+    const url = `${environment.apiBaseUrl}/processes/${processId}/alert-keywords`;
+    return this._http.get<AlertKeywordsResponse>(url);
+  }
+
+  /**
+   * Get alert keyword stats for a process (count per keyword)
+   *
+   * @param processId - Process ID
+   * @returns Observable with list of keyword stats (name, slug, count)
+   */
+  getAlertKeywordStats(processId: string): Observable<AlertKeywordStatsResponse> {
+    const url = `${environment.apiBaseUrl}/processes/${processId}/alert-keyword-stats`;
+    return this._http.get<AlertKeywordStatsResponse>(url);
+  }
+
+  /**
    * Get process actions with filters and pagination
    *
    * @param id - Process ID
@@ -151,6 +175,9 @@ export class ProcessService {
     }
     if (filters.search) {
       params = params.set('search', filters.search);
+    }
+    if (filters.alert_slug) {
+      params = params.set('alert_slug', filters.alert_slug);
     }
 
     const url = `${environment.apiBaseUrl}/processes/${id}/actions`;
