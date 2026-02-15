@@ -83,7 +83,69 @@
     "signOut": "Sign Out"
   },
   "dashboard": {
-    "title": "Dashboard"
+    "title": "Dashboard",
+    "stats": {
+      "title": "Dashboard statistics",
+      "totalProcesses": "Total processes",
+      "activeProcesses": "Active processes",
+      "inactiveProcesses": "Inactive processes",
+      "notifications": {
+        "actuacion": "Notifications by actuación",
+        "sujetoProcesal": "Notifications by subject",
+        "actuacionAlerta": "Actuación alerts"
+      },
+      "viewDetail": "View detail",
+      "empty": "No statistics available"
+    }
+  },
+  "notificationsDrawer": {
+    "title": {
+      "actuacion": "Notifications by actuación",
+      "sujeto_procesal": "Notifications by subject",
+      "actuacion_alerta": "Actuación alerts"
+    },
+    "description": {
+      "actuacion": "List of notifications related to judicial actions.",
+      "sujeto_procesal": "List of notifications related to procedural subjects.",
+      "actuacion_alerta": "List of priority action alerts (consultation, appeal, second instance)."
+    },
+    "close": "Close",
+    "loading": "Loading notifications...",
+    "scrollForMore": "Scroll down to load more",
+    "emptyWatermark": "No data",
+    "emptyTitle": "No data to display",
+    "emptyDescription": {
+      "actuacion": "There are no actuación notifications at this time.",
+      "sujeto_procesal": "There are no subject notifications at this time.",
+      "actuacion_alerta": "There are no action alerts at this time."
+    },
+    "markAllAsViewed": "Mark all as viewed",
+    "markSelectedAsViewed": "Mark selected as viewed",
+    "markSelectedAsViewedWithCount": "Mark selected as viewed ({{count}})",
+    "markedCountSuccess": "{{count}} marked as viewed",
+    "confirm": {
+      "markAllTitle": "Mark all as viewed",
+      "markAllMessage": "Do you want to mark {{total}} notifications as viewed?",
+      "markSelectedTitle": "Mark as viewed",
+      "markSelectedMessage": "Do you want to mark the {{count}} selected notifications as viewed?",
+      "confirmButton": "Confirm",
+      "cancelButton": "Cancel"
+    },
+    "table": {
+      "processNumber": "Process number",
+      "action": "Action",
+      "annotation": "Annotation",
+      "actionDate": "Action date",
+      "registrationDate": "Registration date",
+      "notifiedWhen": "Notified",
+      "subjects": "Parties",
+      "seeMoreSubjects": "See more ({{count}})",
+      "seeLess": "See less",
+      "subjectType": "Subject type",
+      "nameOrBusinessName": "Name or business name",
+      "identification": "Identification",
+      "empty": "No notifications"
+    }
   },
   "gestionProcesos": {
     "title": "Process Management",

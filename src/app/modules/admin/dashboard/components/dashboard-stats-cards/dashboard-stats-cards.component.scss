@@ -1,0 +1,11 @@
+// Dashboard stats cards - semantic colors via DaisyUI classes in template
+
+:host {
+  display: block;
+}
+
+// Forzar cursor pointer en tarjetas clickeables (manita)
+:host .stats-card--clickable,
+:host .stats-card--clickable * {
+  cursor: pointer !important;
+}

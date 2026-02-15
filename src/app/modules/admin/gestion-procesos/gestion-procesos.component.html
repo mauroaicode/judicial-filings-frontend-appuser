@@ -32,6 +32,24 @@
     </button>
   </div>
 
+  <!-- Stats cards (above filters) -->
+  <section class="dashboard-stats" aria-labelledby="gestion-stats-heading">
+    <h2 id="gestion-stats-heading" class="sr-only">
+      {{ 'dashboard.stats.title' | transloco }}
+    </h2>
+    <app-dashboard-stats-cards
+      [stats]="stats()"
+      [loading]="statsLoading()"
+      [error]="statsError()"
+    />
+  </section>
+
+  <!-- Notifications drawer (state from NotificationsDrawerStateService) -->
+  <app-notifications-drawer
+    (closed)="onNotificationsDrawerClosed()"
+    (rowClick)="onNotificationRowClick($event)"
+  />
+
   <!-- Filters -->
   <div class="card bg-base-100 shadow-sm">
     <div class="card-body">

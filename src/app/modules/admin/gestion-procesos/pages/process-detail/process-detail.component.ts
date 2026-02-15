@@ -18,6 +18,7 @@ import {
   ActionFilter,
   ActionResponseMeta,
 } from '@app/core/models/process/process.model';
+import { buildAnnotationWithHighlights } from '@app/core/utils/alert-highlight.utils';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
 import { DataTableComponent, DataTableColumn } from '@app/shared/components/data-table/data-table.component';
 
@@ -92,7 +93,9 @@ export class ProcessDetailComponent {
       {
         key: 'annotation',
         label: 'processDetail.actions.table.annotation',
-        render: (value: string | null) => value || '-',
+        html: true,
+        render: (value: string | null, row: Action) =>
+          buildAnnotationWithHighlights(row.annotation ?? value, row.alert_highlights),
       },
       {
         key: 'court',
@@ -237,7 +240,7 @@ export class ProcessDetailComponent {
   }
 
   /**
-   * Format date for display
+   * Format date for display (table columns, etc.)
    */
   formatDate(dateString: string | null | undefined): string {
     if (!dateString) return '-';
@@ -254,6 +257,31 @@ export class ProcessDetailComponent {
     } catch {
       return dateString;
     }
+  }
+
+  /**
+   * Safe date display: if the API returns an ISO/parseable date we format it;
+   * if it returns an already human-readable string (e.g. "8 de mayo de 2024") we show it as-is.
+   * Avoids InvalidPipeArgument when using the date pipe with non-parseable strings.
+   */
+  formatDateSafe(value: string | null | undefined, kind: 'short' | 'shortDate'): string {
+    if (!value || !value.trim()) return '–';
+    const trimmed = value.trim();
+    const date = new Date(trimmed);
+    if (!isNaN(date.getTime())) {
+      if (kind === 'short') {
+        return date.toLocaleString('es-ES', {
+          dateStyle: 'short',
+          timeStyle: 'short',
+        });
+      }
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+    }
+    return trimmed;
   }
 
 }

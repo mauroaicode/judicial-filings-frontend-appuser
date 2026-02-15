@@ -1,6 +1,22 @@
-<div class="w-full">
+<div class="w-full space-y-6">
   <h1 class="text-2xl font-bold text-base-content md:text-3xl">
     {{ 'dashboard.title' | transloco }}
   </h1>
+
+  <section class="dashboard-stats" aria-labelledby="dashboard-stats-heading">
+    <h2 id="dashboard-stats-heading" class="sr-only">
+      {{ 'dashboard.stats.title' | transloco }}
+    </h2>
+    <app-dashboard-stats-cards
+      [stats]="stats()"
+      [loading]="isLoading()"
+      [error]="error()"
+    />
+  </section>
+
+  <app-notifications-drawer
+    (closed)="onNotificationsDrawerClosed()"
+    (rowClick)="onNotificationRowClick($event)"
+  />
 </div>
 

@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   signal,
+  OnInit,
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -13,21 +14,41 @@ import { ProcessService } from '@app/core/services/process/process.service';
 import { Process, ProcessFilter, ProcessResponseMeta, CreateProcessResponse } from '@app/core/models/process/process.model';
 import { DataTableComponent, DataTableColumn } from '@app/shared/components/data-table/data-table.component';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
+import { DashboardService } from '@app/core/services/dashboard/dashboard.service';
+import { DashboardStatsCardsComponent } from '../dashboard/components/dashboard-stats-cards/dashboard-stats-cards.component';
+import { NotificationsDrawerComponent } from '@app/shared/components/notifications-drawer/notifications-drawer.component';
+import { NotificationsDrawerStateService } from '@app/core/services/notification/notifications-drawer-state.service';
+import type { OrganizationNotificationRow } from '@app/core/models/notification/organization-notification.model';
 
 @Component({
   selector: 'app-gestion-procesos',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslocoPipe, DataTableComponent, DateRangePickerComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    TranslocoPipe,
+    DataTableComponent,
+    DateRangePickerComponent,
+    DashboardStatsCardsComponent,
+    NotificationsDrawerComponent,
+  ],
   templateUrl: './gestion-procesos.component.html',
   styleUrls: ['./gestion-procesos.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GestionProcesosComponent {
+export class GestionProcesosComponent implements OnInit {
   private _processService = inject(ProcessService);
+  private _dashboardService = inject(DashboardService);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
   private _fb = inject(FormBuilder);
+
+  readonly stats = this._dashboardService.stats;
+  readonly statsLoading = this._dashboardService.isLoading;
+  readonly statsError = this._dashboardService.error;
+
+  private _drawerState = inject(NotificationsDrawerStateService);
 
   // State
   public processes = signal<Process[]>([]);
@@ -127,6 +148,10 @@ export class GestionProcesosComponent {
   constructor() {
     this._loadFiltersFromQueryParams();
     this.loadProcesses();
+  }
+
+  ngOnInit(): void {
+    this._dashboardService.loadStats();
   }
 
   /**
@@ -360,6 +385,17 @@ export class GestionProcesosComponent {
    */
   onRowClick(process: Process): void {
     this._router.navigate(['/admin/gestion-procesos', process.id]);
+  }
+
+  onNotificationsDrawerClosed(): void {
+    this._drawerState.closeDrawer();
+  }
+
+  onNotificationRowClick(row: OrganizationNotificationRow): void {
+    if (row?.process_id) {
+      this._drawerState.closeDrawer();
+      this._router.navigate(['/admin/gestion-procesos', row.process_id]);
+    }
   }
 
   /**
