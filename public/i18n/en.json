@@ -212,8 +212,8 @@
       "court": "Court",
       "processClass": "Process Class",
       "status": "Status",
-      "plaintiff": "Plaintiff (s)",
-      "defendant": "Defendant (s)",
+      "plaintiff": "Plaintiff (S)",
+      "defendant": "Defendant (S)",
       "multipleInstances": "Multiple Instances",
       "processDate": "Registration Date",
       "lastActivityDate": "Last Activity Date"
@@ -278,15 +278,20 @@
         "actionDateRangePlaceholder": "Select date range",
         "registrationDateRange": "Registration Date Range",
         "registrationDateRangePlaceholder": "Select date range",
+        "alertKeyword": "Alert keyword",
+        "alertKeywordPlaceholder": "All keywords",
         "search": "Search",
         "searchPlaceholder": "Search in action or annotation",
         "reset": "Clear Filters"
       },
       "table": {
-        "actionDate": "Action Date",
-        "registrationDate": "Registration Date",
+        "index": "#",
         "action": "Action",
         "annotation": "Annotation",
+        "termStartDate": "Term start date",
+        "termEndDate": "Term end date",
+        "actionDate": "Action date",
+        "registrationDate": "Registration date",
         "court": "Court"
       }
     },

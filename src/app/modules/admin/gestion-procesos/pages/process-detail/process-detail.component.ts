@@ -7,9 +7,9 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { ProcessService } from '@app/core/services/process/process.service';
 import {
   ProcessDetail,
@@ -17,6 +17,8 @@ import {
   Action,
   ActionFilter,
   ActionResponseMeta,
+  AlertKeyword,
+  AlertKeywordStat,
 } from '@app/core/models/process/process.model';
 import { buildAnnotationWithHighlights } from '@app/core/utils/alert-highlight.utils';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
@@ -40,8 +42,6 @@ import { DataTableComponent, DataTableColumn } from '@app/shared/components/data
 export class ProcessDetailComponent {
   private _processService = inject(ProcessService);
   private _route = inject(ActivatedRoute);
-  private _router = inject(Router);
-  private _translocoService = inject(TranslocoService);
   private _fb = inject(FormBuilder);
 
   // State
@@ -52,11 +52,16 @@ export class ProcessDetailComponent {
   public loadingActions = signal<boolean>(false);
   public error = signal<string | null>(null);
   public actionsPagination = signal<ActionResponseMeta | null>(null);
+  /** Palabras clave de alerta para filtrar actuaciones (desde processes/:id/alert-keywords) */
+  public alertKeywords = signal<AlertKeyword[]>([]);
+  /** Conteo por palabra clave (desde processes/:id/alert-keyword-stats) */
+  public alertKeywordStats = signal<AlertKeywordStat[]>([]);
 
   // Filter form for actions
   public actionFilterForm: FormGroup = this._fb.group({
     action_date_range: [null as DateRange | null],
     registration_date_range: [null as DateRange | null],
+    alert_slug: [null as string | null],
     search: [''],
   });
 
@@ -69,21 +74,20 @@ export class ProcessDetailComponent {
       return this.formatDate(value);
     };
 
-    // Initialize action columns with date formatting
+    // Render para fechas de término: "-" o vacío → "–", sino valor tal cual (API puede enviar texto legible)
+    const formatTermDate = (value: string | null | undefined): string => {
+      if (value == null || String(value).trim() === '' || String(value).trim() === '-') return '–';
+      return String(value).trim();
+    };
+
+    // Columnas: # primero, luego actuación y anotación, fechas al final (sin despacho)
     this.actionColumns = [
       {
-        key: 'action_date',
-        label: 'processDetail.actions.table.actionDate',
-        width: '150px',
+        key: 'index',
+        label: 'processDetail.actions.table.index',
+        width: '56px',
         align: 'center',
-        render: formatDateFn,
-      },
-      {
-        key: 'registration_date',
-        label: 'processDetail.actions.table.registrationDate',
-        width: '150px',
-        align: 'center',
-        render: formatDateFn,
+        render: (value: number | undefined) => (value != null ? String(value) : '–'),
       },
       {
         key: 'action',
@@ -98,21 +102,82 @@ export class ProcessDetailComponent {
           buildAnnotationWithHighlights(row.annotation ?? value, row.alert_highlights),
       },
       {
-        key: 'court',
-        label: 'processDetail.actions.table.court',
-        width: '200px',
+        key: 'term_start_date',
+        label: 'processDetail.actions.table.termStartDate',
+        width: '140px',
+        align: 'center',
+        render: formatTermDate,
+      },
+      {
+        key: 'term_end_date',
+        label: 'processDetail.actions.table.termEndDate',
+        width: '140px',
+        align: 'center',
+        render: formatTermDate,
+      },
+      {
+        key: 'action_date',
+        label: 'processDetail.actions.table.actionDate',
+        width: '150px',
+        align: 'center',
+        render: formatDateFn,
+      },
+      {
+        key: 'registration_date',
+        label: 'processDetail.actions.table.registrationDate',
+        width: '150px',
+        align: 'center',
+        render: formatDateFn,
       },
     ];
 
     this.loadProcessDetail();
 
-    // Load actions when process is loaded
+    // Load alert keywords, stats and actions when process is loaded
     effect(() => {
       const process = this.process();
       if (process) {
+        this.loadAlertKeywords(process.id);
+        this.loadAlertKeywordStats(process.id);
         this.loadActions();
       }
     });
+  }
+
+  /**
+   * Load alert keywords for the process (for filter select)
+   */
+  loadAlertKeywords(processId: string): void {
+    this._processService.getAlertKeywords(processId).subscribe({
+      next: (response) => {
+        this.alertKeywords.set(response.data ?? []);
+      },
+      error: () => {
+        this.alertKeywords.set([]);
+      },
+    });
+  }
+
+  /**
+   * Load alert keyword stats (count per keyword) for the process
+   */
+  loadAlertKeywordStats(processId: string): void {
+    this._processService.getAlertKeywordStats(processId).subscribe({
+      next: (response) => {
+        this.alertKeywordStats.set(response.data ?? []);
+      },
+      error: () => {
+        this.alertKeywordStats.set([]);
+      },
+    });
+  }
+
+  /**
+   * Apply filter by alert keyword and run search (UX: click on stat chip)
+   */
+  applyAlertFilter(slug: string): void {
+    this.actionFilterForm.patchValue({ alert_slug: slug });
+    this.loadActions(1, this.actionsPagination()?.per_page || 10);
   }
 
   /**
@@ -157,12 +222,14 @@ export class ProcessDetailComponent {
     const formValue = this.actionFilterForm.value;
     const actionDateRange: DateRange | null = formValue.action_date_range;
     const registrationDateRange: DateRange | null = formValue.registration_date_range;
+    const alertSlug = formValue.alert_slug?.trim();
 
     const filters: ActionFilter = {
       action_date_from: actionDateRange?.from && actionDateRange.from.trim() ? actionDateRange.from : undefined,
       action_date_to: actionDateRange?.to && actionDateRange.to.trim() ? actionDateRange.to : undefined,
       registration_date_from: registrationDateRange?.from && registrationDateRange.from.trim() ? registrationDateRange.from : undefined,
       registration_date_to: registrationDateRange?.to && registrationDateRange.to.trim() ? registrationDateRange.to : undefined,
+      alert_slug: alertSlug || undefined,
       search: formValue.search?.trim() || undefined,
       page,
       per_page: perPage,
@@ -191,6 +258,8 @@ export class ProcessDetailComponent {
       },
       error: (error) => {
         console.error('Error loading actions:', error);
+        this.actions.set([]);
+        this.actionsPagination.set(null);
         this.loadingActions.set(false);
       },
     });
@@ -210,6 +279,7 @@ export class ProcessDetailComponent {
     this.actionFilterForm.reset({
       action_date_range: null,
       registration_date_range: null,
+      alert_slug: null,
       search: '',
     });
     this.loadActions(1, this.actionsPagination()?.per_page || 10);

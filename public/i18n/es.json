@@ -211,8 +211,8 @@
       "court": "Despacho",
       "processClass": "Clase de Proceso",
       "status": "Estado",
-      "plaintiff": "Demandante (s)",
-      "defendant": "Demandados (s)",
+      "plaintiff": "Demandante (S)",
+      "defendant": "Demandados (S)",
       "multipleInstances": "Múltiples instancias",
       "processDate": "Fecha de Registro",
       "lastActivityDate": "Fecha Ultima Actuación"
@@ -277,15 +277,20 @@
         "actionDateRangePlaceholder": "Seleccionar rango de fechas",
         "registrationDateRange": "Rango de Fecha de Registro",
         "registrationDateRangePlaceholder": "Seleccionar rango de fechas",
+        "alertKeyword": "Palabra clave de alerta",
+        "alertKeywordPlaceholder": "Todas las palabras clave",
         "search": "Buscar",
         "searchPlaceholder": "Buscar en acción o anotación",
         "reset": "Limpiar Filtros"
       },
       "table": {
-        "actionDate": "Fecha de Actuación",
-        "registrationDate": "Fecha de Registro",
+        "index": "#",
         "action": "Actuación",
         "annotation": "Anotación",
+        "termStartDate": "Fecha inicio término",
+        "termEndDate": "Fecha finaliza término",
+        "actionDate": "Fecha de actuación",
+        "registrationDate": "Fecha de registro",
         "court": "Despacho"
       }
     },

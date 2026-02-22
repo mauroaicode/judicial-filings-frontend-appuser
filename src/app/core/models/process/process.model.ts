@@ -1,5 +1,29 @@
 /**
- * Process Model - Based on API response
+ * Process Instance - Una instancia dentro de un proceso (mismo radicado, otro despacho)
+ */
+export interface ProcessInstance {
+  index: number;
+  id: string;
+  process_number: string;
+  court: string;
+  process_class: string;
+  subclass_process: string;
+  process_date: string;
+  last_activity_date: string | null;
+  is_private: boolean;
+  has_multiple_instances: boolean;
+  status_label: string;
+  created_at: string;
+  term_start_date?: string | null;
+  term_end_date?: string | null;
+  plaintiff: string | null;
+  defendant: string | null;
+  plaintiffs?: string[];
+  defendants?: string[];
+}
+
+/**
+ * Process Model - Based on API response (una fila por radicado; puede incluir instancias)
  */
 export interface Process {
   index: number;
@@ -16,6 +40,14 @@ export interface Process {
   created_at: string;
   plaintiff: string | null;
   defendant: string | null;
+  term_start_date?: string | null;
+  term_end_date?: string | null;
+  /** Lista completa de demandantes (para tooltip) */
+  plaintiffs?: string[];
+  /** Lista completa de demandados (para tooltip) */
+  defendants?: string[];
+  /** Instancias del mismo radicado (expandible en la tabla) */
+  instances?: ProcessInstance[];
 }
 
 /**
@@ -149,16 +181,48 @@ export interface AlertHighlight {
  * Action - Process action/actuación
  */
 export interface Action {
+  index?: number;
   id: string;
+  action_registration_id?: number;
+  cons_action?: number;
   action_date: string;
   registration_date: string;
   action: string;
   annotation: string | null;
-  court: string;
-  created_at: string;
-  updated_at: string;
+  term_start_date?: string | null;
+  term_end_date?: string | null;
+  court?: string;
+  created_at?: string;
+  updated_at?: string;
   /** Optional: ranges to highlight in annotation (e.g. keywords like "Sentencia") */
   alert_highlights?: AlertHighlight[] | null;
+}
+
+/**
+ * Alert keyword for filtering actions (from GET processes/:id/alert-keywords)
+ */
+export interface AlertKeyword {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface AlertKeywordsResponse {
+  data: AlertKeyword[];
+}
+
+/**
+ * Alert keyword with count (from GET processes/:id/alert-keyword-stats)
+ */
+export interface AlertKeywordStat {
+  id: string;
+  name: string;
+  slug: string;
+  count: number;
+}
+
+export interface AlertKeywordStatsResponse {
+  data: AlertKeywordStat[];
 }
 
 /**
@@ -169,6 +233,8 @@ export interface ActionFilter {
   action_date_to?: string;
   registration_date_from?: string;
   registration_date_to?: string;
+  /** Filtrar por tipo de alerta (slug del keyword) */
+  alert_slug?: string;
   search?: string;
   page?: number;
   per_page?: number;

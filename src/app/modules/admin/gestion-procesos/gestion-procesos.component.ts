@@ -11,8 +11,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ProcessService } from '@app/core/services/process/process.service';
-import { Process, ProcessFilter, ProcessResponseMeta, CreateProcessResponse } from '@app/core/models/process/process.model';
-import { DataTableComponent, DataTableColumn } from '@app/shared/components/data-table/data-table.component';
+import { Process, ProcessInstance, ProcessFilter, ProcessResponseMeta, CreateProcessResponse } from '@app/core/models/process/process.model';
+import { DataTableColumn } from '@app/shared/components/data-table/data-table.component';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
 import { DashboardService } from '@app/core/services/dashboard/dashboard.service';
 import { DashboardStatsCardsComponent } from '../dashboard/components/dashboard-stats-cards/dashboard-stats-cards.component';
@@ -27,7 +27,6 @@ import type { OrganizationNotificationRow } from '@app/core/models/notification/
     CommonModule,
     ReactiveFormsModule,
     TranslocoPipe,
-    DataTableComponent,
     DateRangePickerComponent,
     DashboardStatsCardsComponent,
     NotificationsDrawerComponent,
@@ -82,6 +81,11 @@ export class GestionProcesosComponent implements OnInit {
     created_at_range: [null as DateRange | null],
     last_api_update_range: [null as DateRange | null],
   });
+
+  /** IDs de procesos con fila expandida (mostrar instancias) */
+  public expandedProcessIds = signal<Set<string>>(new Set());
+  /** ID de la fila bajo el cursor: process.id (fila principal) o instance.id (fila instancia) */
+  public hoveredRowId = signal<string | null>(null);
 
   // Table columns
   public columns: DataTableColumn[] = [
@@ -381,10 +385,90 @@ export class GestionProcesosComponent implements OnInit {
   }
 
   /**
-   * Handle row click
+   * Expandir/colapsar fila de proceso (solo cuando tiene múltiples instancias)
    */
-  onRowClick(process: Process): void {
-    this._router.navigate(['/admin/gestion-procesos', process.id]);
+  toggleExpand(process: Process): void {
+    if (!process.has_multiple_instances || !process.instances?.length) return;
+    const next = new Set(this.expandedProcessIds());
+    if (next.has(process.id)) {
+      next.delete(process.id);
+    } else {
+      next.add(process.id);
+    }
+    this.expandedProcessIds.set(next);
+  }
+
+  /**
+   * Navegar al detalle del proceso (doble clic en fila principal o en instancia)
+   */
+  onRowDblClick(row: Process | ProcessInstance): void {
+    this._router.navigate(['/admin/gestion-procesos', row.id]);
+  }
+
+  /**
+   * Indica si la fila del proceso está expandida
+   */
+  isExpanded(process: Process): boolean {
+    return this.expandedProcessIds().has(process.id);
+  }
+
+  /**
+   * Helper para mostrar demandante/demandado: texto principal, (+N) en accent y tooltip ordenado
+   */
+  getPartyDisplay(list: string[] | null | undefined): { mainText: string; extraCount: number; tooltipText: string; fullList: string[] } {
+    const arr = list?.filter(Boolean) ?? [];
+    if (arr.length === 0) return { mainText: '', extraCount: 0, tooltipText: '', fullList: [] };
+    const mainText = arr[0];
+    const extraCount = arr.length - 1;
+    const tooltipText = arr.map((name, i) => `${i + 1}. ${name}`).join('\n');
+    return { mainText, extraCount, tooltipText, fullList: arr };
+  }
+
+  /**
+   * Valor de celda para una fila (proceso o instancia)
+   */
+  getProcessCellValue(row: Process | ProcessInstance, column: DataTableColumn): string | number | boolean | null {
+    const record = row as unknown as Record<string, unknown>;
+    if (column.render) {
+      return column.render(record[column.key], row) as string;
+    }
+    const value = record[column.key];
+    return value != null ? value as string | number | boolean : null;
+  }
+
+  /**
+   * Formatear fecha para tabla (si viene en formato ISO; si no, mostrar tal cual)
+   */
+  formatProcessDate(dateString: string | null | undefined): string {
+    if (!dateString) return '–';
+    const s = String(dateString).trim();
+    if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? s : d.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    }
+    return s;
+  }
+
+  /** Opciones de tamaño de página para la paginación */
+  pageSizeOptions = [10, 20, 25, 50, 100];
+
+  /**
+   * Números de página a mostrar en la paginación
+   */
+  getPageNumbers(): number[] {
+    const pagination = this.pagination();
+    if (!pagination) return [];
+    const current = pagination.current_page;
+    const last = pagination.last_page;
+    const pages: number[] = [];
+    let start = Math.max(1, current - 2);
+    let end = Math.min(last, current + 2);
+    if (end - start < 4) {
+      if (start === 1) end = Math.min(last, start + 4);
+      else start = Math.max(1, end - 4);
+    }
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
   }
 
   onNotificationsDrawerClosed(): void {

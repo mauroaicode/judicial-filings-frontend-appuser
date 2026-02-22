@@ -226,18 +226,300 @@
     </div>
   </div>
 
-  <!-- Data Table -->
+  <!-- Process Table (expandible por instancias; doble clic = detalle) -->
   <div class="card bg-base-100 shadow-sm">
     <div class="card-body p-0">
-      <app-data-table
-        [columns]="columns"
-        [data]="processes()"
-        [pagination]="pagination()"
-        [loading]="loading()"
-        [emptyMessage]="'gestionProcesos.table.empty' | transloco"
-        (pageChange)="onPageChange($event)"
-        (rowClick)="onRowClick($event)"
-      ></app-data-table>
+      @if (loading()) {
+        <div class="flex items-center justify-center py-12">
+          <span class="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+      } @else if (processes().length === 0) {
+        <div class="flex flex-col items-center justify-center py-12 text-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-12 w-12 text-base-content/30 mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+            />
+          </svg>
+          <p class="text-base-content/70">{{ 'gestionProcesos.table.empty' | transloco }}</p>
+        </div>
+      } @else {
+        <div class="overflow-x-auto w-full process-list-table">
+          <table class="table table-zebra" style="min-width: 1000px;">
+            <thead style="background-color: #161326; color: #ffffff;">
+              <tr>
+                <th style="width: 48px;" class="text-center"></th>
+                @for (column of columns; track column.key) {
+                  <th
+                    [class.sticky-col-radicado]="column.key === 'process_number'"
+                    [class.text-left]="!column.align || column.align === 'left'"
+                    [class.text-center]="column.align === 'center'"
+                    [class.text-right]="column.align === 'right'"
+                    [style.width]="column.width"
+                  >
+                    {{ column.label | transloco }}
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (process of processes(); track process.id) {
+                <!-- Fila principal del proceso -->
+                <tr
+                  class="cursor-pointer group process-table-main-row"
+                  [class.process-row-hovered]="hoveredRowId() === process.id"
+                  [class.rounded-b-none]="isExpanded(process) && process.instances?.length"
+                  [class.border-b-0]="isExpanded(process) && process.instances?.length"
+                  [class.bg-base-200/30]="isExpanded(process) && process.instances?.length"
+                  (mouseenter)="hoveredRowId.set(process.id)"
+                  (mouseleave)="hoveredRowId.set(null)"
+                  (click)="toggleExpand(process)"
+                  (dblclick)="onRowDblClick(process)"
+                >
+                  <td class="text-center align-middle p-2">
+                    @if (process.has_multiple_instances && process.instances && process.instances.length > 1) {
+                      <button
+                        type="button"
+                        class="btn btn-ghost btn-xs btn-square"
+                        (click)="toggleExpand(process); $event.stopPropagation()"
+                        [attr.aria-expanded]="isExpanded(process)"
+                        [attr.aria-label]="isExpanded(process) ? 'Colapsar' : 'Expandir'"
+                      >
+                        @if (isExpanded(process)) {
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        } @else {
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                          </svg>
+                        }
+                      </button>
+                    } @else {
+                      <span class="opacity-0 group-hover:opacity-30">–</span>
+                    }
+                  </td>
+                  <td class="text-center align-middle">{{ process.index }}</td>
+                  <td class="whitespace-nowrap align-middle sticky-col-radicado">
+                    <span class="sticky-cell-bg" aria-hidden="true"></span>
+                    <span class="sticky-cell-txt">{{ process.process_number }}</span>
+                  </td>
+                  <td class="align-middle">{{ process.court }}</td>
+                  <td class="align-middle">{{ process.process_class }}</td>
+                  <td class="text-center align-middle">
+                    <span
+                      class="badge whitespace-nowrap"
+                      [class.badge-success]="process.status_label === 'Activo'"
+                      [class.badge-warning]="process.status_label === 'Pendiente'"
+                      [class.badge-error]="process.status_label === 'Cerrado'"
+                    >
+                      {{ process.status_label }}
+                    </span>
+                  </td>
+                  <td class="align-middle">
+                    @let plaintiffDisplay = getPartyDisplay(process.plaintiffs ?? (process.plaintiff ? [process.plaintiff] : []));
+                    @if (plaintiffDisplay.mainText || plaintiffDisplay.extraCount > 0) {
+                      <span>
+                        {{ plaintiffDisplay.mainText }}
+                        @if (plaintiffDisplay.extraCount > 0) {
+                          <span class="tooltip tooltip-bottom tooltip-accent process-list-tooltip" (click)="$event.stopPropagation()">
+                            <div class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
+                              @for (name of plaintiffDisplay.fullList; track name; let i = $index) {
+                                <div class="text-base-content">{{ i + 1 }}. {{ name }}</div>
+                              }
+                            </div>
+                            <span class="text-accent font-medium cursor-pointer whitespace-nowrap underline decoration-accent/50 decoration-dotted underline-offset-1">
+                              (+{{ plaintiffDisplay.extraCount }})
+                            </span>
+                          </span>
+                        }
+                      </span>
+                    } @else {
+                      <span class="text-base-content/50">–</span>
+                    }
+                  </td>
+                  <td class="align-middle">
+                    @let defendantDisplay = getPartyDisplay(process.defendants ?? (process.defendant ? [process.defendant] : []));
+                    @if (defendantDisplay.mainText || defendantDisplay.extraCount > 0) {
+                      <span>
+                        {{ defendantDisplay.mainText }}
+                        @if (defendantDisplay.extraCount > 0) {
+                          <span class="tooltip tooltip-bottom tooltip-accent process-list-tooltip" (click)="$event.stopPropagation()">
+                            <div class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
+                              @for (name of defendantDisplay.fullList; track name; let i = $index) {
+                                <div class="text-base-content">{{ i + 1 }}. {{ name }}</div>
+                              }
+                            </div>
+                            <span class="text-accent font-medium cursor-pointer whitespace-nowrap underline decoration-accent/50 decoration-dotted underline-offset-1">
+                              (+{{ defendantDisplay.extraCount }})
+                            </span>
+                          </span>
+                        }
+                      </span>
+                    } @else {
+                      <span class="text-base-content/50">–</span>
+                    }
+                  </td>
+                  <td class="text-center align-middle">{{ process.has_multiple_instances ? 'Sí' : 'No' }}</td>
+                  <td class="text-center align-middle whitespace-nowrap">{{ formatProcessDate(process.created_at) }}</td>
+                  <td class="text-center align-middle whitespace-nowrap">{{ formatProcessDate(process.last_activity_date) }}</td>
+                </tr>
+                <!-- Filas de instancias (cuando está expandido) -->
+                @if (isExpanded(process) && process.instances && process.instances.length > 0) {
+                  @for (instance of process.instances; track instance.id) {
+                    <tr
+                      class="cursor-pointer bg-accent/10 process-table-instance-row border-l-4 border-accent"
+                      [class.process-row-hovered]="hoveredRowId() === instance.id"
+                      (mouseenter)="hoveredRowId.set(instance.id)"
+                      (mouseleave)="hoveredRowId.set(null)"
+                      (dblclick)="onRowDblClick(instance)"
+                    >
+                      <td class="text-center align-middle p-2 pl-4">
+                        <span class="text-accent/70 text-xs" aria-hidden="true">↳</span>
+                      </td>
+                      <td class="text-center align-middle text-base-content/70">{{ instance.index }}</td>
+                      <td class="whitespace-nowrap align-middle text-base-content/80 sticky-col-radicado">
+                        <span class="sticky-cell-bg" aria-hidden="true"></span>
+                        <span class="sticky-cell-txt">{{ instance.process_number }}</span>
+                      </td>
+                      <td class="align-middle text-base-content/80">{{ instance.court }}</td>
+                      <td class="align-middle text-base-content/80">{{ instance.process_class }}</td>
+                      <td class="text-center align-middle">
+                        <span
+                          class="badge badge-sm whitespace-nowrap"
+                          [class.badge-success]="instance.status_label === 'Activo'"
+                          [class.badge-warning]="instance.status_label === 'Pendiente'"
+                          [class.badge-error]="instance.status_label === 'Cerrado'"
+                        >
+                          {{ instance.status_label }}
+                        </span>
+                      </td>
+                      <td class="align-middle">
+                        @let instPlaint = getPartyDisplay(instance.plaintiffs ?? (instance.plaintiff ? [instance.plaintiff] : []));
+                        @if (instPlaint.mainText || instPlaint.extraCount > 0) {
+                          <span>
+                            {{ instPlaint.mainText }}
+                            @if (instPlaint.extraCount > 0) {
+                              <span class="tooltip tooltip-bottom tooltip-accent process-list-tooltip" (click)="$event.stopPropagation()">
+                                <div class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
+                                  @for (name of instPlaint.fullList; track name; let i = $index) {
+                                    <div class="text-base-content">{{ i + 1 }}. {{ name }}</div>
+                                  }
+                                </div>
+                                <span class="text-accent font-medium cursor-pointer whitespace-nowrap underline decoration-accent/50 decoration-dotted underline-offset-1">
+                                  (+{{ instPlaint.extraCount }})
+                                </span>
+                              </span>
+                            }
+                          </span>
+                        } @else {
+                          <span class="text-base-content/50">–</span>
+                        }
+                      </td>
+                      <td class="align-middle">
+                        @let instDef = getPartyDisplay(instance.defendants ?? (instance.defendant ? [instance.defendant] : []));
+                        @if (instDef.mainText || instDef.extraCount > 0) {
+                          <span>
+                            {{ instDef.mainText }}
+                            @if (instDef.extraCount > 0) {
+                              <span class="tooltip tooltip-bottom tooltip-accent process-list-tooltip" (click)="$event.stopPropagation()">
+                                <div class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
+                                  @for (name of instDef.fullList; track name; let i = $index) {
+                                    <div class="text-base-content">{{ i + 1 }}. {{ name }}</div>
+                                  }
+                                </div>
+                                <span class="text-accent font-medium cursor-pointer whitespace-nowrap underline decoration-accent/50 decoration-dotted underline-offset-1">
+                                  (+{{ instDef.extraCount }})
+                                </span>
+                              </span>
+                            }
+                          </span>
+                        } @else {
+                          <span class="text-base-content/50">–</span>
+                        }
+                      </td>
+                      <td class="text-center align-middle text-base-content/70">–</td>
+                      <td class="text-center align-middle whitespace-nowrap text-base-content/70">{{ formatProcessDate(instance.created_at) }}</td>
+                      <td class="text-center align-middle whitespace-nowrap text-base-content/70">{{ formatProcessDate(instance.last_activity_date) }}</td>
+                    </tr>
+                  }
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (pagination(); as paginationInfo) {
+          <div class="pagination-container border-t border-base-300 bg-base-100">
+            <div class="pagination-results-info">
+              {{ 'table.showing' | transloco }}
+              <span class="font-semibold">{{ paginationInfo.from }}</span>
+              {{ 'table.to' | transloco }}
+              <span class="font-semibold">{{ paginationInfo.to }}</span>
+              {{ 'table.of' | transloco }}
+              <span class="font-semibold">{{ paginationInfo.total }}</span>
+              {{ 'table.results' | transloco }}
+            </div>
+            <div class="pagination-controls join">
+              <button
+                class="join-item btn btn-sm"
+                [class.btn-disabled]="paginationInfo.current_page === 1"
+                (click)="onPageChange({ page: 1, perPage: paginationInfo.per_page })"
+                [disabled]="paginationInfo.current_page === 1"
+              >««</button>
+              <button
+                class="join-item btn btn-sm"
+                [class.btn-disabled]="paginationInfo.current_page === 1"
+                (click)="onPageChange({ page: paginationInfo.current_page - 1, perPage: paginationInfo.per_page })"
+                [disabled]="paginationInfo.current_page === 1"
+              >«</button>
+              @for (page of getPageNumbers(); track page) {
+                <button
+                  class="join-item btn btn-sm"
+                  [class.btn-active]="page === paginationInfo.current_page"
+                  (click)="onPageChange({ page, perPage: paginationInfo.per_page })"
+                >
+                  {{ page }}
+                </button>
+              }
+              <button
+                class="join-item btn btn-sm"
+                [class.btn-disabled]="paginationInfo.current_page === paginationInfo.last_page"
+                (click)="onPageChange({ page: paginationInfo.current_page + 1, perPage: paginationInfo.per_page })"
+                [disabled]="paginationInfo.current_page === paginationInfo.last_page"
+              >»</button>
+              <button
+                class="join-item btn btn-sm"
+                [class.btn-disabled]="paginationInfo.current_page === paginationInfo.last_page"
+                (click)="onPageChange({ page: paginationInfo.last_page, perPage: paginationInfo.per_page })"
+                [disabled]="paginationInfo.current_page === paginationInfo.last_page"
+              >»»</button>
+            </div>
+            <div class="pagination-page-size">
+              <select
+                class="select select-bordered select-sm"
+                [value]="paginationInfo.per_page"
+                (change)="onPageChange({ page: 1, perPage: +$any($event.target).value })"
+              >
+                @for (size of pageSizeOptions; track size) {
+                  <option [value]="size" [attr.selected]="size === paginationInfo.per_page ? '' : null">
+                    {{ size }} {{ 'table.perPage' | transloco }}
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+        }
+      }
     </div>
   </div>
 
