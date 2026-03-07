@@ -149,6 +149,17 @@ export interface ProcessDetail {
 }
 
 /**
+ * Process instance summary for detail view selector (GET /processes/:id/instances)
+ */
+export interface ProcessDetailInstance {
+  id: string;
+  court: string;
+  actions_count: number;
+  last_api_update: string;
+  status_label: string;
+}
+
+/**
  * Subject - Process subject (Demandante/Demandado)
  */
 export interface Subject {

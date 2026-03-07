@@ -3,7 +3,6 @@ import {
   Component,
   inject,
   signal,
-  OnInit,
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -36,7 +35,7 @@ import type { OrganizationNotificationRow } from '@app/core/models/notification/
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GestionProcesosComponent implements OnInit {
+export class GestionProcesosComponent {
   private _processService = inject(ProcessService);
   private _dashboardService = inject(DashboardService);
   private _router = inject(Router);
@@ -152,10 +151,6 @@ export class GestionProcesosComponent implements OnInit {
   constructor() {
     this._loadFiltersFromQueryParams();
     this.loadProcesses();
-  }
-
-  ngOnInit(): void {
-    this._dashboardService.loadStats();
   }
 
   /**
@@ -323,6 +318,9 @@ export class GestionProcesosComponent implements OnInit {
     });
 
     this._updateQueryParams(filters, false);
+    // Dashboard stats must follow the same active filters (without pagination)
+    const { page: _page, per_page: _perPage, ...statsFilters } = filters;
+    this._dashboardService.loadStats(statsFilters);
 
     this._processService.getProcesses(filters).subscribe({
       next: (response) => {
@@ -410,6 +408,15 @@ export class GestionProcesosComponent implements OnInit {
    */
   isExpanded(process: Process): boolean {
     return this.expandedProcessIds().has(process.id);
+  }
+
+  /**
+   * Cantidad de instancias de un proceso.
+   * Si no hay arreglo de instancias, se asume 1 (la instancia principal).
+   */
+  getInstanceCount(process: Process): number {
+    if (process.instances && process.instances.length > 0) return process.instances.length;
+    return 1;
   }
 
   /**

@@ -89,6 +89,7 @@
       "totalProcesses": "Total processes",
       "activeProcesses": "Active processes",
       "inactiveProcesses": "Inactive processes",
+      "multipleInstancesTotal": "Total Multiple instances",
       "notifications": {
         "actuacion": "Notifications by actuación",
         "sujetoProcesal": "Notifications by subject",
@@ -239,6 +240,9 @@
   },
   "processDetail": {
     "title": "Process Detail",
+    "status": "Status",
+    "activateProcess": "Activate Process",
+    "deactivateProcess": "Deactivate Process",
     "back": "Back",
     "generalInfo": "General Information",
     "processNumber": "Process Number",
@@ -298,6 +302,14 @@
     "error": {
       "idNotFound": "Process ID not found in route params",
       "loadError": "Error loading process detail"
+    },
+    "instances": {
+      "title": "Process instances",
+      "subtitle": "Select an instance to inspect its actions",
+      "countLabel": "instances",
+      "selected": "Selected",
+      "lastUpdate": "Last update",
+      "actionsCount": "actions"
     }
   },
   "table": {
@@ -306,6 +318,13 @@
     "of": "of",
     "results": "results",
     "perPage": "per page"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unread": "unread",
+    "noNotificationsTitle": "You're all caught up!",
+    "noNotifications": "You have no notifications",
+    "viewAll": "View all notifications",
+    "clickToViewDetails": "Click to view details"
   }
 }
-

@@ -88,6 +88,7 @@
       "totalProcesses": "Total de procesos",
       "activeProcesses": "Procesos activos",
       "inactiveProcesses": "Procesos inactivos",
+      "multipleInstancesTotal": "Total Multiple instancia",
       "notifications": {
         "actuacion": "Notificaciones por actuación",
         "sujetoProcesal": "Notificaciones por sujeto procesal",
@@ -238,6 +239,9 @@
   },
   "processDetail": {
     "title": "Detalle del Proceso",
+    "status": "Estado",
+    "activateProcess": "Activar Proceso",
+    "deactivateProcess": "Desactivar Proceso",
     "back": "Volver",
     "generalInfo": "Información General",
     "processNumber": "Número de Radicado",
@@ -297,6 +301,14 @@
     "error": {
       "idNotFound": "ID del proceso no encontrado en los parámetros de la ruta",
       "loadError": "Error al cargar el detalle del proceso"
+    },
+    "instances": {
+      "title": "Instancias del proceso",
+      "subtitle": "Selecciona una instancia para consultar sus actuaciones",
+      "countLabel": "instancias",
+      "selected": "Seleccionada",
+      "lastUpdate": "Última actualización",
+      "actionsCount": "actuaciones"
     }
   },
   "table": {
@@ -305,6 +317,13 @@
     "of": "de",
     "results": "resultados",
     "perPage": "por página"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "unread": "sin leer",
+    "noNotificationsTitle": "¡Todo al día!",
+    "noNotifications": "No tienes notificaciones",
+    "viewAll": "Ver todas las notificaciones",
+    "clickToViewDetails": "Haz clic para ver más detalles"
   }
 }
-

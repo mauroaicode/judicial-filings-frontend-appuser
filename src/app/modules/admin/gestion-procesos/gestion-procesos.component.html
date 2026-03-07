@@ -227,8 +227,8 @@
   </div>
 
   <!-- Process Table (expandible por instancias; doble clic = detalle) -->
-  <div class="card bg-base-100 shadow-sm">
-    <div class="card-body p-0">
+  <div class="card bg-base-100 shadow-sm process-list-card">
+    <div class="card-body p-0 process-list-card-body">
       @if (loading()) {
         <div class="flex items-center justify-center py-12">
           <span class="loading loading-spinner loading-lg text-primary"></span>
@@ -317,9 +317,12 @@
                   <td class="text-center align-middle">
                     <span
                       class="badge whitespace-nowrap"
-                      [class.badge-success]="process.status_label === 'Activo'"
-                      [class.badge-warning]="process.status_label === 'Pendiente'"
-                      [class.badge-error]="process.status_label === 'Cerrado'"
+                      [ngClass]="{
+                        'badge-success': process.status_label === 'Activo',
+                        'badge-warning': process.status_label === 'Pendiente',
+                        'badge-neutral': process.status_label === 'Cerrado',
+                        'badge-error': process.status_label === 'Inactivo'
+                      }"
                     >
                       {{ process.status_label }}
                     </span>
@@ -368,7 +371,15 @@
                       <span class="text-base-content/50">–</span>
                     }
                   </td>
-                  <td class="text-center align-middle">{{ process.has_multiple_instances ? 'Sí' : 'No' }}</td>
+                  <td class="text-center align-middle">
+                    <span
+                      class="badge badge-sm"
+                      [class.badge-accent]="getInstanceCount(process) > 1"
+                      [class.badge-ghost]="getInstanceCount(process) <= 1"
+                    >
+                      {{ getInstanceCount(process) }}
+                    </span>
+                  </td>
                   <td class="text-center align-middle whitespace-nowrap">{{ formatProcessDate(process.created_at) }}</td>
                   <td class="text-center align-middle whitespace-nowrap">{{ formatProcessDate(process.last_activity_date) }}</td>
                 </tr>
@@ -383,7 +394,13 @@
                       (dblclick)="onRowDblClick(instance)"
                     >
                       <td class="text-center align-middle p-2 pl-4">
-                        <span class="text-accent/70 text-xs" aria-hidden="true">↳</span>
+                        <span
+                          aria-hidden="true"
+                          class="inline-flex items-center justify-center text-[#37E6B4] text-lg font-bold leading-none drop-shadow-[0_0_5px_rgba(55,230,180,0.55)]"
+                          title="Instancia relacionada"
+                        >
+                          ↳
+                        </span>
                       </td>
                       <td class="text-center align-middle text-base-content/70">{{ instance.index }}</td>
                       <td class="whitespace-nowrap align-middle text-base-content/80 sticky-col-radicado">
@@ -395,9 +412,12 @@
                       <td class="text-center align-middle">
                         <span
                           class="badge badge-sm whitespace-nowrap"
-                          [class.badge-success]="instance.status_label === 'Activo'"
-                          [class.badge-warning]="instance.status_label === 'Pendiente'"
-                          [class.badge-error]="instance.status_label === 'Cerrado'"
+                          [ngClass]="{
+                            'badge-success': instance.status_label === 'Activo',
+                            'badge-warning': instance.status_label === 'Pendiente',
+                            'badge-neutral': instance.status_label === 'Cerrado',
+                            'badge-error': instance.status_label === 'Inactivo'
+                          }"
                         >
                           {{ instance.status_label }}
                         </span>
@@ -446,7 +466,15 @@
                           <span class="text-base-content/50">–</span>
                         }
                       </td>
-                      <td class="text-center align-middle text-base-content/70">–</td>
+                      <td class="text-center align-middle">
+                        <span
+                          class="badge badge-sm"
+                          [class.badge-accent]="getInstanceCount(process) > 1"
+                          [class.badge-ghost]="getInstanceCount(process) <= 1"
+                        >
+                          {{ getInstanceCount(process) }}
+                        </span>
+                      </td>
                       <td class="text-center align-middle whitespace-nowrap text-base-content/70">{{ formatProcessDate(instance.created_at) }}</td>
                       <td class="text-center align-middle whitespace-nowrap text-base-content/70">{{ formatProcessDate(instance.last_activity_date) }}</td>
                     </tr>

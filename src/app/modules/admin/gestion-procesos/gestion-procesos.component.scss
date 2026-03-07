@@ -15,27 +15,42 @@
   background-color: #ccf6f1 !important; /* accent teal, mismo que data-table hover */
 }
 
+/* IMPORTANTE: evitar que ancestros con overflow rompan el sticky del header */
+.process-list-card,
+.process-list-card-body {
+  overflow: visible !important;
+}
+
 // Columna Número de Radicación sticky en scroll horizontal
 .process-list-table {
+  --table-sticky-top: 0px;
   overflow-x: auto !important;
-  overflow-y: visible !important;
+  overflow-y: auto !important;
+  max-height: calc(100vh - 280px);
   -webkit-overflow-scrolling: touch;
   position: relative;
-  isolation: isolate;
-  transform: translateZ(0);
 
   & > table {
     position: relative;
     border-collapse: separate !important;
     border-spacing: 0 !important;
-    isolation: isolate;
-    transform: translateZ(0);
+  }
+
+  /* Header sticky global (todas las columnas) */
+  thead th {
+    position: sticky !important;
+    top: var(--table-sticky-top) !important;
+    z-index: 2000 !important;
+    background: #161326 !important;
+    background-color: #161326 !important;
+    color: #fff !important;
   }
 
   thead th.sticky-col-radicado {
     position: sticky !important;
+    top: var(--table-sticky-top) !important;
     left: 0 !important;
-    z-index: 1000 !important;
+    z-index: 2200 !important;
     background: #161326 !important;
     background-color: #161326 !important;
     color: #fff !important;
@@ -106,6 +121,12 @@
   }
 
   /* Filas de instancias: siempre el mismo accent claro (override zebra nth-child) */
+  tbody tr.process-table-instance-row td,
+  tbody tr.process-table-instance-row:nth-child(2n) td {
+    background-color: $sticky-instance !important;
+    background: $sticky-instance !important;
+  }
+
   tbody tr.process-table-instance-row td.sticky-col-radicado,
   tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-radicado {
     background-color: $sticky-instance !important;
