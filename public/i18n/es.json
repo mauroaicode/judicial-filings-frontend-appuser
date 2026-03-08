@@ -11,8 +11,8 @@
     "signIn": {
       "title": "Iniciar Sesión",
       "welcome": "Bienvenido de nuevo",
-      "emailLabel": "Correo electrónico",
-      "emailPlaceholder": "tu@email.com",
+      "identificationLabel": "Identificación",
+      "identificationPlaceholder": "98765432-1",
       "passwordLabel": "Contraseña",
       "passwordPlaceholder": "••••••••",
       "rememberMe": "Recordarme",
@@ -52,13 +52,13 @@
       "securityTip3": "No compartas tu código de recuperación con nadie"
     },
     "errors": {
-      "emailRequired": "El correo electrónico es requerido",
+      "identificationRequired": "La identificación es requerida",
       "emailInvalid": "Correo electrónico inválido",
       "passwordRequired": "La contraseña es requerida",
       "codeRequired": "El código es requerido",
       "passwordMinLength": "La contraseña debe tener al menos 8 caracteres",
       "fieldRequired": "Este campo es requerido",
-      "emailOrPasswordIncorrect": "Correo electrónico o contraseña incorrectos",
+      "identificationOrPasswordIncorrect": "Identificación o contraseña incorrectos",
       "serverError": "Error del servidor. Por favor, intenta más tarde.",
       "somethingWentWrong": "Algo salió mal. Intenta nuevamente."
     },
@@ -69,6 +69,7 @@
   "navigation": {
     "dashboard": "Dashboard",
     "gestionProcesos": "Gestión de Procesos",
+    "keywords": "Palabras Clave",
     "toggleSidebar": "Alternar menú lateral"
   },
   "header": {
@@ -187,7 +188,7 @@
       "defendant": "Demandado",
       "defendantPlaceholder": "Ej: EMPRESA ABC",
       "status": "Estado",
-      "statusPlaceholder": "Seleccionar estado",
+      "statusPlaceholder": "Todos",
       "statusActive": "Activo",
       "statusInactive": "Inactivo",
       "hasMultipleInstances": "Múltiples Instancias",
@@ -239,7 +240,6 @@
   },
   "processDetail": {
     "title": "Detalle del Proceso",
-    "status": "Estado",
     "activateProcess": "Activar Proceso",
     "deactivateProcess": "Desactivar Proceso",
     "back": "Volver",
@@ -325,5 +325,39 @@
     "noNotifications": "No tienes notificaciones",
     "viewAll": "Ver todas las notificaciones",
     "clickToViewDetails": "Haz clic para ver más detalles"
+  },
+  "keywords": {
+    "title": "Palabras Clave",
+    "description": "Gestiona las palabras clave para alertas automáticas en actuaciones judiciales.",
+    "add": "Agregar Palabra Clave",
+    "edit": "Editar Palabra Clave",
+    "delete": "Eliminar Palabra Clave",
+    "empty": "No hay palabras clave registradas",
+    "loading": "Cargando palabras clave...",
+    "loadMore": "Cargar más",
+    "fields": {
+      "name": "Nombre de la Alerta",
+      "namePlaceholder": "Ej: Alerta de Sentencia",
+      "keyword": "Palabra Clave",
+      "keywordPlaceholder": "Ej: Sentencia",
+      "status": "Estado"
+    },
+    "status": {
+      "active": "Activa",
+      "inactive": "Inactiva"
+    },
+    "messages": {
+      "created": "Palabra clave creada satisfactoriamente",
+      "updated": "Palabra clave actualizada satisfactoriamente",
+      "deleted": "Palabra clave eliminada satisfactoriamente",
+      "error": "Ha ocurrido un error al procesar la solicitud",
+      "confirmDelete": "¿Estás seguro de que deseas eliminar esta palabra clave?"
+    },
+    "filters": {
+      "title": "Filtros de Búsqueda",
+      "search": "Buscar",
+      "reset": "Limpiar Filtros",
+      "all": "Todos"
+    }
   }
 }

@@ -57,7 +57,7 @@ export class GestionProcesosComponent {
   public isModalOpen = signal<boolean>(false);
   public submitting = signal<boolean>(false);
   public error = signal<string | null>(null);
-  
+
   // Info modal state (for multiple instances or private processes)
   public isInfoModalOpen = signal<boolean>(false);
   public infoModalData = signal<CreateProcessResponse | null>(null);
@@ -85,6 +85,16 @@ export class GestionProcesosComponent {
   public expandedProcessIds = signal<Set<string>>(new Set());
   /** ID de la fila bajo el cursor: process.id (fila principal) o instance.id (fila instancia) */
   public hoveredRowId = signal<string | null>(null);
+
+  // Filter Visibility
+  public showFilters = signal<boolean>(false);
+
+  /**
+   * Toggle filter visibility
+   */
+  public toggleFilters(): void {
+    this.showFilters.update(v => !v);
+  }
 
   // Table columns
   public columns: DataTableColumn[] = [
@@ -265,7 +275,7 @@ export class GestionProcesosComponent {
     // When we pass only the params we want, Angular Router will replace ALL query params
     // This means params not in this object will be automatically removed
     const finalParams: Record<string, string> = { ...queryParams };
-    
+
     // Add page if needed
     if (includePage && page > 1) {
       finalParams['page'] = page.toString();
@@ -497,13 +507,13 @@ export class GestionProcesosComponent {
     if (!value) {
       return null; // Let required validator handle empty values
     }
-    
+
     // Check if it's exactly 23 digits
     const numericRegex = /^\d{23}$/;
     if (!numericRegex.test(value)) {
       return { invalidProcessNumber: true };
     }
-    
+
     return null;
   }
 
@@ -543,10 +553,10 @@ export class GestionProcesosComponent {
       next: (response) => {
         this.submitting.set(false);
         this.closeAddProcessModal();
-        
+
         // Always reload processes table
         this.loadProcesses(1, this.pagination()?.per_page || 20);
-        
+
         // Show info modal if has_multiple_instances is true or private_count >= 1
         if (response.has_multiple_instances === true || response.private_count >= 1) {
           this.infoModalData.set(response);
@@ -555,7 +565,7 @@ export class GestionProcesosComponent {
       },
       error: (error) => {
         this.submitting.set(false);
-        
+
         // Handle error response
         if (error.error && error.error.messages && Array.isArray(error.error.messages)) {
           // Join all error messages
@@ -601,7 +611,7 @@ export class GestionProcesosComponent {
     const numericValue = value.replace(/\D/g, '');
     // Limit to 23 digits
     const limitedValue = numericValue.slice(0, 23);
-    
+
     if (value !== limitedValue) {
       input.value = limitedValue;
       this.addProcessForm.patchValue({ process_number: limitedValue }, { emitEvent: false });

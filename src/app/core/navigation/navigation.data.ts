@@ -12,6 +12,13 @@ export const DEFAULT_NAVIGATION: NavigationItem[] = [
     icon: 'gestion-procesos',
     link: '/admin/gestion-procesos',
   },
+  {
+    id: 'keywords',
+    title: 'navigation.keywords',
+    type: 'basic',
+    icon: 'keywords',
+    link: '/admin/keywords',
+  },
   // More items will be added here as needed
 ];
 

@@ -15,7 +15,7 @@ body {
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-  sans-serif;
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -98,6 +98,7 @@ app-date-range-picker .flatpickr-current-month .numInputWrapper,
 .flatpickr-current-month .numInputWrapper {
   color: hsl(var(--nc)) !important;
   font-size: 0.875rem !important;
+
   input {
     color: hsl(var(--nc)) !important;
     background: transparent !important;
@@ -218,5 +219,74 @@ app-date-range-picker .flatpickr-time,
 /* Tabla procesos: hover accent en todas las filas (color sólido para que se vea) */
 app-gestion-procesos .process-list-table tbody tr.process-row-hovered,
 app-gestion-procesos .process-list-table tbody tr.process-row-hovered td {
-  background-color: #ccf6f1 !important; /* teal accent, mismo que data-table */
+  background-color: #ccf6f1 !important;
+  /* teal accent, mismo que data-table */
 }
+
+/* --- STANDARDIZED UI CLASSES --- */
+
+.label-standard {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.15em !important;
+  color: hsl(var(--bc) / 0.5) !important;
+  display: inline-block !important;
+}
+
+.input-standard,
+.select-standard {
+  height: 2.75rem !important;
+  border-radius: 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  border-color: hsl(var(--bc) / 0.2) !important;
+  background-color: transparent !important;
+  width: 100% !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.input-standard:focus,
+.select-standard:focus {
+  border-color: hsl(var(--a)) !important;
+  outline: 2px solid hsl(var(--a) / 0.3) !important;
+  outline-offset: 1px !important;
+}
+
+.input-standard::placeholder,
+.input::placeholder {
+  font-weight: 500 !important;
+  opacity: 0.35 !important;
+}
+
+.btn-standard-search {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 2.75rem !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  border-radius: 0.75rem !important;
+  font-weight: 700 !important;
+  gap: 0.5rem !important;
+  text-transform: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  background-color: #161326 !important;
+  border: 1px solid #161326 !important;
+  color: #ffffff !important;
+}
+
+.btn-standard-search:hover:not(:disabled) {
+  background-color: #ffffff !important;
+  color: #161326 !important;
+}
+
+.btn-standard-search:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  background-color: #A4A4A9 !important;
+  border-color: #A4A4A9 !important;
+}
+
+/* --- END STANDARDIZED UI CLASSES --- */

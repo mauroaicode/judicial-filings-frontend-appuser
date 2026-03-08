@@ -13,6 +13,11 @@ export default [
     loadChildren: () =>
       import('./gestion-procesos/gestion-procesos.routes').then((m) => m.default),
   },
+  {
+    path: 'keywords',
+    loadChildren: () =>
+      import('./keywords/keywords.routes').then((m) => m.default),
+  },
   // More admin routes will be added here as modules are created
   // Example structure for future modules with role guards:
   // {
