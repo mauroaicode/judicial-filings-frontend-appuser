@@ -1,0 +1,238 @@
+<div class="w-full space-y-6 animate-fade-in relative">
+    <!-- Feedback Toast (DaisyUI) -->
+    @if (feedbackMessage()) {
+    <div class="toast toast-top toast-end z-[9999] animate-fade-in">
+        <div class="alert shadow-xl rounded-2xl border-none font-bold py-3 pr-8"
+            [class.alert-success]="feedbackType() === 'success'" [class.alert-error]="feedbackType() === 'error'">
+            <svg *ngIf="feedbackType() === 'success'" xmlns="http://www.w3.org/2000/svg"
+                class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <svg *ngIf="feedbackType() === 'error'" xmlns="http://www.w3.org/2000/svg"
+                class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{{ feedbackMessage() | transloco }}</span>
+        </div>
+    </div>
+    }
+
+    <!-- Page Header -->
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-base-content md:text-3xl">
+                {{ 'keywords.title' | transloco }}
+            </h1>
+            <p class="mt-1 text-sm text-base-content/70">
+                {{ 'keywords.description' | transloco }}
+            </p>
+        </div>
+        <div class="flex gap-2">
+            <button type="button" class="btn btn-ghost btn-sm sm:btn-md rounded-xl px-4"
+                [class.bg-base-200]="showFilters()" (click)="toggleFilters()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                <span class="hidden sm:inline font-bold">{{ 'keywords.filters.title' | transloco }}</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm sm:btn-md normal-case font-bold px-6 rounded-xl"
+                (click)="openCreateModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                {{ 'keywords.add' | transloco }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters Card -->
+    @if (showFilters()) {
+    <div class="card bg-white shadow-sm border border-base-200 animate-fade-in-up">
+        <div class="card-body p-6">
+            <h2 class="label-standard mb-6">{{ 'keywords.filters.title' | transloco }}</h2>
+            <form [formGroup]="filterForm" class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4"
+                (ngSubmit)="onSearch()">
+                <!-- Name Filter -->
+                <div class="form-control w-full">
+                    <label class="label pt-0 pb-1">
+                        <span class="label-standard">{{ 'keywords.fields.name' | transloco }}</span>
+                    </label>
+                    <input type="text" formControlName="name" class="input-standard input w-full"
+                        [placeholder]="'keywords.fields.namePlaceholder' | transloco" />
+                </div>
+
+                <!-- Keyword Filter -->
+                <div class="form-control w-full">
+                    <label class="label pt-0 pb-1">
+                        <span class="label-standard">{{ 'keywords.fields.keyword' | transloco }}</span>
+                    </label>
+                    <input type="text" formControlName="keyword" class="input-standard input w-full"
+                        [placeholder]="'keywords.fields.keywordPlaceholder' | transloco" />
+                </div>
+
+                <!-- Status Filter -->
+                <div class="form-control w-full">
+                    <label class="label pt-0 pb-1">
+                        <span class="label-standard">{{ 'keywords.fields.status' | transloco }}</span>
+                    </label>
+                    <select formControlName="status" class="select-standard select w-full">
+                        <option value="">{{ 'keywords.filters.all' | transloco }}</option>
+                        @for (status of statuses(); track status.value) {
+                        <option [value]="status.value">{{ status.label }}</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Actions -->
+                <div class="md:col-span-3 flex justify-end items-center gap-4 mt-4">
+                    <button type="button"
+                        class="btn btn-link btn-sm normal-case text-base-content/60 no-underline hover:text-base-content font-bold"
+                        (click)="onResetFilters()">
+                        {{ 'keywords.filters.reset' | transloco }}
+                    </button>
+                    <button type="submit" class="btn-standard-search">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        {{ 'keywords.filters.search' | transloco }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    }
+
+    <!-- Content Area -->
+    <div class="min-h-[400px]">
+        @if (isLoading() && keywords().length === 0) {
+        <div
+            class="flex flex-col items-center justify-center py-24 gap-4 bg-base-100 rounded-2xl border border-base-200">
+            <span class="loading loading-spinner loading-lg text-primary"></span>
+            <p class="text-xs font-bold uppercase tracking-widest text-base-content/40">{{ 'keywords.loading' |
+                transloco }}</p>
+        </div>
+        } @else if (keywords().length === 0) {
+        <div
+            class="flex flex-col items-center justify-center py-24 bg-base-100 rounded-2xl border-2 border-dashed border-base-250">
+            <svg class="w-16 h-16 text-base-content/5 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    [attr.d]="getIconPath('keywords')"></path>
+            </svg>
+            <h3 class="text-xl font-bold text-base-content/20 uppercase tracking-widest">{{ 'keywords.empty' | transloco
+                }}</h3>
+        </div>
+        } @else {
+        <!-- Grid of Keywords -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            @for (keyword of keywords(); track keyword.id) {
+            <app-keyword-card [keyword]="keyword" (onEdit)="openEditModal($event)" (onDelete)="deleteKeyword($event)"
+                class="animate-fade-in-up" [style.animation-delay]="($index * 40) + 'ms'">
+            </app-keyword-card>
+            }
+        </div>
+
+        <!-- Pagination / Load More -->
+        <div class="flex flex-col items-center justify-center mt-12 pb-12">
+            @if (hasMore()) {
+            <button class="btn btn-primary btn-outline btn-sm sm:btn-md rounded-xl px-12 normal-case font-bold h-11"
+                [disabled]="isLoading()" (click)="loadMore()">
+                @if (isLoading()) {
+                <span class="loading loading-spinner"></span>
+                } @else {
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+                }
+                {{ 'keywords.loadMore' | transloco }}
+            </button>
+            } @else {
+            <div class="flex items-center gap-4 w-full px-8 opacity-50">
+                <div class="h-[1px] bg-base-300 flex-1"></div>
+                <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-base-content/40">Fin del
+                    listado</span>
+                <div class="h-[1px] bg-base-300 flex-1"></div>
+            </div>
+            }
+        </div>
+        }
+    </div>
+</div>
+
+<!-- Modal for Create/Edit (Clean Style) -->
+<input type="checkbox" id="keyword-modal" class="modal-toggle" [checked]="isModalOpen()" />
+<div class="modal modal-bottom sm:modal-middle" (click)="closeModal()">
+    <div class="modal-box rounded-2xl p-0 overflow-hidden bg-base-100 shadow-2xl" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="p-8 border-b border-base-200">
+            <h3 class="font-bold text-2xl text-base-content">{{ (editingKeyword() ? 'keywords.edit' : 'keywords.add') |
+                transloco }}</h3>
+            <p class="text-sm text-base-content/60 mt-1">{{ 'keywords.description' | transloco }}</p>
+        </div>
+
+        <!-- Form -->
+        <form [formGroup]="keywordForm" (ngSubmit)="saveKeyword()" class="p-8 space-y-8">
+            <div class="form-control">
+                <label class="label pb-1">
+                    <span class="label-standard">{{ 'keywords.fields.name' | transloco }}</span>
+                </label>
+                <input type="text" formControlName="name" class="input-standard input w-full"
+                    [placeholder]="'keywords.fields.namePlaceholder' | transloco" />
+                @if (keywordForm.get('name')?.touched && keywordForm.get('name')?.invalid) {
+                <span class="text-[10px] font-bold text-error mt-1 uppercase tracking-wider">Ingresa al menos 3
+                    caracteres</span>
+                }
+            </div>
+
+            <div class="form-control">
+                <label class="label pb-1">
+                    <span class="label-standard">{{ 'keywords.fields.keyword' | transloco }}</span>
+                </label>
+                <input type="text" formControlName="keyword" class="input-standard input w-full"
+                    [placeholder]="'keywords.fields.keywordPlaceholder' | transloco" />
+                @if (keywordForm.get('keyword')?.touched && keywordForm.get('keyword')?.invalid) {
+                <span class="text-[10px] font-bold text-error mt-1 uppercase tracking-wider">Campo requerido</span>
+                }
+            </div>
+
+            <div class="form-control">
+                <label class="label pb-1">
+                    <span class="label-standard">{{ 'keywords.fields.status' | transloco }}</span>
+                </label>
+                <div class="flex gap-8 mt-2">
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input type="radio" value="active" formControlName="status"
+                            class="radio radio-accent radio-sm" />
+                        <span
+                            class="text-sm font-bold text-base-content/70 group-hover:text-accent transition-colors">{{
+                            'keywords.status.active' | transloco }}</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input type="radio" value="inactive" formControlName="status"
+                            class="radio radio-accent radio-sm" />
+                        <span class="text-sm font-bold text-base-content/70 group-hover:text-error transition-colors">{{
+                            'keywords.status.inactive' | transloco }}</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="modal-action mt-6 pt-6 border-t border-base-200">
+                <button type="button" class="btn btn-ghost btn-sm sm:btn-md h-11 px-8 rounded-xl font-bold normal-case"
+                    (click)="closeModal()">{{ 'generics.cancel' | transloco }}</button>
+                <button type="submit"
+                    class="btn btn-primary btn-sm sm:btn-md h-11 px-10 rounded-xl font-bold normal-case"
+                    [disabled]="isSaving() || keywordForm.invalid">
+                    <span *ngIf="isSaving()" class="loading loading-spinner loading-xs"></span>
+                    {{ 'generics.confirm' | transloco }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

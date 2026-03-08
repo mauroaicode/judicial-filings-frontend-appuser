@@ -16,15 +16,17 @@
     th {
       font-weight: 600;
       font-size: 0.875rem;
-      text-transform: uppercase;
       background-color: #161326 !important; // neutral color (black from project)
       color: #ffffff !important; // white text
-      position: relative;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 700 !important;
 
       &.sticky-header {
         position: sticky !important;
+        top: 0 !important;
         left: 0 !important;
-        z-index: 1000 !important;
+        z-index: 1200 !important;
         background: #161326 !important; // Force solid background
         color: #ffffff !important;
         box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;

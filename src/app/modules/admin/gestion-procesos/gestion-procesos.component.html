@@ -9,471 +9,656 @@
         {{ 'gestionProcesos.description' | transloco }}
       </p>
     </div>
-    <button
-      type="button"
-      class="btn btn-primary btn-sm sm:btn-md"
-      (click)="openAddProcessModal()"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-5 w-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M12 4v16m8-8H4"
-        />
-      </svg>
-      {{ 'gestionProcesos.addProcess.button' | transloco }}
-    </button>
+    <div class="flex gap-2">
+      <button type="button" class="btn btn-ghost btn-sm sm:btn-md rounded-xl px-4" [class.bg-base-200]="showFilters()"
+        (click)="toggleFilters()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+        </svg>
+        <span class="hidden sm:inline font-bold">{{ 'gestionProcesos.filters.title' | transloco }}</span>
+      </button>
+      <button type="button" class="btn btn-primary btn-sm sm:btn-md normal-case font-bold px-6 rounded-xl"
+        (click)="openAddProcessModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        {{ 'gestionProcesos.addProcess.button' | transloco }}
+      </button>
+    </div>
   </div>
 
-  <!-- Stats cards (above filters) -->
+  <!-- Stats cards -->
   <section class="dashboard-stats" aria-labelledby="gestion-stats-heading">
     <h2 id="gestion-stats-heading" class="sr-only">
       {{ 'dashboard.stats.title' | transloco }}
     </h2>
-    <app-dashboard-stats-cards
-      [stats]="stats()"
-      [loading]="statsLoading()"
-      [error]="statsError()"
-    />
+    <app-dashboard-stats-cards [stats]="stats()" [loading]="statsLoading()" [error]="statsError()" />
   </section>
 
-  <!-- Notifications drawer (state from NotificationsDrawerStateService) -->
-  <app-notifications-drawer
-    (closed)="onNotificationsDrawerClosed()"
-    (rowClick)="onNotificationRowClick($event)"
-  />
+  <!-- Notifications drawer -->
+  <app-notifications-drawer (closed)="onNotificationsDrawerClosed()" (rowClick)="onNotificationRowClick($event)" />
 
-  <!-- Filters -->
-  <div class="card bg-base-100 shadow-sm">
-    <div class="card-body">
-      <h2 class="card-title text-lg mb-4">{{ 'gestionProcesos.filters.title' | transloco }}</h2>
-      <form [formGroup]="filterForm" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" autocomplete="off">
-        <!-- Row 1: Process Number, Court, Process Class, Plaintiff -->
+  <!-- Filters Card -->
+  @if (showFilters()) {
+  <div class="card bg-white shadow-sm border border-base-200 animate-fade-in-up">
+    <div class="card-body p-6">
+      <h2 class="label-standard mb-6">{{ 'gestionProcesos.filters.title' | transloco }}</h2>
+      <form [formGroup]="filterForm"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4" autocomplete="off">
+
         <!-- Process Number Filter -->
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">{{ 'gestionProcesos.filters.processNumber' | transloco }}</span>
+          <label class="label pt-0 pb-1">
+            <span class="label-standard">{{ 'gestionProcesos.filters.processNumber' | transloco }}</span>
           </label>
-          <input
-            type="text"
-            name="process_number"
-            formControlName="process_number"
-            class="input input-bordered input-sm"
-            [placeholder]="'gestionProcesos.filters.processNumberPlaceholder' | transloco"
-            autocomplete="one-time-code"
-            data-form-type="other"
-            inputmode="numeric"
-          />
+          <input type="text" formControlName="process_number" class="input-standard input w-full"
+            [placeholder]="'gestionProcesos.filters.processNumberPlaceholder' | transloco" inputmode="numeric" />
         </div>
 
         <!-- Court Filter -->
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">{{ 'gestionProcesos.filters.court' | transloco }}</span>
+          <label class="label pt-0 pb-1">
+            <span class="label-standard">{{ 'gestionProcesos.filters.court' | transloco }}</span>
           </label>
-          <input
-            type="text"
-            formControlName="court"
-            class="input input-bordered input-sm"
-            [placeholder]="'gestionProcesos.filters.courtPlaceholder' | transloco"
-            autocomplete="off"
-          />
+          <input type="text" formControlName="court" class="input-standard input w-full"
+            [placeholder]="'gestionProcesos.filters.courtPlaceholder' | transloco" />
         </div>
 
         <!-- Process Class Filter -->
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">{{ 'gestionProcesos.filters.processClass' | transloco }}</span>
+          <label class="label pt-0 pb-1">
+            <span class="label-standard">{{ 'gestionProcesos.filters.processClass' | transloco }}</span>
           </label>
-          <input
-            type="text"
-            formControlName="process_class"
-            class="input input-bordered input-sm"
-            [placeholder]="'gestionProcesos.filters.processClassPlaceholder' | transloco"
-            autocomplete="off"
-          />
+          <input type="text" formControlName="process_class" class="input-standard input w-full"
+            [placeholder]="'gestionProcesos.filters.processClassPlaceholder' | transloco" />
         </div>
 
         <!-- Plaintiff Filter -->
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">{{ 'gestionProcesos.filters.plaintiff' | transloco }}</span>
+          <label class="label pt-0 pb-1">
+            <span class="label-standard">{{ 'gestionProcesos.filters.plaintiff' | transloco }}</span>
           </label>
-          <input
-            type="text"
-            formControlName="plaintiff"
-            class="input input-bordered input-sm"
-            [placeholder]="'gestionProcesos.filters.plaintiffPlaceholder' | transloco"
-            autocomplete="off"
-          />
+          <input type="text" formControlName="plaintiff" class="input-standard input w-full"
+            [placeholder]="'gestionProcesos.filters.plaintiffPlaceholder' | transloco" />
         </div>
 
-        <!-- Row 2: Defendant, Status, Has Multiple Instances, Process Date -->
         <!-- Defendant Filter -->
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">{{ 'gestionProcesos.filters.defendant' | transloco }}</span>
+          <label class="label pt-0 pb-1">
+            <span class="label-standard">{{ 'gestionProcesos.filters.defendant' | transloco }}</span>
           </label>
-          <input
-            type="text"
-            formControlName="defendant"
-            class="input input-bordered input-sm"
-            [placeholder]="'gestionProcesos.filters.defendantPlaceholder' | transloco"
-            autocomplete="off"
-          />
+          <input type="text" formControlName="defendant" class="input-standard input w-full"
+            [placeholder]="'gestionProcesos.filters.defendantPlaceholder' | transloco" />
         </div>
 
         <!-- Status Filter -->
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">{{ 'gestionProcesos.filters.status' | transloco }}</span>
+          <label class="label pt-0 pb-1">
+            <span class="label-standard">{{ 'gestionProcesos.filters.status' | transloco }}</span>
           </label>
-          <select
-            formControlName="status"
-            class="select select-bordered select-sm w-full"
-          >
+          <select formControlName="status" class="select-standard select w-full">
             <option value="">{{ 'gestionProcesos.filters.statusPlaceholder' | transloco }}</option>
             <option value="active">{{ 'gestionProcesos.filters.statusActive' | transloco }}</option>
             <option value="inactive">{{ 'gestionProcesos.filters.statusInactive' | transloco }}</option>
           </select>
         </div>
 
-        <!-- Has Multiple Instances Filter -->
+        <!-- Multiple Instances Filter -->
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">{{ 'gestionProcesos.filters.hasMultipleInstances' | transloco }}</span>
+          <label class="label pt-0 pb-1">
+            <span class="label-standard">{{ 'gestionProcesos.filters.hasMultipleInstances' | transloco }}</span>
           </label>
-          <select
-            formControlName="has_multiple_instances"
-            class="select select-bordered select-sm w-full"
-          >
+          <select formControlName="has_multiple_instances" class="select-standard select w-full">
             <option [value]="null">{{ 'gestionProcesos.filters.all' | transloco }}</option>
             <option [value]="true">{{ 'gestionProcesos.filters.yes' | transloco }}</option>
             <option [value]="false">{{ 'gestionProcesos.filters.no' | transloco }}</option>
           </select>
         </div>
 
-        <!-- Row 3: Process Date Range (Radicación), Created At Range, Last API Update Range -->
-        <!-- Process Date Range Filter (Fecha de Radicación) -->
+        <!-- Radicación Date Range -->
         <div class="form-control">
-          <app-date-range-picker
-            [label]="'gestionProcesos.filters.createdAtRange' | transloco"
+          <app-date-range-picker [label]="'gestionProcesos.filters.createdAtRange' | transloco"
             [placeholder]="'gestionProcesos.filters.createdAtRangePlaceholder' | transloco"
-            [size]="'sm'"
-            formControlName="process_date_range"
-          ></app-date-range-picker>
+            formControlName="process_date_range"></app-date-range-picker>
         </div>
 
-        <!-- Created At Range Filter (Fecha de Creación del Registro) -->
+        <!-- Registro Date Range -->
         <div class="form-control">
-          <app-date-range-picker
-            [label]="'gestionProcesos.filters.processDateRange' | transloco"
+          <app-date-range-picker [label]="'gestionProcesos.filters.processDateRange' | transloco"
             [placeholder]="'gestionProcesos.filters.processDateRangePlaceholder' | transloco"
-            [size]="'sm'"
-            formControlName="created_at_range"
-          ></app-date-range-picker>
+            formControlName="created_at_range"></app-date-range-picker>
         </div>
 
-        <!-- Last API Update Range Filter -->
-        <div class="form-control">
-          <app-date-range-picker
-            [label]="'gestionProcesos.filters.lastApiUpdateRange' | transloco"
+        <!-- API Proxy Date Range -->
+        <div class="form-control md:col-span-2 lg:col-span-1">
+          <app-date-range-picker [label]="'gestionProcesos.filters.lastApiUpdateRange' | transloco"
             [placeholder]="'gestionProcesos.filters.lastApiUpdateRangePlaceholder' | transloco"
-            [size]="'sm'"
-            formControlName="last_api_update_range"
-          ></app-date-range-picker>
+            formControlName="last_api_update_range"></app-date-range-picker>
+        </div>
+
+        <!-- Actions -->
+        <div class="md:col-span-2 lg:col-span-3 xl:col-span-4 flex justify-end items-center gap-4 mt-4">
+          <button type="button"
+            class="btn btn-link btn-sm normal-case text-base-content/60 no-underline hover:text-base-content font-bold"
+            (click)="onResetFilters()">
+            {{ 'gestionProcesos.filters.reset' | transloco }}
+          </button>
+          <button type="button" class="btn-standard-search" (click)="onSearch()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            {{ 'gestionProcesos.filters.search' | transloco }}
+          </button>
         </div>
       </form>
-
-      <!-- Filter Actions -->
-      <div class="card-actions justify-end mt-4">
-        <button
-          type="button"
-          class="btn btn-ghost btn-sm"
-          (click)="onResetFilters()"
-        >
-          {{ 'gestionProcesos.filters.reset' | transloco }}
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary btn-sm"
-          (click)="onSearch()"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-          {{ 'gestionProcesos.filters.search' | transloco }}
-        </button>
-      </div>
     </div>
   </div>
+  }
 
-  <!-- Data Table -->
-  <div class="card bg-base-100 shadow-sm">
-    <div class="card-body p-0">
-      <app-data-table
-        [columns]="columns"
-        [data]="processes()"
-        [pagination]="pagination()"
-        [loading]="loading()"
-        [emptyMessage]="'gestionProcesos.table.empty' | transloco"
-        (pageChange)="onPageChange($event)"
-        (rowClick)="onRowClick($event)"
-      ></app-data-table>
+  <!-- Table Card -->
+  <div class="card bg-base-100 shadow-sm process-list-card">
+    <div class="card-body p-0 process-list-card-body">
+      @if (loading()) {
+      <div class="flex items-center justify-center py-12">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+      } @else if (processes().length === 0) {
+      <div class="flex flex-col items-center justify-center py-12 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-base-content/30 mb-4" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <p class="text-base-content/70">{{ 'gestionProcesos.table.empty' | transloco }}</p>
+      </div>
+      } @else {
+      <div class="overflow-x-auto w-full process-list-table">
+        <table class="table table-zebra" style="min-width: 1000px;">
+          <thead style="background-color: #161326; color: #ffffff;">
+            <tr>
+              <th style="width: 48px;" class="text-center"></th>
+              @for (column of columns; track column.key) {
+              <th [class.sticky-col-radicado]="column.key === 'process_number'"
+                [class.text-left]="!column.align || column.align === 'left'"
+                [class.text-center]="column.align === 'center'" [class.text-right]="column.align === 'right'"
+                [style.width]="column.width">
+                {{ column.label | transloco }}
+              </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (process of processes(); track process.id) {
+            <tr class="cursor-pointer group process-table-main-row"
+              [class.process-row-hovered]="hoveredRowId() === process.id"
+              [class.rounded-b-none]="isExpanded(process) && process.instances?.length"
+              [class.border-b-0]="isExpanded(process) && process.instances?.length"
+              [class.bg-base-200/30]="isExpanded(process) && process.instances?.length"
+              (mouseenter)="hoveredRowId.set(process.id)" (mouseleave)="hoveredRowId.set(null)"
+              (click)="toggleExpand(process)" (dblclick)="onRowDblClick(process)">
+              <td class="text-center align-middle p-2">
+                @if (process.has_multiple_instances && process.instances && process.instances.length > 1) {
+                <button type="button" class="btn btn-ghost btn-xs btn-square"
+                  (click)="toggleExpand(process); $event.stopPropagation()" [attr.aria-expanded]="isExpanded(process)"
+                  [attr.aria-label]="isExpanded(process) ? 'Colapsar' : 'Expandir'">
+                  @if (isExpanded(process)) {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                  } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                  }
+                </button>
+                } @else {
+                <span class="opacity-0 group-hover:opacity-30">–</span>
+                }
+              </td>
+              <td class="text-center align-middle">{{ process.index }}</td>
+              <td class="whitespace-nowrap align-middle sticky-col-radicado">
+                <span class="sticky-cell-bg" aria-hidden="true"></span>
+                <span class="sticky-cell-txt">{{ process.process_number }}</span>
+              </td>
+              <td class="align-middle">{{ process.court }}</td>
+              <td class="align-middle">{{ process.process_class }}</td>
+              <td class="text-center align-middle">
+                <span class="badge whitespace-nowrap" [ngClass]="{
+                        'badge-success': process.status_label === 'Activo',
+                        'badge-warning': process.status_label === 'Pendiente',
+                        'badge-neutral': process.status_label === 'Cerrado',
+                        'badge-error': process.status_label === 'Inactivo'
+                      }">
+                  {{ process.status_label }}
+                </span>
+              </td>
+              <td class="align-middle">
+                @let plaintiffDisplay = getPartyDisplay(process.plaintiffs ?? (process.plaintiff ? [process.plaintiff] :
+                []));
+                @if (plaintiffDisplay.mainText || plaintiffDisplay.extraCount > 0) {
+                <span>
+                  {{ plaintiffDisplay.mainText }}
+                  @if (plaintiffDisplay.extraCount > 0) {
+                  <span class="tooltip tooltip-bottom tooltip-accent process-list-tooltip"
+                    (click)="$event.stopPropagation()">
+                    <div
+                      class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
+                      @for (name of plaintiffDisplay.fullList; track name; let i = $index) {
+                      <div class="text-base-content">{{ i + 1 }}. {{ name }}</div>
+                      }
+                    </div>
+                    <span
+                      class="text-accent font-medium cursor-pointer whitespace-nowrap underline decoration-accent/50 decoration-dotted underline-offset-1">
+                      (+{{ plaintiffDisplay.extraCount }})
+                    </span>
+                  </span>
+                  }
+                </span>
+                } @else {
+                <span class="text-base-content/50">–</span>
+                }
+              </td>
+              <td class="align-middle">
+                @let defendantDisplay = getPartyDisplay(process.defendants ?? (process.defendant ? [process.defendant] :
+                []));
+                @if (defendantDisplay.mainText || defendantDisplay.extraCount > 0) {
+                <span>
+                  {{ defendantDisplay.mainText }}
+                  @if (defendantDisplay.extraCount > 0) {
+                  <span class="tooltip tooltip-bottom tooltip-accent process-list-tooltip"
+                    (click)="$event.stopPropagation()">
+                    <div
+                      class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
+                      @for (name of defendantDisplay.fullList; track name; let i = $index) {
+                      <div class="text-base-content">{{ i + 1 }}. {{ name }}</div>
+                      }
+                    </div>
+                    <span
+                      class="text-accent font-medium cursor-pointer whitespace-nowrap underline decoration-accent/50 decoration-dotted underline-offset-1">
+                      (+{{ defendantDisplay.extraCount }})
+                    </span>
+                  </span>
+                  }
+                </span>
+                } @else {
+                <span class="text-base-content/50">–</span>
+                }
+              </td>
+              <td class="text-center align-middle">
+                <span class="badge badge-sm" [class.badge-accent]="getInstanceCount(process) > 1"
+                  [class.badge-ghost]="getInstanceCount(process) <= 1">
+                  {{ getInstanceCount(process) }}
+                </span>
+              </td>
+              <td class="text-center align-middle whitespace-nowrap">{{ formatProcessDate(process.created_at) }}</td>
+              <td class="text-center align-middle whitespace-nowrap">{{ formatProcessDate(process.last_activity_date) }}
+              </td>
+            </tr>
+
+            @if (isExpanded(process) && process.instances && process.instances.length > 0) {
+            @for (instance of process.instances; track instance.id) {
+            <tr class="cursor-pointer bg-accent/10 process-table-instance-row border-l-4 border-accent"
+              [class.process-row-hovered]="hoveredRowId() === instance.id" (mouseenter)="hoveredRowId.set(instance.id)"
+              (mouseleave)="hoveredRowId.set(null)" (dblclick)="onRowDblClick(instance)">
+              <td class="text-center align-middle p-2 pl-4">
+                <span aria-hidden="true"
+                  class="inline-flex items-center justify-center text-[#37E6B4] text-lg font-bold leading-none drop-shadow-[0_0_5px_rgba(55,230,180,0.55)]"
+                  title="Instancia relacionada">
+                  ↳
+                </span>
+              </td>
+              <td class="text-center align-middle text-base-content/70">{{ instance.index }}</td>
+              <td class="whitespace-nowrap align-middle text-base-content/80 sticky-col-radicado">
+                <span class="sticky-cell-bg" aria-hidden="true"></span>
+                <span class="sticky-cell-txt">{{ instance.process_number }}</span>
+              </td>
+              <td class="align-middle text-base-content/80">{{ instance.court }}</td>
+              <td class="align-middle text-base-content/80">{{ instance.process_class }}</td>
+              <td class="text-center align-middle">
+                <span class="badge badge-sm whitespace-nowrap" [ngClass]="{
+                            'badge-success': instance.status_label === 'Activo',
+                            'badge-warning': instance.status_label === 'Pendiente',
+                            'badge-neutral': instance.status_label === 'Cerrado',
+                            'badge-error': instance.status_label === 'Inactivo'
+                          }">
+                  {{ instance.status_label }}
+                </span>
+              </td>
+              <td class="align-middle">
+                @let instPlaint = getPartyDisplay(instance.plaintiffs ?? (instance.plaintiff ? [instance.plaintiff] :
+                []));
+                @if (instPlaint.mainText || instPlaint.extraCount > 0) {
+                <span>
+                  {{ instPlaint.mainText }}
+                  @if (instPlaint.extraCount > 0) {
+                  <span class="tooltip tooltip-bottom tooltip-accent process-list-tooltip"
+                    (click)="$event.stopPropagation()">
+                    <div
+                      class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
+                      @for (name of instPlaint.fullList; track name; let i = $index) {
+                      <div class="text-base-content">{{ i + 1 }}. {{ name }}</div>
+                      }
+                    </div>
+                    <span
+                      class="text-accent font-medium cursor-pointer whitespace-nowrap underline decoration-accent/50 decoration-dotted underline-offset-1">
+                      (+{{ instPlaint.extraCount }})
+                    </span>
+                  </span>
+                  }
+                </span>
+                } @else {
+                <span class="text-base-content/50">–</span>
+                }
+              </td>
+              <td class="align-middle">
+                @let instDef = getPartyDisplay(instance.defendants ?? (instance.defendant ? [instance.defendant] : []));
+                @if (instDef.mainText || instDef.extraCount > 0) {
+                <span>
+                  {{ instDef.mainText }}
+                  @if (instDef.extraCount > 0) {
+                  <span class="tooltip tooltip-bottom tooltip-accent process-list-tooltip"
+                    (click)="$event.stopPropagation()">
+                    <div
+                      class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
+                      @for (name of instDef.fullList; track name; let i = $index) {
+                      <div class="text-base-content">{{ i + 1 }}. {{ name }}</div>
+                      }
+                    </div>
+                    <span
+                      class="text-accent font-medium cursor-pointer whitespace-nowrap underline decoration-accent/50 decoration-dotted underline-offset-1">
+                      (+{{ instDef.extraCount }})
+                    </span>
+                  </span>
+                  }
+                </span>
+                } @else {
+                <span class="text-base-content/50">–</span>
+                }
+              </td>
+              <td class="text-center align-middle">
+                <span class="badge badge-sm" [class.badge-accent]="getInstanceCount(process) > 1"
+                  [class.badge-ghost]="getInstanceCount(process) <= 1">
+                  {{ getInstanceCount(process) }}
+                </span>
+              </td>
+              <td class="text-center align-middle whitespace-nowrap text-base-content/70">{{
+                formatProcessDate(instance.created_at) }}</td>
+              <td class="text-center align-middle whitespace-nowrap text-base-content/70">{{
+                formatProcessDate(instance.last_activity_date) }}</td>
+            </tr>
+            }
+            }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      @if (pagination(); as paginationInfo) {
+      <div class="pagination-container border-t border-base-300 bg-base-100">
+        <div class="pagination-results-info">
+          {{ 'table.showing' | transloco }}
+          <span class="font-semibold">{{ paginationInfo.from }}</span>
+          {{ 'table.to' | transloco }}
+          <span class="font-semibold">{{ paginationInfo.to }}</span>
+          {{ 'table.of' | transloco }}
+          <span class="font-semibold">{{ paginationInfo.total }}</span>
+          {{ 'table.results' | transloco }}
+        </div>
+        <div class="pagination-controls join">
+          <button class="join-item btn btn-sm" [class.btn-disabled]="paginationInfo.current_page === 1"
+            (click)="onPageChange({ page: 1, perPage: paginationInfo.per_page })"
+            [disabled]="paginationInfo.current_page === 1">««</button>
+          <button class="join-item btn btn-sm" [class.btn-disabled]="paginationInfo.current_page === 1"
+            (click)="onPageChange({ page: paginationInfo.current_page - 1, perPage: paginationInfo.per_page })"
+            [disabled]="paginationInfo.current_page === 1">«</button>
+          @for (page of getPageNumbers(); track page) {
+          <button class="join-item btn btn-sm" [class.btn-active]="page === paginationInfo.current_page"
+            (click)="onPageChange({ page, perPage: paginationInfo.per_page })">
+            {{ page }}
+          </button>
+          }
+          <button class="join-item btn btn-sm"
+            [class.btn-disabled]="paginationInfo.current_page === paginationInfo.last_page"
+            (click)="onPageChange({ page: paginationInfo.current_page + 1, perPage: paginationInfo.per_page })"
+            [disabled]="paginationInfo.current_page === paginationInfo.last_page">»</button>
+          <button class="join-item btn btn-sm"
+            [class.btn-disabled]="paginationInfo.current_page === paginationInfo.last_page"
+            (click)="onPageChange({ page: paginationInfo.last_page, perPage: paginationInfo.per_page })"
+            [disabled]="paginationInfo.current_page === paginationInfo.last_page">»»</button>
+        </div>
+        <div class="pagination-page-size">
+          <select class="select select-bordered select-sm" [value]="paginationInfo.per_page"
+            (change)="onPageChange({ page: 1, perPage: +$any($event.target).value })">
+            @for (size of pageSizeOptions; track size) {
+            <option [value]="size" [attr.selected]="size === paginationInfo.per_page ? '' : null">
+              {{ size }} {{ 'table.perPage' | transloco }}
+            </option>
+            }
+          </select>
+        </div>
+      </div>
+      }
+      }
     </div>
   </div>
 
   <!-- Add Process Modal -->
   <dialog class="modal" [class.modal-open]="isModalOpen()">
-    <div class="modal-box max-w-2xl w-full">
-      <h3 class="font-bold text-lg text-base-content mb-4">
-        {{ 'gestionProcesos.addProcess.title' | transloco }}
-      </h3>
+    <div class="modal-box rounded-2xl p-0 overflow-hidden bg-base-100 shadow-2xl max-w-2xl w-full">
+      <!-- Header -->
+      <div class="p-8 border-b border-base-200">
+        <h3 class="font-bold text-2xl text-base-content">{{ 'gestionProcesos.addProcess.title' | transloco }}</h3>
+        <p class="text-sm text-base-content/60 mt-1">{{ 'gestionProcesos.description' | transloco }}</p>
+      </div>
 
-      <!-- Error Alert -->
-      @if (error()) {
-        <div class="alert alert-error mb-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+      <div class="p-8">
+        <!-- Error Alert -->
+        @if (error()) {
+        <div class="alert alert-error mb-6 rounded-xl border-none shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span>
+          <span class="text-sm font-semibold">
             @if (error()!.includes('.')) {
-              {{ error() | transloco }}
+            {{ error() | transloco }}
             } @else {
-              {{ error() }}
+            {{ error() }}
             }
           </span>
         </div>
-      }
+        }
 
-      <!-- Info Alert with recommendations -->
-      <div class="alert alert-info mb-4">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          class="stroke-current shrink-0 h-6 w-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <div>
-          <h4 class="font-bold">{{ 'gestionProcesos.addProcess.recommendations.title' | transloco }}</h4>
-          <ul class="list-disc list-inside text-sm mt-2">
-            <li>{{ 'gestionProcesos.addProcess.recommendations.rule1' | transloco }}</li>
-            <li>{{ 'gestionProcesos.addProcess.recommendations.rule2' | transloco }}</li>
-            <li>{{ 'gestionProcesos.addProcess.recommendations.rule3' | transloco }}</li>
-          </ul>
+        <!-- Recommendations -->
+        <div class="alert bg-info/10 border-none rounded-2xl p-6 flex items-start gap-4 mb-8">
+          <div class="bg-info/20 p-3 rounded-xl text-info">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              class="stroke-current shrink-0 h-6 w-6">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="font-bold text-info text-base">{{ 'gestionProcesos.addProcess.recommendations.title' | transloco
+              }}</h4>
+            <ul class="space-y-1.5 mt-2">
+              <li class="flex items-center gap-2 text-info/80 text-sm font-medium">
+                <div class="w-1 h-1 rounded-full bg-info"></div>
+                {{ 'gestionProcesos.addProcess.recommendations.rule1' | transloco }}
+              </li>
+              <li class="flex items-center gap-2 text-info/80 text-sm font-medium">
+                <div class="w-1 h-1 rounded-full bg-info"></div>
+                {{ 'gestionProcesos.addProcess.recommendations.rule2' | transloco }}
+              </li>
+              <li class="flex items-center gap-2 text-info/80 text-sm font-medium">
+                <div class="w-1 h-1 rounded-full bg-info"></div>
+                {{ 'gestionProcesos.addProcess.recommendations.rule3' | transloco }}
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
 
-      <!-- Form -->
-      <form [formGroup]="addProcessForm" (ngSubmit)="onSubmitAddProcess()">
-        <div class="form-control mb-4">
-          <label class="label">
-            <span class="label-text">{{ 'gestionProcesos.addProcess.processNumberLabel' | transloco }}</span>
-          </label>
-          <input
-            type="text"
-            formControlName="process_number"
-            class="input input-bordered w-full"
-            [class.input-error]="addProcessForm.get('process_number')?.invalid && addProcessForm.get('process_number')?.touched"
-            [placeholder]="'gestionProcesos.addProcess.processNumberPlaceholder' | transloco"
-            autocomplete="one-time-code"
-            inputmode="numeric"
-            maxlength="23"
-            (input)="onProcessNumberInput($event)"
-          />
-          @if (getProcessNumberError()) {
-            <label class="label">
-              <span class="label-text-alt text-error">
+        <!-- Form -->
+        <form [formGroup]="addProcessForm" (ngSubmit)="onSubmitAddProcess()" class="space-y-6">
+          <div class="form-control">
+            <label class="label pb-1">
+              <span class="label-standard">{{ 'gestionProcesos.addProcess.processNumberLabel' | transloco }}</span>
+            </label>
+            <div class="relative">
+              <input type="text" formControlName="process_number" class="input-standard input w-full"
+                [class.input-error]="addProcessForm.get('process_number')?.invalid && addProcessForm.get('process_number')?.touched"
+                [placeholder]="'gestionProcesos.addProcess.processNumberPlaceholder' | transloco"
+                autocomplete="one-time-code" inputmode="numeric" maxlength="23"
+                (input)="onProcessNumberInput($event)" />
+              @if (addProcessForm.get('process_number')?.valid && addProcessForm.get('process_number')?.value?.length
+              === 23) {
+              <div
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-success animate-in fade-in zoom-in duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd" />
+                </svg>
+              </div>
+              }
+            </div>
+            @if (getProcessNumberError()) {
+            <label class="label pt-1.5">
+              <span class="text-[10px] font-bold text-error uppercase tracking-wider">
                 {{ getProcessNumberError() | transloco }}
               </span>
             </label>
-          }
-        </div>
+            }
+          </div>
 
-        <!-- Actions -->
-        <div class="modal-action">
-          <form method="dialog">
-            <button
-              type="button"
-              class="btn btn-ghost"
-              [disabled]="submitting()"
-              (click)="closeAddProcessModal()"
-            >
+          <!-- Actions -->
+          <div class="modal-action mt-6 pt-6 border-t border-base-200">
+            <button type="button" class="btn btn-ghost btn-sm sm:btn-md h-11 px-8 rounded-xl font-bold normal-case"
+              [disabled]="submitting()" (click)="closeAddProcessModal()">
               {{ 'gestionProcesos.addProcess.cancel' | transloco }}
             </button>
-          </form>
-          <button
-            type="submit"
-            class="btn btn-primary"
-            [disabled]="addProcessForm.invalid || submitting()"
-          >
-            @if (submitting()) {
-              <span class="loading loading-spinner loading-sm"></span>
+            <button type="submit" class="btn btn-primary btn-sm sm:btn-md h-11 px-10 rounded-xl font-bold normal-case"
+              [disabled]="addProcessForm.invalid || submitting()">
+              @if (submitting()) {
+              <span class="loading loading-spinner loading-xs"></span>
               {{ 'gestionProcesos.addProcess.submitting' | transloco }}
-            } @else {
+              } @else {
               {{ 'gestionProcesos.addProcess.submit' | transloco }}
-            }
-          </button>
-        </div>
-      </form>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
     <form method="dialog" class="modal-backdrop" (click)="closeAddProcessModal()">
       <button type="button">{{ 'gestionProcesos.addProcess.close' | transloco }}</button>
     </form>
   </dialog>
 
-  <!-- Info Modal (for multiple instances or private processes) -->
+  <!-- Info Modal -->
   <dialog class="modal" [class.modal-open]="isInfoModalOpen()">
-    <div class="modal-box max-w-2xl w-full">
-      <h3 class="font-bold text-lg text-base-content mb-4">
-        {{ 'gestionProcesos.infoModal.title' | transloco }}
-      </h3>
+    <div class="modal-box rounded-2xl p-0 overflow-hidden bg-base-100 shadow-2xl max-w-2xl w-full">
+      <div class="p-8 border-b border-base-200">
+        <h3 class="font-bold text-2xl text-base-content">{{ 'gestionProcesos.infoModal.title' | transloco }}</h3>
+      </div>
 
-      @if (infoModalData()) {
+      <div class="p-8">
+        @if (infoModalData()) {
         <div class="space-y-4">
           <!-- Success Message -->
-          <div class="alert alert-success">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="stroke-current shrink-0 h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
+          <div class="alert alert-success rounded-xl border-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>{{ infoModalData()!.message }}</span>
+            <span class="font-bold">{{ infoModalData()!.message }}</span>
           </div>
 
           <!-- Multiple Instances Warning -->
           @if (infoModalData()!.has_multiple_instances) {
-            <div class="alert alert-warning">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
-              <div>
-                <h4 class="font-bold">{{ 'gestionProcesos.infoModal.multipleInstances.title' | transloco }}</h4>
-                <p class="text-sm mt-1">{{ 'gestionProcesos.infoModal.multipleInstances.message' | transloco }}</p>
-              </div>
+          <div class="alert alert-warning rounded-xl border-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <h4 class="font-bold">{{ 'gestionProcesos.infoModal.multipleInstances.title' | transloco }}</h4>
+              <p class="text-sm mt-1">{{ 'gestionProcesos.infoModal.multipleInstances.message' | transloco }}</p>
             </div>
+          </div>
           }
 
           <!-- Private Processes Warning -->
           @if (infoModalData()!.private_count >= 1) {
-            <div class="alert alert-warning">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
-              <div>
-                <h4 class="font-bold">{{ 'gestionProcesos.infoModal.privateProcesses.title' | transloco }}</h4>
-                <p class="text-sm mt-1">
-                  {{ 'gestionProcesos.infoModal.privateProcesses.message' | transloco }}
-                  <strong>{{ infoModalData()!.private_count }}</strong>
-                  {{ 'gestionProcesos.infoModal.privateProcesses.messageCount' | transloco }}
-                </p>
-              </div>
+          <div class="alert alert-warning rounded-xl border-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <h4 class="font-bold">{{ 'gestionProcesos.infoModal.privateProcesses.title' | transloco }}</h4>
+              <p class="text-sm mt-1">
+                {{ 'gestionProcesos.infoModal.privateProcesses.message' | transloco }}
+                <strong>{{ infoModalData()!.private_count }}</strong>
+                {{ 'gestionProcesos.infoModal.privateProcesses.messageCount' | transloco }}
+              </p>
             </div>
+          </div>
           }
 
-          <!-- Process Details -->
-          <div class="card bg-base-200">
-            <div class="card-body">
-              <h4 class="card-title text-base">{{ 'gestionProcesos.infoModal.processDetails.title' | transloco }}</h4>
-              <div class="space-y-2 text-sm">
-                <div class="flex justify-between">
-                  <span class="font-semibold text-base-content/70">{{ 'gestionProcesos.table.processNumber' | transloco }}:</span>
-                  <span class="text-base-content">{{ infoModalData()!.process.process_number }}</span>
+          <!-- Details -->
+          <div class="card bg-base-200 rounded-2xl">
+            <div class="card-body p-6">
+              <h4 class="text-xs font-bold uppercase tracking-widest text-base-content/40 mb-4">{{
+                'gestionProcesos.infoModal.processDetails.title' | transloco }}</h4>
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between border-b border-base-content/5 pb-2">
+                  <span class="font-bold text-base-content/60">{{ 'gestionProcesos.table.processNumber' | transloco
+                    }}:</span>
+                  <span class="font-bold text-base-content">{{ infoModalData()!.process.process_number }}</span>
                 </div>
                 @if (infoModalData()!.process.court) {
-                  <div class="flex justify-between">
-                    <span class="font-semibold text-base-content/70">{{ 'gestionProcesos.table.court' | transloco }}:</span>
-                    <span class="text-base-content">{{ infoModalData()!.process.court }}</span>
-                  </div>
+                <div class="flex justify-between border-b border-base-content/5 pb-2">
+                  <span class="font-bold text-base-content/60">{{ 'gestionProcesos.table.court' | transloco }}:</span>
+                  <span class="font-bold text-base-content">{{ infoModalData()!.process.court }}</span>
+                </div>
                 }
-                <div class="flex justify-between">
-                  <span class="font-semibold text-base-content/70">{{ 'gestionProcesos.infoModal.processDetails.totalProcesses' | transloco }}:</span>
-                  <span class="text-base-content">{{ infoModalData()!.total_processes }}</span>
+                <div class="flex justify-between border-b border-base-content/5 pb-2">
+                  <span class="font-bold text-base-content/60">{{
+                    'gestionProcesos.infoModal.processDetails.totalProcesses' | transloco }}:</span>
+                  <span class="font-bold text-base-content badge badge-ghost font-mono">{{
+                    infoModalData()!.total_processes }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="font-semibold text-base-content/70">{{ 'gestionProcesos.infoModal.processDetails.registeredCount' | transloco }}:</span>
-                  <span class="text-base-content">{{ infoModalData()!.registered_count }}</span>
+                  <span class="font-bold text-base-content/60">{{
+                    'gestionProcesos.infoModal.processDetails.registeredCount' | transloco }}:</span>
+                  <span class="font-bold text-success">{{ infoModalData()!.registered_count }}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      }
+        }
 
-      <!-- Modal Actions -->
-      <div class="modal-action">
-        <form method="dialog">
-          <button
-            type="button"
-            class="btn btn-primary"
-            (click)="closeInfoModal()"
-          >
+        <!-- Actions -->
+        <div class="modal-action mt-8 pt-6 border-t border-base-200">
+          <button type="button" class="btn btn-primary btn-sm sm:btn-md normal-case font-bold px-10 rounded-xl h-11"
+            (click)="closeInfoModal()">
             {{ 'gestionProcesos.infoModal.close' | transloco }}
           </button>
-        </form>
+        </div>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop" (click)="closeInfoModal()">

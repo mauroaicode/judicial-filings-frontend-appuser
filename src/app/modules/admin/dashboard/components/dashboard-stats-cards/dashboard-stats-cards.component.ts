@@ -75,6 +75,13 @@ export class DashboardStatsCardsComponent {
         clickable: false,
       },
       {
+        type: 'processes_with_multiple_instances',
+        value: s.processes_with_multiple_instances ?? 0,
+        labelKey: 'dashboard.stats.multipleInstancesTotal',
+        valueClass: 'text-secondary',
+        clickable: false,
+      },
+      {
         type: 'actuacion',
         value: byType.actuacion,
         labelKey: 'dashboard.stats.notifications.actuacion',

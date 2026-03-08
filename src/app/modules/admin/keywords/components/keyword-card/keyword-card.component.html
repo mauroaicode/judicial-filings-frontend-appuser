@@ -1,0 +1,53 @@
+<div
+    class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-all duration-300 relative group rounded-2xl">
+    <div class="card-body p-5">
+        <!-- Header: Status and Actions -->
+        <div class="flex justify-between items-start mb-4">
+            <div class="badge badge-sm font-bold uppercase tracking-wider h-6 px-3 border-none"
+                [class.badge-success]="keyword.status === 'active'" [class.badge-error]="keyword.status === 'inactive'">
+                {{ 'keywords.status.' + keyword.status | transloco }}
+            </div>
+
+            <div class="flex gap-1 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                <button class="btn btn-ghost btn-xs btn-square text-info hover:bg-info/10"
+                    (click)="onEdit.emit(keyword)" [title]="'keywords.edit' | transloco">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            [attr.d]="getIconPath('pencil')"></path>
+                    </svg>
+                </button>
+                <button class="btn btn-ghost btn-xs btn-square text-error hover:bg-error/10"
+                    (click)="onDelete.emit(keyword)" [title]="'keywords.delete' | transloco">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            [attr.d]="getIconPath('trash')"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Content: Name and Date -->
+        <div class="flex items-center gap-3 mb-6">
+            <div class="p-2.5 bg-base-200 rounded-xl text-base-content/60">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        [attr.d]="getIconPath('keywords')"></path>
+                </svg>
+            </div>
+            <div class="flex flex-col min-w-0">
+                <h3 class="font-bold text-base text-base-content truncate leading-tight">{{ keyword.name }}</h3>
+                <span class="text-[10px] font-medium text-base-content/40 uppercase tracking-widest mt-0.5">{{
+                    keyword.created_at | date:'dd/MM/yyyy' }}</span>
+            </div>
+        </div>
+
+        <!-- Keyword Box: Clean and Soft -->
+        <div class="flex flex-col p-4 bg-base-200/40 rounded-xl border border-base-200/50">
+            <span class="text-[9px] font-bold uppercase text-base-content/30 tracking-[0.2em] mb-1.5">{{
+                'keywords.fields.keyword' | transloco }}</span>
+            <div class="flex items-center gap-2">
+                <span class="text-xl font-bold text-base-content truncate">{{ keyword.keyword }}</span>
+            </div>
+        </div>
+    </div>
+</div>

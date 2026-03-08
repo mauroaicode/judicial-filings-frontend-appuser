@@ -3,7 +3,6 @@ import {
   Component,
   inject,
   signal,
-  OnInit,
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -11,8 +10,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ProcessService } from '@app/core/services/process/process.service';
-import { Process, ProcessFilter, ProcessResponseMeta, CreateProcessResponse } from '@app/core/models/process/process.model';
-import { DataTableComponent, DataTableColumn } from '@app/shared/components/data-table/data-table.component';
+import { Process, ProcessInstance, ProcessFilter, ProcessResponseMeta, CreateProcessResponse } from '@app/core/models/process/process.model';
+import { DataTableColumn } from '@app/shared/components/data-table/data-table.component';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
 import { DashboardService } from '@app/core/services/dashboard/dashboard.service';
 import { DashboardStatsCardsComponent } from '../dashboard/components/dashboard-stats-cards/dashboard-stats-cards.component';
@@ -27,7 +26,6 @@ import type { OrganizationNotificationRow } from '@app/core/models/notification/
     CommonModule,
     ReactiveFormsModule,
     TranslocoPipe,
-    DataTableComponent,
     DateRangePickerComponent,
     DashboardStatsCardsComponent,
     NotificationsDrawerComponent,
@@ -37,7 +35,7 @@ import type { OrganizationNotificationRow } from '@app/core/models/notification/
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GestionProcesosComponent implements OnInit {
+export class GestionProcesosComponent {
   private _processService = inject(ProcessService);
   private _dashboardService = inject(DashboardService);
   private _router = inject(Router);
@@ -59,7 +57,7 @@ export class GestionProcesosComponent implements OnInit {
   public isModalOpen = signal<boolean>(false);
   public submitting = signal<boolean>(false);
   public error = signal<string | null>(null);
-  
+
   // Info modal state (for multiple instances or private processes)
   public isInfoModalOpen = signal<boolean>(false);
   public infoModalData = signal<CreateProcessResponse | null>(null);
@@ -82,6 +80,21 @@ export class GestionProcesosComponent implements OnInit {
     created_at_range: [null as DateRange | null],
     last_api_update_range: [null as DateRange | null],
   });
+
+  /** IDs de procesos con fila expandida (mostrar instancias) */
+  public expandedProcessIds = signal<Set<string>>(new Set());
+  /** ID de la fila bajo el cursor: process.id (fila principal) o instance.id (fila instancia) */
+  public hoveredRowId = signal<string | null>(null);
+
+  // Filter Visibility
+  public showFilters = signal<boolean>(false);
+
+  /**
+   * Toggle filter visibility
+   */
+  public toggleFilters(): void {
+    this.showFilters.update(v => !v);
+  }
 
   // Table columns
   public columns: DataTableColumn[] = [
@@ -148,10 +161,6 @@ export class GestionProcesosComponent implements OnInit {
   constructor() {
     this._loadFiltersFromQueryParams();
     this.loadProcesses();
-  }
-
-  ngOnInit(): void {
-    this._dashboardService.loadStats();
   }
 
   /**
@@ -266,7 +275,7 @@ export class GestionProcesosComponent implements OnInit {
     // When we pass only the params we want, Angular Router will replace ALL query params
     // This means params not in this object will be automatically removed
     const finalParams: Record<string, string> = { ...queryParams };
-    
+
     // Add page if needed
     if (includePage && page > 1) {
       finalParams['page'] = page.toString();
@@ -319,6 +328,9 @@ export class GestionProcesosComponent implements OnInit {
     });
 
     this._updateQueryParams(filters, false);
+    // Dashboard stats must follow the same active filters (without pagination)
+    const { page: _page, per_page: _perPage, ...statsFilters } = filters;
+    this._dashboardService.loadStats(statsFilters);
 
     this._processService.getProcesses(filters).subscribe({
       next: (response) => {
@@ -381,10 +393,99 @@ export class GestionProcesosComponent implements OnInit {
   }
 
   /**
-   * Handle row click
+   * Expandir/colapsar fila de proceso (solo cuando tiene múltiples instancias)
    */
-  onRowClick(process: Process): void {
-    this._router.navigate(['/admin/gestion-procesos', process.id]);
+  toggleExpand(process: Process): void {
+    if (!process.has_multiple_instances || !process.instances?.length) return;
+    const next = new Set(this.expandedProcessIds());
+    if (next.has(process.id)) {
+      next.delete(process.id);
+    } else {
+      next.add(process.id);
+    }
+    this.expandedProcessIds.set(next);
+  }
+
+  /**
+   * Navegar al detalle del proceso (doble clic en fila principal o en instancia)
+   */
+  onRowDblClick(row: Process | ProcessInstance): void {
+    this._router.navigate(['/admin/gestion-procesos', row.id]);
+  }
+
+  /**
+   * Indica si la fila del proceso está expandida
+   */
+  isExpanded(process: Process): boolean {
+    return this.expandedProcessIds().has(process.id);
+  }
+
+  /**
+   * Cantidad de instancias de un proceso.
+   * Si no hay arreglo de instancias, se asume 1 (la instancia principal).
+   */
+  getInstanceCount(process: Process): number {
+    if (process.instances && process.instances.length > 0) return process.instances.length;
+    return 1;
+  }
+
+  /**
+   * Helper para mostrar demandante/demandado: texto principal, (+N) en accent y tooltip ordenado
+   */
+  getPartyDisplay(list: string[] | null | undefined): { mainText: string; extraCount: number; tooltipText: string; fullList: string[] } {
+    const arr = list?.filter(Boolean) ?? [];
+    if (arr.length === 0) return { mainText: '', extraCount: 0, tooltipText: '', fullList: [] };
+    const mainText = arr[0];
+    const extraCount = arr.length - 1;
+    const tooltipText = arr.map((name, i) => `${i + 1}. ${name}`).join('\n');
+    return { mainText, extraCount, tooltipText, fullList: arr };
+  }
+
+  /**
+   * Valor de celda para una fila (proceso o instancia)
+   */
+  getProcessCellValue(row: Process | ProcessInstance, column: DataTableColumn): string | number | boolean | null {
+    const record = row as unknown as Record<string, unknown>;
+    if (column.render) {
+      return column.render(record[column.key], row) as string;
+    }
+    const value = record[column.key];
+    return value != null ? value as string | number | boolean : null;
+  }
+
+  /**
+   * Formatear fecha para tabla (si viene en formato ISO; si no, mostrar tal cual)
+   */
+  formatProcessDate(dateString: string | null | undefined): string {
+    if (!dateString) return '–';
+    const s = String(dateString).trim();
+    if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? s : d.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    }
+    return s;
+  }
+
+  /** Opciones de tamaño de página para la paginación */
+  pageSizeOptions = [10, 20, 25, 50, 100];
+
+  /**
+   * Números de página a mostrar en la paginación
+   */
+  getPageNumbers(): number[] {
+    const pagination = this.pagination();
+    if (!pagination) return [];
+    const current = pagination.current_page;
+    const last = pagination.last_page;
+    const pages: number[] = [];
+    let start = Math.max(1, current - 2);
+    let end = Math.min(last, current + 2);
+    if (end - start < 4) {
+      if (start === 1) end = Math.min(last, start + 4);
+      else start = Math.max(1, end - 4);
+    }
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
   }
 
   onNotificationsDrawerClosed(): void {
@@ -406,13 +507,13 @@ export class GestionProcesosComponent implements OnInit {
     if (!value) {
       return null; // Let required validator handle empty values
     }
-    
+
     // Check if it's exactly 23 digits
     const numericRegex = /^\d{23}$/;
     if (!numericRegex.test(value)) {
       return { invalidProcessNumber: true };
     }
-    
+
     return null;
   }
 
@@ -452,10 +553,10 @@ export class GestionProcesosComponent implements OnInit {
       next: (response) => {
         this.submitting.set(false);
         this.closeAddProcessModal();
-        
+
         // Always reload processes table
         this.loadProcesses(1, this.pagination()?.per_page || 20);
-        
+
         // Show info modal if has_multiple_instances is true or private_count >= 1
         if (response.has_multiple_instances === true || response.private_count >= 1) {
           this.infoModalData.set(response);
@@ -464,7 +565,7 @@ export class GestionProcesosComponent implements OnInit {
       },
       error: (error) => {
         this.submitting.set(false);
-        
+
         // Handle error response
         if (error.error && error.error.messages && Array.isArray(error.error.messages)) {
           // Join all error messages
@@ -510,7 +611,7 @@ export class GestionProcesosComponent implements OnInit {
     const numericValue = value.replace(/\D/g, '');
     // Limit to 23 digits
     const limitedValue = numericValue.slice(0, 23);
-    
+
     if (value !== limitedValue) {
       input.value = limitedValue;
       this.addProcessForm.patchValue({ process_number: limitedValue }, { emitEvent: false });

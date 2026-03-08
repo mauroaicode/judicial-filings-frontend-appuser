@@ -17,7 +17,7 @@ import { CommonModule } from '@angular/common';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { SecurityTipsPanelComponent } from '@app/shared/components/security-tips-panel/security-tips-panel.component';
-import {TitleSystemAuth} from '@app/shared/components/title-system-auth/title-system-auth';
+import { TitleSystemAuth } from '@app/shared/components/title-system-auth/title-system-auth';
 import { AlertComponent } from '@app/shared/components/alert/alert.component';
 import { AuthService } from '@app/core/auth/auth.service';
 import { ROLE_ROUTE_MAP, ROUTES_ADMIN } from '@app/core/constants/router.constant';
@@ -49,7 +49,7 @@ export class SignInComponent implements OnInit {
 
   ngOnInit(): void {
     this.signInForm = this._formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
+      identification: ['', [Validators.required]],
       password: ['', [Validators.required]],
       rememberMe: [false],
     });
@@ -77,10 +77,10 @@ export class SignInComponent implements OnInit {
 
     try {
 
-      const { email, password } = this.signInForm.value;
+      const { identification, password } = this.signInForm.value;
 
       const response = await firstValueFrom(
-        this._authService.signIn({ email, password })
+        this._authService.signIn({ identification, password })
       );
 
       // Save token and user
@@ -110,7 +110,7 @@ export class SignInComponent implements OnInit {
       this._isDirectMessage.set(false);
 
       if (error?.status === 401 || error?.status === 422) {
-        this.alertMessage.set('auth.errors.emailOrPasswordIncorrect');
+        this.alertMessage.set('auth.errors.identificationOrPasswordIncorrect');
         this.showAlert.set(true);
         return;
       }
@@ -150,12 +150,9 @@ export class SignInComponent implements OnInit {
   getFieldError(fieldName: string): string {
     const field = this.signInForm.get(fieldName);
     if (field?.hasError('required')) {
-      return fieldName === 'email'
-        ? 'auth.errors.emailRequired'
+      return fieldName === 'identification'
+        ? 'auth.errors.identificationRequired'
         : 'auth.errors.passwordRequired';
-    }
-    if (field?.hasError('email')) {
-      return 'auth.errors.emailInvalid';
     }
     return '';
   }

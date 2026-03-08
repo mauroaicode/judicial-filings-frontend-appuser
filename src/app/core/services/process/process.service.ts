@@ -11,6 +11,9 @@ import {
   ProcessDetailResponse,
   ActionFilter,
   ActionResponse,
+  AlertKeywordsResponse,
+  AlertKeywordStatsResponse,
+  ProcessDetailInstance,
 } from '@app/core/models/process/process.model';
 
 @Injectable({
@@ -121,6 +124,39 @@ export class ProcessService {
   }
 
   /**
+   * Get all instances for a process number/group
+   *
+   * @param id - Any process ID from the instances group
+   * @returns Observable with instances summary list
+   */
+  getProcessInstances(id: string): Observable<ProcessDetailInstance[]> {
+    const url = `${environment.apiBaseUrl}/processes/${id}/instances`;
+    return this._http.get<ProcessDetailInstance[]>(url);
+  }
+
+  /**
+   * Get alert keywords for a process (for filtering actions by keyword)
+   *
+   * @param processId - Process ID
+   * @returns Observable with list of alert keywords
+   */
+  getAlertKeywords(processId: string): Observable<AlertKeywordsResponse> {
+    const url = `${environment.apiBaseUrl}/processes/${processId}/alert-keywords`;
+    return this._http.get<AlertKeywordsResponse>(url);
+  }
+
+  /**
+   * Get alert keyword stats for a process (count per keyword)
+   *
+   * @param processId - Process ID
+   * @returns Observable with list of keyword stats (name, slug, count)
+   */
+  getAlertKeywordStats(processId: string): Observable<AlertKeywordStatsResponse> {
+    const url = `${environment.apiBaseUrl}/processes/${processId}/alert-keyword-stats`;
+    return this._http.get<AlertKeywordStatsResponse>(url);
+  }
+
+  /**
    * Get process actions with filters and pagination
    *
    * @param id - Process ID
@@ -152,8 +188,23 @@ export class ProcessService {
     if (filters.search) {
       params = params.set('search', filters.search);
     }
+    if (filters.alert_slug) {
+      params = params.set('alert_slug', filters.alert_slug);
+    }
 
     const url = `${environment.apiBaseUrl}/processes/${id}/actions`;
     return this._http.get<ActionResponse>(url, { params });
+  }
+
+  /**
+   * Update process status (activate/deactivate)
+   *
+   * @param id - Process ID
+   * @param isActive - true to activate, false to deactivate
+   * @returns Observable with message response
+   */
+  updateProcessStatus(id: string, isActive: boolean): Observable<{ message: string }> {
+    const url = `${environment.apiBaseUrl}/processes/${id}/status`;
+    return this._http.patch<{ message: string }>(url, { is_active: isActive });
   }
 }

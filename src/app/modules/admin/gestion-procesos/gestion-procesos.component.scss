@@ -1,49 +1,186 @@
 // Gestión de Procesos component styles
 
-// Ensure form controls always have labels above inputs, regardless of screen size
-form {
-  .form-control {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    width: 100%;
-    
-    .label {
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: flex-start !important;
-      justify-content: flex-start !important;
-      padding-bottom: 0.5rem !important;
-      margin-bottom: 0 !important;
-      width: 100% !important;
-      
-      .label-text {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: hsl(var(--bc) / 0.8);
-        display: block;
-        width: 100%;
-        text-align: left;
-      }
+// Tooltip de sujetos procesales: por encima de la tabla (evitar que se vea la fila de abajo)
+.process-list-tooltip .tooltip-content {
+  z-index: 9999 !important;
+  isolation: isolate;
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+// Hover accent en todas las filas (principales e instancias) — color sólido para que se vea
+.process-list-table tbody tr.process-row-hovered,
+.process-list-table tbody tr.process-row-hovered td {
+  background-color: #ccf6f1 !important;
+  /* accent teal, mismo que data-table hover */
+}
+
+/* IMPORTANTE: evitar que ancestros con overflow rompan el sticky del header */
+.process-list-card,
+.process-list-card-body {
+  overflow: visible !important;
+}
+
+// Columna Número de Radicación sticky en scroll horizontal
+.process-list-table {
+  --table-sticky-top: 0px;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  max-height: calc(100vh - 280px);
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+
+  &>table {
+    position: relative;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+  }
+
+  /* Header sticky global (todas las columnas) */
+  thead th {
+    position: sticky !important;
+    top: var(--table-sticky-top) !important;
+    z-index: 20 !important;
+    background: #161326 !important;
+    background-color: #161326 !important;
+    color: #fff !important;
+  }
+
+  thead th.sticky-col-radicado {
+    position: sticky !important;
+    top: var(--table-sticky-top) !important;
+    left: 0 !important;
+    z-index: 30 !important;
+    background: #161326 !important;
+    background-color: #161326 !important;
+    color: #fff !important;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    width: 240px !important;
+    isolation: isolate !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+  }
+
+  /* Colores sólidos para sticky sin hover (evitar transparencia al hacer scroll) */
+  $sticky-base: #ffffff;
+  $sticky-zebra: #f8f9fa;
+  /* gris muy suave para que no destaque respecto al resto de la fila par */
+  $sticky-instance: #e0f7f4;
+  /* mismo tono que bg-accent/10 en filas de instancias */
+
+  /* Celda sticky: color sólido 100% opaco para que el scroll no se vea por debajo */
+  tbody td.sticky-col-radicado {
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 10 !important;
+    background-color: $sticky-base !important;
+    background: $sticky-base !important;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    width: 240px !important;
+    white-space: nowrap !important;
+    isolation: isolate !important;
+    contain: paint !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+
+    & .sticky-cell-bg {
+      position: absolute !important;
+      inset: 0 !important;
+      background: inherit !important;
+      z-index: 0;
+      pointer-events: none;
     }
-    
-    // Ensure inputs, selects, and date pickers take full width
-    .input,
-    .select,
-    app-date-range-picker {
-      width: 100% !important;
-      margin-top: 0 !important;
+
+    & .sticky-cell-txt {
+      position: relative !important;
+      z-index: 1;
     }
-    
-    // Ensure date range picker component maintains vertical layout
-    app-date-range-picker {
-      display: flex !important;
-      flex-direction: column !important;
-      
-      .form-control {
-        display: flex !important;
-        flex-direction: column !important;
-      }
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: $sticky-base !important;
+      z-index: -1;
+      pointer-events: none;
     }
+  }
+
+  /* Filas pares (zebra): gris claro sólido */
+  tbody tr:nth-child(2n) td.sticky-col-radicado {
+    background-color: $sticky-zebra !important;
+    background: $sticky-zebra !important;
+
+    &::before {
+      background: $sticky-zebra !important;
+    }
+
+    & .sticky-cell-bg {
+      background: $sticky-zebra !important;
+    }
+  }
+
+  tbody tr:not(:nth-child(2n)) td.sticky-col-radicado .sticky-cell-bg {
+    background: $sticky-base !important;
+  }
+
+  /* Filas de instancias: siempre el mismo accent claro (override zebra nth-child) */
+  tbody tr.process-table-instance-row td,
+  tbody tr.process-table-instance-row:nth-child(2n) td {
+    background-color: $sticky-instance !important;
+    background: $sticky-instance !important;
+  }
+
+  tbody tr.process-table-instance-row td.sticky-col-radicado,
+  tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-radicado {
+    background-color: $sticky-instance !important;
+    background: $sticky-instance !important;
+
+    &::before {
+      background: $sticky-instance !important;
+    }
+
+    & .sticky-cell-bg {
+      background: $sticky-instance !important;
+    }
+  }
+
+  /* Hover: color accent opaco (ya estaba bien) */
+  tbody tr.process-row-hovered td.sticky-col-radicado,
+  tbody tr.process-row-hovered td.sticky-col-radicado::before,
+  tbody tr.process-row-hovered td.sticky-col-radicado .sticky-cell-bg {
+    background-color: #ccf6f1 !important;
+    background: #ccf6f1 !important;
+  }
+}
+
+// Pagination (misma estructura que data-table)
+.pagination-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  width: 100%;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .pagination-results-info {
+    font-size: 0.875rem;
+    color: hsl(var(--bc) / 0.7);
+  }
+
+  .pagination-controls {
+    display: flex;
   }
 }

@@ -6,7 +6,7 @@
       <button type="button" class="btn btn-ghost" (click)="onCancel()">
         {{ cancelLabel() }}
       </button>
-      <button type="button" [class]="'btn ' + confirmClass()" (click)="onConfirm()">
+      <button type="button" class="btn bg-neutral text-neutral-content hover:bg-neutral-focus" (click)="onConfirm()">
         {{ confirmLabel() }}
       </button>
     </div>

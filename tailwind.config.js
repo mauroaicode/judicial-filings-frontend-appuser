@@ -50,6 +50,8 @@ module.exports = {
           'accent-content': COLORS.textOnDark,
           'base-content': COLORS.textOnWhite,
           // Keep default DaisyUI colors for other properties
+          error: COLORS.salmon,
+          'error-content': '#fff',
         },
       },
     ],

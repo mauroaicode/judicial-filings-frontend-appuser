@@ -1,1 +1,153 @@
 // Process Detail Component Styles
+
+.process-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+@media (min-width: 768px) {
+  .process-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .process-detail-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.process-detail-item {
+  border: 1px solid hsl(var(--b3));
+  border-radius: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  background: hsl(var(--b1));
+}
+
+.process-detail-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: hsl(var(--bc) / 0.65);
+  margin-bottom: 0.15rem;
+}
+
+.process-detail-value {
+  color: hsl(var(--bc));
+  font-size: 0.93rem;
+  font-weight: 500;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.subject-group-card {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0.2rem 0.6rem;
+}
+
+.subject-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 0.6rem;
+}
+
+.subject-group-title {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: hsl(var(--bc));
+}
+
+.subject-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.subject-item {
+  border: 0;
+  border-radius: 0;
+  padding: 0.2rem 0;
+  background: transparent;
+}
+
+.subject-name {
+  margin: 0;
+  color: hsl(var(--bc));
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.subject-index {
+  display: inline-block;
+  min-width: 1.4rem;
+  font-weight: 700;
+  color: hsl(var(--bc) / 0.75);
+}
+
+.subject-empty {
+  margin: 0;
+  font-size: 0.9rem;
+  color: hsl(var(--bc) / 0.55);
+}
+
+@media (min-width: 1024px) {
+  .subject-columns .subject-group-card + .subject-group-card {
+    border-left: 1px solid hsl(var(--b3));
+    padding-left: 1rem;
+  }
+}
+
+.process-status-hero {
+  font-size: 0.82rem;
+  padding: 0.28rem 0.7rem;
+  font-weight: 700;
+}
+
+// Estilos para proceso inactivo - Atenuar el contenido
+.process-inactive {
+  .collapse-title,
+  .collapse-content,
+  .process-detail-label,
+  .process-detail-value,
+  .subject-group-title,
+  .subject-name,
+  .subject-index,
+  .subject-empty {
+    opacity: 0.65;
+  }
+
+  .collapse-title {
+    color: hsl(var(--bc) / 0.75);
+  }
+
+  .process-detail-item {
+    background: hsl(var(--b2) / 0.5);
+    border-color: hsl(var(--b3) / 0.6);
+  }
+
+  .subject-group-card {
+    opacity: 0.7;
+  }
+
+  // La tabla de actuaciones también se ve afectada
+  .card {
+    opacity: 0.75;
+  }
+}
+
+// Botón de éxito para el modal
+.btn-success {
+  background-color: hsl(var(--su));
+  border-color: hsl(var(--su));
+  color: hsl(var(--suc));
+
+  &:hover {
+    background-color: hsl(var(--su) / 0.9);
+    border-color: hsl(var(--su) / 0.9);
+  }
+}

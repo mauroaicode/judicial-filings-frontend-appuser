@@ -1,20 +1,18 @@
 export interface AuthResponse {
   token: string;
   user: User;
+  requires_2fa: boolean;
+  is_first_login: boolean;
 }
 
 export interface User {
-  id: number;
+  id: string;
   name: string;
   last_name: string;
   email: string;
-  document_type: string;
-  document_number: string;
-  phone: string;
-  address: string;
-  status: string;
+  slug: string;
+  profile_image: string | null;
   roles: Role[];
-  requires_password_change: boolean;
 }
 
 export interface Role {
@@ -23,7 +21,7 @@ export interface Role {
 }
 
 export interface LoginRequest {
-  email: string;
+  identification: string;
   password: string;
 }
 

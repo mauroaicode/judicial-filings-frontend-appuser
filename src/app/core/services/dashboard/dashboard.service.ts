@@ -1,8 +1,9 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 import { environment } from '@app/core/config/environment.config';
 import { DashboardStats } from '@app/core/models/dashboard/dashboard-stats.model';
+import { ProcessFilter } from '@app/core/models/process/process.model';
 
 @Injectable({
   providedIn: 'root',
@@ -27,14 +28,31 @@ export class DashboardService {
   /**
    * Load dashboard stats from GET dashboard/stats
    */
-  loadStats(): void {
+  loadStats(filters: ProcessFilter = {}): void {
     this._isLoading.set(true);
     this._error.set(null);
 
     const url = `${environment.apiBaseUrl}/dashboard/stats`;
+    let params = new HttpParams();
+
+    if (filters.process_number) params = params.set('process_number', filters.process_number);
+    if (filters.court) params = params.set('court', filters.court);
+    if (filters.process_class) params = params.set('process_class', filters.process_class);
+    if (filters.plaintiff) params = params.set('plaintiff', filters.plaintiff);
+    if (filters.defendant) params = params.set('defendant', filters.defendant);
+    if (filters.status) params = params.set('status', filters.status);
+    if (filters.has_multiple_instances !== undefined && filters.has_multiple_instances !== null) {
+      params = params.set('has_multiple_instances', String(filters.has_multiple_instances));
+    }
+    if (filters.process_date_from) params = params.set('process_date_from', filters.process_date_from);
+    if (filters.process_date_to) params = params.set('process_date_to', filters.process_date_to);
+    if (filters.created_at_from) params = params.set('created_at_from', filters.created_at_from);
+    if (filters.created_at_to) params = params.set('created_at_to', filters.created_at_to);
+    if (filters.last_api_update_from) params = params.set('last_api_update_from', filters.last_api_update_from);
+    if (filters.last_api_update_to) params = params.set('last_api_update_to', filters.last_api_update_to);
 
     this._http
-      .get<DashboardStats>(url)
+      .get<DashboardStats>(url, { params })
       .pipe(
         tap({
           next: (data) => {
