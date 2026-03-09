@@ -17,7 +17,7 @@ import { CommonModule } from '@angular/common';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { environment } from '@app/core/config/environment.config';
 import { SecurityTipsPanelComponent } from '@app/shared/components/security-tips-panel/security-tips-panel.component';
-import {TitleSystemAuth} from '@app/shared/components/title-system-auth/title-system-auth';
+import { TitleSystemAuth } from '@app/shared/components/title-system-auth/title-system-auth';
 import { AlertComponent } from '@app/shared/components/alert/alert.component';
 import { ErrorHandlerService } from '@app/core/services/error/error-handler.service';
 
@@ -41,6 +41,7 @@ export class ForgotPasswordComponent implements OnInit {
   public alertMessage = signal<string>('');
   public alertType = signal<'success' | 'error'>('error');
   public wasCodeSent = signal<boolean>(false);
+  public currentYear = new Date().getFullYear();
   public systemName = environment.systemName;
   private _isDirectMessage = signal<boolean>(false);
 

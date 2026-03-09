@@ -5,7 +5,11 @@
     "email": "Correo electrónico",
     "password": "Contraseña",
     "confirm": "Confirmar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "action": "Actuación",
+    "actions": "Actuaciones",
+    "instance": "Instancia",
+    "instances": "Instancias"
   },
   "auth": {
     "signIn": {
@@ -277,9 +281,9 @@
       "empty": "No hay actuaciones disponibles",
       "filters": {
         "title": "Filtros de Búsqueda",
-        "actionDateRange": "Rango de Fecha de Actuación",
+        "actionDateRange": "Fecha de Actuación",
         "actionDateRangePlaceholder": "Seleccionar rango de fechas",
-        "registrationDateRange": "Rango de Fecha de Registro",
+        "registrationDateRange": "Fecha de Registro",
         "registrationDateRangePlaceholder": "Seleccionar rango de fechas",
         "alertKeyword": "Palabra clave de alerta",
         "alertKeywordPlaceholder": "Todas las palabras clave",

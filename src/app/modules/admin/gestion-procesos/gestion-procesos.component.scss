@@ -12,8 +12,8 @@
 // Hover accent en todas las filas (principales e instancias) — color sólido para que se vea
 .process-list-table tbody tr.process-row-hovered,
 .process-list-table tbody tr.process-row-hovered td {
-  background-color: #ccf6f1 !important;
-  /* accent teal, mismo que data-table hover */
+  background-color: #F3F0F9 !important;
+  /* light brand purple */
 }
 
 /* IMPORTANTE: evitar que ancestros con overflow rompan el sticky del header */
@@ -42,8 +42,8 @@
     position: sticky !important;
     top: var(--table-sticky-top) !important;
     z-index: 20 !important;
-    background: #161326 !important;
-    background-color: #161326 !important;
+    background: #24163E !important;
+    background-color: #24163E !important;
     color: #fff !important;
   }
 
@@ -52,8 +52,8 @@
     top: var(--table-sticky-top) !important;
     left: 0 !important;
     z-index: 30 !important;
-    background: #161326 !important;
-    background-color: #161326 !important;
+    background: #24163E !important;
+    background-color: #24163E !important;
     color: #fff !important;
     box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
     min-width: 240px !important;
@@ -66,10 +66,10 @@
 
   /* Colores sólidos para sticky sin hover (evitar transparencia al hacer scroll) */
   $sticky-base: #ffffff;
-  $sticky-zebra: #f8f9fa;
+  $sticky-zebra: #f9fafb;
   /* gris muy suave para que no destaque respecto al resto de la fila par */
-  $sticky-instance: #e0f7f4;
-  /* mismo tono que bg-accent/10 en filas de instancias */
+  $sticky-instance: #F3F0F9;
+  /* brand purple light */
 
   /* Celda sticky: color sólido 100% opaco para que el scroll no se vea por debajo */
   tbody td.sticky-col-radicado {
@@ -154,8 +154,8 @@
   tbody tr.process-row-hovered td.sticky-col-radicado,
   tbody tr.process-row-hovered td.sticky-col-radicado::before,
   tbody tr.process-row-hovered td.sticky-col-radicado .sticky-cell-bg {
-    background-color: #ccf6f1 !important;
-    background: #ccf6f1 !important;
+    background-color: #F3F0F9 !important;
+    background: #F3F0F9 !important;
   }
 }
 

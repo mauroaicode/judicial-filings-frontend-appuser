@@ -1,11 +1,136 @@
-// Dashboard stats cards - semantic colors via DaisyUI classes in template
-
+// Dashboard stats cards - Professional Clean UI/UX
 :host {
   display: block;
 }
 
-// Forzar cursor pointer en tarjetas clickeables (manita)
+// Global cursor pointer for clickable cards
 :host .stats-card--clickable,
 :host .stats-card--clickable * {
   cursor: pointer !important;
+}
+
+.stats-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 1.5rem;
+
+  &--clickable {
+    // Professional Solid Backgrounds
+
+    // NOTIFICACIONES (Blue Theme)
+    &.card-actuacion {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+      border: 1px solid #bae6fd !important;
+
+      .icon-container {
+        background-color: #ffffff;
+        color: #0369a1;
+        box-shadow: 0 4px 12px rgba(3, 105, 161, 0.1);
+      }
+
+      p.text-base-content\/70 {
+        color: #0369a1 !important;
+        font-weight: 600;
+      }
+
+      .stats-card__value {
+        color: #0c4a6e !important;
+      }
+
+      .stats-card__action span {
+        background-color: rgba(3, 105, 161, 0.08);
+        color: #0369a1 !important;
+        padding: 6px 16px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        border: 1.5px solid rgba(3, 105, 161, 0.2);
+      }
+
+      &:hover {
+        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%) !important;
+
+        .stats-card__action span {
+          background-color: #0369a1;
+          color: #ffffff !important;
+        }
+      }
+    }
+
+    // ALERTAS (Amber Theme)
+    &.card-actuacion_alerta {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+      border: 1px solid #fde68a !important;
+
+      .icon-container {
+        background-color: #ffffff;
+        color: #b45309;
+        box-shadow: 0 4px 12px rgba(180, 83, 9, 0.1);
+      }
+
+      p.text-base-content\/70 {
+        color: #b45309 !important;
+        font-weight: 600;
+      }
+
+      .stats-card__value {
+        color: #78350f !important;
+      }
+
+      .stats-card__action span {
+        background-color: rgba(217, 119, 6, 0.08);
+        color: #b45309 !important;
+        padding: 6px 16px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        border: 1.5px solid rgba(180, 83, 9, 0.2);
+      }
+
+      &:hover {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+
+        .stats-card__action span {
+          background-color: #d97706;
+          color: #ffffff !important;
+        }
+      }
+    }
+
+    // Active state
+    &:active {
+      transform: translateY(-2px) scale(0.98);
+    }
+
+    .stats-card__action {
+      display: flex;
+      justify-content: center;
+      margin-top: auto;
+
+      span {
+        display: inline-block;
+        text-transform: none; // REMOVE UPPERCASE
+        letter-spacing: normal;
+        transition: all 0.3s ease;
+      }
+    }
+  }
+
+  .icon-container {
+    transition: transform 0.3s ease;
+  }
+}
+
+// Utility to hide scrollbar
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

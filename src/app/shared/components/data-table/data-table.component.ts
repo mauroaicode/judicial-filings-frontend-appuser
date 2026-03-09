@@ -148,14 +148,14 @@ export class DataTableComponent {
       const [year, month, day] = datePart.split('-').map(Number);
       let hours = parseInt(hoursStr, 10);
       const minutes = parseInt(minutesStr, 10);
-      
+
       // Convert to 24-hour format
       if (amPm === 'PM' && hours !== 12) {
         hours += 12;
       } else if (amPm === 'AM' && hours === 12) {
         hours = 0;
       }
-      
+
       const date = new Date(year, month - 1, day, hours, minutes);
       return date.toLocaleString('es-ES', {
         year: 'numeric',
@@ -197,10 +197,10 @@ export class DataTableComponent {
     // Fallback for other date formats
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return dateString;
-    
+
     // Check if the date has time component
     const hasTime = dateString.includes(':');
-    
+
     if (hasTime) {
       return date.toLocaleString('es-ES', {
         year: 'numeric',
@@ -211,7 +211,7 @@ export class DataTableComponent {
         hour12: true,
       });
     }
-    
+
     return date.toLocaleDateString('es-ES', {
       year: 'numeric',
       month: '2-digit',
@@ -223,7 +223,7 @@ export class DataTableComponent {
    * Get sticky header style
    */
   getStickyHeaderStyle(): string {
-    return 'position: -webkit-sticky !important; position: sticky !important; left: 0 !important; z-index: 1000 !important; background-color: #161326 !important; background: #161326 !important; color: #ffffff !important; min-width: 240px !important; max-width: 240px !important; width: 240px !important; box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important; will-change: transform !important;';
+    return 'position: -webkit-sticky !important; position: sticky !important; left: 0 !important; z-index: 1000 !important; background-color: #24163E !important; background: #24163E !important; color: #ffffff !important; min-width: 240px !important; max-width: 240px !important; width: 240px !important; box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important; will-change: transform !important;';
   }
 
   /**

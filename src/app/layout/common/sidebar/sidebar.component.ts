@@ -8,7 +8,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NavigationService } from '@app/core/navigation/navigation.service';
 import { NavigationItem } from '@app/core/models/navigation/navigation-item.model';
@@ -44,7 +44,16 @@ export class SidebarComponent {
   // Track expanded items for collapsable menus
   private _expandedItems = signal<Set<string>>(new Set());
 
+  // Track current URL to force reactivity on route changes
+  public currentUrl = signal<string>(this._router.url);
+
   constructor() {
+    // Monitor router events
+    this._router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.currentUrl.set(event.urlAfterRedirects);
+      }
+    });
     // Check if mobile on init and resize
     this._checkMobile();
     window.addEventListener('resize', () => {
@@ -121,6 +130,11 @@ export class SidebarComponent {
    */
   isItemActive(item: NavigationItem): boolean {
     if (!item.link) return false;
+
+    // Read the currentUrl signal so Angular re-evaluates this function 
+    // when the route changes under OnPush change detection
+    this.currentUrl();
+
     return this._router.isActive(item.link, {
       paths: 'subset',
       queryParams: 'subset',

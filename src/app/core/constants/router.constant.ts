@@ -1,6 +1,6 @@
 export const ROUTES_ADMIN = {
-  DASHBOARD: '/admin/dashboard',
-  GESTION_PROCESOS: '/admin/gestion-procesos',
+  DASHBOARD: '/dashboard',
+  GESTION_PROCESOS: '/gestion-procesos',
   SIGN_IN: '/sign-in',
   SIGN_OUT: '/sign-out',
 } as const;

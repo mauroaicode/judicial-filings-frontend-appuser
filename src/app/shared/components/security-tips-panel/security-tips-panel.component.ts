@@ -11,6 +11,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
   selector: 'app-security-tips-panel',
   imports: [CommonModule, TranslocoPipe],
   templateUrl: './security-tips-panel.component.html',
+  styleUrl: './security-tips-panel.component.scss',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

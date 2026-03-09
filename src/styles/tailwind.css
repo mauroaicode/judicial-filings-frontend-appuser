@@ -1,3 +1,51 @@
 @import "tailwindcss";
-@plugin "daisyui";
 
+@plugin "daisyui" {
+  themes: light;
+}
+
+@theme {
+  /* Brand Theme Colors to use explicitly */
+  --color-brand-primary: #4B2A7D;
+  --color-brand-primary-dark: #371B58;
+  --color-brand-primary-light: #F3F0F9;
+
+  --color-brand-secondary: #7C57B7;
+
+  --color-brand-accent: #FBB03B;
+  --color-brand-accent-content: #1F2937;
+
+  --color-brand-success: #059669;
+  /* Emerald 600 - Professional Green */
+  --color-brand-success-content: #ffffff;
+
+  --color-brand-neutral: #24163E;
+  --color-brand-neutral-content: #ffffff;
+
+  --color-brand-background: #ffffff;
+}
+
+/* Force DaisyUI internal variables to use our brand if developers still use generic class names */
+:root,
+[data-theme] {
+  --color-primary: var(--color-brand-primary) !important;
+  --color-primary-content: #ffffff !important;
+
+  --color-secondary: var(--color-brand-secondary) !important;
+  --color-secondary-content: #ffffff !important;
+
+  /* We keep accent as our gold, but for UI legibility on backgrounds we ensure content is dark */
+  --color-accent: var(--color-brand-accent) !important;
+  --color-accent-content: var(--color-brand-accent-content) !important;
+
+  --color-neutral: var(--color-brand-neutral) !important;
+  --color-neutral-content: var(--color-brand-neutral-content) !important;
+
+  /* Standardizing System states to our new professional shades */
+  --color-success: var(--color-brand-success) !important;
+  --color-success-content: var(--color-brand-success-content) !important;
+
+  /* The default "info" blue is changed to a professional secondary purple to keep the UI clean */
+  --color-info: var(--color-brand-secondary) !important;
+  --color-info-content: #ffffff !important;
+}

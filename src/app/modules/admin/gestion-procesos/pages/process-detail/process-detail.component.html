@@ -1,487 +1,576 @@
 <div class="w-full">
   <!-- Toast notification -->
   @if (toastVisible()) {
-    <div class="toast toast-end z-50">
-      @if (toastType() === 'success') {
-        <div class="alert alert-success">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>{{ toastMessage() }}</span>
-        </div>
-      } @else {
-        <div class="alert alert-error">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>{{ toastMessage() }}</span>
-        </div>
-      }
+  <div class="toast toast-end z-[110]">
+    <div
+      [class]="'alert shadow-lg border-none animate-in fade-in slide-in-from-right duration-300 ' + (toastType() === 'success' ? 'alert-success' : 'alert-error')">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span class="font-medium text-sm">{{ toastMessage() }}</span>
     </div>
+  </div>
   }
 
   <!-- Page Header -->
-  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-    <div>
-      <h1 class="text-2xl font-bold text-base-content md:text-3xl">
-        {{ 'processDetail.title' | transloco }}
-      </h1>
-      @if (process()) {
-        <p class="mt-1 text-sm text-base-content/70">
-          {{ process()!.process_number }}
-        </p>
-        <div class="mt-2 flex items-center gap-3">
-          <span class="text-xs font-semibold text-base-content/60 mr-2">{{ 'processDetail.status' | transloco }}:</span>
-          <span [class]="'badge process-status-hero ' + getStatusClass(initialStatusLabel() || process()!.status_label)">
-            {{ process()!.status_label }}
-          </span>
+  <div class="mb-6 p-5 sm:p-6 bg-base-100 border border-base-200 rounded-2xl shadow-sm">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
         </div>
-      }
-    </div>
-    @if (process() && process()!.last_api_update) {
-      <div class="flex items-end gap-4">
-        <div class="text-right">
-          <h2 class="text-2xl font-bold text-base-content md:text-3xl">
+        <div>
+          <h1 class="text-xl font-bold text-base-content md:text-2xl">
+            {{ 'processDetail.title' | transloco }}
+          </h1>
+          @if (process()) {
+          <div class="flex flex-wrap items-center gap-2 mt-1">
+            <span class="text-xs font-semibold text-primary bg-primary/5 px-2 py-0.5 rounded border border-primary/10">
+              {{ process()!.process_number }}
+            </span>
+            <span
+              [class]="'badge badge-sm font-bold uppercase ' + getStatusClass(initialStatusLabel() || process()!.status_label)">
+              {{ initialStatusLabel() || process()!.status_label }}
+            </span>
+          </div>
+          }
+        </div>
+      </div>
+
+      @if (process()) {
+      <div class="flex items-center gap-4 pt-4 md:pt-0 border-t md:border-t-0 border-base-200">
+        <div class="text-left md:text-right">
+          <h2 class="text-[10px] uppercase font-bold text-base-content/40 mb-0.5">
             {{ 'processDetail.lastUpdate' | transloco }}
           </h2>
-          <p class="mt-1 text-sm text-base-content/70">
+          <p class="text-sm font-semibold text-base-content/80">
             {{ formatDateSafe(process()!.last_api_update, 'short') }}
           </p>
         </div>
-        <!-- Botón de acciones del proceso -->
+
         <div class="dropdown dropdown-end">
-          <button tabindex="0" class="btn btn-sm btn-ghost">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+          <button tabindex="0" class="btn btn-sm btn-circle btn-ghost bg-base-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
             </svg>
           </button>
-          <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-lg bg-base-100 rounded-box w-56 border border-base-300">
-            <li class="menu-title">
-              <span class="text-xs text-base-content/60">Acciones del Proceso</span>
-            </li>
+          <ul tabindex="0"
+            class="dropdown-content z-[2] menu p-2 shadow-xl bg-base-100 rounded-xl w-52 border border-base-200 mt-2">
+            <li class="menu-title"><span class="text-[10px] font-bold uppercase opacity-40">{{ 'common.actions' |
+                transloco }}</span></li>
             <li>
-              <button (click)="toggleProcessStatus()" class="flex items-center gap-2">
-                @if (!(initialStatusLabel() || process()!.status_label).toLowerCase().includes('inactivo') && !(initialStatusLabel() || process()!.status_label).toLowerCase().includes('inactive')) {
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                  </svg>
-                  <span class="text-error">{{ 'processDetail.deactivateProcess' | transloco }}</span>
+              <button (click)="toggleProcessStatus()"
+                class="flex items-center gap-2 py-2 rounded-lg font-medium text-sm">
+                @if (!isProcessInactive()) {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-error" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                </svg>
+                <span class="text-error">{{ 'processDetail.deactivateProcess' | transloco }}</span>
                 } @else {
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span class="text-success">{{ 'processDetail.activateProcess' | transloco }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-success" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-success">{{ 'processDetail.activateProcess' | transloco }}</span>
                 }
               </button>
             </li>
           </ul>
         </div>
       </div>
-    }
+      }
+    </div>
   </div>
 
   <!-- Content -->
-  <div class="space-y-6">
-
-  <!-- Loading State -->
-  @if (loading()) {
-    <div class="flex justify-center items-center py-12">
-      <span class="loading loading-spinner loading-lg text-primary"></span>
+  <div class="space-y-6 pb-8">
+    <!-- Loading State -->
+    @if (loading()) {
+    <div class="flex flex-col justify-center items-center py-16 gap-3">
+      <span class="loading loading-spinner loading-md text-primary"></span>
+      <p class="text-xs font-semibold text-base-content/40 uppercase tracking-wider">{{ 'common.loading' | transloco }}
+      </p>
     </div>
-  }
+    }
 
-  <!-- Error State -->
-  @if (error() && !loading()) {
-    <div class="alert alert-error">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="stroke-current shrink-0 h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m6-8a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
+    <!-- Error State -->
+    @if (error() && !loading()) {
+    <div class="alert alert-error rounded-xl shadow-sm border border-error/20 flex gap-3 p-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5 opacity-60" fill="none"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
-      <span>{{ error() | transloco }}</span>
+      <span class="text-sm font-medium">{{ error() | transloco }}</span>
     </div>
-  }
+    }
 
-  <!-- Process Detail -->
-  @if (process() && !loading()) {
-    <div class="space-y-4" [class.process-inactive]="isProcessInactive()">
-      <!-- Process instances selector -->
+    <!-- Process Detail Modules -->
+    @if (process() && !loading()) {
+    <div class="space-y-6" [class.process-inactive]="isProcessInactive()">
+
+      <!-- MODULE: INSTANCES -->
       @if (process()!.has_multiple_instances) {
-        <div class="card bg-base-100 border border-base-300 shadow-sm">
-          <div class="card-body">
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 class="text-lg font-semibold">{{ 'processDetail.instances.title' | transloco }}</h3>
-                <p class="text-sm text-base-content/70">{{ 'processDetail.instances.subtitle' | transloco }}</p>
-              </div>
-              <span class="badge badge-accent badge-outline">
-                {{ processInstances().length }} {{ 'processDetail.instances.countLabel' | transloco }}
-              </span>
+      <div class="bg-base-100 border border-base-200 rounded-2xl overflow-hidden shadow-sm">
+        <div class="p-5 sm:p-6">
+          <!-- Desktop Instance Header -->
+          <div class="hidden sm:flex items-center justify-between mb-6">
+            <div>
+              <h3 class="text-lg font-bold text-base-content">{{ 'processDetail.instances.title' | transloco }}</h3>
+              <p class="text-[11px] text-base-content/40 font-medium uppercase tracking-wider mt-0.5">{{
+                'processDetail.instances.subtitle' | transloco }}</p>
             </div>
+            <span class="badge badge-secondary badge-outline font-bold text-[10px] px-3 h-7 rounded-lg">
+              {{ processInstances().length }} {{ (processInstances().length === 1 ? 'generics.instance' :
+              'generics.instances') | transloco | uppercase }}
+            </span>
+          </div>
 
-            @if (loadingInstances()) {
-              <div class="flex items-center justify-center py-6">
-                <span class="loading loading-spinner loading-md text-accent"></span>
+          <!-- Mobile Instance Trigger -->
+          <div class="sm:hidden flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold">{{ 'processDetail.instances.title' | transloco }}</h3>
+              <span class="badge badge-secondary font-bold text-[9px] px-2">{{ processInstances().length }} {{
+                (processInstances().length === 1 ? 'generics.instance' : 'generics.instances') | transloco | uppercase
+                }}</span>
+            </div>
+            <div (click)="toggleInstanceSelector()"
+              class="bg-base-200/50 border border-base-200 rounded-xl p-4 flex items-center justify-between group active:scale-[0.98] transition-all cursor-pointer">
+              <div class="flex items-center gap-3 overflow-hidden">
+                <div
+                  class="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+                  {{ (selectedInstance()?.court || '-').charAt(0).toUpperCase() }}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-[9px] uppercase font-bold text-primary tracking-wider mb-0.5">{{
+                    'processDetail.instances.selected' | transloco }}</p>
+                  <p class="text-sm font-bold text-base-content truncate leading-tight">{{ selectedInstance()?.court ||
+                    'Cargando...' }}</p>
+                </div>
               </div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-base-content/30" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+
+          @if (loadingInstances()) {
+          <div class="flex justify-center py-8"><span class="loading loading-spinner loading-sm text-primary"></span>
+          </div>
+          } @else {
+          <!-- Instance Grid (Desktop) -->
+          <div class="hidden sm:grid grid-cols-1 md:grid-cols-2 gap-4">
+            @for (instance of processInstances(); track instance.id) {
+            <ng-container *ngTemplateOutlet="instanceCard; context: { $implicit: instance }"></ng-container>
+            }
+          </div>
+          }
+        </div>
+      </div>
+      }
+
+      <!-- MODULE: ACCORDIÓN DE INFORMACIÓN -->
+      <div class="space-y-4">
+        <!-- Item: Información General -->
+        <div class="collapse collapse-plus bg-base-100 border border-base-200 rounded-2xl shadow-sm overflow-hidden">
+          <input type="radio" name="process-accordion" checked="checked" />
+          <div class="collapse-title flex items-center gap-3 py-4 px-6 hover:bg-base-200/20 transition-colors">
+            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span class="text-base font-bold">{{ 'processDetail.generalInfo' | transloco }}</span>
+          </div>
+          <div class="collapse-content px-6 pb-6 pt-0">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-2">
+              <ng-container
+                *ngTemplateOutlet="infoItem; context: { label: 'processDetail.processNumber', value: process()!.process_number, strong: true }"></ng-container>
+              <ng-container
+                *ngTemplateOutlet="infoItem; context: { label: 'processDetail.processId', value: process()!.process_id }"></ng-container>
+              <ng-container
+                *ngTemplateOutlet="infoItem; context: { label: 'processDetail.court', value: process()!.court }"></ng-container>
+              <ng-container
+                *ngTemplateOutlet="infoItem; context: { label: 'processDetail.processType', value: process()!.process_type }"></ng-container>
+              <ng-container
+                *ngTemplateOutlet="infoItem; context: { label: 'processDetail.processClass', value: process()!.process_class }"></ng-container>
+              <ng-container
+                *ngTemplateOutlet="infoItem; context: { label: 'processDetail.subclassProcess', value: process()!.subclass_process }"></ng-container>
+              <ng-container
+                *ngTemplateOutlet="infoItem; context: { label: 'processDetail.location', value: process()!.location }"></ng-container>
+              <ng-container
+                *ngTemplateOutlet="infoItem; context: { label: 'processDetail.processDate', value: formatDateSafe(process()!.process_date, 'shortDate') }"></ng-container>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item: Sujetos Procesales -->
+        <div class="collapse collapse-plus bg-base-100 border border-base-200 rounded-2xl shadow-sm overflow-hidden">
+          <input type="radio" name="process-accordion" />
+          <div class="collapse-title flex items-center gap-3 py-4 px-6 hover:bg-base-200/20 transition-colors">
+            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <span class="text-base font-bold">{{ 'processDetail.subjects.title' | transloco }}</span>
+          </div>
+          <div class="collapse-content px-6 pb-6 pt-0">
+            @if (subjects().length === 0) {
+            <div class="text-center py-6 bg-base-200/20 rounded-xl border border-dashed border-base-300">
+              <p class="text-base-content/40 font-medium text-xs">{{ 'processDetail.subjects.empty' | transloco }}</p>
+            </div>
             } @else {
-              <div class="mt-4 space-y-3">
-                @for (instance of processInstances(); track instance.id) {
-                  <button
-                    type="button"
-                    class="w-full text-left rounded-xl border border-base-300 bg-base-100 p-4 transition-all hover:border-accent/50 hover:bg-accent/10 cursor-pointer"
-                    [class.border-info]="isSelectedInstance(instance.id)"
-                    [class.bg-info/10]="isSelectedInstance(instance.id)"
-                    [class.ring-1]="isSelectedInstance(instance.id)"
-                    [class.ring-info/40]="isSelectedInstance(instance.id)"
-                    (click)="onSelectInstance(instance.id)"
-                  >
-                    <div class="flex items-start justify-between gap-4">
-                      <div class="min-w-0">
-                        <p class="font-semibold text-base-content break-words">{{ instance.court }}</p>
-                        <div class="mt-2 flex flex-wrap items-center gap-3 text-xs text-base-content/70">
-                          <span class="inline-flex items-center gap-1.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-accent/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {{ 'processDetail.instances.lastUpdate' | transloco }}: {{ formatDateSafe(instance.last_api_update, 'short') }}
-                          </span>
-                          <span class="inline-flex items-center gap-1.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-accent/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V18a2 2 0 01-2 2z" />
-                            </svg>
-                            {{ instance.actions_count }} {{ 'processDetail.instances.actionsCount' | transloco }}
-                          </span>
-                        </div>
-                      </div>
-                      <div class="flex items-center gap-2 shrink-0">
-                        <span [class]="'badge badge-sm ' + getStatusClass(instance.status_label)">
-                          {{ instance.status_label }}
-                        </span>
-                        @if (isSelectedInstance(instance.id)) {
-                          <span class="badge badge-sm badge-info">{{ 'processDetail.instances.selected' | transloco }}</span>
-                        }
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </button>
-                }
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-3">
+              <div class="space-y-4">
+                <h4 class="text-[9px] uppercase font-bold text-base-content/40 tracking-wider">Demandante(s)</h4>
+                <div class="space-y-2">
+                  @for (subject of plaintiffSubjects(); track subject.id; let i = $index) {
+                  <div
+                    class="flex items-center gap-3 p-3 bg-base-200/30 rounded-xl border border-transparent hover:border-primary/5 transition-all">
+                    <span class="text-[10px] font-bold text-primary/40">{{ i + 1 }}.</span>
+                    <p class="text-sm font-semibold text-base-content leading-tight">{{ subject.name_or_business_name }}
+                    </p>
+                  </div>
+                  }
+                </div>
               </div>
+              <div class="space-y-4">
+                <h4 class="text-[9px] uppercase font-bold text-base-content/40 tracking-wider">Demandado(s)</h4>
+                <div class="space-y-2">
+                  @for (subject of defendantSubjects(); track subject.id; let i = $index) {
+                  <div
+                    class="flex items-center gap-3 p-3 bg-base-200/30 rounded-xl border border-transparent hover:border-secondary/5 transition-all">
+                    <span class="text-[10px] font-bold text-secondary/40">{{ i + 1 }}.</span>
+                    <p class="text-sm font-semibold text-base-content leading-tight">{{ subject.name_or_business_name }}
+                    </p>
+                  </div>
+                  }
+                </div>
+              </div>
+            </div>
             }
           </div>
         </div>
-      }
 
-      <!-- General Information -->
-      <div class="collapse collapse-arrow bg-base-100 border border-base-300">
-        <input type="radio" name="process-accordion" checked="checked" />
-        <div class="collapse-title text-xl font-medium flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          {{ 'processDetail.generalInfo' | transloco }}
-        </div>
-        <div class="collapse-content">
-          <div class="process-detail-grid">
-            <div class="process-detail-item">
-              <span class="process-detail-label">{{ 'processDetail.processNumber' | transloco }}</span>
-              <p class="process-detail-value">{{ process()!.process_number }}</p>
-            </div>
-            <div class="process-detail-item">
-              <span class="process-detail-label">{{ 'processDetail.processId' | transloco }}</span>
-              <p class="process-detail-value">{{ process()!.process_id }}</p>
-            </div>
-            <div class="process-detail-item">
-              <span class="process-detail-label">{{ 'processDetail.court' | transloco }}</span>
-              <p class="process-detail-value">{{ process()!.court }}</p>
-            </div>
-            <div class="process-detail-item">
-              <span class="process-detail-label">{{ 'processDetail.processType' | transloco }}</span>
-              <p class="process-detail-value">{{ process()!.process_type || '–' }}</p>
-            </div>
-            <div class="process-detail-item">
-              <span class="process-detail-label">{{ 'processDetail.processClass' | transloco }}</span>
-              <p class="process-detail-value">{{ process()!.process_class || '–' }}</p>
-            </div>
-            <div class="process-detail-item">
-              <span class="process-detail-label">{{ 'processDetail.subclassProcess' | transloco }}</span>
-              <p class="process-detail-value">{{ process()!.subclass_process || '–' }}</p>
-            </div>
-            <div class="process-detail-item">
-              <span class="process-detail-label">{{ 'processDetail.processDate' | transloco }}</span>
-              <p class="process-detail-value">{{ formatDateSafe(process()!.process_date, 'shortDate') }}</p>
-            </div>
-            <div class="process-detail-item">
-              <span class="process-detail-label">{{ 'processDetail.lastActivityDate' | transloco }}</span>
-              <p class="process-detail-value">{{ process()!.last_activity_date ? formatDateSafe(process()!.last_activity_date, 'short') : '–' }}</p>
-            </div>
-            <div class="process-detail-item">
-              <span class="process-detail-label">{{ 'processDetail.location' | transloco }}</span>
-              <p class="process-detail-value">{{ process()!.location || '–' }}</p>
-            </div>
-            <div class="process-detail-item">
-              <span class="process-detail-label">{{ 'processDetail.createdAt' | transloco }}</span>
-              <p class="process-detail-value">{{ formatDateSafe(process()!.created_at, 'short') }}</p>
-            </div>
-
-            <div class="process-detail-item">
-              <span class="process-detail-label">{{ 'processDetail.hasMultipleInstances' | transloco }}</span>
-              <div class="mt-1">
-                <span [class]="'badge ' + (process()!.has_multiple_instances ? 'badge-info badge-outline' : 'badge-ghost')">
-                  {{ process()!.has_multiple_instances ? ('processDetail.yes' | transloco) : ('processDetail.no' | transloco) }}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Subjects Section -->
-      <div class="collapse collapse-arrow bg-base-100 border border-base-300 shadow-sm">
-        <input type="radio" name="process-accordion" />
-        <div class="collapse-title text-xl font-medium flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          {{ 'processDetail.subjects.title' | transloco }}
-        </div>
-        <div class="collapse-content">
-          @if (subjects().length === 0) {
-            <div class="text-center py-8">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-16 w-16 mx-auto text-base-content/30 mb-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
+        <!-- Item: Lista de Actuaciones -->
+        <div
+          class="collapse collapse-plus bg-base-100 border border-base-200 rounded-2xl shadow-sm overflow-hidden mb-8">
+          <input type="radio" name="process-accordion" />
+          <div class="collapse-title flex items-center gap-3 py-4 px-6 hover:bg-base-200/20 transition-colors">
+            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
               </svg>
-              <p class="text-base-content/70">{{ 'processDetail.subjects.empty' | transloco }}</p>
             </div>
-          } @else {
-            <div class="subject-columns grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div class="subject-group-card">
-                <div class="subject-group-header">
-                  <h4 class="subject-group-title">Demandante(s)</h4>
-                </div>
-                @if (plaintiffSubjects().length === 0) {
-                  <p class="subject-empty">–</p>
-                } @else {
-                  <div class="subject-list">
-                    @for (subject of plaintiffSubjects(); track subject.id; let i = $index) {
-                      <div class="subject-item">
-                        <p class="subject-name"><span class="subject-index">{{ i + 1 }}.</span> {{ subject.name_or_business_name }}</p>
-                      </div>
-                    }
-                  </div>
-                }
-              </div>
-
-              <div class="subject-group-card">
-                <div class="subject-group-header">
-                  <h4 class="subject-group-title">Demandado(s)</h4>
-                </div>
-                @if (defendantSubjects().length === 0) {
-                  <p class="subject-empty">–</p>
-                } @else {
-                  <div class="subject-list">
-                    @for (subject of defendantSubjects(); track subject.id; let i = $index) {
-                      <div class="subject-item">
-                        <p class="subject-name"><span class="subject-index">{{ i + 1 }}.</span> {{ subject.name_or_business_name }}</p>
-                      </div>
-                    }
-                  </div>
-                }
-              </div>
-            </div>
-          }
-        </div>
-      </div>
-
-      <!-- Actions Section -->
-      <div class="collapse collapse-arrow bg-base-100 border border-base-300 shadow-sm">
-        <input type="radio" name="process-accordion" />
-        <div class="collapse-title text-xl font-medium flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          {{ 'processDetail.actions.title' | transloco }}
-        </div>
-        <div class="collapse-content">
-          <!-- Alert keyword stats (conteo por palabra clave) -->
-          @if (alertKeywordStats().length > 0) {
-            <div class="mb-4">
-              <p class="text-sm font-medium text-base-content/70 mb-2">
-                {{ 'processDetail.actions.keywordStatsTitle' | transloco }}
-              </p>
-              <div class="flex flex-wrap gap-2">
+            <span class="text-base font-bold">{{ 'processDetail.actions.title' | transloco }}</span>
+          </div>
+          <div class="collapse-content px-0 pb-6 pt-0">
+            <div class="px-5 sm:px-6 space-y-6">
+              <!-- Tags/Stats -->
+              @if (alertKeywordStats().length > 0) {
+              <div class="flex flex-wrap gap-2 mt-2">
                 @for (stat of alertKeywordStats(); track stat.id) {
-                  <button
-                    type="button"
-                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-base-300 bg-base-100 hover:bg-primary/10 hover:border-primary/50 hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                    (click)="applyAlertFilter(stat.slug)"
-                  >
-                    <span class="text-base-content">{{ stat.name }}</span>
-                    <span class="badge badge-sm badge-secondary badge-outline">{{ stat.count }}</span>
-                  </button>
+                <button type="button" (click)="applyAlertFilter(stat.slug)"
+                  class="btn btn-xs h-auto py-2 px-3 bg-white hover:bg-primary/10 border border-base-200 hover:border-primary/30 rounded-lg gap-2 transition-all">
+                  <span class="text-[9px] font-bold text-base-content/60">{{ stat.name }}</span>
+                  <span class="badge badge-xs bg-primary/5 text-primary border-none font-bold">{{ stat.count }}</span>
+                </button>
                 }
               </div>
-            </div>
-          }
+              }
 
-          <!-- Filters -->
-          <div class="card bg-base-100 shadow-sm mb-4">
-            <div class="card-body">
-              <h3 class="card-title text-lg mb-4">{{ 'processDetail.actions.filters.title' | transloco }}</h3>
-              <form [formGroup]="actionFilterForm" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" autocomplete="off">
-                <!-- Action Date Range Filter -->
-                <div class="form-control">
-                  <app-date-range-picker
-                    [label]="'processDetail.actions.filters.actionDateRange' | transloco"
-                    [placeholder]="'processDetail.actions.filters.actionDateRangePlaceholder' | transloco"
-                    [size]="'sm'"
-                    formControlName="action_date_range"
-                  ></app-date-range-picker>
-                </div>
-
-                <!-- Registration Date Range Filter -->
-                <div class="form-control">
-                  <app-date-range-picker
-                    [label]="'processDetail.actions.filters.registrationDateRange' | transloco"
-                    [placeholder]="'processDetail.actions.filters.registrationDateRangePlaceholder' | transloco"
-                    [size]="'sm'"
-                    formControlName="registration_date_range"
-                  ></app-date-range-picker>
-                </div>
-
-                <!-- Alert keyword filter (palabra clave) -->
-                <div class="form-control">
-                  <label class="label">
-                    <span class="label-text">{{ 'processDetail.actions.filters.alertKeyword' | transloco }}</span>
-                  </label>
-                  <select
-                    formControlName="alert_slug"
-                    class="select select-bordered select-sm w-full"
-                  >
-                    <option [ngValue]="null">{{ 'processDetail.actions.filters.alertKeywordPlaceholder' | transloco }}</option>
-                    @for (keyword of alertKeywords(); track keyword.id) {
-                      <option [ngValue]="keyword.slug">{{ keyword.name }}</option>
-                    }
-                  </select>
-                </div>
-
-                <!-- Search Filter -->
-                <div class="form-control">
-                  <label class="label">
-                    <span class="label-text">{{ 'processDetail.actions.filters.search' | transloco }}</span>
-                  </label>
-                  <input
-                    type="text"
-                    formControlName="search"
-                    class="input input-bordered input-sm"
-                    [placeholder]="'processDetail.actions.filters.searchPlaceholder' | transloco"
-                    autocomplete="off"
-                  />
-                </div>
-              </form>
-
-              <!-- Filter Actions -->
-              <div class="card-actions justify-end mt-4">
-                <button
-                  type="button"
-                  class="btn btn-ghost btn-sm"
-                  (click)="onResetActionFilters()"
-                >
-                  {{ 'processDetail.actions.filters.reset' | transloco }}
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-primary btn-sm"
-                  (click)="onSearchActions()"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
+              <!-- Search Area -->
+              <div class="p-6 bg-white rounded-2xl border border-base-200 shadow-sm shadow-base-200/50">
+                <div class="flex items-center gap-2 mb-8">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 opacity-30" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                   </svg>
-                  {{ 'processDetail.actions.filters.search' | transloco }}
-                </button>
+                  <span class="text-[11px] font-bold uppercase text-base-content tracking-[0.2em]">FILTROS DE
+                    BÚSQUEDA</span>
+                </div>
+
+                <form [formGroup]="actionFilterForm"
+                  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-6">
+                  <div class="form-control">
+                    <label class="label !pt-0 !pb-1"><span class="label-standard">{{
+                        'processDetail.actions.filters.actionDateRange' | transloco }}</span></label>
+                    <app-date-range-picker [size]="'sm'" formControlName="action_date_range"></app-date-range-picker>
+                  </div>
+
+                  <div class="form-control">
+                    <label class="label !pt-0 !pb-1"><span class="label-standard">{{
+                        'processDetail.actions.filters.registrationDateRange' | transloco }}</span></label>
+                    <app-date-range-picker [size]="'sm'"
+                      formControlName="registration_date_range"></app-date-range-picker>
+                  </div>
+
+                  <div class="form-control">
+                    <label class="label !pt-0 !pb-1"><span class="label-standard">{{
+                        'processDetail.actions.filters.alertKeyword' | transloco }}</span></label>
+                    <select formControlName="alert_slug" class="select-standard select select-bordered">
+                      <option [ngValue]="null">{{ 'processDetail.actions.filters.alertKeywordPlaceholder' | transloco }}
+                      </option>
+                      @for (keyword of alertKeywords(); track keyword.id) {
+                      <option [ngValue]="keyword.slug">{{ keyword.name }}</option>
+                      }
+                    </select>
+                  </div>
+
+                  <div class="form-control">
+                    <label class="label !pt-0 !pb-1"><span class="label-standard">{{
+                        'processDetail.actions.filters.search' | transloco }}</span></label>
+                    <input type="text" formControlName="search" class="input-standard input input-bordered"
+                      [placeholder]="'processDetail.actions.filters.searchPlaceholder' | transloco" />
+                  </div>
+                </form>
+
+                <!-- Unified Action Buttons (Filter style) -->
+                <div class="mt-8 flex justify-end items-center gap-6 border-t border-base-200/50 pt-6">
+                  <button type="button"
+                    class="btn btn-link btn-sm normal-case text-base-content/60 no-underline hover:text-base-content font-bold"
+                    (click)="onResetActionFilters()">
+                    {{ 'processDetail.actions.filters.reset' | transloco }}
+                  </button>
+                  <button type="button" class="btn-standard-search" (click)="onSearchActions()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                      stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    {{ 'processDetail.actions.filters.search' | transloco }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Actions Table/Cards (No rounded corners for table container on desktop) -->
+              <div class="bg-white border border-base-200 overflow-hidden shadow-sm action-data-container">
+                <!-- Desktop: Table (lg and up) -->
+                <div class="hidden lg:block">
+                  <app-data-table [columns]="actionColumns" [data]="actions()" [pagination]="actionsPagination()"
+                    [loading]="loadingActions()" [emptyMessage]="'processDetail.actions.empty' | transloco"
+                    (pageChange)="onActionsPageChange($event)"></app-data-table>
+                </div>
+
+                <!-- Mobile: Cards (below lg) -->
+                <div class="lg:hidden">
+                  @if (loadingActions()) {
+                  <div class="flex justify-center py-12"><span
+                      class="loading loading-spinner loading-md text-primary"></span></div>
+                  } @else if (actions().length === 0) {
+                  <div class="py-12 text-center">
+                    <p class="text-sm text-base-content/40 font-medium">{{ 'processDetail.actions.empty' | transloco }}
+                    </p>
+                  </div>
+                  } @else {
+                  <div class="divide-y divide-base-200">
+                    @for (action of actions(); track action.id; let i = $index) {
+                    <div class="p-4 sm:p-5 hover:bg-base-200/5 transition-colors">
+                      <div class="flex items-start gap-4">
+                        <span
+                          class="w-8 h-8 rounded-lg bg-base-200 flex items-center justify-center text-[10px] font-bold text-base-content/40 shrink-0 mt-1">
+                          {{ (actionsPagination()?.from || 0) + i }}
+                        </span>
+                        <div class="min-w-0 flex-1 space-y-3">
+                          <div class="flex justify-between items-start gap-3">
+                            <h4 class="text-sm font-bold text-base-content leading-tight">{{ action.action }}</h4>
+                            <span
+                              class="text-[9px] font-bold text-primary whitespace-nowrap bg-primary/5 px-2 py-1 rounded border border-primary/10">{{
+                              formatDateSafe(action.action_date, 'shortDate') }}</span>
+                          </div>
+
+                          <p
+                            class="text-xs font-medium text-base-content/80 leading-relaxed italic border-l-3 border-primary/20 pl-4 bg-base-200/20 py-2 rounded-r-lg">
+                            {{ action.annotation || 'Sin anotación' }}
+                          </p>
+
+                          <div
+                            class="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 border-t border-dashed border-base-200">
+                            <div class="flex items-center gap-2">
+                              <span class="text-[9px] font-bold uppercase text-base-content/30 tracking-wider">Fecha
+                                Registro</span>
+                              <span class="text-[10px] font-bold text-base-content/60">{{
+                                formatDateSafe(action.registration_date, 'short') }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    }
+                  </div>
+
+                  <!-- Mobile Pagination Simplified -->
+                  @if (actionsPagination(); as pagination) {
+                  <div class="p-4 bg-base-200/30 border-t border-base-200 flex flex-col gap-4">
+                    <div class="flex items-center justify-between">
+                      <span class="text-[10px] font-bold text-base-content/40 uppercase tracking-widest">Pág. {{
+                        pagination.current_page }} de {{ pagination.last_page }}</span>
+                      <div class="join">
+                        <button
+                          (click)="onActionsPageChange({ page: pagination.current_page - 1, perPage: pagination.per_page })"
+                          [disabled]="pagination.current_page === 1"
+                          class="btn btn-xs join-item bg-base-100 border-base-200 px-3 font-bold">Anterior</button>
+                        <button
+                          (click)="onActionsPageChange({ page: pagination.current_page + 1, perPage: pagination.per_page })"
+                          [disabled]="pagination.current_page === pagination.last_page"
+                          class="btn btn-xs join-item bg-base-100 border-base-200 px-3 font-bold">Siguiente</button>
+                      </div>
+                    </div>
+
+                    <select class="select select-bordered select-xs w-full font-bold text-base-content/60"
+                      (change)="onActionsPageChange({ page: 1, perPage: +$any($event.target).value })">
+                      @for (size of [10, 20, 50]; track size) {
+                      <option [value]="size" [selected]="pagination.per_page === size">{{ size }} por página</option>
+                      }
+                    </select>
+                  </div>
+                  }
+                  }
+                </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
 
-          <!-- Actions Table -->
-          @if (actions().length === 0 && !loadingActions()) {
-            <div class="text-center py-8">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-16 w-16 mx-auto text-base-content/30 mb-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-              <p class="text-base-content/70">{{ 'processDetail.actions.empty' | transloco }}</p>
+  <!-- MOBILE BOTTOM SHEET -->
+  @if (showInstanceSelector() && !loading()) {
+  <div class="fixed inset-0 z-[120] sm:hidden">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-base-content/20 backdrop-blur-sm animate-in fade-in"
+      (click)="toggleInstanceSelector()"></div>
+
+    <!-- Panel -->
+    <div
+      class="absolute bottom-0 left-0 right-0 max-h-[85vh] bg-base-100 rounded-t-3xl shadow-2xl flex flex-col animate-in slide-in-from-bottom duration-300">
+      <div class="w-12 h-1 bg-base-300 rounded-full mx-auto mt-3 mb-6 shrink-0"></div>
+
+      <div class="flex items-center justify-between px-6 pb-4 border-b border-base-200">
+        <h3 class="text-lg font-bold">{{ 'processDetail.instances.title' | transloco }}</h3>
+        <button (click)="toggleInstanceSelector()" class="btn btn-sm btn-circle btn-ghost">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="overflow-y-auto p-6 space-y-4">
+        @for (instance of processInstances(); track instance.id) {
+        <ng-container *ngTemplateOutlet="instanceCard; context: { $implicit: instance }"></ng-container>
+        }
+      </div>
+      <div class="h-8 shrink-0"></div>
+    </div>
+  </div>
+  }
+
+  <!-- TEMPLATE: INSTANCE CARD (IMPROVED LEGIBILITY) -->
+  <ng-template #instanceCard let-instance>
+    <div (click)="onSelectInstance(instance.id)"
+      class="w-full text-left rounded-xl border p-5 transition-all active:scale-[0.98] cursor-pointer relative overflow-hidden group"
+      [class.bg-primary/5]="isSelectedInstance(instance.id)" [class.border-primary/40]="isSelectedInstance(instance.id)"
+      [class.bg-base-100]="!isSelectedInstance(instance.id)" [class.border-base-200]="!isSelectedInstance(instance.id)"
+      [class.hover:border-primary/20]="!isSelectedInstance(instance.id)">
+
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl transition-all shrink-0"
+              [class]="isSelectedInstance(instance.id) ? 'bg-primary text-white shadow-md' : 'bg-base-200 text-base-content/30 group-hover:text-primary'">
+              {{ (instance.court || '-').charAt(0).toUpperCase() }}
             </div>
-          } @else {
-            <div class="card bg-base-100 shadow-sm">
-              <div class="card-body p-0">
-                <app-data-table
-                  [columns]="actionColumns"
-                  [data]="actions()"
-                  [pagination]="actionsPagination()"
-                  [loading]="loadingActions()"
-                  [emptyMessage]="'processDetail.actions.empty' | transloco"
-                  (pageChange)="onActionsPageChange($event)"
-                ></app-data-table>
+            <div class="min-w-0 flex-1">
+              <p class="font-bold text-base text-base-content leading-tight transition-colors"
+                [class.text-primary]="isSelectedInstance(instance.id)">
+                {{ instance.court }}
+              </p>
+              <span *ngIf="isSelectedInstance(instance.id)"
+                class="text-[9px] font-bold uppercase tracking-[0.1em] text-primary mt-1.5 inline-block">SELECCIONADA</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2.5 ml-16">
+            <div class="flex items-center gap-2.5 text-[11px] font-semibold text-base-content/60">
+              <div class="w-5 h-5 rounded bg-base-200 flex items-center justify-center shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 opacity-60" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
+              <span class="leading-none">Última actualización: <span class="text-base-content font-bold">{{
+                  formatDateSafe(instance.last_api_update, 'shortDate') }}</span> <span
+                  class="text-[10px] font-medium opacity-50 ml-1">{{ formatDateSafe(instance.last_api_update,
+                  'onlyTime') }}</span></span>
             </div>
+            <div class="flex items-center gap-2.5 text-[11px] font-semibold text-base-content/60">
+              <div class="w-5 h-5 rounded bg-base-200 flex items-center justify-center shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 opacity-60" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                    d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V18a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <span class="leading-none">{{ instance.actions_count }} <span class="uppercase tracking-tighter">{{
+                  (instance.actions_count === 1 ? 'generics.action' : 'generics.actions') | transloco }}</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col items-end gap-3 shrink-0">
+          <span [class]="'badge badge-sm font-bold uppercase rounded py-1.5 ' + getStatusClass(instance.status_label)">
+            {{ instance.status_label }}
+          </span>
+          @if (isSelectedInstance(instance.id)) {
+          <div
+            class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
           }
         </div>
       </div>
     </div>
-  }
-  </div>
+  </ng-template>
 
-  <!-- Modal de confirmación para cambiar estado -->
-  <app-confirmation-dialog
-    [open]="confirmModalOpen()"
-    [title]="confirmModalTitle()"
-    [message]="confirmModalMessage()"
-    [confirmLabel]="'Confirmar'"
-    [cancelLabel]="'Cancelar'"
+  <!-- TEMPLATE: INFO ITEM -->
+  <ng-template #infoItem let-label="label" let-value="value" let-strong="strong">
+    <div
+      class="p-4 bg-base-200/20 border border-base-200/50 rounded-xl hover:bg-white hover:border-primary/10 transition-all h-full">
+      <span class="block text-[9px] uppercase font-bold text-base-content/30 tracking-wider mb-1">{{ label | transloco
+        }}</span>
+      <p class="text-sm font-semibold text-base-content leading-snug break-words" [class.text-primary]="strong">
+        {{ value || '–' }}
+      </p>
+    </div>
+  </ng-template>
+
+  <!-- Confirmation Dialog -->
+  <app-confirmation-dialog [open]="confirmModalOpen()" [title]="confirmModalTitle()" [message]="confirmModalMessage()"
+    [confirmLabel]="'Confirmar'" [cancelLabel]="'Cancelar'"
     [confirmClass]="confirmModalAction() === 'deactivate' ? 'btn-error' : 'btn-success'"
-    (confirm)="onConfirmStatusChange()"
-    (cancel)="onCancelStatusChange()"
-  ></app-confirmation-dialog>
+    (confirm)="onConfirmStatusChange()" (cancel)="onCancelStatusChange()"></app-confirmation-dialog>
 </div>

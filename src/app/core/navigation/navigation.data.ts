@@ -10,14 +10,14 @@ export const DEFAULT_NAVIGATION: NavigationItem[] = [
     title: 'navigation.gestionProcesos',
     type: 'basic',
     icon: 'gestion-procesos',
-    link: '/admin/gestion-procesos',
+    link: '/gestion-procesos',
   },
   {
     id: 'keywords',
     title: 'navigation.keywords',
     type: 'basic',
     icon: 'keywords',
-    link: '/admin/keywords',
+    link: '/palabras-clave',
   },
   // More items will be added here as needed
 ];

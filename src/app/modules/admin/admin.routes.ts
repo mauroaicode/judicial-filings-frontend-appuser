@@ -14,7 +14,7 @@ export default [
       import('./gestion-procesos/gestion-procesos.routes').then((m) => m.default),
   },
   {
-    path: 'keywords',
+    path: 'palabras-clave',
     loadChildren: () =>
       import('./keywords/keywords.routes').then((m) => m.default),
   },

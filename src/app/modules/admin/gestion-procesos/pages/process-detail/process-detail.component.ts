@@ -84,6 +84,14 @@ export class ProcessDetailComponent {
   public toastType = signal<'success' | 'error'>('success');
   public toastMessage = signal<string>('');
 
+  /** Selector de instancia en móvil */
+  public showInstanceSelector = signal<boolean>(false);
+
+  /** Instancia actualmente seleccionada */
+  public selectedInstance = computed(() =>
+    this.processInstances().find(instance => instance.id === this.process()?.id)
+  );
+
   // Filter form for actions
   public actionFilterForm: FormGroup = this._fb.group({
     action_date_range: [null as DateRange | null],
@@ -271,8 +279,16 @@ export class ProcessDetailComponent {
   }
 
   onSelectInstance(instanceId: string): void {
-    if (this.isSelectedInstance(instanceId)) return;
-    this._router.navigate(['/admin/gestion-procesos', instanceId]);
+    if (this.isSelectedInstance(instanceId)) {
+      this.showInstanceSelector.set(false);
+      return;
+    }
+    this.showInstanceSelector.set(false);
+    this._router.navigate(['/gestion-procesos', instanceId]);
+  }
+
+  toggleInstanceSelector(): void {
+    this.showInstanceSelector.update(v => !v);
   }
 
   /**
@@ -491,10 +507,11 @@ export class ProcessDetailComponent {
    * if it returns an already human-readable string (e.g. "8 de mayo de 2024") we show it as-is.
    * Avoids InvalidPipeArgument when using the date pipe with non-parseable strings.
    */
-  formatDateSafe(value: string | null | undefined, kind: 'short' | 'shortDate'): string {
+  formatDateSafe(value: string | null | undefined, kind: 'short' | 'shortDate' | 'onlyTime'): string {
     if (!value || !value.trim()) return '–';
     const trimmed = value.trim();
     const date = new Date(trimmed);
+
     if (!isNaN(date.getTime())) {
       if (kind === 'short') {
         return date.toLocaleString('es-ES', {
@@ -502,13 +519,22 @@ export class ProcessDetailComponent {
           timeStyle: 'short',
         });
       }
+      if (kind === 'onlyTime') {
+        return date.toLocaleTimeString('es-ES', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+      }
       return date.toLocaleDateString('es-ES', {
         year: 'numeric',
-        month: '2-digit',
         day: '2-digit',
+        month: '2-digit',
       });
     }
-    return trimmed;
+
+    // If not a parseable date (already formatted from API), don't duplicate for onlyTime
+    return kind === 'onlyTime' ? '' : trimmed;
   }
 
 }
