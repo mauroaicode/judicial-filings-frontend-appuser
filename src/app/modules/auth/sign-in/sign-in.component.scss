@@ -1,3 +1,92 @@
-// Sign In Component Styles
-// Using DaisyUI classes, minimal custom styles needed
+// Auth Component Styles - Refined & Professional
 
+:host {
+    display: block;
+    width: 100%;
+}
+
+.animate-in {
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(2rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.fade-in {
+    animation-name: fadeIn;
+}
+
+.slide-in-from-bottom {
+    animation-name: slideInFromBottom;
+}
+
+.slide-in-from-top-1 {
+    animation-name: slideInFromTop;
+}
+
+.zoom-in {
+    animation-name: zoomIn;
+}
+
+.delay-300 {
+    animation-delay: 300ms;
+}
+
+.delay-400 {
+    animation-delay: 400ms;
+}
+
+.delay-500 {
+    animation-delay: 500ms;
+}
+
+// Input focus refinement
+.input {
+    &:focus {
+        box-shadow: 0 0 0 4px rgba(var(--p-rgb), 0.1);
+    }
+}

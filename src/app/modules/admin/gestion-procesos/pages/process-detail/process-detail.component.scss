@@ -1,153 +1,170 @@
-// Process Detail Component Styles
+// Process Detail Component Styles - Clean Professional UI
 
-.process-detail-grid {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: 0.7rem;
+// Global container
+.w-full {
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-@media (min-width: 768px) {
-  .process-detail-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+// Custom Animations
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
   }
 }
 
-@media (min-width: 1280px) {
-  .process-detail-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }
 
-.process-detail-item {
-  border: 1px solid hsl(var(--b3));
-  border-radius: 0.75rem;
-  padding: 0.65rem 0.75rem;
-  background: hsl(var(--b1));
-}
+.animate-in {
+  animation-duration: 0.2s;
+  animation-fill-mode: both;
 
-.process-detail-label {
-  display: block;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: hsl(var(--bc) / 0.65);
-  margin-bottom: 0.15rem;
-}
+  &.fade-in {
+    animation-name: fadeIn;
+  }
 
-.process-detail-value {
-  color: hsl(var(--bc));
-  font-size: 0.93rem;
-  font-weight: 500;
-  line-height: 1.35;
-  word-break: break-word;
-}
-
-.subject-group-card {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  padding: 0.2rem 0.6rem;
-}
-
-.subject-group-header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  margin-bottom: 0.6rem;
-}
-
-.subject-group-title {
-  margin: 0;
-  font-size: 0.98rem;
-  font-weight: 700;
-  color: hsl(var(--bc));
-}
-
-.subject-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.subject-item {
-  border: 0;
-  border-radius: 0;
-  padding: 0.2rem 0;
-  background: transparent;
-}
-
-.subject-name {
-  margin: 0;
-  color: hsl(var(--bc));
-  font-size: 0.95rem;
-  line-height: 1.45;
-}
-
-.subject-index {
-  display: inline-block;
-  min-width: 1.4rem;
-  font-weight: 700;
-  color: hsl(var(--bc) / 0.75);
-}
-
-.subject-empty {
-  margin: 0;
-  font-size: 0.9rem;
-  color: hsl(var(--bc) / 0.55);
-}
-
-@media (min-width: 1024px) {
-  .subject-columns .subject-group-card + .subject-group-card {
-    border-left: 1px solid hsl(var(--b3));
-    padding-left: 1rem;
+  &.slide-in-from-bottom {
+    animation-name: slideUp;
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
 
-.process-status-hero {
-  font-size: 0.82rem;
-  padding: 0.28rem 0.7rem;
-  font-weight: 700;
+// Accordion overrides for cleaner look
+.collapse {
+  &-plus {
+    .collapse-title:after {
+      background-color: hsl(var(--p) / 0.05);
+      color: hsl(var(--p));
+      border-radius: 8px;
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 1.1rem !important;
+      right: 1.5rem !important;
+      font-size: 0.75rem !important;
+    }
+  }
 }
 
-// Estilos para proceso inactivo - Atenuar el contenido
+// Process inactive state
 .process-inactive {
+
   .collapse-title,
-  .collapse-content,
-  .process-detail-label,
-  .process-detail-value,
-  .subject-group-title,
-  .subject-name,
-  .subject-index,
-  .subject-empty {
-    opacity: 0.65;
-  }
-
-  .collapse-title {
-    color: hsl(var(--bc) / 0.75);
-  }
-
-  .process-detail-item {
-    background: hsl(var(--b2) / 0.5);
-    border-color: hsl(var(--b3) / 0.6);
-  }
-
-  .subject-group-card {
+  .collapse-content {
     opacity: 0.7;
   }
+}
 
-  // La tabla de actuaciones también se ve afectada
-  .card {
-    opacity: 0.75;
+// Custom Scrollbar
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--bc) / 0.1) transparent;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--bc) / 0.1);
+    border-radius: 10px;
   }
 }
 
-// Botón de éxito para el modal
-.btn-success {
-  background-color: hsl(var(--su));
-  border-color: hsl(var(--su));
-  color: hsl(var(--suc));
+// Badge styling refinement
+.badge {
+  border-radius: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 9px;
+  padding: 0.25rem 0.6rem;
+  height: auto;
+  border-width: 1px;
+}
 
-  &:hover {
-    background-color: hsl(var(--su) / 0.9);
-    border-color: hsl(var(--su) / 0.9);
+// Table refinement - Removed rounded corners for desktop data table
+:host ::ng-deep {
+  .action-data-container {
+    .data-table-container {
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+
+      .table {
+        border-radius: 0 !important;
+
+        thead,
+        tr,
+        th {
+          border-radius: 0 !important;
+        }
+
+        th {
+          font-size: 9px !important;
+          text-transform: uppercase !important;
+          font-weight: 800 !important;
+          letter-spacing: 0.05em !important;
+          padding: 1.25rem 1rem !important;
+          background-color: #24163E !important; // Match Gestion de Procesos header
+          color: white !important;
+          border-bottom: none !important;
+        }
+
+        td {
+          padding: 1.25rem 1rem !important;
+          font-weight: 500 !important;
+          font-size: 0.825rem !important;
+          border-bottom-color: hsl(var(--bc) / 0.05) !important;
+        }
+
+        tbody tr:hover {
+          background-color: #F3F0F9 !important;
+        }
+      }
+    }
+  }
+
+  // Label standard adjustment to prevent wrapping and improve alignment
+  .label-standard {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.05em !important;
+    min-height: 1.2rem;
+    display: flex;
+    align-items: flex-end;
+  }
+}
+
+.ml-13 {
+  margin-left: 3.25rem;
+}
+
+.ml-16 {
+  margin-left: 4rem;
+}
+
+// Mobile specific refinements
+@media (max-width: 640px) {
+  .collapse-title {
+    padding-right: 4rem !important;
   }
 }

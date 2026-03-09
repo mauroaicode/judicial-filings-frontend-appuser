@@ -43,7 +43,8 @@ export class DashboardStatsCardsComponent {
   /** Emitted when a card is clicked (for compatibility) */
   cardClick = output<DashboardStatsCardType>();
 
-  readonly cards = computed<DashboardStatsCardItem[]>(() => {
+  /** All defined cards */
+  private readonly _allCards = computed<DashboardStatsCardItem[]>(() => {
     const s = this.stats();
     if (!s) return [];
 
@@ -52,7 +53,7 @@ export class DashboardStatsCardsComponent {
       actuacion_alerta: 0,
     };
 
-    const cardsList: DashboardStatsCardItem[] = [
+    return [
       {
         type: 'total_processes',
         value: s.total_processes,
@@ -92,12 +93,21 @@ export class DashboardStatsCardsComponent {
         type: 'actuacion_alerta',
         value: byType.actuacion_alerta,
         labelKey: 'dashboard.stats.notifications.actuacionAlerta',
-        valueClass: 'text-orange',
+        valueClass: 'text-warning',
         clickable: true,
       },
     ];
-    return cardsList;
   });
+
+  /** Regular informational cards */
+  readonly regularCards = computed(() =>
+    this._allCards().filter(c => !NOTIFICATION_CARD_TYPES.includes(c.type))
+  );
+
+  /** High priority actionable cards */
+  readonly importantCards = computed(() =>
+    this._allCards().filter(c => NOTIFICATION_CARD_TYPES.includes(c.type))
+  );
 
   onCardClick(item: DashboardStatsCardItem): void {
     if (item.clickable && NOTIFICATION_CARD_TYPES.includes(item.type)) {

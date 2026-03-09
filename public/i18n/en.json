@@ -241,7 +241,6 @@
   },
   "processDetail": {
     "title": "Process Detail",
-    "status": "Status",
     "activateProcess": "Activate Process",
     "deactivateProcess": "Deactivate Process",
     "back": "Back",
@@ -279,9 +278,9 @@
       "empty": "No actions available",
       "filters": {
         "title": "Search Filters",
-        "actionDateRange": "Action Date Range",
+        "actionDateRange": "Action Date",
         "actionDateRangePlaceholder": "Select date range",
-        "registrationDateRange": "Registration Date Range",
+        "registrationDateRange": "Registration Date",
         "registrationDateRangePlaceholder": "Select date range",
         "alertKeyword": "Alert keyword",
         "alertKeywordPlaceholder": "All keywords",

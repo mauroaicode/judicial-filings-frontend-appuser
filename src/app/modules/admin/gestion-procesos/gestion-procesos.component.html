@@ -10,7 +10,8 @@
       </p>
     </div>
     <div class="flex gap-2">
-      <button type="button" class="btn btn-ghost btn-sm sm:btn-md rounded-xl px-4" [class.bg-base-200]="showFilters()"
+      <button type="button" class="hidden lg:inline-flex btn btn-sm sm:btn-md rounded-xl px-4 transition-all border"
+        [ngClass]="showFilters() ? 'bg-primary/10 text-primary border-primary/30 shadow-sm' : 'btn-ghost border-transparent text-base-content/80 hover:bg-base-200'"
         (click)="toggleFilters()">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
           stroke="currentColor">
@@ -19,14 +20,37 @@
         </svg>
         <span class="hidden sm:inline font-bold">{{ 'gestionProcesos.filters.title' | transloco }}</span>
       </button>
-      <button type="button" class="btn btn-primary btn-sm sm:btn-md normal-case font-bold px-6 rounded-xl"
+      <button type="button"
+        class="hidden lg:inline-flex btn btn-primary btn-sm sm:btn-md normal-case font-bold px-6 rounded-xl"
         (click)="openAddProcessModal()">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          stroke-width="2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
         </svg>
         {{ 'gestionProcesos.addProcess.button' | transloco }}
       </button>
+
+      <!-- FAB Mobile Actions Container -->
+      <div class="lg:hidden fixed bottom-20 right-4 z-[50] flex flex-col gap-3">
+        <!-- Add FAB -->
+        <button type="button"
+          class="btn btn-circle btn-lg shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-2 border-primary bg-primary text-white"
+          (click)="openAddProcessModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+        <!-- Filter FAB -->
+        <button type="button" class="btn btn-circle btn-lg shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-2 transition-all"
+          [ngClass]="showFilters() ? 'bg-primary text-white border-primary' : 'bg-base-100 text-primary border-primary/20'"
+          (click)="toggleFilters()">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -43,7 +67,7 @@
 
   <!-- Filters Card -->
   @if (showFilters()) {
-  <div class="card bg-white shadow-sm border border-base-200 animate-fade-in-up">
+  <div id="filters-section" class="card bg-white shadow-sm border border-base-200 animate-fade-in-up">
     <div class="card-body p-6">
       <h2 class="label-standard mb-6">{{ 'gestionProcesos.filters.title' | transloco }}</h2>
       <form [formGroup]="filterForm"
@@ -177,9 +201,162 @@
         <p class="text-base-content/70">{{ 'gestionProcesos.table.empty' | transloco }}</p>
       </div>
       } @else {
-      <div class="overflow-x-auto w-full process-list-table">
+      <!-- Mobile layout: Cards view -->
+      <div class="block lg:hidden w-full bg-base-100/50 p-3 sm:p-4 space-y-4">
+        @for (process of processes(); track process.id) {
+        <div
+          class="card bg-base-100 border border-base-200 shadow-sm overflow-hidden transition-all duration-200 cursor-pointer hover:border-primary/40 hover:shadow-md"
+          [class.border-primary]="hoveredRowId() === process.id" (click)="onRowDblClick(process)">
+          <!-- Header -->
+          <div class="bg-base-200/50 p-3 sm:p-4 flex justify-between items-center border-b border-base-200">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-primary">{{ process.process_number }}</span>
+            </div>
+            <!-- status badge -->
+            <span class="badge badge-sm font-semibold" [ngClass]="{
+                      'badge-success': process.status_label === 'Activo',
+                      'badge-warning': process.status_label === 'Pendiente',
+                      'badge-neutral': process.status_label === 'Cerrado',
+                      'badge-error': process.status_label === 'Inactivo'
+                    }">
+              {{ process.status_label }}
+            </span>
+          </div>
+
+          <!-- Body -->
+          <div class="p-3 sm:p-4 space-y-4 text-sm">
+            <!-- Court & Class -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="flex flex-col">
+                <span class="text-[10px] text-base-content/50 uppercase font-bold tracking-wider mb-1">{{
+                  'gestionProcesos.table.court' | transloco }}</span>
+                <span class="text-base-content/90 font-medium leading-tight">{{ process.court }}</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-[10px] text-base-content/50 uppercase font-bold tracking-wider mb-1">{{
+                  'gestionProcesos.table.processClass' | transloco }}</span>
+                <span class="text-base-content/90 font-medium leading-tight">{{ process.process_class }}</span>
+              </div>
+            </div>
+
+            <!-- Last Activity & Created -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="flex flex-col">
+                <span class="text-[10px] text-base-content/50 uppercase font-bold tracking-wider mb-1">{{
+                  'gestionProcesos.table.lastActivityDate' | transloco }}</span>
+                <span class="text-base-content/90 font-medium whitespace-nowrap">{{
+                  formatProcessDate(process.last_activity_date) }}</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-[10px] text-base-content/50 uppercase font-bold tracking-wider mb-1">{{
+                  'gestionProcesos.table.processDate' | transloco }}</span>
+                <span class="text-base-content/90 font-medium whitespace-nowrap">{{
+                  formatProcessDate(process.created_at) }}</span>
+              </div>
+            </div>
+
+            <div class="divider my-0 opacity-40"></div>
+
+            <!-- Parties -->
+            <div class="space-y-3">
+              <div class="flex flex-col">
+                <span class="text-[10px] text-base-content/50 uppercase font-bold tracking-wider mb-1">{{
+                  'gestionProcesos.table.plaintiff' | transloco }}:</span>
+                @let plaintiffDisplayMobile = getPartyDisplay(process.plaintiffs ?? (process.plaintiff ?
+                [process.plaintiff] : []));
+                <span class="text-base-content/80 font-medium break-words leading-snug">
+                  {{ plaintiffDisplayMobile.mainText || '–' }}
+                  @if (plaintiffDisplayMobile.extraCount > 0) {
+                  <span class="text-primary font-bold">(+{{ plaintiffDisplayMobile.extraCount }})</span>
+                  }
+                </span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-[10px] text-base-content/50 uppercase font-bold tracking-wider mb-1">{{
+                  'gestionProcesos.table.defendant' | transloco }}:</span>
+                @let defendantDisplayMobile = getPartyDisplay(process.defendants ?? (process.defendant ?
+                [process.defendant] : []));
+                <span class="text-base-content/80 font-medium break-words leading-snug">
+                  {{ defendantDisplayMobile.mainText || '–' }}
+                  @if (defendantDisplayMobile.extraCount > 0) {
+                  <span class="text-primary font-bold">(+{{ defendantDisplayMobile.extraCount }})</span>
+                  }
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Instances Footer if applicable -->
+          @if (process.has_multiple_instances && process.instances && process.instances.length > 1) {
+          <div
+            class="bg-base-200/40 p-3 sm:px-4 border-t border-base-200 flex justify-between items-center cursor-pointer hover:bg-base-200/60 transition-colors"
+            (click)="toggleExpand(process); $event.stopPropagation()">
+            <div class="flex items-center gap-2">
+              <span class="badge badge-primary badge-sm font-bold shadow-sm">{{ getInstanceCount(process) }}</span>
+              <span class="text-[11px] font-bold text-base-content/70 uppercase tracking-widest">Instancias</span>
+            </div>
+            <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/60">
+              @if (isExpanded(process)) {
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+              </svg>
+              } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+              }
+            </button>
+          </div>
+
+          @if (isExpanded(process)) {
+          <div
+            class="bg-primary/5 p-3 sm:p-4 space-y-3 border-t border-base-200 border-l-4 border-l-primary animate-fade-in-up">
+            @for (instance of process.instances; track instance.id) {
+            <div class="bg-base-100 rounded-lg p-3 sm:p-4 shadow-sm border border-base-200 align-start"
+              (click)="onRowDblClick(instance); $event.stopPropagation()">
+              <div class="flex justify-between items-start mb-2 gap-2">
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[10px] text-base-content/50 uppercase font-bold tracking-wider mb-0.5"># Radicación
+                    (Inst. {{ instance.index }})</span>
+                  <span class="font-bold text-base-content text-sm truncate">{{ instance.process_number }}</span>
+                </div>
+                <span class="badge badge-sm font-semibold whitespace-nowrap" [ngClass]="{
+                            'badge-success': instance.status_label === 'Activo',
+                            'badge-warning': instance.status_label === 'Pendiente',
+                            'badge-neutral': instance.status_label === 'Cerrado',
+                            'badge-error': instance.status_label === 'Inactivo'
+                          }">
+                  {{ instance.status_label }}
+                </span>
+              </div>
+              <div class="grid grid-cols-2 gap-x-2 gap-y-2 mt-3 text-xs border-t border-base-200/50 pt-2">
+                <div class="flex flex-col">
+                  <span
+                    class="text-[9px] text-base-content/50 uppercase font-bold tracking-wider mb-0.5">Despacho</span>
+                  <span class="text-base-content/80 font-medium leading-snug">{{ instance.court }}</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[9px] text-base-content/50 uppercase font-bold tracking-wider mb-0.5">Últ.
+                    Actividad</span>
+                  <span class="text-base-content/80 font-medium">{{ formatProcessDate(instance.last_activity_date)
+                    }}</span>
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+          }
+          }
+        </div>
+        }
+      </div>
+
+      <!-- Desktop layout: Table view -->
+      <div class="hidden lg:block overflow-x-auto w-full process-list-table">
         <table class="table table-zebra" style="min-width: 1000px;">
-          <thead style="background-color: #161326; color: #ffffff;">
+          <thead style="background-color: #24163E; color: #ffffff;">
             <tr>
               <th style="width: 48px;" class="text-center"></th>
               @for (column of columns; track column.key) {
@@ -246,7 +423,7 @@
                 <span>
                   {{ plaintiffDisplay.mainText }}
                   @if (plaintiffDisplay.extraCount > 0) {
-                  <span class="tooltip tooltip-bottom tooltip-accent process-list-tooltip"
+                  <span class="tooltip tooltip-bottom tooltip-primary process-list-tooltip"
                     (click)="$event.stopPropagation()">
                     <div
                       class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
@@ -255,7 +432,7 @@
                       }
                     </div>
                     <span
-                      class="text-accent font-medium cursor-pointer whitespace-nowrap underline decoration-accent/50 decoration-dotted underline-offset-1">
+                      class="text-primary font-bold cursor-pointer whitespace-nowrap underline decoration-primary/50 decoration-dotted underline-offset-1">
                       (+{{ plaintiffDisplay.extraCount }})
                     </span>
                   </span>
@@ -272,7 +449,7 @@
                 <span>
                   {{ defendantDisplay.mainText }}
                   @if (defendantDisplay.extraCount > 0) {
-                  <span class="tooltip tooltip-bottom tooltip-accent process-list-tooltip"
+                  <span class="tooltip tooltip-bottom tooltip-primary process-list-tooltip"
                     (click)="$event.stopPropagation()">
                     <div
                       class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
@@ -281,7 +458,7 @@
                       }
                     </div>
                     <span
-                      class="text-accent font-medium cursor-pointer whitespace-nowrap underline decoration-accent/50 decoration-dotted underline-offset-1">
+                      class="text-primary font-bold cursor-pointer whitespace-nowrap underline decoration-primary/50 decoration-dotted underline-offset-1">
                       (+{{ defendantDisplay.extraCount }})
                     </span>
                   </span>
@@ -292,8 +469,9 @@
                 }
               </td>
               <td class="text-center align-middle">
-                <span class="badge badge-sm" [class.badge-accent]="getInstanceCount(process) > 1"
-                  [class.badge-ghost]="getInstanceCount(process) <= 1">
+                <span class="badge badge-sm font-bold" [class.badge-primary]="getInstanceCount(process) > 1"
+                  [class.badge-ghost]="getInstanceCount(process) <= 1"
+                  [class.text-primary-content]="getInstanceCount(process) > 1">
                   {{ getInstanceCount(process) }}
                 </span>
               </td>
@@ -304,12 +482,12 @@
 
             @if (isExpanded(process) && process.instances && process.instances.length > 0) {
             @for (instance of process.instances; track instance.id) {
-            <tr class="cursor-pointer bg-accent/10 process-table-instance-row border-l-4 border-accent"
+            <tr class="cursor-pointer bg-primary/5 process-table-instance-row border-l-4 border-primary"
               [class.process-row-hovered]="hoveredRowId() === instance.id" (mouseenter)="hoveredRowId.set(instance.id)"
               (mouseleave)="hoveredRowId.set(null)" (dblclick)="onRowDblClick(instance)">
               <td class="text-center align-middle p-2 pl-4">
                 <span aria-hidden="true"
-                  class="inline-flex items-center justify-center text-[#37E6B4] text-lg font-bold leading-none drop-shadow-[0_0_5px_rgba(55,230,180,0.55)]"
+                  class="inline-flex items-center justify-center text-primary text-xl font-black leading-none opacity-50"
                   title="Instancia relacionada">
                   ↳
                 </span>
@@ -338,7 +516,7 @@
                 <span>
                   {{ instPlaint.mainText }}
                   @if (instPlaint.extraCount > 0) {
-                  <span class="tooltip tooltip-bottom tooltip-accent process-list-tooltip"
+                  <span class="tooltip tooltip-bottom tooltip-primary process-list-tooltip"
                     (click)="$event.stopPropagation()">
                     <div
                       class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
@@ -347,7 +525,7 @@
                       }
                     </div>
                     <span
-                      class="text-accent font-medium cursor-pointer whitespace-nowrap underline decoration-accent/50 decoration-dotted underline-offset-1">
+                      class="text-primary font-bold cursor-pointer whitespace-nowrap underline decoration-primary/50 decoration-dotted underline-offset-1">
                       (+{{ instPlaint.extraCount }})
                     </span>
                   </span>
@@ -363,7 +541,7 @@
                 <span>
                   {{ instDef.mainText }}
                   @if (instDef.extraCount > 0) {
-                  <span class="tooltip tooltip-bottom tooltip-accent process-list-tooltip"
+                  <span class="tooltip tooltip-bottom tooltip-primary process-list-tooltip"
                     (click)="$event.stopPropagation()">
                     <div
                       class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
@@ -372,7 +550,7 @@
                       }
                     </div>
                     <span
-                      class="text-accent font-medium cursor-pointer whitespace-nowrap underline decoration-accent/50 decoration-dotted underline-offset-1">
+                      class="text-primary font-bold cursor-pointer whitespace-nowrap underline decoration-primary/50 decoration-dotted underline-offset-1">
                       (+{{ instDef.extraCount }})
                     </span>
                   </span>
@@ -383,8 +561,9 @@
                 }
               </td>
               <td class="text-center align-middle">
-                <span class="badge badge-sm" [class.badge-accent]="getInstanceCount(process) > 1"
-                  [class.badge-ghost]="getInstanceCount(process) <= 1">
+                <span class="badge badge-sm font-bold" [class.badge-primary]="getInstanceCount(process) > 1"
+                  [class.badge-ghost]="getInstanceCount(process) <= 1"
+                  [class.text-primary-content]="getInstanceCount(process) > 1">
                   {{ getInstanceCount(process) }}
                 </span>
               </td>
@@ -451,15 +630,16 @@
   </div>
 
   <!-- Add Process Modal -->
-  <dialog class="modal" [class.modal-open]="isModalOpen()">
-    <div class="modal-box rounded-2xl p-0 overflow-hidden bg-base-100 shadow-2xl max-w-2xl w-full">
+  <dialog class="modal modal-bottom lg:modal-middle" [class.modal-open]="isModalOpen()">
+    <div
+      class="modal-box p-0 flex flex-col bg-base-100 shadow-2xl lg:max-w-2xl w-full lg:rounded-2xl rounded-t-3xl rounded-b-none pb-8 lg:pb-0 max-h-[95vh] sm:max-h-[90vh]">
       <!-- Header -->
-      <div class="p-8 border-b border-base-200">
+      <div class="p-6 sm:p-8 border-b border-base-200 flex-none">
         <h3 class="font-bold text-2xl text-base-content">{{ 'gestionProcesos.addProcess.title' | transloco }}</h3>
         <p class="text-sm text-base-content/60 mt-1">{{ 'gestionProcesos.description' | transloco }}</p>
       </div>
 
-      <div class="p-8">
+      <div class="p-6 sm:p-8 overflow-y-auto flex-1">
         <!-- Error Alert -->
         @if (error()) {
         <div class="alert alert-error mb-6 rounded-xl border-none shadow-sm">

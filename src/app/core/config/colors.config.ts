@@ -5,37 +5,39 @@
 export const COLORS = {
   // Base colors
   white: '#fff',
-  black: '#161326',
-  
+  black: '#24163E', // Very dark brand purple
+
   // Primary colors
-  primary: '#161326',
-  
-  // Accent colors (yellowGreen usado como accent en tema; versión más oscura para mejor legibilidad)
-  yellowGreen: '#7CB855',
-  orchid: '#C388F7',
-  khaki: '#ECFF79',
+  primary: '#4B2A7D', // Main logo purple
+  primaryDark: '#371B58', // Darker logo purple
+  primaryLight: '#F3F0F9', // Very light brand purple for backgrounds
+
+  // Accent colors (Gold/Yellow from logo)
+  yellowGreen: '#FBB03B', // Logo Gold
+  orchid: '#7C57B7', // Secondary purple
+  khaki: '#FFEB99',
   lightSkyBlue: '#AFC0FF',
-  
+
   // Gray scale
-  grayDark: '#6D6D6D',
-  gray: '#A4A4A9',
-  gainsboro: '#F8F8F8',
-  lightGray: '#D2DDDC',
-  
+  grayDark: '#4A4A4A',
+  gray: '#9CA3AF',
+  gainsboro: '#F9FAFB',
+  lightGray: '#E5E7EB',
+
   // Status colors
-  salmon: '#FD7972',
-  green: '#2BC155',
-  limeGreen: '#24293E',
-  orange: '#24293E',
-  
+  salmon: '#EF4444', // Professional red
+  green: '#10B981', // Professional green
+  limeGreen: '#84CC16',
+  orange: '#F59E0B', // Professional orange
+
   // Text colors
-  textOnWhite: '#0a0a0c',
-  textOnDark: '#fff',
-  
+  textOnWhite: '#1F2937',
+  textOnDark: '#FFFFFF',
+
   // Button colors
-  buttonPrimary: '#161326',
-  buttonPrimaryBorder: '#161326',
-  buttonHoverText: '#fff',
-  buttonHoverBorder: '#161326',
+  buttonPrimary: '#4B2A7D',
+  buttonPrimaryBorder: '#4B2A7D',
+  buttonHoverText: '#FFFFFF',
+  buttonHoverBorder: '#371B58',
 } as const;
 

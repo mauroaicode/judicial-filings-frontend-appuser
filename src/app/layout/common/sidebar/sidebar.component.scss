@@ -5,14 +5,14 @@ aside {
   max-height: 100vh !important;
   overflow: hidden !important;
   z-index: 30 !important;
-  
+
   // Desktop: sidebar is fixed, content will have margin
   @media (min-width: 768px) {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
   }
-  
+
   // Mobile: sidebar overlays content
   @media (max-width: 767px) {
     position: fixed !important;
@@ -20,16 +20,16 @@ aside {
     top: 0 !important;
     left: 0 !important;
   }
-  
+
   // Ensure inner container respects height limits
-  > div {
+  >div {
     height: 100% !important;
     max-height: 100vh !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
   }
-  
+
   // Sidebar header - fixed height
   .flex.h-16 {
     flex-shrink: 0 !important;
@@ -37,7 +37,7 @@ aside {
     min-height: 4rem !important;
     max-height: 4rem !important;
   }
-  
+
   // Navigation - takes remaining space and scrolls
   nav {
     flex: 1 1 auto !important;
@@ -54,9 +54,28 @@ aside {
   pointer-events: none;
 }
 
-// Active state for collapsable items
-button.active {
-  background-color: hsl(var(--a)); // accent color
-  color: hsl(var(--ac)); // accent-content color
+// Standard sidebar links
+.sidebar-item {
+  color: var(--color-brand-neutral-content);
+  transition: all 0.2s ease;
+
+  &:hover:not(.sidebar-item-active) {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 }
 
+// Active link state logic (works with routerLinkActive)
+.sidebar-item-active,
+button.active .sidebar-item-active {
+  background-color: var(--color-brand-accent) !important;
+  color: var(--color-brand-accent-content) !important;
+  font-weight: 700 !important;
+
+  // Custom hover constraint so that Active yellow does not darken poorly but softly brightens up
+  &:hover {
+    background-color: var(--color-brand-accent) !important;
+    filter: brightness(1.1);
+    /* Brillo sutil, no oscurece */
+    color: var(--color-brand-accent-content) !important;
+  }
+}

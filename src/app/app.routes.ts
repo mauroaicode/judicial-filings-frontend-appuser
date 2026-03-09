@@ -27,7 +27,7 @@ export const routes: Routes = [
 
   // Admin routes (protected - only for authenticated users)
   {
-    path: 'admin',
+    path: '',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./layout/layouts/authenticated/authenticated.component').then(

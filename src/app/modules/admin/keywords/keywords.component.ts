@@ -4,6 +4,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { KeywordService, KeywordStatus } from '@app/core/services/keyword/keyword.service';
 import { Keyword, KeywordPagination } from '@app/core/models/keyword/keyword.model';
 import { KeywordCardComponent } from './components/keyword-card/keyword-card.component';
+import { ConfirmationDialogComponent } from '@app/shared/components/confirmation-dialog/confirmation-dialog.component';
 import { IconService } from '@app/core/services/icon/icon.service';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -11,7 +12,7 @@ import { finalize } from 'rxjs';
 @Component({
     selector: 'app-keywords',
     standalone: true,
-    imports: [CommonModule, TranslocoModule, KeywordCardComponent, FormsModule, ReactiveFormsModule],
+    imports: [CommonModule, TranslocoModule, KeywordCardComponent, FormsModule, ReactiveFormsModule, ConfirmationDialogComponent],
     templateUrl: './keywords.component.html',
     styleUrls: ['./keywords.component.scss'],
     encapsulation: ViewEncapsulation.None,
@@ -44,6 +45,12 @@ export class KeywordsComponent implements OnInit {
     // Feedback State
     public feedbackMessage = signal<string | null>(null);
     public feedbackType = signal<'success' | 'error'>('success');
+
+    // Confirm Modal State
+    public confirmModalOpen = signal<boolean>(false);
+    public confirmModalTitle = signal<string>('');
+    public confirmModalMessage = signal<string>('');
+    public keywordToDelete = signal<Keyword | null>(null);
 
     constructor() {
         // Initialize Create/Edit Form
@@ -132,6 +139,11 @@ export class KeywordsComponent implements OnInit {
      */
     toggleFilters(): void {
         this.showFilters.update(v => !v);
+        if (this.showFilters()) {
+            setTimeout(() => {
+                document.getElementById('filters-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 50);
+        }
     }
 
     /**
@@ -210,17 +222,36 @@ export class KeywordsComponent implements OnInit {
      */
     deleteKeyword(keyword: Keyword): void {
         const confirmMsg = this._transloco.translate('keywords.messages.confirmDelete');
-        if (confirm(confirmMsg)) {
+        this.keywordToDelete.set(keyword);
+        this.confirmModalTitle.set('Eliminar Palabra Clave');
+        this.confirmModalMessage.set(confirmMsg || '¿Está seguro de que desea eliminar esta palabra clave?');
+        this.confirmModalOpen.set(true);
+    }
+
+    onConfirmDelete(): void {
+        const keyword = this.keywordToDelete();
+        if (keyword) {
             this._keywordService.deleteKeyword(keyword.id).subscribe({
                 next: () => {
                     this._showFeedback('keywords.messages.deleted', 'success');
                     this.keywords.update(current => current.filter(k => k.id !== keyword.id));
+                    this.closeConfirmModal();
                 },
                 error: () => {
                     this._showFeedback('keywords.messages.error', 'error');
+                    this.closeConfirmModal();
                 }
             });
         }
+    }
+
+    onCancelDelete(): void {
+        this.closeConfirmModal();
+    }
+
+    private closeConfirmModal(): void {
+        this.confirmModalOpen.set(false);
+        this.keywordToDelete.set(null);
     }
 
     /**

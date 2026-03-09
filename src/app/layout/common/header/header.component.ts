@@ -32,6 +32,7 @@ export class HeaderComponent {
   // Inputs
   public pageTitle = input<string>('');
   public sidebar = input<SidebarComponent | null>(null);
+  public isScrolled = input<boolean>(false);
 
   // Outputs
   public toggleSidebar = output<void>();
@@ -51,9 +52,6 @@ export class HeaderComponent {
    */
   onToggleSidebar(): void {
     this.toggleSidebar.emit();
-    if (this.sidebar()) {
-      this.sidebar()?.toggleSidebar();
-    }
   }
 
   /**

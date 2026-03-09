@@ -30,8 +30,10 @@
             </p>
         </div>
         <div class="flex gap-2">
-            <button type="button" class="btn btn-ghost btn-sm sm:btn-md rounded-xl px-4"
-                [class.bg-base-200]="showFilters()" (click)="toggleFilters()">
+            <button type="button"
+                class="hidden lg:inline-flex btn btn-sm sm:btn-md rounded-xl px-4 transition-all border"
+                [ngClass]="showFilters() ? 'bg-primary/10 text-primary border-primary/30 shadow-sm' : 'btn-ghost border-transparent text-base-content/80 hover:bg-base-200'"
+                (click)="toggleFilters()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -39,20 +41,45 @@
                 </svg>
                 <span class="hidden sm:inline font-bold">{{ 'keywords.filters.title' | transloco }}</span>
             </button>
-            <button type="button" class="btn btn-primary btn-sm sm:btn-md normal-case font-bold px-6 rounded-xl"
+            <button type="button"
+                class="hidden lg:inline-flex btn btn-primary btn-sm sm:btn-md normal-case font-bold px-6 rounded-xl"
                 (click)="openCreateModal()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
                 {{ 'keywords.add' | transloco }}
             </button>
+
+            <!-- FAB Mobile Actions Container -->
+            <div class="lg:hidden fixed bottom-20 right-4 z-[50] flex flex-col gap-3">
+                <!-- Add FAB -->
+                <button type="button"
+                    class="btn btn-circle btn-lg shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-2 border-primary bg-primary text-white"
+                    (click)="openCreateModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                </button>
+                <!-- Filter FAB -->
+                <button type="button"
+                    class="btn btn-circle btn-lg shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-2 transition-all"
+                    [ngClass]="showFilters() ? 'bg-primary text-white border-primary' : 'bg-base-100 text-primary border-primary/20'"
+                    (click)="toggleFilters()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- Filters Card -->
     @if (showFilters()) {
-    <div class="card bg-white shadow-sm border border-base-200 animate-fade-in-up">
+    <div id="filters-section" class="card bg-white shadow-sm border border-base-200 animate-fade-in-up">
         <div class="card-body p-6">
             <h2 class="label-standard mb-6">{{ 'keywords.filters.title' | transloco }}</h2>
             <form [formGroup]="filterForm" class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4"
@@ -166,18 +193,18 @@
 </div>
 
 <!-- Modal for Create/Edit (Clean Style) -->
-<input type="checkbox" id="keyword-modal" class="modal-toggle" [checked]="isModalOpen()" />
-<div class="modal modal-bottom sm:modal-middle" (click)="closeModal()">
-    <div class="modal-box rounded-2xl p-0 overflow-hidden bg-base-100 shadow-2xl" (click)="$event.stopPropagation()">
+<dialog class="modal modal-bottom lg:modal-middle" [class.modal-open]="isModalOpen()">
+    <div
+        class="modal-box p-0 flex flex-col bg-base-100 shadow-2xl lg:max-w-2xl w-full lg:rounded-2xl rounded-t-3xl rounded-b-none pb-8 lg:pb-0 max-h-[95vh] sm:max-h-[90vh]">
         <!-- Header -->
-        <div class="p-8 border-b border-base-200">
+        <div class="p-6 sm:p-8 border-b border-base-200 flex-none">
             <h3 class="font-bold text-2xl text-base-content">{{ (editingKeyword() ? 'keywords.edit' : 'keywords.add') |
                 transloco }}</h3>
             <p class="text-sm text-base-content/60 mt-1">{{ 'keywords.description' | transloco }}</p>
         </div>
 
         <!-- Form -->
-        <form [formGroup]="keywordForm" (ngSubmit)="saveKeyword()" class="p-8 space-y-8">
+        <form [formGroup]="keywordForm" (ngSubmit)="saveKeyword()" class="p-6 sm:p-8 space-y-8 overflow-y-auto flex-1">
             <div class="form-control">
                 <label class="label pb-1">
                     <span class="label-standard">{{ 'keywords.fields.name' | transloco }}</span>
@@ -235,4 +262,12 @@
             </div>
         </form>
     </div>
-</div>
+    <form method="dialog" class="modal-backdrop" (click)="closeModal()">
+        <button type="button">{{ 'generics.cancel' | transloco }}</button>
+    </form>
+</dialog>
+
+<!-- Modal de confirmación para eliminar -->
+<app-confirmation-dialog [open]="confirmModalOpen()" [title]="confirmModalTitle()" [message]="confirmModalMessage()"
+    [confirmLabel]="'generics.confirm' | transloco" [cancelLabel]="'generics.cancel' | transloco"
+    [confirmClass]="'btn-error'" (confirm)="onConfirmDelete()" (cancel)="onCancelDelete()"></app-confirmation-dialog>

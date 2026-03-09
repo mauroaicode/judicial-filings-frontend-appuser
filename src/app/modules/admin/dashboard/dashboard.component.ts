@@ -44,7 +44,7 @@ export class DashboardComponent implements OnInit {
   onNotificationRowClick(row: OrganizationNotificationRow): void {
     if (row?.process_id) {
       this._drawerState.closeDrawer();
-      this._router.navigate(['/admin/gestion-procesos', row.process_id]);
+      this._router.navigate(['/gestion-procesos', row.process_id]);
     }
   }
 }

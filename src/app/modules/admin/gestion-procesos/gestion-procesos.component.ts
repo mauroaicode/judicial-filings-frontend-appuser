@@ -94,6 +94,11 @@ export class GestionProcesosComponent {
    */
   public toggleFilters(): void {
     this.showFilters.update(v => !v);
+    if (this.showFilters()) {
+      setTimeout(() => {
+        document.getElementById('filters-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+    }
   }
 
   // Table columns
@@ -410,7 +415,7 @@ export class GestionProcesosComponent {
    * Navegar al detalle del proceso (doble clic en fila principal o en instancia)
    */
   onRowDblClick(row: Process | ProcessInstance): void {
-    this._router.navigate(['/admin/gestion-procesos', row.id]);
+    this._router.navigate(['/gestion-procesos', row.id]);
   }
 
   /**
@@ -495,7 +500,7 @@ export class GestionProcesosComponent {
   onNotificationRowClick(row: OrganizationNotificationRow): void {
     if (row?.process_id) {
       this._drawerState.closeDrawer();
-      this._router.navigate(['/admin/gestion-procesos', row.process_id]);
+      this._router.navigate(['/gestion-procesos', row.process_id]);
     }
   }
 

@@ -45,6 +45,7 @@ export class SignInComponent implements OnInit {
   public showAlert = signal<boolean>(false);
   public alertMessage = signal<string>('');
   public alertType = signal<'success' | 'error'>('error');
+  public currentYear = new Date().getFullYear();
   private _isDirectMessage = signal<boolean>(false);
 
   ngOnInit(): void {
