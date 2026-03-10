@@ -3,9 +3,7 @@
   <app-sidebar #sidebar></app-sidebar>
 
   <!-- Main Content Area -->
-  <div class="flex flex-1 flex-col h-screen min-w-0 transition-all duration-300"
-    [class.ml-64]="sidebar?.isOpen() && !sidebar?.isMobile()"
-    [class.ml-16]="!sidebar?.isOpen() && !sidebar?.isMobile()">
+  <div class="flex flex-1 flex-col h-screen min-w-0 transition-all duration-300">
 
     <!-- Header (Fixed at top) -->
     <div class="w-full flex-none z-30">

@@ -9,7 +9,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AuthService } from '@app/core/auth/auth.service';
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -18,7 +18,7 @@ import { NotificationBellComponent } from './notification-bell/notification-bell
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, TranslocoPipe, NotificationBellComponent],
+  imports: [CommonModule, TranslocoPipe, NotificationBellComponent, RouterLink],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   encapsulation: ViewEncapsulation.None,

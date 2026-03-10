@@ -73,7 +73,7 @@
   "navigation": {
     "dashboard": "Dashboard",
     "gestionProcesos": "Gestión de Procesos",
-    "keywords": "Palabras Clave",
+    "keywords": "Etapas Procesales",
     "toggleSidebar": "Alternar menú lateral"
   },
   "header": {
@@ -249,7 +249,7 @@
     "back": "Volver",
     "generalInfo": "Información General",
     "processNumber": "Número de Radicado",
-    "processId": "ID del Proceso",
+    "speaker": "Ponente",
     "court": "Despacho",
     "department": "Departamento",
     "processType": "Tipo de Proceso",
@@ -285,8 +285,8 @@
         "actionDateRangePlaceholder": "Seleccionar rango de fechas",
         "registrationDateRange": "Fecha de Registro",
         "registrationDateRangePlaceholder": "Seleccionar rango de fechas",
-        "alertKeyword": "Palabra clave de alerta",
-        "alertKeywordPlaceholder": "Todas las palabras clave",
+        "alertKeyword": "Etapa procesal de alerta",
+        "alertKeywordPlaceholder": "Todas las etapas procesales",
         "search": "Buscar",
         "searchPlaceholder": "Buscar en acción o anotación",
         "reset": "Limpiar Filtros"
@@ -331,18 +331,18 @@
     "clickToViewDetails": "Haz clic para ver más detalles"
   },
   "keywords": {
-    "title": "Palabras Clave",
-    "description": "Gestiona las palabras clave para alertas automáticas en actuaciones judiciales.",
-    "add": "Agregar Palabra Clave",
-    "edit": "Editar Palabra Clave",
-    "delete": "Eliminar Palabra Clave",
-    "empty": "No hay palabras clave registradas",
-    "loading": "Cargando palabras clave...",
+    "title": "Etapas Procesales",
+    "description": "Gestiona las etapas procesales para alertas automáticas en actuaciones judiciales.",
+    "add": "Agregar Etapa Procesal",
+    "edit": "Editar Etapa Procesal",
+    "delete": "Eliminar Etapa Procesal",
+    "empty": "No hay etapas procesales registradas",
+    "loading": "Cargando etapas procesales...",
     "loadMore": "Cargar más",
     "fields": {
       "name": "Nombre de la Alerta",
       "namePlaceholder": "Ej: Alerta de Sentencia",
-      "keyword": "Palabra Clave",
+      "keyword": "Etapa Procesal",
       "keywordPlaceholder": "Ej: Sentencia",
       "status": "Estado"
     },
@@ -351,11 +351,11 @@
       "inactive": "Inactiva"
     },
     "messages": {
-      "created": "Palabra clave creada satisfactoriamente",
-      "updated": "Palabra clave actualizada satisfactoriamente",
-      "deleted": "Palabra clave eliminada satisfactoriamente",
+      "created": "Etapa procesal creada satisfactoriamente",
+      "updated": "Etapa procesal actualizada satisfactoriamente",
+      "deleted": "Etapa procesal eliminada satisfactoriamente",
       "error": "Ha ocurrido un error al procesar la solicitud",
-      "confirmDelete": "¿Estás seguro de que deseas eliminar esta palabra clave?"
+      "confirmDelete": "¿Estás seguro de que deseas eliminar esta etapa procesal?"
     },
     "filters": {
       "title": "Filtros de Búsqueda",
@@ -363,5 +363,39 @@
       "reset": "Limpiar Filtros",
       "all": "Todos"
     }
+  },
+  "profile": {
+    "title": "Perfil de Usuario",
+    "description": "Actualiza tu información personal y contraseña.",
+    "personalInfo": "Información Personal",
+    "security": "Seguridad y Contraseña",
+    "fields": {
+      "name": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo Electrónico",
+      "identification": "Identificación",
+      "password": "Nueva Contraseña",
+      "passwordConfirmation": "Confirmar Nueva Contraseña"
+    },
+    "placeholders": {
+      "name": "Carlos",
+      "lastName": "López",
+      "email": "carlos.lopez@example.com",
+      "identification": "98765432-1",
+      "password": "••••••••",
+      "passwordConfirmation": "••••••••"
+    },
+    "messages": {
+      "updated": "Perfil actualizado exitosamente",
+      "errorLoading": "Error al cargar los datos del perfil",
+      "errorUpdating": "Error al actualizar el perfil",
+      "passwordMismatch": "Las contraseñas no coinciden"
+    },
+    "submit": "Actualizar Perfil",
+    "updating": "Actualizando..."
+  },
+  "process": {
+    "import_finished_title": "Importación Finalizada",
+    "import_finished_description": "El proceso de importación de radicados ha terminado satisfactoriamente."
   }
 }

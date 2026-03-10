@@ -10,6 +10,7 @@ export interface User {
   name: string;
   last_name: string;
   email: string;
+  identification: string;
   slug: string;
   profile_image: string | null;
   roles: Role[];
@@ -23,5 +24,14 @@ export interface Role {
 export interface LoginRequest {
   identification: string;
   password: string;
+}
+
+export interface ProfileUpdateRequest {
+  name: string;
+  last_name: string;
+  email: string;
+  identification: string;
+  password?: string;
+  password_confirmation?: string;
 }
 

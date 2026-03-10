@@ -18,6 +18,11 @@ export default [
     loadChildren: () =>
       import('./keywords/keywords.routes').then((m) => m.default),
   },
+  {
+    path: 'perfil',
+    loadChildren: () =>
+      import('./profile/profile.routes').then((m) => m.default),
+  },
   // More admin routes will be added here as modules are created
   // Example structure for future modules with role guards:
   // {

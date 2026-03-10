@@ -1,0 +1,185 @@
+<div class="flex flex-col flex-auto min-w-0 p-4 md:p-8">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <h2 class="text-3xl font-bold tracking-tight text-base-content">{{ 'profile.title' | transloco }}</h2>
+      <p class="text-base-content/60">{{ 'profile.description' | transloco }}</p>
+    </div>
+  </div>
+
+  <!-- Feedback Message -->
+  @if (feedbackMessage()) {
+    <div class="mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
+      <div class="alert" [ngClass]="feedbackType() === 'success' ? 'alert-success' : 'alert-error'">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          @if (feedbackType() === 'success') {
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          } @else {
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          }
+        </svg>
+        <span>{{ feedbackMessage() }}</span>
+      </div>
+    </div>
+  }
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Left Column: User Card -->
+    <div class="lg:col-span-1">
+      <div class="card bg-base-100 shadow-xl overflow-hidden border border-base-200">
+        <div class="h-32 bg-gradient-to-r from-brand-primary to-brand-secondary"></div>
+        <div class="px-6 pb-6 text-center -mt-16">
+          <div class="avatar online">
+            <div class="w-32 rounded-full border-4 border-base-100 bg-base-100 ring ring-primary ring-offset-base-100 ring-offset-2">
+              @if (currentUser()?.profile_image) {
+                <img [src]="currentUser()?.profile_image" alt="Avatar" />
+              } @else {
+                <div class="flex items-center justify-center h-full w-full bg-brand-primary text-white text-4xl font-bold">
+                  {{ currentUser()?.name?.charAt(0) }}{{ currentUser()?.last_name?.charAt(0) }}
+                </div>
+              }
+            </div>
+          </div>
+          <h3 class="mt-4 text-xl font-bold">{{ currentUser()?.name }} {{ currentUser()?.last_name }}</h3>
+          <p class="text-sm text-base-content/60">{{ currentUser()?.email }}</p>
+          
+          <div class="mt-4 flex flex-wrap justify-center gap-2">
+            @for (role of currentUser()?.roles; track role.value) {
+              <div class="badge badge-primary badge-outline">{{ role.label }}</div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Form -->
+    <div class="lg:col-span-2">
+      <div class="card bg-base-100 shadow-xl border border-base-200">
+        <div class="card-body">
+          <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="space-y-6">
+            <!-- Personal Info Section -->
+            <div>
+              <h3 class="text-lg font-semibold flex items-center gap-2 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                {{ 'profile.personalInfo' | transloco }}
+              </h3>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Name -->
+                <div class="form-control w-full">
+                  <label class="label">
+                    <span class="label-text font-medium">{{ 'profile.fields.name' | transloco }}</span>
+                  </label>
+                  <input type="text" formControlName="name" class="input input-bordered w-full focus:input-primary transition-all" 
+                    [placeholder]="'profile.placeholders.name' | transloco"
+                    [class.input-error]="profileForm.get('name')?.invalid && profileForm.get('name')?.touched">
+                  @if (profileForm.get('name')?.invalid && profileForm.get('name')?.touched) {
+                    <label class="label">
+                      <span class="label-text-alt text-error italic">{{ 'auth.errors.fieldRequired' | transloco }}</span>
+                    </label>
+                  }
+                </div>
+
+                <!-- Last Name -->
+                <div class="form-control w-full">
+                  <label class="label">
+                    <span class="label-text font-medium">{{ 'profile.fields.lastName' | transloco }}</span>
+                  </label>
+                  <input type="text" formControlName="last_name" class="input input-bordered w-full focus:input-primary transition-all"
+                    [placeholder]="'profile.placeholders.lastName' | transloco"
+                    [class.input-error]="profileForm.get('last_name')?.invalid && profileForm.get('last_name')?.touched">
+                  @if (profileForm.get('last_name')?.invalid && profileForm.get('last_name')?.touched) {
+                    <label class="label">
+                      <span class="label-text-alt text-error italic">{{ 'auth.errors.fieldRequired' | transloco }}</span>
+                    </label>
+                  }
+                </div>
+
+                <!-- Email -->
+                <div class="form-control w-full">
+                  <label class="label">
+                    <span class="label-text font-medium">{{ 'profile.fields.email' | transloco }}</span>
+                  </label>
+                  <input type="email" formControlName="email" class="input input-bordered w-full focus:input-primary transition-all"
+                    [placeholder]="'profile.placeholders.email' | transloco"
+                    [class.input-error]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+                  @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
+                    <label class="label">
+                      <span class="label-text-alt text-error italic">{{ 'auth.errors.emailInvalid' | transloco }}</span>
+                    </label>
+                  }
+                </div>
+
+                <!-- Identification -->
+                <div class="form-control w-full">
+                  <label class="label">
+                    <span class="label-text font-medium">{{ 'profile.fields.identification' | transloco }}</span>
+                  </label>
+                  <input type="text" formControlName="identification" class="input input-bordered w-full focus:input-primary transition-all"
+                    [placeholder]="'profile.placeholders.identification' | transloco"
+                    [class.input-error]="profileForm.get('identification')?.invalid && profileForm.get('identification')?.touched">
+                  @if (profileForm.get('identification')?.invalid && profileForm.get('identification')?.touched) {
+                    <label class="label">
+                      <span class="label-text-alt text-error italic">{{ 'auth.errors.fieldRequired' | transloco }}</span>
+                    </label>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Security Section -->
+            <div>
+              <h3 class="text-lg font-semibold flex items-center gap-2 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                {{ 'profile.security' | transloco }}
+              </h3>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Password -->
+                <div class="form-control w-full">
+                  <label class="label">
+                    <span class="label-text font-medium">{{ 'profile.fields.password' | transloco }}</span>
+                  </label>
+                  <input type="password" formControlName="password" class="input input-bordered w-full focus:input-primary transition-all"
+                    [placeholder]="'profile.placeholders.password' | transloco">
+                </div>
+
+                <!-- Password Confirmation -->
+                <div class="form-control w-full">
+                  <label class="label">
+                    <span class="label-text font-medium">{{ 'profile.fields.passwordConfirmation' | transloco }}</span>
+                  </label>
+                  <input type="password" formControlName="password_confirmation" class="input input-bordered w-full focus:input-primary transition-all"
+                    [placeholder]="'profile.placeholders.passwordConfirmation' | transloco"
+                    [class.input-error]="profileForm.get('password_confirmation')?.hasError('mismatch')">
+                  @if (profileForm.get('password_confirmation')?.hasError('mismatch')) {
+                    <label class="label">
+                      <span class="label-text-alt text-error italic">{{ 'profile.messages.passwordMismatch' | transloco }}</span>
+                    </label>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="card-actions justify-end mt-8">
+              <button type="submit" class="btn btn-primary min-w-[160px]" [disabled]="profileForm.invalid || isSaving() || isLoading()">
+                @if (isSaving()) {
+                  <span class="loading loading-spinner"></span>
+                  {{ 'profile.updating' | transloco }}
+                } @else {
+                  {{ 'profile.submit' | transloco }}
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
