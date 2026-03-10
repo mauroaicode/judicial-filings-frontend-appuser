@@ -70,7 +70,7 @@
   "navigation": {
     "dashboard": "Dashboard",
     "gestionProcesos": "Process Management",
-    "keywords": "Keywords",
+    "keywords": "Procedural Stages",
     "toggleSidebar": "Toggle sidebar"
   },
   "header": {
@@ -246,7 +246,7 @@
     "back": "Back",
     "generalInfo": "General Information",
     "processNumber": "Process Number",
-    "processId": "Process ID",
+    "speaker": "Speaker",
     "court": "Court",
     "department": "Department",
     "processType": "Process Type",
@@ -282,8 +282,8 @@
         "actionDateRangePlaceholder": "Select date range",
         "registrationDateRange": "Registration Date",
         "registrationDateRangePlaceholder": "Select date range",
-        "alertKeyword": "Alert keyword",
-        "alertKeywordPlaceholder": "All keywords",
+        "alertKeyword": "Procedural stage alert",
+        "alertKeywordPlaceholder": "All procedural stages",
         "search": "Search",
         "searchPlaceholder": "Search in action or annotation",
         "reset": "Clear Filters"
@@ -328,18 +328,18 @@
     "clickToViewDetails": "Click to view details"
   },
   "keywords": {
-    "title": "Keywords",
-    "description": "Manage keywords for automatic alerts in judicial proceedings.",
-    "add": "Add Keyword",
-    "edit": "Edit Keyword",
-    "delete": "Delete Keyword",
-    "empty": "No keywords registered",
-    "loading": "Loading keywords...",
+    "title": "Procedural Stages",
+    "description": "Manage procedural stages for automatic alerts in judicial proceedings.",
+    "add": "Add Procedural Stage",
+    "edit": "Add Procedural Stage",
+    "delete": "Delete Procedural Stage",
+    "empty": "No procedural stages registered",
+    "loading": "Loading procedural stages...",
     "loadMore": "Load more",
     "fields": {
       "name": "Alert Name",
       "namePlaceholder": "e.g. Judgment Alert",
-      "keyword": "Keyword",
+      "keyword": "Procedural Stage",
       "keywordPlaceholder": "e.g. Judgment",
       "status": "Status"
     },
@@ -348,11 +348,11 @@
       "inactive": "Inactive"
     },
     "messages": {
-      "created": "Keyword created successfully",
-      "updated": "Keyword updated successfully",
-      "deleted": "Keyword deleted successfully",
+      "created": "Procedural stage created successfully",
+      "updated": "Procedural stage updated successfully",
+      "deleted": "Procedural stage deleted successfully",
       "error": "An error occurred while processing the request",
-      "confirmDelete": "Are you sure you want to delete this keyword?"
+      "confirmDelete": "Are you sure you want to delete this procedural stage?"
     },
     "filters": {
       "title": "Search Filters",
@@ -360,5 +360,39 @@
       "reset": "Clear Filters",
       "all": "All"
     }
+  },
+  "profile": {
+    "title": "User Profile",
+    "description": "Update your personal information and password.",
+    "personalInfo": "Personal Information",
+    "security": "Security and Password",
+    "fields": {
+      "name": "Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "identification": "Identification",
+      "password": "New Password",
+      "passwordConfirmation": "Confirm New Password"
+    },
+    "placeholders": {
+      "name": "Carlos",
+      "lastName": "López",
+      "email": "carlos.lopez@example.com",
+      "identification": "98765432-1",
+      "password": "••••••••",
+      "passwordConfirmation": "••••••••"
+    },
+    "messages": {
+      "updated": "Profile updated successfully",
+      "errorLoading": "Error loading profile data",
+      "errorUpdating": "Error updating profile",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "submit": "Update Profile",
+    "updating": "Updating..."
+  },
+  "process": {
+    "import_finished_title": "Import Finished",
+    "import_finished_description": "The process of importing filings has finished successfully."
   }
 }

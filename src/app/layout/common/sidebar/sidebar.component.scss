@@ -1,4 +1,8 @@
 // Sidebar specific styles
+:host {
+  display: block;
+}
+
 aside {
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); // shadow-lg equivalent
   height: 100vh !important;
@@ -6,11 +10,10 @@ aside {
   overflow: hidden !important;
   z-index: 30 !important;
 
-  // Desktop: sidebar is fixed, content will have margin
+  // Desktop: sidebar is part of the flex flow
   @media (min-width: 768px) {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
+    position: relative !important;
+    z-index: 30 !important;
   }
 
   // Mobile: sidebar overlays content

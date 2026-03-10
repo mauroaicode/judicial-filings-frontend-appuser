@@ -41,7 +41,6 @@
                   </svg>
                 </div>
                 <input type="text" formControlName="identification"
-                  [placeholder]="'auth.signIn.identificationPlaceholder' | transloco"
                   class="input w-full pl-12 bg-slate-50 border-slate-200 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-xl transition-all font-semibold"
                   [class.input-error]="isFieldInvalid('identification')" />
               </div>
@@ -75,7 +74,6 @@
                   </svg>
                 </div>
                 <input [type]="showPassword() ? 'text' : 'password'" formControlName="password"
-                  [placeholder]="'auth.signIn.passwordPlaceholder' | transloco"
                   class="input w-full pl-12 pr-12 bg-slate-50 border-slate-200 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-xl transition-all font-semibold"
                   [class.input-error]="isFieldInvalid('password')" />
                 <button type="button"

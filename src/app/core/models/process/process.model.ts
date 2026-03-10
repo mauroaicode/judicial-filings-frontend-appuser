@@ -131,6 +131,7 @@ export interface ProcessDetail {
   process_id: number;
   process_number: string;
   court: string;
+  speaker?: string | null;
   department: string;
   process_type: string;
   process_class: string;

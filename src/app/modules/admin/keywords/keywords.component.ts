@@ -223,8 +223,8 @@ export class KeywordsComponent implements OnInit {
     deleteKeyword(keyword: Keyword): void {
         const confirmMsg = this._transloco.translate('keywords.messages.confirmDelete');
         this.keywordToDelete.set(keyword);
-        this.confirmModalTitle.set('Eliminar Palabra Clave');
-        this.confirmModalMessage.set(confirmMsg || '¿Está seguro de que desea eliminar esta palabra clave?');
+        this.confirmModalTitle.set('Eliminar Etapa Procesal');
+        this.confirmModalMessage.set(confirmMsg || '¿Está seguro de que desea eliminar esta etapa procesal?');
         this.confirmModalOpen.set(true);
     }
 

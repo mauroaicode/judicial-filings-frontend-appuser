@@ -1,5 +1,9 @@
 // Header specific styles
+:host {
+  display: block;
+  width: 100%;
+}
+
 header {
   border-bottom: 1px solid hsl(var(--bc) / 0.1); // Using base-content with opacity for subtle border
 }
-
