@@ -20,7 +20,7 @@ import {
   OrganizationNotificationMeta,
   OrganizationNotificationSubject,
 } from '@app/core/models/notification/organization-notification.model';
-import { buildAnnotationWithHighlights } from '@app/core/utils/alert-highlight.utils';
+import { buildTextWithHighlights } from '@app/core/utils/alert-highlight.utils';
 import { SafeHtmlPipe } from '@app/shared/pipes/safe-html.pipe';
 import { ConfirmationDialogComponent } from '@app/shared/components/confirmation-dialog/confirmation-dialog.component';
 
@@ -140,8 +140,12 @@ export class NotificationsDrawerComponent implements OnDestroy {
     return this._formatDate(value);
   }
 
+  getActionHtml(row: OrganizationNotificationRow): string {
+    return buildTextWithHighlights(row.action ?? null, row.alert_highlights, 'action');
+  }
+
   getAnnotationHtml(row: OrganizationNotificationRow): string {
-    return buildAnnotationWithHighlights(row.annotation ?? null, row.alert_highlights);
+    return buildTextWithHighlights(row.annotation ?? null, row.alert_highlights, 'annotation');
   }
 
   isSubjectsExpanded(rowId: string): boolean {

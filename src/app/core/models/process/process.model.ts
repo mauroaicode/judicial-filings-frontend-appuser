@@ -187,6 +187,7 @@ export interface AlertHighlight {
   start: number;
   end: number;
   text: string;
+  source?: string; // 'action' or 'annotation'
 }
 
 /**

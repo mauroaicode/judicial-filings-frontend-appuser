@@ -24,6 +24,12 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./modules/auth/forgot-password/forgot-password.routes'),
   },
+  {
+    path: 'reset-password',
+    canActivate: [guestGuard],
+    loadChildren: () =>
+      import('./modules/auth/reset-password/reset-password.routes'),
+  },
 
   // Admin routes (protected - only for authenticated users)
   {

@@ -13,6 +13,17 @@
 
     <!-- Page Content (Scrollable independently) -->
     <main class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 pb-20 relative" (scroll)="onMainScroll($event)">
+      
+      <!-- Security Warning: Must Change Password -->
+      @if (mustChangePassword()) {
+        <div class="mb-6 animate-in fade-in slide-in-from-top-4 duration-500">
+          <app-alert 
+            type="error" 
+            [message]="'auth.success.mustChangePassword'" 
+            [useTranslation]="true" />
+        </div>
+      }
+
       <router-outlet></router-outlet>
     </main>
 

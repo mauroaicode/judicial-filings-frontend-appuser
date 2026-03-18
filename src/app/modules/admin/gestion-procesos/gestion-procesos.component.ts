@@ -1,10 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   inject,
   signal,
   ViewEncapsulation,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
@@ -17,6 +19,7 @@ import { DashboardService } from '@app/core/services/dashboard/dashboard.service
 import { DashboardStatsCardsComponent } from '../dashboard/components/dashboard-stats-cards/dashboard-stats-cards.component';
 import { NotificationsDrawerComponent } from '@app/shared/components/notifications-drawer/notifications-drawer.component';
 import { NotificationsDrawerStateService } from '@app/core/services/notification/notifications-drawer-state.service';
+import { NotificationService } from '@app/core/services/notification/notification.service';
 import type { OrganizationNotificationRow } from '@app/core/models/notification/organization-notification.model';
 
 @Component({
@@ -41,6 +44,8 @@ export class GestionProcesosComponent {
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
   private _fb = inject(FormBuilder);
+  private _notificationService = inject(NotificationService);
+  private _destroyRef = inject(DestroyRef);
 
   readonly stats = this._dashboardService.stats;
   readonly statsLoading = this._dashboardService.isLoading;
@@ -166,6 +171,14 @@ export class GestionProcesosComponent {
   constructor() {
     this._loadFiltersFromQueryParams();
     this.loadProcesses();
+
+    // Subscribe to process refresh events (WebSocket notifications)
+    this._notificationService.refreshProcesses$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => {
+        console.log('Refreshing process list because of a notification...');
+        this.loadProcesses(this.pagination()?.current_page || 1, this.pagination()?.per_page || 20);
+      });
   }
 
   /**

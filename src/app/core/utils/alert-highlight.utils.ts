@@ -5,6 +5,7 @@ export interface AlertHighlightRange {
   start: number;
   end: number;
   text: string;
+  source?: string;
 }
 
 const MARK_OPEN = '<mark class="alert-highlight">';
@@ -23,19 +24,21 @@ function escapeHtml(s: string): string {
 }
 
 /**
- * Build HTML string for annotation text with highlighted ranges.
+ * Build HTML string for a text with highlighted ranges.
  * Ranges must be sorted by start; overlapping ranges are merged by taking the union.
  * Returns escaped text with <mark class="alert-highlight"> around keyword ranges.
  */
-export function buildAnnotationWithHighlights(
-  annotation: string | null | undefined,
+export function buildTextWithHighlights(
+  content: string | null | undefined,
   highlights: AlertHighlightRange[] | null | undefined,
+  sourceFilter?: string,
   maxLength?: number
 ): string {
-  if (annotation == null || annotation === '') {
+  if (content == null || content === '') {
     return '–';
   }
-  const text = annotation;
+  
+  const text = content;
   const truncated = maxLength && text.length > maxLength;
   const displayText = truncated ? text.slice(0, maxLength) + '…' : text;
 
@@ -43,8 +46,18 @@ export function buildAnnotationWithHighlights(
     return escapeHtml(displayText);
   }
 
+  // Filter by source if requested. 
+  // If source is missing from a highlight, we assume it's for 'annotation' for backwards compatibility.
+  const relevantHighlights = sourceFilter 
+    ? highlights.filter(h => (h.source || 'annotation') === sourceFilter)
+    : highlights;
+
+  if (relevantHighlights.length === 0) {
+    return escapeHtml(displayText);
+  }
+
   // Sort by start, then merge overlapping ranges
-  const sorted = [...highlights].sort((a, b) => a.start - b.start);
+  const sorted = [...relevantHighlights].sort((a, b) => a.start - b.start);
   const merged: { start: number; end: number }[] = [];
   for (const h of sorted) {
     const start = Math.max(0, h.start);
@@ -76,3 +89,8 @@ export function buildAnnotationWithHighlights(
   }
   return out;
 }
+
+/**
+ * @deprecated Use buildTextWithHighlights instead
+ */
+export const buildAnnotationWithHighlights = buildTextWithHighlights;

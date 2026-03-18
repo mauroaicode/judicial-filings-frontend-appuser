@@ -20,6 +20,8 @@ import { SecurityTipsPanelComponent } from '@app/shared/components/security-tips
 import { TitleSystemAuth } from '@app/shared/components/title-system-auth/title-system-auth';
 import { AlertComponent } from '@app/shared/components/alert/alert.component';
 import { ErrorHandlerService } from '@app/core/services/error/error-handler.service';
+import { AuthService } from '@app/core/auth/auth.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-forgot-password',
@@ -34,6 +36,7 @@ export class ForgotPasswordComponent implements OnInit {
   private _router = inject(Router);
   private _formBuilder = inject(FormBuilder);
   private _errorHandler = inject(ErrorHandlerService);
+  private _authService = inject(AuthService);
 
   public forgotPasswordForm!: FormGroup;
   public isLoading = signal<boolean>(false);
@@ -47,7 +50,7 @@ export class ForgotPasswordComponent implements OnInit {
 
   ngOnInit(): void {
     this.forgotPasswordForm = this._formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
+      identification: ['', [Validators.required]],
     });
   }
 
@@ -60,12 +63,7 @@ export class ForgotPasswordComponent implements OnInit {
       return;
     }
 
-    if (!this.wasCodeSent()) {
-      await this.sendCode();
-      return;
-    }
-
-    await this.resetPassword();
+    await this.sendCode();
   }
 
   /**
@@ -76,31 +74,12 @@ export class ForgotPasswordComponent implements OnInit {
     this.isLoading.set(true);
 
     try {
-      const { email } = this.forgotPasswordForm.value;
+      const { identification } = this.forgotPasswordForm.value;
 
-      // TODO: Implementar llamada al servicio
-      // await firstValueFrom(this._authService.sendCodeRecoveryPassword(email));
+      await firstValueFrom(this._authService.forgotPassword({ identification }));
 
-      // Simulación temporal
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Disable email field and add code and password fields
-      this.forgotPasswordForm.get('email')?.disable();
-      this.forgotPasswordForm.addControl(
-        'code',
-        this._formBuilder.control('', [Validators.required])
-      );
-      this.forgotPasswordForm.addControl(
-        'password',
-        this._formBuilder.control('', [Validators.required, Validators.minLength(8)])
-      );
-      this.forgotPasswordForm.addControl(
-        'confirmPassword',
-        this._formBuilder.control('', [Validators.required])
-      );
-
-      this.forgotPasswordForm.markAsUntouched();
       this.wasCodeSent.set(true);
+      this.forgotPasswordForm.get('identification')?.disable();
 
       this.alertType.set('success');
       this.alertMessage.set('auth.forgotPassword.codeSent');
@@ -126,68 +105,6 @@ export class ForgotPasswordComponent implements OnInit {
     }
   }
 
-  /**
-   * Reset password with code
-   */
-  async resetPassword(): Promise<void> {
-    this.showAlert.set(false);
-    this.isLoading.set(true);
-
-    try {
-      const { email, code, password, confirmPassword } = this.forgotPasswordForm.value;
-
-      if (password !== confirmPassword) {
-        this.alertType.set('error');
-        this.alertMessage.set('auth.forgotPassword.passwordsNotMatch');
-        this.showAlert.set(true);
-        this.isLoading.set(false);
-        return;
-      }
-
-      // TODO: Implementar llamada al servicio
-      // await firstValueFrom(
-      //   this._authService.resetPassword(email, code, password)
-      // );
-
-      // Simulación temporal
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      this.alertType.set('success');
-      this.alertMessage.set('auth.forgotPassword.passwordReset');
-      this._isDirectMessage.set(false);
-      this.showAlert.set(true);
-
-      // Redirect to sign-in after 2 seconds
-      setTimeout(() => {
-        this._router.navigate(['/sign-in']);
-      }, 2000);
-    } catch (error: any) {
-
-      this.alertType.set('error');
-
-      const errorMessage = this._errorHandler.getErrorMessage(error, true);
-
-      if (errorMessage) {
-        this.alertMessage.set(errorMessage);
-        this._isDirectMessage.set(true);
-        this.showAlert.set(true);
-        return;
-      }
-
-      this._isDirectMessage.set(false);
-
-      if (error?.status >= 500) {
-        this.alertMessage.set('auth.errors.somethingWentWrong');
-        this.showAlert.set(true);
-        return;
-      }
-
-      this.alertMessage.set('auth.forgotPassword.invalidCode');
-      this.showAlert.set(true);
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
 
   /**
    * Check if a form field is invalid
@@ -210,10 +127,8 @@ export class ForgotPasswordComponent implements OnInit {
   getFieldError(fieldName: string): string {
     const field = this.forgotPasswordForm.get(fieldName);
     if (field?.hasError('required')) {
+      if (fieldName === 'identification') return 'auth.errors.identificationRequired';
       return 'auth.errors.fieldRequired';
-    }
-    if (field?.hasError('email')) {
-      return 'auth.errors.emailInvalid';
     }
     if (field?.hasError('minlength')) {
       return 'auth.errors.passwordMinLength';

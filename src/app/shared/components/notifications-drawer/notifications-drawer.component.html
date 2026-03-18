@@ -126,7 +126,9 @@
                         }
                       </div>
                       <!-- Título (acción) centrado / destacado -->
-                      <p class="text-sm font-semibold text-base-content">{{ row.action }}</p>
+                      <p class="text-sm font-semibold text-base-content">
+                        <span [innerHTML]="getActionHtml(row) | safeHtml"></span>
+                      </p>
                       <!-- Anotación / contenido importante justo debajo del título -->
                       <div class="text-sm text-base-content/80 break-words">
                         <span [innerHTML]="getAnnotationHtml(row) | safeHtml"></span>

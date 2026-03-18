@@ -21,9 +21,9 @@
     },
     "forgotPassword": {
       "title": "Forgot Password",
-      "subtitle": "Enter your email to receive a recovery code",
-      "emailLabel": "Email",
-      "emailPlaceholder": "your@email.com",
+      "subtitle": "Enter your identification to receive a recovery code",
+      "identificationLabel": "Identification",
+      "identificationPlaceholder": "Enter your identification",
       "codeLabel": "Recovery code",
       "codePlaceholder": "Enter the code",
       "newPasswordLabel": "New password",
@@ -35,7 +35,7 @@
       "sendingCode": "Sending code...",
       "resetting": "Resetting...",
       "backToSignIn": "← Back to sign in",
-      "codeSent": "Recovery code sent to your email",
+      "codeSent": "If the identification number exists in our system, you will receive an email with instructions.",
       "passwordReset": "Password reset successfully",
       "invalidCode": "Invalid or expired code",
       "passwordsNotMatch": "Passwords do not match",
@@ -56,7 +56,8 @@
       "somethingWentWrong": "Something went wrong. Please try again."
     },
     "success": {
-      "login": "Login successful"
+      "login": "Login successful",
+      "mustChangePassword": "For security, you must change your password. Please update it as soon as possible."
     }
   },
   "generics": {
@@ -199,7 +200,7 @@
       "createdAt": "Created At",
       "createdAtRange": "Filing Date Range",
       "createdAtRangePlaceholder": "Select date range",
-      "lastApiUpdateRange": "Last API Update Range",
+      "lastApiUpdateRange": "Last Update Range",
       "lastApiUpdateRangePlaceholder": "Select date range",
       "all": "All",
       "yes": "Yes",

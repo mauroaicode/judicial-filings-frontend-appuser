@@ -147,9 +147,11 @@
   </div>
 
   <!-- Right Side: Security Tips & Visuals -->
-  <div class="hidden w-1/2 md:flex relative min-h-screen">
-    <app-security-tips-panel imageSrc="/images/ui/bg-sign-in.png" [titleKey]="'auth.signIn.securityTitle'"
-      [tip1Key]="'auth.signIn.securityTip1'" [tip2Key]="'auth.signIn.securityTip2'"
-      [tip3Key]="'auth.signIn.securityTip3'" />
+  <div class="hidden md:flex w-1/2 relative bg-[#1e1b4b]">
+    <div class="sticky top-0 h-screen w-full overflow-hidden">
+      <app-security-tips-panel imageSrc="/images/ui/bg-sign-in.png" [titleKey]="'auth.signIn.securityTitle'"
+        [tip1Key]="'auth.signIn.securityTip1'" [tip2Key]="'auth.signIn.securityTip2'"
+        [tip3Key]="'auth.signIn.securityTip3'" />
+    </div>
   </div>
 </div>
