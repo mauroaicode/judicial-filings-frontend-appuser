@@ -1,4 +1,7 @@
 {
+  "common": {
+    "actions": "Acciones"
+  },
   "generics": {
     "spanish": "Español",
     "english": "Inglés",
@@ -245,8 +248,8 @@
   },
   "processDetail": {
     "title": "Detalle del Proceso",
-    "activateProcess": "Activar Proceso",
-    "deactivateProcess": "Desactivar Proceso",
+    "activateProcess": "Activar Seguimiento",
+    "deactivateProcess": "Desactivar Seguimiento",
     "back": "Volver",
     "generalInfo": "Información General",
     "processNumber": "Número de Radicado",

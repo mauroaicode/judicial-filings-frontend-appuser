@@ -1,8 +1,11 @@
 {
+  "common": {
+    "actions": "Actions"
+  },
   "auth": {
     "signIn": {
       "title": "Sign In",
-      "welcome": "Welcome again",
+      "welcome": "Welcome back",
       "toOurWebsite": "to our website",
       "identificationLabel": "Identification",
       "identificationPlaceholder": "98765432-1",
@@ -242,8 +245,8 @@
   },
   "processDetail": {
     "title": "Process Detail",
-    "activateProcess": "Activate Process",
-    "deactivateProcess": "Deactivate Process",
+    "activateProcess": "Activate Tracking",
+    "deactivateProcess": "Deactivate Tracking",
     "back": "Back",
     "generalInfo": "General Information",
     "processNumber": "Process Number",
@@ -332,7 +335,7 @@
     "title": "Procedural Stages",
     "description": "Manage procedural stages for automatic alerts in judicial proceedings.",
     "add": "Add Procedural Stage",
-    "edit": "Add Procedural Stage",
+    "edit": "Edit Procedural Stage",
     "delete": "Delete Procedural Stage",
     "empty": "No procedural stages registered",
     "loading": "Loading procedural stages...",

@@ -575,11 +575,18 @@ export class GestionProcesosComponent {
         // Always reload processes table
         this.loadProcesses(1, this.pagination()?.per_page || 20);
 
-        // Show info modal if has_multiple_instances is true or private_count >= 1
-        if (response.has_multiple_instances === true || response.private_count >= 1) {
-          this.infoModalData.set(response);
-          this.isInfoModalOpen.set(true);
+        // Normalizamos la respuesta por si la API retorna el nuevo formato de array o el antiguo singular
+        const responseData = { ...response };
+        if (response.processes && response.processes.length > 0) {
+          responseData.process = response.processes[0];
+          responseData.total_processes = response.total_processes ?? response.processes.length;
+          responseData.registered_count = response.registered_count ?? response.processes.length;
+          responseData.has_multiple_instances = response.has_multiple_instances ?? (response.processes.length > 1);
         }
+
+        // Siempre mostramos el modal de información para que el usuario vea los detalles del radicado registrado
+        this.infoModalData.set(responseData);
+        this.isInfoModalOpen.set(true);
       },
       error: (error) => {
         this.submitting.set(false);
@@ -603,6 +610,14 @@ export class GestionProcesosComponent {
   closeInfoModal(): void {
     this.isInfoModalOpen.set(false);
     this.infoModalData.set(null);
+  }
+
+  /**
+   * Navigate to process detail
+   */
+  navigateToDetail(id: string): void {
+    this.closeInfoModal();
+    this._router.navigate(['/gestion-procesos', id]);
   }
 
   /**

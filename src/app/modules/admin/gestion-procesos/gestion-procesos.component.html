@@ -746,95 +746,127 @@
 
   <!-- Info Modal -->
   <dialog class="modal" [class.modal-open]="isInfoModalOpen()">
-    <div class="modal-box rounded-2xl p-0 overflow-hidden bg-base-100 shadow-2xl max-w-2xl w-full">
-      <div class="p-8 border-b border-base-200">
-        <h3 class="font-bold text-2xl text-base-content">{{ 'gestionProcesos.infoModal.title' | transloco }}</h3>
+    <div class="modal-box rounded-3xl p-0 overflow-hidden bg-base-100 shadow-2xl max-w-2xl w-full border border-base-200/50">
+      <!-- Header with Icon -->
+      <div class="p-8 pb-0 flex items-center gap-4">
+        <div class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center shrink-0 shadow-sm border border-primary/5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-xl text-base-content tracking-tight">{{ 'gestionProcesos.infoModal.title' | transloco }}</h3>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-xs font-semibold text-primary bg-primary/5 px-2 py-0.5 rounded border border-primary/10">
+              {{ infoModalData()?.process?.process_number }}
+            </span>
+            <span class="badge badge-success badge-xs font-bold uppercase py-1.5 px-2">Activo</span>
+          </div>
+        </div>
       </div>
 
-      <div class="p-8">
+      <div class="p-8 space-y-6">
         @if (infoModalData()) {
-        <div class="space-y-4">
+        <div class="space-y-6">
           <!-- Success Message -->
-          <div class="alert alert-success rounded-xl border-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span class="font-bold">{{ infoModalData()!.message }}</span>
+          <div class="alert alert-success rounded-2xl border-none shadow-md flex items-center gap-4 py-4 px-6">
+            <div class="bg-white/20 p-2 rounded-xl">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5 text-white" fill="none"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span class="font-semibold text-white text-base tracking-tight">{{ infoModalData()?.message }}</span>
           </div>
 
           <!-- Multiple Instances Warning -->
-          @if (infoModalData()!.has_multiple_instances) {
-          <div class="alert alert-warning rounded-xl border-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
+          @if (infoModalData()?.has_multiple_instances) {
+          <div class="alert alert-warning rounded-2xl border-none shadow-md flex items-start gap-5 p-6 border-l-4 border-warning/30">
+            <div class="bg-white/30 p-2 rounded-xl mt-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
             <div>
-              <h4 class="font-bold">{{ 'gestionProcesos.infoModal.multipleInstances.title' | transloco }}</h4>
-              <p class="text-sm mt-1">{{ 'gestionProcesos.infoModal.multipleInstances.message' | transloco }}</p>
+              <h4 class="font-bold text-base uppercase tracking-wider">{{ 'gestionProcesos.infoModal.multipleInstances.title' | transloco }}</h4>
+              <p class="font-medium mt-1 text-sm text-base-content/80 leading-relaxed">{{ 'gestionProcesos.infoModal.multipleInstances.message' | transloco }}</p>
             </div>
           </div>
           }
 
-          <!-- Private Processes Warning -->
-          @if (infoModalData()!.private_count >= 1) {
-          <div class="alert alert-warning rounded-xl border-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <div>
-              <h4 class="font-bold">{{ 'gestionProcesos.infoModal.privateProcesses.title' | transloco }}</h4>
-              <p class="text-sm mt-1">
-                {{ 'gestionProcesos.infoModal.privateProcesses.message' | transloco }}
-                <strong>{{ infoModalData()!.private_count }}</strong>
-                {{ 'gestionProcesos.infoModal.privateProcesses.messageCount' | transloco }}
-              </p>
+          <!-- Registered Processes List -->
+          <div class="space-y-4">
+            <h4 class="text-[9px] font-bold uppercase tracking-[0.2em] text-base-content/30 ml-2">PROCESOS REGISTRADOS</h4>
+            
+            <div class="space-y-3">
+              @for (proc of infoModalData()?.processes || (infoModalData()?.process ? [infoModalData()!.process] : []); track $index) {
+                <div 
+                  class="bg-base-100 border border-base-200 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all group overflow-hidden relative cursor-pointer active:scale-[0.98]"
+                  (click)="navigateToDetail(proc?.id!)"
+                >
+                  <div class="flex items-center gap-4 mr-4 flex-1 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-base-200 flex items-center justify-center font-bold text-lg text-base-content/20 group-hover:bg-primary/5 group-hover:text-primary/40 transition-all">
+                      {{ (proc?.court || '-').charAt(0).toUpperCase() }}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <p class="font-bold text-sm text-base-content leading-tight group-hover:text-primary transition-colors truncate">
+                        {{ proc?.court }}
+                      </p>
+                      @if (proc?.speaker) {
+                        <p class="text-[10px] font-medium text-base-content/40 leading-tight mt-1 truncate">{{ proc?.speaker }}</p>
+                      }
+                      <div class="flex items-center gap-2 mt-1.5">
+                        <span class="text-[9px] font-bold text-base-content/30 uppercase tracking-tighter">Radicación:</span>
+                        <span class="text-[11px] font-semibold text-primary bg-primary/5 px-2 py-0.5 rounded border border-primary/10">
+                          {{ proc?.process_number }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center shrink-0">
+                    <div class="w-8 h-8 rounded-full bg-primary/5 text-primary/40 flex items-center justify-center border border-primary/5 transition-all group-hover:bg-primary/10 group-hover:text-primary group-hover:translate-x-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              }
             </div>
           </div>
-          }
 
-          <!-- Details -->
-          <div class="card bg-base-200 rounded-2xl">
-            <div class="card-body p-6">
-              <h4 class="text-xs font-bold uppercase tracking-widest text-base-content/40 mb-4">{{
-                'gestionProcesos.infoModal.processDetails.title' | transloco }}</h4>
-              <div class="space-y-3 text-sm">
-                <div class="flex justify-between border-b border-base-content/5 pb-2">
-                  <span class="font-bold text-base-content/60">{{ 'gestionProcesos.table.processNumber' | transloco
-                    }}:</span>
-                  <span class="font-bold text-base-content">{{ infoModalData()!.process.process_number }}</span>
-                </div>
-                @if (infoModalData()!.process.court) {
-                <div class="flex justify-between border-b border-base-content/5 pb-2">
-                  <span class="font-bold text-base-content/60">{{ 'gestionProcesos.table.court' | transloco }}:</span>
-                  <span class="font-bold text-base-content">{{ infoModalData()!.process.court }}</span>
-                </div>
-                }
-                <div class="flex justify-between border-b border-base-content/5 pb-2">
-                  <span class="font-bold text-base-content/60">{{
-                    'gestionProcesos.infoModal.processDetails.totalProcesses' | transloco }}:</span>
-                  <span class="font-bold text-base-content badge badge-ghost font-mono">{{
-                    infoModalData()!.total_processes }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="font-bold text-base-content/60">{{
-                    'gestionProcesos.infoModal.processDetails.registeredCount' | transloco }}:</span>
-                  <span class="font-bold text-success">{{ infoModalData()!.registered_count }}</span>
-                </div>
+          <!-- Summary Info and Counters -->
+          @if (infoModalData()?.total_processes && infoModalData()?.total_processes! > 0) {
+          <div class="p-5 bg-base-200/30 rounded-2xl flex justify-around items-center border border-base-200/50">
+            <div class="text-center">
+              <span class="block text-[8px] font-bold text-base-content/30 tracking-widest mb-0.5 uppercase">Total Procesos</span>
+              <span class="text-xl font-bold text-base-content">{{ infoModalData()?.total_processes }}</span>
+            </div>
+            <div class="w-px h-6 bg-base-300"></div>
+            <div class="text-center">
+              <span class="block text-[8px] font-bold text-base-content/30 tracking-widest mb-0.5 uppercase">Registrados</span>
+              <span class="text-xl font-bold text-success">{{ infoModalData()?.registered_count }}</span>
+            </div>
+            @if (infoModalData()?.private_count && infoModalData()?.private_count! > 0) {
+              <div class="w-px h-6 bg-base-300"></div>
+              <div class="text-center">
+                <span class="block text-[8px] font-bold text-base-content/30 tracking-widest mb-0.5 uppercase">Privados</span>
+                <span class="text-xl font-bold text-warning">{{ infoModalData()?.private_count }}</span>
               </div>
-            </div>
+            }
           </div>
+          }
         </div>
         }
 
         <!-- Actions -->
-        <div class="modal-action mt-8 pt-6 border-t border-base-200">
-          <button type="button" class="btn btn-primary btn-sm sm:btn-md normal-case font-bold px-10 rounded-xl h-11"
+        <div class="modal-action mt-6 pt-4 border-t border-base-200/50 flex justify-end">
+          <button type="button" class="btn btn-primary btn-md normal-case font-bold px-10 rounded-xl shadow-lg shadow-primary/20 active:scale-95 transition-all"
             (click)="closeInfoModal()">
             {{ 'gestionProcesos.infoModal.close' | transloco }}
           </button>

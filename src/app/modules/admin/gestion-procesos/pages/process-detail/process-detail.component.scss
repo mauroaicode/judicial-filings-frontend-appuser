@@ -88,18 +88,6 @@
   }
 }
 
-// Badge styling refinement
-.badge {
-  border-radius: 6px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  font-size: 9px;
-  padding: 0.25rem 0.6rem;
-  height: auto;
-  border-width: 1px;
-}
-
 // Table refinement - Removed rounded corners for desktop data table
 :host ::ng-deep {
   .action-data-container {

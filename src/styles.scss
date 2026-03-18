@@ -299,4 +299,16 @@ app-gestion-procesos .process-list-table tbody tr.process-row-hovered td {
   border-color: #A4A4A9 !important;
 }
 
+/* Badge styling refinement - STANDARDIZED APPEARANCE FOR STATUS/LABELS */
+.badge:not(.indicator-item):not(.p-0) {
+  border-radius: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 10px;
+  padding: 0.15rem 0.45rem;
+  height: auto;
+  border-width: 1px;
+}
+
 /* --- END STANDARDIZED UI CLASSES --- */
