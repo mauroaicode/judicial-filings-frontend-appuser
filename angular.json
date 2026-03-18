@@ -29,6 +29,10 @@
             "styles": [
               "src/styles/tailwind.css",
               "src/styles.scss"
+            ],
+            "allowedCommonJsDependencies": [
+              "pusher-js",
+              "flatpickr/dist/l10n/es"
             ]
           },
           "configurations": {
