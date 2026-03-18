@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, Subject, tap } from 'rxjs';
 import { environment } from '@app/core/config/environment.config';
 import { AppNotification, NotificationResponse, UnreadCountResponse } from '@app/core/models/notification/notification.model';
 
@@ -13,6 +13,10 @@ export class NotificationService {
     // State
     private _notifications = signal<AppNotification[]>([]);
     private _unreadCount = signal<number>(0);
+
+    // Events
+    private _refreshProcesses$ = new Subject<void>();
+    public readonly refreshProcesses$ = this._refreshProcesses$.asObservable();
 
     public readonly notifications = this._notifications.asReadonly();
     public readonly unreadCount = this._unreadCount.asReadonly();
@@ -67,17 +71,30 @@ export class NotificationService {
      * Handle incoming WebSocket notification
      */
     handleIncomingNotification(payload: any): void {
+        // Detailed debug logs for troubleshooting
+        console.log('--- [DEBUG] NEW NOTIFICATION RECEIVED ---');
+        console.log('Full Payload Structure:', JSON.stringify(payload, null, 2));
+
+        // Attempt to extract business type from all possible locations in the payload
+        const businessType = payload.type || payload.data?.type || payload.notification_type || payload.data?.notification_type;
+        const status = payload.status || payload.data?.status;
+
+        console.log('--- [DEBUG] EXTRACTED VALUES ---');
+        console.log('Business Type:', businessType);
+        console.log('Status:', status);
+        console.log('-----------------------------------------');
+
         const newNotification: AppNotification = {
-            id: payload.id, // Notification DB ID
-            type: payload.type || 'BroadcastNotificationCreated',
+            id: payload.id || payload.data?.id,
+            type: businessType || 'BroadcastNotificationCreated',
             notifiable_type: '',
             notifiable_id: '',
             data: {
-                title: payload.title,
-                description: payload.description,
-                type: payload.type,
-                id: payload.id_resource || payload.id, // Adjust if needed
-                status: payload.status
+                title: payload.title || payload.data?.title,
+                description: payload.description || payload.data?.description,
+                type: businessType,
+                id: payload.id_resource || payload.id || payload.data?.id,
+                status: status
             },
             read_at: null,
             created_at: new Date().toISOString(),
@@ -87,5 +104,31 @@ export class NotificationService {
         // Update state live
         this._notifications.update(current => [newNotification, ...current]);
         this._unreadCount.update(count => count + 1);
+
+        /**
+         * Refresh Logic
+         * Trigger refresh for judicial updates or completed imports
+         */
+        const typesToRefresh = [
+            'ProcessImportFinished',
+            'JudicialActionDetected',
+            'ConsolidatedJudicialActions',
+            'import-report',
+            'new-action',
+            'alert-keyword',
+            'actuacion_alerta',
+            'actuacion'
+        ];
+
+        const shouldRefresh = typesToRefresh.includes(businessType);
+        console.log(`[DEBUG] Result: shouldRefresh = ${shouldRefresh}`);
+
+        if (shouldRefresh) {
+            // Small delay to ensure DB consistency on backend before fetching
+            setTimeout(() => {
+                console.log('[DEBUG] Refreshing frontend data...');
+                this._refreshProcesses$.next();
+            }, 800);
+        }
     }
 }

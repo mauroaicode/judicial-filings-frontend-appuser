@@ -58,13 +58,21 @@ body {
 }
 
 .checkbox-primary {
-  border-color: hsl(var(--p));
+  --chkbg: hsl(var(--p));
+  --chkfg: #fff;
+  border-color: hsl(var(--bc) / 0.2);
+}
+
+.checkbox-primary:hover {
+  border-color: hsl(var(--p) / 0.5);
 }
 
 .checkbox-primary:checked {
-  background-color: hsl(var(--p));
   border-color: hsl(var(--p));
+  background-color: hsl(var(--p));
+  background-image: linear-gradient(-45deg, transparent 65%, hsl(var(--p)) 65.99%), linear-gradient(45deg, transparent 75%, hsl(var(--p)) 75.99%), linear-gradient(-45deg, hsl(var(--p)) 40%, transparent 40.99%), linear-gradient(45deg, hsl(var(--p)) 30%, #fff 30.99%, #fff 40%, transparent 40.99%), linear-gradient(-45deg, #fff 50%, hsl(var(--p)) 50.99%);
 }
+
 
 /* Flatpickr Date Range Picker Styles */
 app-date-range-picker .flatpickr-calendar,
@@ -297,6 +305,18 @@ app-gestion-procesos .process-list-table tbody tr.process-row-hovered td {
   cursor: not-allowed !important;
   background-color: #A4A4A9 !important;
   border-color: #A4A4A9 !important;
+}
+
+/* Badge styling refinement - STANDARDIZED APPEARANCE FOR STATUS/LABELS */
+.badge:not(.indicator-item):not(.p-0) {
+  border-radius: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 10px;
+  padding: 0.15rem 0.45rem;
+  height: auto;
+  border-width: 1px;
 }
 
 /* --- END STANDARDIZED UI CLASSES --- */

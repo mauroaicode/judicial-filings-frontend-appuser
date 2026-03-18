@@ -89,7 +89,15 @@ export class SignInComponent implements OnInit {
       this._authService.currentUser = response.user;
 
       this.alertType.set('success');
-      this.alertMessage.set('auth.success.login');
+      
+      // Check if user must change password
+      if (response.user.must_change_password) {
+        this.alertMessage.set('auth.success.mustChangePassword');
+        this.alertType.set('error'); // Show as a warning/error type for more visibility
+      } else {
+        this.alertMessage.set('auth.success.login');
+      }
+
       this._isDirectMessage.set(false)
       this.showAlert.set(true);
 

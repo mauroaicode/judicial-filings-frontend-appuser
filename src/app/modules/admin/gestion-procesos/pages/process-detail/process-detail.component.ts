@@ -24,7 +24,7 @@ import {
   AlertKeyword,
   AlertKeywordStat,
 } from '@app/core/models/process/process.model';
-import { buildAnnotationWithHighlights } from '@app/core/utils/alert-highlight.utils';
+import { buildTextWithHighlights } from '@app/core/utils/alert-highlight.utils';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
 import { DataTableComponent, DataTableColumn } from '@app/shared/components/data-table/data-table.component';
 import { ConfirmationDialogComponent } from '@app/shared/components/confirmation-dialog/confirmation-dialog.component';
@@ -128,13 +128,16 @@ export class ProcessDetailComponent {
         key: 'action',
         label: 'processDetail.actions.table.action',
         sortable: true,
+        html: true,
+        render: (value: string | null, row: Action) =>
+          buildTextWithHighlights(row.action ?? value, row.alert_highlights, 'action'),
       },
       {
         key: 'annotation',
         label: 'processDetail.actions.table.annotation',
         html: true,
         render: (value: string | null, row: Action) =>
-          buildAnnotationWithHighlights(row.annotation ?? value, row.alert_highlights),
+          buildTextWithHighlights(row.annotation ?? value, row.alert_highlights, 'annotation'),
       },
       {
         key: 'term_start_date',

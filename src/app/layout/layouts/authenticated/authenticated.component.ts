@@ -16,11 +16,13 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { SidebarComponent } from '@app/layout/common/sidebar/sidebar.component';
 import { HeaderComponent } from '@app/layout/common/header/header.component';
 import { NotificationsComponent } from '@app/layout/common/notifications/notifications.component';
+import { AuthService } from '@app/core/auth/auth.service';
+import { AlertComponent } from '@app/shared/components/alert/alert.component';
 
 @Component({
   selector: 'app-authenticated-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent, HeaderComponent, NotificationsComponent],
+  imports: [CommonModule, RouterOutlet, SidebarComponent, HeaderComponent, NotificationsComponent, AlertComponent],
   templateUrl: './authenticated.component.html',
   styleUrls: ['./authenticated.component.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -29,8 +31,12 @@ import { NotificationsComponent } from '@app/layout/common/notifications/notific
 export class AuthenticatedLayoutComponent implements OnInit {
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
+  private _authService = inject(AuthService);
 
   @ViewChild(SidebarComponent) sidebar!: SidebarComponent;
+
+  // Check if user must change password
+  public mustChangePassword = computed(() => this._authService.user()?.must_change_password ?? false);
 
   // State signals
   private _currentUrl = signal<string>(this._router.url);

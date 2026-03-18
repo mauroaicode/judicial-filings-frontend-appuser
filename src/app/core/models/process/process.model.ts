@@ -20,6 +20,7 @@ export interface ProcessInstance {
   defendant: string | null;
   plaintiffs?: string[];
   defendants?: string[];
+  speaker?: string | null;
 }
 
 /**
@@ -48,6 +49,7 @@ export interface Process {
   defendants?: string[];
   /** Instancias del mismo radicado (expandible en la tabla) */
   instances?: ProcessInstance[];
+  speaker?: string | null;
 }
 
 /**
@@ -116,11 +118,12 @@ export interface ProcessResponseMeta {
  */
 export interface CreateProcessResponse {
   message: string;
-  has_multiple_instances: boolean;
-  total_processes: number;
-  registered_count: number;
-  private_count: number;
-  process: Process;
+  has_multiple_instances?: boolean;
+  total_processes?: number;
+  registered_count?: number;
+  private_count?: number;
+  process?: Process;
+  processes?: Process[];
 }
 
 /**
@@ -187,6 +190,7 @@ export interface AlertHighlight {
   start: number;
   end: number;
   text: string;
+  source?: string; // 'action' or 'annotation'
 }
 
 /**

@@ -1,4 +1,7 @@
 {
+  "common": {
+    "actions": "Acciones"
+  },
   "generics": {
     "spanish": "Español",
     "english": "Inglés",
@@ -32,9 +35,9 @@
     },
     "forgotPassword": {
       "title": "Recuperar Contraseña",
-      "subtitle": "Ingresa tu email para recibir un código de recuperación",
-      "emailLabel": "Correo electrónico",
-      "emailPlaceholder": "tu@email.com",
+      "subtitle": "Ingresa tu identificación para recibir un código de recuperación",
+      "identificationLabel": "Identificación",
+      "identificationPlaceholder": "Ingrese su identificación",
       "codeLabel": "Código de recuperación",
       "codePlaceholder": "Ingresa el código",
       "newPasswordLabel": "Nueva contraseña",
@@ -46,7 +49,7 @@
       "sendingCode": "Enviando código...",
       "resetting": "Restableciendo...",
       "backToSignIn": "← Volver a iniciar sesión",
-      "codeSent": "Código de recuperación enviado a tu email",
+      "codeSent": "Si el número de identificación existe en nuestro sistema, recibirás un correo con las instrucciones.",
       "passwordReset": "Contraseña restablecida exitosamente",
       "invalidCode": "Código inválido o expirado",
       "passwordsNotMatch": "Las contraseñas no coinciden",
@@ -67,7 +70,8 @@
       "somethingWentWrong": "Algo salió mal. Intenta nuevamente."
     },
     "success": {
-      "login": "Inicio de sesión exitoso"
+      "login": "Inicio de sesión exitoso",
+      "mustChangePassword": "Por seguridad, debes cambiar tu contraseña. Por favor, actualízala lo antes posible."
     }
   },
   "navigation": {
@@ -202,7 +206,7 @@
       "createdAt": "Fecha de Creación",
       "createdAtRange": "Rango de Fecha de Radicación",
       "createdAtRangePlaceholder": "Seleccionar rango de fechas",
-      "lastApiUpdateRange": "Rango de Última Actualización Rama Judicial",
+      "lastApiUpdateRange": "Rango de Última Actualización",
       "lastApiUpdateRangePlaceholder": "Seleccionar rango de fechas",
       "all": "Todos",
       "yes": "Sí",
@@ -244,8 +248,8 @@
   },
   "processDetail": {
     "title": "Detalle del Proceso",
-    "activateProcess": "Activar Proceso",
-    "deactivateProcess": "Desactivar Proceso",
+    "activateProcess": "Activar Seguimiento",
+    "deactivateProcess": "Desactivar Seguimiento",
     "back": "Volver",
     "generalInfo": "Información General",
     "processNumber": "Número de Radicado",

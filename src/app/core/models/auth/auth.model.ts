@@ -14,6 +14,7 @@ export interface User {
   slug: string;
   profile_image: string | null;
   roles: Role[];
+  must_change_password: boolean;
 }
 
 export interface Role {
@@ -33,5 +34,16 @@ export interface ProfileUpdateRequest {
   identification: string;
   password?: string;
   password_confirmation?: string;
+}
+
+export interface ForgotPasswordRequest {
+  identification: string;
+}
+
+export interface ResetPasswordRequest {
+  identification: string;
+  token: string;
+  password: string;
+  password_confirmation: string;
 }
 

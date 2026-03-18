@@ -2,7 +2,7 @@ import {HttpClient} from '@angular/common/http';
 import {inject, Injectable, signal} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {environment} from '@app/core/config/environment.config';
-import {AuthResponse, LoginRequest, User} from '@app/core/models/auth/auth.model';
+import {AuthResponse, ForgotPasswordRequest, LoginRequest, ResetPasswordRequest, User} from '@app/core/models/auth/auth.model';
 import {SessionStorageService} from '@app/core/services/storage/session-storage.service';
 import {STORAGE} from '@app/core/constants/storage.constant';
 
@@ -86,6 +86,28 @@ export class AuthService {
   signIn(credentials: LoginRequest): Observable<AuthResponse> {
     const url = `${environment.apiBaseUrl}/login`;
     return this._httpClient.post<AuthResponse>(url, credentials);
+  }
+
+  /**
+   * Forgot password request
+   *
+   * @param data - Forgot password request data
+   * @returns Observable
+   */
+  forgotPassword(data: ForgotPasswordRequest): Observable<any> {
+    const url = `${environment.apiBaseUrl}/forgot-password`;
+    return this._httpClient.post(url, data);
+  }
+
+  /**
+   * Reset password request
+   *
+   * @param data - Reset password request data
+   * @returns Observable
+   */
+  resetPassword(data: ResetPasswordRequest): Observable<any> {
+    const url = `${environment.apiBaseUrl}/reset-password`;
+    return this._httpClient.post(url, data);
   }
 
   /**
