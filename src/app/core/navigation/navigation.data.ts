@@ -13,6 +13,13 @@ export const DEFAULT_NAVIGATION: NavigationItem[] = [
     link: '/gestion-procesos',
   },
   {
+    id: 'actuaciones-recientes',
+    title: 'actuacionesRecientes.title',
+    type: 'basic',
+    icon: 'bell',
+    link: '/actuaciones-recientes',
+  },
+  {
     id: 'keywords',
     title: 'navigation.keywords',
     type: 'basic',

@@ -1,4 +1,19 @@
-// Gestión de Procesos component styles
+// Actuaciones Recientes component styles
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 // Tooltip de sujetos procesales: por encima del texto (evitar cortes al final de la tabla)
 .process-list-tooltip {
@@ -45,7 +60,7 @@
   }
 }
 
-// Global adjustment for daisyUI tooltips inside sticky columns
+// Global adjustment for tooltips inside sticky columns
 .sticky-col-radicado .tooltip {
   overflow: visible !important;
   z-index: 50 !important;
@@ -55,11 +70,18 @@
   }
 }
 
-// Hover accent en todas las filas (principales e instancias) — color sólido para que se vea
+// Hover accent en todas las filas (igual que gestion-procesos)
 .process-list-table tbody tr.process-row-hovered,
 .process-list-table tbody tr.process-row-hovered td {
   background-color: #F3F0F9 !important;
-  /* light brand purple */
+}
+
+/* Hover específico para la celda sticky */
+.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado::before,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado .sticky-cell-bg {
+  background-color: #F3F0F9 !important;
+  background: #F3F0F9 !important;
 }
 
 /* IMPORTANTE: evitar que ancestros con overflow rompan el sticky del header */
@@ -91,6 +113,7 @@
     background: #24163E !important;
     background-color: #24163E !important;
     color: #fff !important;
+    padding: 1rem !important;
   }
 
   thead th.sticky-col-radicado {
@@ -102,32 +125,23 @@
     background-color: #24163E !important;
     color: #fff !important;
     box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
-    min-width: 280px !important;
+    min-width: 280px !important; // Aumentado para el formato con guiones
     max-width: 280px !important;
     width: 280px !important;
     transform: translateZ(0) !important;
   }
 
-  /* Colores sólidos para sticky sin hover (evitar transparencia al hacer scroll) */
-  $sticky-base: #ffffff;
-  $sticky-zebra: #f9fafb;
-  /* gris muy suave para que no destaque respecto al resto de la fila par */
-  $sticky-instance: #F3F0F9;
-  /* brand purple light */
-
-  /* Celda sticky: color sólido 100% opaco para que el scroll no se vea por debajo */
+  /* Celda sticky */
   tbody td.sticky-col-radicado {
     position: sticky !important;
     left: 0 !important;
     z-index: 10 !important;
-    background-color: $sticky-base !important;
-    background: $sticky-base !important;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
-    min-width: 280px !important;
+    background-color: #ffffff !important;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.1) !important;
+    min-width: 280px !important; // Aumentado para el formato con guiones
     max-width: 280px !important;
     width: 280px !important;
     white-space: nowrap !important;
-    backface-visibility: hidden !important;
     transform: translateZ(0) !important;
 
     & .sticky-cell-bg {
@@ -142,87 +156,89 @@
       position: relative !important;
       z-index: 1;
     }
-
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: $sticky-base !important;
-      z-index: -1;
-      pointer-events: none;
-    }
   }
 
-  /* Filas pares (zebra): gris claro sólido */
+  /* Filas pares (zebra) */
   tbody tr:nth-child(2n) td.sticky-col-radicado {
-    background-color: $sticky-zebra !important;
-    background: $sticky-zebra !important;
-
-    &::before {
-      background: $sticky-zebra !important;
-    }
-
-    & .sticky-cell-bg {
-      background: $sticky-zebra !important;
-    }
-  }
-
-  tbody tr:not(:nth-child(2n)) td.sticky-col-radicado .sticky-cell-bg {
-    background: $sticky-base !important;
-  }
-
-  /* Filas de instancias: siempre el mismo accent claro (override zebra nth-child) */
-  tbody tr.process-table-instance-row td,
-  tbody tr.process-table-instance-row:nth-child(2n) td {
-    background-color: $sticky-instance !important;
-    background: $sticky-instance !important;
-  }
-
-  tbody tr.process-table-instance-row td.sticky-col-radicado,
-  tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-radicado {
-    background-color: $sticky-instance !important;
-    background: $sticky-instance !important;
-
-    &::before {
-      background: $sticky-instance !important;
-    }
-
-    & .sticky-cell-bg {
-      background: $sticky-instance !important;
-    }
-  }
-
-  /* Hover: color accent opaco (ya estaba bien) */
-  tbody tr.process-row-hovered td.sticky-col-radicado,
-  tbody tr.process-row-hovered td.sticky-col-radicado::before,
-  tbody tr.process-row-hovered td.sticky-col-radicado .sticky-cell-bg {
-    background-color: #F3F0F9 !important;
-    background: #F3F0F9 !important;
+    background-color: #f9fafb !important;
   }
 }
 
-// Pagination (misma estructura que data-table)
+// Pagination (misma estructura que gestion-procesos)
 .pagination-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
-  margin-top: 1.5rem;
   padding: 1rem;
   width: 100%;
 
-  @media (min-width: 640px) {
+  @media (min-width: 768px) {
     flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
   }
 
   .pagination-results-info {
     font-size: 0.875rem;
     color: hsl(var(--bc) / 0.7);
+    order: 2;
+    @media (min-width: 768px) {
+      order: 1;
+    }
   }
 
   .pagination-controls {
     display: flex;
+    order: 1;
+    @media (min-width: 768px) {
+      order: 2;
+    }
+  }
+
+  .pagination-page-size {
+    order: 3;
+  }
+}
+
+// Label styles match project standards
+.label-standard {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: hsl(var(--bc) / 0.6);
+}
+
+.input-standard {
+  border-radius: 0.75rem;
+  border-color: hsl(var(--bc) / 0.1);
+  background-color: hsl(var(--b1));
+  height: 2.5rem;
+  font-size: 0.875rem;
+  
+  &:focus {
+    border-color: hsl(var(--p));
+    outline: 2px solid hsl(var(--p) / 0.2);
+    outline-offset: 1px;
+  }
+}
+
+.btn-standard-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: hsl(var(--p));
+  color: hsl(var(--pc));
+  padding: 0 1.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px hsl(var(--p) / 0.3);
+    opacity: 0.9;
   }
 }

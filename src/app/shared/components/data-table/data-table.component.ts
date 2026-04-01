@@ -56,6 +56,7 @@ export class DataTableComponent {
   // Outputs
   public pageChange = output<{ page: number; perPage: number }>();
   public rowClick = output<any>();
+  public rowDblClick = output<any>();
 
   // Page size options
   public pageSizeOptions = [10, 20, 25, 50, 100];
@@ -72,6 +73,13 @@ export class DataTableComponent {
    */
   onRowClick(row: any): void {
     this.rowClick.emit(row);
+  }
+
+  /**
+   * Handle row double click
+   */
+  onRowDblClick(row: any): void {
+    this.rowDblClick.emit(row);
   }
 
   /**

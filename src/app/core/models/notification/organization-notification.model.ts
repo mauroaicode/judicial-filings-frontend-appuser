@@ -30,6 +30,9 @@ export interface OrganizationNotificationDetailActuacion {
   alert_highlights?: AlertHighlight[] | null;
   /** Sujetos procesales (demandante, demandado, vinculado, etc.) */
   subjects?: OrganizationNotificationSubject[] | null;
+  /** Term dates from judicial action */
+  term_start_date?: string | null;
+  term_end_date?: string | null;
 }
 
 /**
@@ -95,6 +98,8 @@ export interface OrganizationNotificationRow {
   registration_date?: string;
   alert_highlights?: AlertHighlight[] | null;
   subjects?: OrganizationNotificationSubject[] | null;
+  term_start_date?: string | null;
+  term_end_date?: string | null;
   // Sujeto_procesal
   subject_type?: string;
   name_or_business_name?: string;

@@ -141,10 +141,18 @@ export class NotificationsDrawerComponent implements OnDestroy {
   }
 
   getActionHtml(row: OrganizationNotificationRow): string {
+    const type = this.notificationType();
+    if (type === 'actuacion') {
+      return row.action ?? '';
+    }
     return buildTextWithHighlights(row.action ?? null, row.alert_highlights, 'action');
   }
 
   getAnnotationHtml(row: OrganizationNotificationRow): string {
+    const type = this.notificationType();
+    if (type === 'actuacion') {
+      return row.annotation ?? '';
+    }
     return buildTextWithHighlights(row.annotation ?? null, row.alert_highlights, 'annotation');
   }
 
@@ -289,6 +297,27 @@ export class NotificationsDrawerComponent implements OnDestroy {
     if (!m) return value;
     const [, y, month, day] = m;
     return `${day}/${month}/${y}`;
+  }
+
+  copyToClipboard(text: string, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    if (!text) return;
+    
+    navigator.clipboard.writeText(text).then(() => {
+      // Reuse the toast mechanism for feedback
+      const originalMessage = this.markedCountMessage();
+      this.markedCountMessage.set(this._transloco.translate('notificationsDrawer.copiedToClipboard'));
+      
+      setTimeout(() => {
+        this.markedCountMessage.set(originalMessage);
+      }, 2000);
+    }).catch(err => {
+      console.error('Could not copy text: ', err);
+    });
   }
 
   private loadNotifications(type: OrganizationNotificationType, page: number, append: boolean): void {

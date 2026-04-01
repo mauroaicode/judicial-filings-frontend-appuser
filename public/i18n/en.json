@@ -129,6 +129,7 @@
     "markSelectedAsViewed": "Mark selected as viewed",
     "markSelectedAsViewedWithCount": "Mark selected as viewed ({{count}})",
     "markedCountSuccess": "{{count}} marked as viewed",
+    "copiedToClipboard": "Copied to clipboard",
     "confirm": {
       "markAllTitle": "Mark all as viewed",
       "markAllMessage": "Do you want to mark {{total}} notifications as viewed?",
@@ -143,6 +144,8 @@
       "annotation": "Annotation",
       "actionDate": "Action date",
       "registrationDate": "Registration date",
+      "termStartDate": "Term start date",
+      "termEndDate": "Term end date",
       "notifiedWhen": "Notified",
       "subjects": "Parties",
       "seeMoreSubjects": "See more ({{count}})",

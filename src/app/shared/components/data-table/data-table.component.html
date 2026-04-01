@@ -12,7 +12,7 @@
   <p class="text-base-content/70">{{ emptyMessage() }}</p>
 </div>
 } @else {
-<div class="overflow-x-auto w-full" style="position: relative; overflow-x: auto; overflow-y: visible;">
+<div class="overflow-x-auto w-full" style="position: relative; overflow-x: auto;">
   <table class="table table-zebra"
     style="min-width: 1000px; border-collapse: separate !important; border-spacing: 0 !important; position: relative;">
     <!-- Table Header -->
@@ -31,7 +31,7 @@
     <!-- Table Body -->
     <tbody>
       @for (row of data(); track row.id) {
-      <tr class="cursor-pointer group" (click)="onRowClick(row)">
+      <tr class="cursor-pointer group" (click)="onRowClick(row)" (dblclick)="onRowDblClick(row)">
         @for (column of columns(); track column.key) {
         <td [class.text-left]="!column.align || column.align === 'left'" [class.text-center]="column.align === 'center'"
           [class.text-right]="column.align === 'right'" [class.sticky-cell]="column.key === 'process_number'"
@@ -50,7 +50,7 @@
           } @else {
           <span class="text-base-content/50">-</span>
           }
-          } @else if ((column.key === 'process_date' || column.key === 'created_at') && row[column.key]) {
+          } @else if ((column.key === 'process_date' || column.key === 'created_at' || column.key === 'registration_date' || column.key === 'action_date') && row[column.key]) {
           {{ formatDate(row[column.key]) }}
           } @else if (column.key === 'plaintiff' || column.key === 'defendant') {
           @if (row[column.key]) {

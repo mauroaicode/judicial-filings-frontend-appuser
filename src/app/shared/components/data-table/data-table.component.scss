@@ -167,7 +167,7 @@
 // Ensure horizontal scroll works properly
 .overflow-x-auto {
   overflow-x: auto !important;
-  overflow-y: visible !important;
+  overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
   position: relative;
   isolation: isolate; // Create stacking context

@@ -8,9 +8,10 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
+import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ProcessService } from '@app/core/services/process/process.service';
 import { Process, ProcessInstance, ProcessFilter, ProcessResponseMeta, CreateProcessResponse } from '@app/core/models/process/process.model';
 import { DataTableColumn } from '@app/shared/components/data-table/data-table.component';
@@ -32,6 +33,7 @@ import type { OrganizationNotificationRow } from '@app/core/models/notification/
     DateRangePickerComponent,
     DashboardStatsCardsComponent,
     NotificationsDrawerComponent,
+    ProcessNumberPipe,
   ],
   templateUrl: './gestion-procesos.component.html',
   styleUrls: ['./gestion-procesos.component.scss'],
@@ -46,6 +48,7 @@ export class GestionProcesosComponent {
   private _fb = inject(FormBuilder);
   private _notificationService = inject(NotificationService);
   private _destroyRef = inject(DestroyRef);
+  private _transloco = inject(TranslocoService);
 
   readonly stats = this._dashboardService.stats;
   readonly statsLoading = this._dashboardService.isLoading;
@@ -66,6 +69,7 @@ export class GestionProcesosComponent {
   // Info modal state (for multiple instances or private processes)
   public isInfoModalOpen = signal<boolean>(false);
   public infoModalData = signal<CreateProcessResponse | null>(null);
+  public copiedMessage = signal<string | null>(null);
 
   // Add process form
   public addProcessForm: FormGroup = this._fb.group({
@@ -117,7 +121,7 @@ export class GestionProcesosComponent {
     {
       key: 'process_number',
       label: 'gestionProcesos.table.processNumber',
-      width: '240px',
+      width: '280px',
       align: 'left',
       sortable: true,
     },
@@ -649,5 +653,26 @@ export class GestionProcesosComponent {
       input.value = limitedValue;
       this.addProcessForm.patchValue({ process_number: limitedValue }, { emitEvent: false });
     }
+  }
+
+  /**
+   * Copiar texto al portapapeles
+   */
+  public copyToClipboard(text: string, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    if (!text) return;
+    
+    navigator.clipboard.writeText(text).then(() => {
+      this.copiedMessage.set(this._transloco.translate('notificationsDrawer.copiedToClipboard'));
+      setTimeout(() => {
+        this.copiedMessage.set(null);
+      }, 2000);
+    }).catch(err => {
+      console.error('Could not copy text: ', err);
+    });
   }
 }

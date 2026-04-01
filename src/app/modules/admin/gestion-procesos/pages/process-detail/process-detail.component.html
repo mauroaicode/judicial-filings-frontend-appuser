@@ -30,7 +30,7 @@
           @if (process()) {
           <div class="flex flex-wrap items-center gap-2 mt-1">
             <span class="text-xs font-semibold text-primary bg-primary/5 px-2 py-0.5 rounded border border-primary/10">
-              {{ process()!.process_number }}
+              {{ process()!.process_number | processNumber }}
             </span>
             <span
               [class]="'badge badge-sm font-bold uppercase ' + getStatusClass(initialStatusLabel() || process()!.status_label)">
@@ -197,7 +197,7 @@
           <div class="collapse-content px-6 pb-6 pt-0">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-2">
               <ng-container
-                *ngTemplateOutlet="infoItem; context: { label: 'processDetail.processNumber', value: process()!.process_number, strong: true }"></ng-container>
+                *ngTemplateOutlet="infoItem; context: { label: 'processDetail.processNumber', value: (process()!.process_number | processNumber), strong: true }"></ng-container>
               <ng-container
                 *ngTemplateOutlet="infoItem; context: { label: 'processDetail.speaker', value: process()!.speaker }"></ng-container>
               <ng-container

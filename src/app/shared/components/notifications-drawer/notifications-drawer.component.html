@@ -76,15 +76,17 @@
       </header>
 
       <div
-        class="notifications-drawer-scroll flex-1 min-h-0 overflow-auto p-6"
+        class="notifications-drawer-scroll flex-1 min-h-0 overflow-auto py-4"
         (scroll)="onScroll($event)"
       >
         @if (error()) {
-          <div class="alert alert-error shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 h-6 w-6">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{{ error() }}</span>
+          <div class="px-8">
+            <div class="alert alert-error shadow-lg rounded-xl">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 h-6 w-6">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{{ error() }}</span>
+            </div>
           </div>
         }
         @if (!error() && notificationType()) {
@@ -108,158 +110,171 @@
             </div>
           }
           @if (rows().length > 0) {
-            <div class="flex w-full flex-col gap-4">
+            <div class="flex w-full flex-col">
               @for (row of rows(); track row.id) {
-                <div class="notifications-drawer-item group flex gap-4 w-full items-start p-5 bg-white border border-base-200 rounded-2xl transition-all duration-200 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 relative overflow-hidden">
-                  <!-- Highlight indicator for unread (visual only if system supports it, here we assume all in list are unread or prioritized) -->
-                  <div class="absolute inset-y-0 left-0 w-1 bg-primary transform -translate-x-full group-hover:translate-x-0 transition-transform"></div>
+                <!-- Notification Row Item -->
+                <div class="notifications-drawer-item group flex flex-col w-full bg-white transition-all duration-300 relative overflow-hidden border-b border-gray-200/80">
+                  
+                  <!-- Selected Indicator bar -->
+                  <div class="absolute inset-y-0 left-0 w-1 transition-all duration-300"
+                    [class]="isSelected(row.id) ? 'bg-primary' : 'bg-transparent'">
+                  </div>
 
-                  <div class="flex flex-col items-center gap-2 shrink-0 pt-1 relative">
-                    <!-- Hidden native checkbox for accessibility -->
-                    <input
-                      type="checkbox"
-                      class="absolute opacity-0 w-8 h-8 cursor-pointer z-10"
-                      [checked]="isSelected(row.id)"
-                      (change)="toggleSelection(row.id, $event)"
-                      (click)="$event.stopPropagation()"
-                    />
-                    <!-- Custom visible checkbox (Circular and High Contrast) -->
-                    <div 
-                      class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200"
-                      [class]="isSelected(row.id) ? 'bg-primary border-primary shadow-md' : 'bg-white border-base-300 group-hover:border-primary/50'"
-                    >
-                      @if (isSelected(row.id)) {
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                  <div class="flex flex-col px-8 md:px-12 py-8 gap-6">
+                    <!-- Top Bar: Meta & Selection -->
+                    <div class="flex items-center justify-between gap-4">
+                      <!-- Selection & Radicado -->
+                      <div class="flex items-center gap-6">
+                        <div class="relative">
+                          <input
+                            type="checkbox"
+                            class="absolute opacity-0 w-6 h-6 cursor-pointer z-10"
+                            [checked]="isSelected(row.id)"
+                            (change)="toggleSelection(row.id, $event)"
+                            (click)="$event.stopPropagation()"
+                          />
+                          <div 
+                            class="w-5 h-5 rounded border flex items-center justify-center transition-all duration-200"
+                            [class]="isSelected(row.id) ? 'bg-primary border-primary shadow-sm' : 'bg-white border-base-300'"
+                          >
+                            @if (isSelected(row.id)) {
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            }
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-3 group/copy">
+                           <span class="font-bold text-primary text-sm md:text-[15px] tracking-tight select-all leading-none">{{ row.process_number }}</span>
+                           <button 
+                              type="button" 
+                              class="btn btn-ghost btn-xs btn-circle opacity-0 group-hover/copy:opacity-100 transition-all hover:bg-primary/5 hover:text-primary scale-90"
+                              [attr.aria-label]="'notificationsDrawer.copy' | transloco"
+                              (click)="copyToClipboard(row.process_number, $event)"
+                           >
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                             </svg>
+                           </button>
+                        </div>
+                      </div>
+
+                      <!-- Time Metadata -->
+                      @if (row.notification_time_human) {
+                        <div class="flex items-center gap-2 px-1 opacity-40 shrink-0">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span class="text-[9px] font-bold uppercase tracking-widest">{{ row.notification_time_human }}</span>
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Main Content -->
+                    <div class="flex flex-col gap-6">
+                      @if (isActuacionOrAlerta()) {
+                        <!-- Actuación Content -->
+                        <div class="flex flex-col gap-1.5">
+                          <span class="text-[9px] font-semibold uppercase tracking-[0.2em] text-base-content/25 leading-none">{{ 'notificationsDrawer.table.action' | transloco }}</span>
+                          <button
+                            type="button"
+                            class="text-left focus:outline-none focus-visible:ring-0 cursor-pointer group/title"
+                            (click)="onItemClick(row)"
+                          >
+                            <h4 class="text-base md:text-lg font-black text-base-content leading-tight transition-colors group-hover/title:text-primary">
+                              <span [innerHTML]="getActionHtml(row) | safeHtml"></span>
+                            </h4>
+                          </button>
+                        </div>
+
+                        <!-- Anotación Content -->
+                        @if (row.annotation && row.annotation !== '-') {
+                          <div class="flex flex-col gap-2">
+                            <span class="text-[9px] font-semibold uppercase tracking-[0.2em] text-base-content/20 leading-none">{{ 'notificationsDrawer.table.annotation' | transloco }}</span>
+                            <div class="text-[13px] md:text-sm text-base-content/50 leading-relaxed font-medium pl-5 border-l border-base-100 py-0.5">
+                               <span [innerHTML]="getAnnotationHtml(row) | safeHtml"></span>
+                            </div>
+                          </div>
+                        }
+
+                        <!-- Sujetos Content (Elegant) -->
+                        @if (row.subjects && row.subjects.length > 0) {
+                          <div class="flex flex-col gap-2.5">
+                            <span class="text-[9px] font-semibold uppercase tracking-[0.2em] text-base-content/20 leading-none">{{ 'notificationsDrawer.table.subjects' | transloco }}</span>
+                            <div class="flex flex-wrap items-center gap-x-10 gap-y-3">
+                              @for (subject of getVisibleSubjects(row); track subject.name + subject.type) {
+                                <div class="flex flex-col gap-0.5">
+                                  <span class="text-[11px] font-bold text-base-content/70">{{ subject.name }}</span>
+                                  <span class="text-[8px] font-bold text-base-content/30 uppercase tracking-widest">{{ subject.type }}</span>
+                                </div>
+                              }
+                              @if (row.subjects.length > 3) {
+                                 <button 
+                                   type="button"
+                                   (click)="toggleSubjects(row.id, $event)"
+                                   class="btn btn-ghost btn-xs h-auto py-1 px-2 text-primary font-bold text-[8px] uppercase tracking-widest hover:bg-primary/5 rounded-full border border-primary/10"
+                                 >
+                                   {{ isSubjectsExpanded(row.id) ? ('notificationsDrawer.table.seeLess' | transloco) : ('notificationsDrawer.table.seeMoreSubjects' | transloco: { count: row.subjects.length - 3 }) }}
+                                   <svg xmlns="http://www.w3.org/2000/svg" class="h-2 w-2 ml-1 transition-transform duration-300" [class.rotate-180]="isSubjectsExpanded(row.id)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
+                                   </svg>
+                                 </button>
+                               }
+                            </div>
+                          </div>
+                        }
+
+                        <!-- Fechas Grid (Minimalist) -->
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-6 pt-1">
+                             <!-- action_date -->
+                             <div class="flex flex-col gap-1">
+                                <span class="text-[8px] font-bold text-base-content/25 uppercase tracking-widest">{{ 'notificationsDrawer.table.actionDate' | transloco }}</span>
+                                <span class="text-[11px] font-medium text-base-content/50">{{ formatDate(row.action_date ?? '') }}</span>
+                             </div>
+                             <!-- registration_date -->
+                             <div class="flex flex-col gap-1">
+                                <span class="text-[8px] font-bold text-base-content/25 uppercase tracking-widest">{{ 'notificationsDrawer.table.registrationDate' | transloco }}</span>
+                                <span class="text-[11px] font-medium text-base-content/50">{{ formatDate(row.registration_date ?? '') }}</span>
+                             </div>
+                             <!-- term_start_date -->
+                             @if (row.term_start_date && row.term_start_date !== '-' && row.term_start_date !== '') {
+                               <div class="flex flex-col gap-1">
+                                  <span class="text-[8px] font-bold text-base-content/25 uppercase tracking-widest">{{ 'notificationsDrawer.table.termStartDate' | transloco }}</span>
+                                  <span class="text-[11px] font-bold text-base-content/70">{{ formatDate(row.term_start_date) }}</span>
+                               </div>
+                             }
+                             <!-- term_end_date -->
+                             @if (row.term_end_date && row.term_end_date !== '-' && row.term_end_date !== '') {
+                               <div class="flex flex-col gap-1">
+                                  <span class="text-[8px] font-bold text-base-content/25 uppercase tracking-widest">{{ 'notificationsDrawer.table.termEndDate' | transloco }}</span>
+                                  <span class="text-[11px] font-bold text-base-content/70">{{ formatDate(row.term_end_date) }}</span>
+                               </div>
+                             }
+                        </div>
+                      } @else {
+                        <!-- Subject Notification Layout (Premium Clean) -->
+                        <div class="flex flex-col gap-6">
+                           <div class="flex flex-col gap-2.5">
+                             <div class="flex items-center gap-2">
+                               <span class="text-[9px] font-semibold uppercase tracking-[0.2em] text-primary/30 leading-none">{{ 'notificationsDrawer.table.nameOrBusinessName' | transloco }}</span>
+                             </div>
+                             <h4 class="text-base md:text-lg font-black text-base-content tracking-tight">{{ row.name_or_business_name }}</h4>
+                           </div>
+                           
+                           @if (row.identification) {
+                             <div class="flex flex-col gap-1">
+                                <span class="text-[9px] font-semibold uppercase tracking-[0.2em] text-base-content/25 leading-none">{{ 'notificationsDrawer.table.identification' | transloco }}</span>
+                                <span class="text-base font-bold text-base-content/40">{{ row.identification }}</span>
+                             </div>
+                           }
+                        </div>
                       }
                     </div>
                   </div>
-
-
-                  <button
-                    type="button"
-                    class="flex-1 min-w-0 text-left focus:outline-none focus-visible:ring-0 rounded cursor-pointer"
-                    (click)="onItemClick(row)"
-                  >
-                  @if (isActuacionOrAlerta()) {
-                    <div class="flex flex-col gap-4">
-                      <!-- Radicado and Time -->
-                      <div class="flex items-start justify-between gap-4">
-                        <div class="flex flex-col">
-                           <span class="text-[10px] font-black uppercase tracking-[0.1em] text-base-content/40 mb-1 leading-none">{{ 'notificationsDrawer.table.processNumber' | transloco }}</span>
-                           <span class="font-bold text-primary text-base leading-tight">{{ row.process_number }}</span>
-                        </div>
-                        @if (row.notification_time_human) {
-                          <div class="flex items-center gap-1.5 bg-base-100 px-2.5 py-1 rounded-full border border-base-200 shrink-0">
-                            <span class="relative flex h-2 w-2">
-                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-40"></span>
-                              <span class="relative inline-flex rounded-full h-2 w-2 bg-primary/80"></span>
-                            </span>
-                            <span class="text-[11px] font-bold text-base-content/60">{{ row.notification_time_human }}</span>
-                          </div>
-                        }
-                      </div>
-
-                      <div class="space-y-2">
-                        <!-- Main Action Title -->
-                        <h4 class="text-base font-extrabold text-base-content leading-snug group-hover:text-primary transition-colors">
-                          <span [innerHTML]="getActionHtml(row) | safeHtml"></span>
-                        </h4>
-                        <!-- Annotation with better spacing and contrast -->
-                        <div class="text-sm text-base-content/70 leading-relaxed font-medium bg-base-50/50 p-3 rounded-xl border border-dashed border-base-200">
-                          <span [innerHTML]="getAnnotationHtml(row) | safeHtml"></span>
-                        </div>
-                      </div>
-
-                      <!-- Subjects Section -->
-                      @if (row.subjects && row.subjects.length > 0) {
-                        <div class="pt-1">
-                          <div class="flex items-center gap-2 mb-2">
-                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                             </svg>
-                             <span class="text-[10px] font-black text-base-content/40 uppercase tracking-widest">{{ 'notificationsDrawer.table.subjects' | transloco }}</span>
-                          </div>
-                          <div class="flex flex-wrap gap-2">
-                            @for (subject of getVisibleSubjects(row); track subject.name + subject.type) {
-                              <div class="inline-flex items-center gap-2 bg-white border border-base-200 pl-2.5 pr-1.5 py-0.5 rounded-lg shadow-sm">
-                                <span class="text-xs font-bold text-base-content/80">{{ subject.name }}</span>
-                                <span class="badge badge-sm border-none bg-primary/10 text-primary font-black text-[9px] h-4.5">{{ subject.type | uppercase }}</span>
-                              </div>
-                            }
-                            @if (getRemainingSubjectsCount(row) > 0) {
-                              <button
-                                type="button"
-                                class="text-xs font-bold text-primary hover:underline px-2"
-                                (click)="toggleSubjects(row.id, $event)"
-                              >
-                                @if (isSubjectsExpanded(row.id)) {
-                                  – {{ 'notificationsDrawer.table.seeLess' | transloco }}
-                                } @else {
-                                  + {{ getRemainingSubjectsCount(row) }} {{ 'notificationsDrawer.table.seeMoreSubjects' | transloco: { count: '' } }}
-                                }
-                              </button>
-                            }
-                          </div>
-                        </div>
-                      }
-
-                      <!-- Dates Row -->
-                      <div class="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2 border-t border-base-100">
-                        <div class="flex items-center gap-2">
-                          <div class="w-7 h-7 rounded-lg bg-base-100 flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                          <div class="flex flex-col">
-                            <span class="text-[9px] font-bold text-base-content/40 uppercase tracking-tight">{{ 'notificationsDrawer.table.actionDate' | transloco }}</span>
-                            <span class="text-xs font-bold text-base-content/70">{{ formatDate(row.action_date ?? '') }}</span>
-                          </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                          <div class="w-7 h-7 rounded-lg bg-base-100 flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                          </div>
-                          <div class="flex flex-col">
-                            <span class="text-[9px] font-bold text-base-content/40 uppercase tracking-tight">{{ 'notificationsDrawer.table.registrationDate' | transloco }}</span>
-                            <span class="text-xs font-bold text-base-content/70">{{ formatDate(row.registration_date ?? '') }}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  } @else {
-                    <div class="space-y-4">
-                      <div class="flex items-start justify-between gap-4">
-                        <div class="flex flex-col">
-                           <span class="text-[10px] font-black uppercase tracking-[0.1em] text-base-content/40 mb-1 leading-none">{{ 'notificationsDrawer.table.processNumber' | transloco }}</span>
-                           <span class="font-bold text-primary text-base leading-tight">{{ row.process_number }}</span>
-                        </div>
-                        <span class="badge badge-primary font-bold text-[10px] h-6 px-3">{{ row.subject_type | uppercase }}</span>
-                      </div>
-                      
-                      <div class="bg-base-50/50 p-4 rounded-xl border border-dashed border-base-200">
-                        <h4 class="text-base font-extrabold text-base-content mb-1">{{ row.name_or_business_name }}</h4>
-                        @if (row.identification) {
-                          <div class="flex items-center gap-2 mt-2">
-                             <div class="w-6 h-6 rounded bg-white flex items-center justify-center border border-base-200 shadow-sm">
-                               <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                               </svg>
-                             </div>
-                             <span class="text-xs font-bold text-base-content/60">{{ 'notificationsDrawer.table.identification' | transloco }}: {{ row.identification }}</span>
-                          </div>
-                        }
-                      </div>
-                    </div>
-                  }
-                  </button>
                 </div>
               }
             </div>
+          }
 
             @if (loadingMore()) {
               <div class="flex justify-center py-6">
@@ -270,10 +285,9 @@
               <p class="text-center text-xs text-base-content/50 py-4">{{ 'notificationsDrawer.scrollForMore' | transloco }}</p>
             }
           }
-        }
+        </div>
       </div>
     </div>
-  </div>
 
   <!-- Toast: éxito al marcar seleccionadas como vistas (DaisyUI toast + auto-dismiss) -->
   @if (markedCountMessage()) {

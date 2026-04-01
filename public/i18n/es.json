@@ -132,6 +132,7 @@
     "markSelectedAsViewed": "Marcar seleccionadas como vistas",
     "markSelectedAsViewedWithCount": "Marcar seleccionadas como vistas ({{count}})",
     "markedCountSuccess": "Se marcaron {{count}} como vistas",
+    "copiedToClipboard": "Copiado al portapapeles",
     "confirm": {
       "markAllTitle": "Marcar todas como vistas",
       "markAllMessage": "¿Desea marcar las {{total}} notificaciones como vistas?",
@@ -146,6 +147,8 @@
       "annotation": "Anotación",
       "actionDate": "Fecha de actuación",
       "registrationDate": "Fecha de registro",
+      "termStartDate": "Fecha inicio término",
+      "termEndDate": "Fecha finaliza término",
       "notifiedWhen": "Notificado",
       "subjects": "Sujetos procesales",
       "seeMoreSubjects": "Ver más ({{count}})",
@@ -172,7 +175,8 @@
         "title": "Recomendaciones",
         "rule1": "El número de radicado debe contener exactamente 23 dígitos",
         "rule2": "Solo se permiten números enteros (0-9)",
-        "rule3": "No se permiten espacios, letras o caracteres especiales"
+        "rule3": "No se permiten espacios, letras o caracteres especiales",
+        "rule4": "Ejemplo: 76001333301320170009301 (Sin puntos ni guiones)"
       },
       "errors": {
         "required": "El número de radicado es requerido",
@@ -225,7 +229,8 @@
       "defendant": "Demandados (S)",
       "multipleInstances": "Múltiples instancias",
       "processDate": "Fecha de Registro",
-      "lastActivityDate": "Fecha Ultima Actuación"
+      "lastActivityDate": "Fecha Ultima Actuación",
+      "copyTooltip": "Copiar número"
     },
     "infoModal": {
       "title": "Información del Proceso Registrado",
@@ -401,5 +406,34 @@
   "process": {
     "import_finished_title": "Importación Finalizada",
     "import_finished_description": "El proceso de importación de radicados ha terminado satisfactoriamente."
+  },
+  "actuacionesRecientes": {
+    "title": "Actuaciones Recientes",
+    "description": "Consulta los últimos movimientos de todos tus procesos judiciales",
+    "filters": {
+      "title": "Filtros de Búsqueda",
+      "processNumber": "Número de radicado",
+      "processNumberPlaceholder": "Ej: 76001...",
+      "registrationDate": "Fecha de registro",
+      "registrationDatePlaceholder": "Filtro por registro",
+      "termStartDate": "Rango fecha inicio término",
+      "termEndDate": "Rango fecha finaliza término",
+      "termDatePlaceholder": "Seleccionar rango",
+      "search": "Buscar",
+      "reset": "Limpiar Filtros"
+    },
+    "table": {
+      "processNumber": "Número de radicado",
+      "court": "Despacho",
+      "actionText": "Actuación",
+      "registrationDate": "Fecha de registro",
+      "plaintiff": "Demandante (S)",
+      "defendant": "Demandado (S)",
+      "termStartDate": "Fecha inicio término",
+      "termEndDate": "Fecha finaliza término",
+      "empty": "No hay actuaciones que coincidan con los filtros aplicados",
+      "emptyToday": "Hoy no se han reportado nuevas actuaciones",
+      "emptyTodayDescription": "Nuestro sistema monitorea tus procesos en tiempo real. Si hay novedades, las verás reflejadas aquí automáticamente."
+    }
   }
 }

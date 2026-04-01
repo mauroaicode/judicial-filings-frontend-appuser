@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProcessService } from '@app/core/services/process/process.service';
 import {
@@ -39,6 +40,7 @@ import { ConfirmationDialogComponent } from '@app/shared/components/confirmation
     DateRangePickerComponent,
     DataTableComponent,
     ConfirmationDialogComponent,
+    ProcessNumberPipe,
   ],
   templateUrl: './process-detail.component.html',
   styleUrls: ['./process-detail.component.scss'],
@@ -393,7 +395,7 @@ export class ProcessDetailComponent {
     this.confirmModalTitle.set(isCurrentlyActive ? 'Desactivar Proceso' : 'Activar Proceso');
     this.confirmModalMessage.set(
       isCurrentlyActive
-        ? '¿Está seguro de desactivar este proceso? Ya no se realizará seguimiento automático de las actualizaciones desde la Rama Judicial.'
+        ? '¿Está seguro de desactivar este proceso? Ya no se realizará seguimiento automático de las actualizaciones.'
         : '¿Está seguro de activar este proceso? Se reanudará el seguimiento automático de las actualizaciones.'
     );
     this.confirmModalAction.set(isCurrentlyActive ? 'deactivate' : 'activate');

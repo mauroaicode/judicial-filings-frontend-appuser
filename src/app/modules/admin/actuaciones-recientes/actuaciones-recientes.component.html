@@ -1,0 +1,243 @@
+<div class="w-full space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-base-content md:text-3xl">
+          {{ 'actuacionesRecientes.title' | transloco }}
+        </h1>
+        <p class="mt-1 text-sm text-base-content/70">
+          {{ 'actuacionesRecientes.description' | transloco }}
+        </p>
+      </div>
+      
+      <!-- Live Clock Component -->
+      <app-live-clock class="sm:ml-6"></app-live-clock>
+    </div>
+    <div class="flex gap-2 items-center">
+      <!-- Toggle Highlights Switch -->
+      <div class="flex items-center gap-2 mr-2 group p-1.5 rounded-xl transition-all hover:bg-base-200/50" 
+           [attr.title]="(showHighlights() ? 'Desactivar resaltado' : 'Activar resaltado')">
+        <span class="text-[10px] uppercase font-bold text-base-content/40 group-hover:text-base-content/60 hidden sm:inline">Resaltar palabras</span>
+        <input type="checkbox" class="toggle toggle-primary toggle-sm sm:toggle-md" [checked]="showHighlights()" (change)="toggleHighlights()" />
+      </div>
+
+      <button type="button" class="btn btn-sm sm:btn-md rounded-xl px-4 transition-all border"
+        [ngClass]="showFilters() ? 'bg-primary/10 text-primary border-primary/30 shadow-sm' : 'btn-ghost border-transparent text-base-content/80 hover:bg-base-200'"
+        (click)="toggleFilters()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+        </svg>
+        <span class="hidden sm:inline font-bold">{{ 'actuacionesRecientes.filters.title' | transloco }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters Card -->
+  @if (showFilters()) {
+  <div id="filters-section" class="card bg-white shadow-sm border border-base-200 animate-fade-in-up">
+    <div class="card-body p-6">
+      <h2 class="label-standard mb-6">{{ 'actuacionesRecientes.filters.title' | transloco }}</h2>
+      <form [formGroup]="filterForm"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4" autocomplete="off">
+
+        <!-- Process Number Filter -->
+        <div class="form-control">
+          <label class="label pt-0 pb-1">
+            <span class="label-standard">{{ 'actuacionesRecientes.filters.processNumber' | transloco }}</span>
+          </label>
+          <input type="text" formControlName="process_number" class="input-standard input w-full"
+            [placeholder]="'actuacionesRecientes.filters.processNumberPlaceholder' | transloco" inputmode="numeric" />
+        </div>
+
+        <!-- Registration Date Range -->
+        <div class="form-control">
+          <app-date-range-picker [label]="'actuacionesRecientes.filters.registrationDate' | transloco"
+            [placeholder]="'actuacionesRecientes.filters.termDatePlaceholder' | transloco"
+            formControlName="registration_date_range"></app-date-range-picker>
+        </div>
+
+        <!-- Term Start Date Range -->
+        <div class="form-control">
+          <app-date-range-picker [label]="'actuacionesRecientes.filters.termStartDate' | transloco"
+            [placeholder]="'actuacionesRecientes.filters.termDatePlaceholder' | transloco"
+            formControlName="term_start_date_range"></app-date-range-picker>
+        </div>
+
+        <!-- Term End Date Range -->
+        <div class="form-control">
+          <app-date-range-picker [label]="'actuacionesRecientes.filters.termEndDate' | transloco"
+            [placeholder]="'actuacionesRecientes.filters.termDatePlaceholder' | transloco"
+            formControlName="term_end_date_range"></app-date-range-picker>
+        </div>
+
+        <!-- Actions -->
+        <div class="md:col-span-2 lg:col-span-2 flex justify-end items-end gap-4">
+          <button type="button"
+            class="btn btn-link btn-sm normal-case text-base-content/60 no-underline hover:text-base-content font-bold mb-1"
+            (click)="onResetFilters()">
+            {{ 'actuacionesRecientes.filters.reset' | transloco }}
+          </button>
+          <button type="button" class="btn-standard-search mb-1" (click)="onSearch()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            {{ 'actuacionesRecientes.filters.search' | transloco }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+
+    <!-- Re-using classes from Gestion de Procesos to ensure fixed header -->
+    <div class="card bg-base-100 shadow-sm border-none rounded-2xl animate-fade-in-up process-list-card">
+      <div class="card-body p-0 process-list-card-body">
+        
+        @if (loading()) {
+          <div class="flex items-center justify-center py-24">
+            <span class="loading loading-spinner loading-lg text-primary"></span>
+          </div>
+        } @else if (movements().length === 0) {
+          <div class="flex flex-col items-center justify-center py-20 px-6 text-center max-w-2xl mx-auto">
+            <div class="w-16 h-16 bg-base-200/50 rounded-2xl flex items-center justify-center mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-base-content/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
+            </div>
+            
+            <h3 class="text-xl font-bold text-base-content mb-2">
+              {{ (isFiltered() ? 'actuacionesRecientes.table.empty' : 'actuacionesRecientes.table.emptyToday') | transloco }}
+            </h3>
+            
+            <p class="text-xs sm:text-sm text-base-content/50 leading-relaxed max-w-md">
+              {{ (isFiltered() ? 'Pruebe ajustando los filtros de búsqueda para encontrar lo que necesita.' : 'actuacionesRecientes.table.emptyTodayDescription' | transloco) }}
+            </p>
+          </div>
+        } @else {
+          <!-- Manual Table (Same as Gestion de Procesos) -->
+          <div class="process-list-table">
+            <table class="table table-zebra w-full" style="border-collapse: separate !important; border-spacing: 0 !important; min-width: 1800px;">
+              <thead style="background-color: #24163E !important; color: #ffffff !important;">
+                <tr>
+                  <th class="text-center" style="width: 48px;">#</th>
+                  @for (col of columns; track col.key) {
+                    <th [class.sticky-col-radicado]="col.key === 'process_number'"
+                        [class.text-left]="!col.align || col.align === 'left'"
+                        [class.text-center]="col.align === 'center'"
+                        [class.text-right]="col.align === 'right'"
+                        [style.width]="col.width"
+                        style="top: 0 !important; position: sticky !important; z-index: 50 !important;">
+                      {{ col.label | transloco }}
+                    </th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of pagedMovements(); track (row.id || $index); let i = $index) {
+                  <tr class="cursor-pointer group" 
+                    [class.process-row-hovered]="hoveredRowId() === row.id"
+                    (mouseenter)="hoveredRowId.set(row.id || null)"
+                    (mouseleave)="hoveredRowId.set(null)"
+                    (dblclick)="onRowDblClick(row)">
+                    <td class="text-center align-middle">{{ ((pagination()?.current_page || 1) - 1) * (pagination()?.per_page || 10) + i + 1 }}</td>
+                    @for (col of columns; track col.key) {
+                      <td [class.sticky-col-radicado]="col.key === 'process_number'"
+                          [class.text-left]="!col.align || col.align === 'left'"
+                          [class.text-center]="col.align === 'center'"
+                          [class.text-right]="col.align === 'right'"
+                          class="align-middle">
+                        @if (col.key === 'process_number') {
+                          <div class="sticky-cell-bg"></div>
+                          <div class="sticky-cell-txt flex items-center gap-2">
+                            <span class="text-base-content/80 font-medium">{{ row.process_number | processNumber }}</span>
+                            <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                              <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary"
+                                (click)="copyToClipboard(row.process_number, $event)">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                                </svg>
+                              </button>
+                            </span>
+                          </div>
+                        } @else if (col.html) {
+                          <div [innerHTML]="col.render ? col.render($any(row)[col.key], row) : $any(row)[col.key]"></div>
+                        } @else {
+                          {{ col.render ? col.render($any(row)[col.key], row) : $any(row)[col.key] }}
+                        }
+                      </td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination EXACT as Gestion de Procesos -->
+          @if (pagination(); as paginationInfo) {
+            <div class="pagination-container border-t border-base-300 bg-base-100">
+              <div class="pagination-results-info">
+                {{ 'table.showing' | transloco }}
+                <span class="font-semibold">{{ paginationInfo.from }}</span>
+                {{ 'table.to' | transloco }}
+                <span class="font-semibold">{{ paginationInfo.to }}</span>
+                {{ 'table.of' | transloco }}
+                <span class="font-semibold">{{ paginationInfo.total }}</span>
+                {{ 'table.results' | transloco }}
+              </div>
+              <div class="pagination-controls join">
+                <button class="join-item btn btn-sm" [class.btn-disabled]="paginationInfo.current_page === 1"
+                  (click)="onPageChange({ page: 1, perPage: paginationInfo.per_page })"
+                  [disabled]="paginationInfo.current_page === 1">««</button>
+                <button class="join-item btn btn-sm" [class.btn-disabled]="paginationInfo.current_page === 1"
+                  (click)="onPageChange({ page: paginationInfo.current_page - 1, perPage: paginationInfo.per_page })"
+                  [disabled]="paginationInfo.current_page === 1">«</button>
+                
+                @for (page of getPageNumbers(); track page) {
+                <button class="join-item btn btn-sm" [class.btn-active]="page === paginationInfo.current_page"
+                  (click)="onPageChange({ page, perPage: paginationInfo.per_page })">
+                  {{ page }}
+                </button>
+                }
+                
+                <button class="join-item btn btn-sm"
+                  [class.btn-disabled]="paginationInfo.current_page === paginationInfo.last_page"
+                  (click)="onPageChange({ page: paginationInfo.current_page + 1, perPage: paginationInfo.per_page })"
+                  [disabled]="paginationInfo.current_page === paginationInfo.last_page">»</button>
+                <button class="join-item btn btn-sm"
+                  [class.btn-disabled]="paginationInfo.current_page === paginationInfo.last_page"
+                  (click)="onPageChange({ page: paginationInfo.last_page, perPage: paginationInfo.per_page })"
+                  [disabled]="paginationInfo.current_page === paginationInfo.last_page">»»</button>
+              </div>
+              <div class="pagination-page-size">
+                <select class="select select-bordered select-sm" [value]="paginationInfo.per_page"
+                  (change)="onPageChange({ page: 1, perPage: +$any($event.target).value })">
+                  @for (size of pageSizeOptions; track size) {
+                  <option [value]="size" [attr.selected]="size === paginationInfo.per_page ? '' : null">
+                    {{ size }} {{ 'table.perPage' | transloco }}
+                  </option>
+                  }
+                </select>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Toast: éxito al copiar al portapapeles -->
+    @if (copiedMessage()) {
+      <div class="toast toast-end toast-bottom z-[10000] pointer-events-none">
+        <div class="alert alert-success shadow-lg border-none bg-success text-success-content rounded-2xl animate-fade-in-up">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="font-bold">{{ copiedMessage() }}</span>
+        </div>
+      </div>
+    }
+</div>

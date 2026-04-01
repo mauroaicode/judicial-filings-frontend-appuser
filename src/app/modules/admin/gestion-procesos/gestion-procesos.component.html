@@ -210,7 +210,15 @@
           <!-- Header -->
           <div class="bg-base-200/50 p-3 sm:p-4 flex justify-between items-center border-b border-base-200">
             <div class="flex items-center gap-2">
-              <span class="font-bold text-primary">{{ process.process_number }}</span>
+              <span class="font-bold text-primary">{{ process.process_number | processNumber }}</span>
+              <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                <button type="button" class="btn btn-ghost btn-xs btn-circle text-primary/40 hover:bg-primary/5 hover:text-primary"
+                  (click)="copyToClipboard(process.process_number, $event)">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                  </svg>
+                </button>
+              </span>
             </div>
             <!-- status badge -->
             <span class="badge badge-sm font-semibold" [ngClass]="{
@@ -320,7 +328,17 @@
                 <div class="flex flex-col min-w-0">
                   <span class="text-[10px] text-base-content/50 uppercase font-bold tracking-wider mb-0.5"># Radicación
                     (Inst. {{ instance.index }})</span>
-                  <span class="font-bold text-base-content text-sm truncate">{{ instance.process_number }}</span>
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-base-content text-sm truncate">{{ instance.process_number }}</span>
+                    <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                      <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/30 hover:bg-primary/5 hover:text-primary"
+                        (click)="copyToClipboard(instance.process_number, $event)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                        </svg>
+                      </button>
+                    </span>
+                  </div>
                 </div>
                 <span class="badge badge-sm font-semibold whitespace-nowrap" [ngClass]="{
                             'badge-success': instance.status_label === 'Activo',
@@ -402,7 +420,17 @@
               <td class="text-center align-middle">{{ process.index }}</td>
               <td class="whitespace-nowrap align-middle sticky-col-radicado">
                 <span class="sticky-cell-bg" aria-hidden="true"></span>
-                <span class="sticky-cell-txt">{{ process.process_number }}</span>
+                <div class="sticky-cell-txt flex items-center gap-2">
+                  <span>{{ process.process_number | processNumber }}</span>
+                  <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                    <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary"
+                      (click)="copyToClipboard(process.process_number, $event)">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                      </svg>
+                    </button>
+                  </span>
+                </div>
               </td>
               <td class="align-middle">{{ process.court }}</td>
               <td class="align-middle">{{ process.process_class }}</td>
@@ -495,7 +523,17 @@
               <td class="text-center align-middle text-base-content/70">{{ instance.index }}</td>
               <td class="whitespace-nowrap align-middle text-base-content/80 sticky-col-radicado">
                 <span class="sticky-cell-bg" aria-hidden="true"></span>
-                <span class="sticky-cell-txt">{{ instance.process_number }}</span>
+                <div class="sticky-cell-txt flex items-center gap-2">
+                  <span>{{ instance.process_number }}</span>
+                  <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                    <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary"
+                      (click)="copyToClipboard(instance.process_number, $event)">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                      </svg>
+                    </button>
+                  </span>
+                </div>
               </td>
               <td class="align-middle text-base-content/80">{{ instance.court }}</td>
               <td class="align-middle text-base-content/80">{{ instance.process_class }}</td>
@@ -683,6 +721,10 @@
                 <div class="w-1 h-1 rounded-full bg-info"></div>
                 {{ 'gestionProcesos.addProcess.recommendations.rule3' | transloco }}
               </li>
+              <li class="flex items-center gap-2 text-info font-bold text-sm">
+                <div class="w-1.5 h-1.5 rounded-full bg-info"></div>
+                {{ 'gestionProcesos.addProcess.recommendations.rule4' | transloco }}
+              </li>
             </ul>
           </div>
         </div>
@@ -820,10 +862,19 @@
                         <p class="text-[10px] font-medium text-base-content/40 leading-tight mt-1 truncate">{{ proc?.speaker }}</p>
                       }
                       <div class="flex items-center gap-2 mt-1.5">
-                        <span class="text-[9px] font-bold text-base-content/30 uppercase tracking-tighter">Radicación:</span>
-                        <span class="text-[11px] font-semibold text-primary bg-primary/5 px-2 py-0.5 rounded border border-primary/10">
-                          {{ proc?.process_number }}
-                        </span>
+                        <div class="flex items-center gap-2">
+                          <span class="text-[11px] font-semibold text-primary bg-primary/5 px-2 py-0.5 rounded border border-primary/10">
+                            {{ proc?.process_number }}
+                          </span>
+                          <span class="tooltip tooltip-top" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                            <button type="button" class="btn btn-ghost btn-xs btn-circle text-primary/40 hover:bg-primary/5 hover:text-primary"
+                              (click)="copyToClipboard(proc?.process_number!, $event)">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                              </svg>
+                            </button>
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -877,4 +928,16 @@
       <button type="button">{{ 'gestionProcesos.infoModal.close' | transloco }}</button>
     </form>
   </dialog>
+
+  <!-- Toast: éxito al copiar al portapapeles -->
+  @if (copiedMessage()) {
+    <div class="toast toast-end toast-bottom z-[10000] pointer-events-none">
+      <div class="alert alert-success shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>{{ copiedMessage() }}</span>
+      </div>
+    </div>
+  }
 </div>
