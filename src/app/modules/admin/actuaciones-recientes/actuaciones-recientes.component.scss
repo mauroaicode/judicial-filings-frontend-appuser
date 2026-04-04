@@ -22,7 +22,7 @@
 
   .tooltip-content {
     position: absolute !important;
-    bottom: 125% !important; 
+    bottom: 140% !important;
     left: 50% !important;
     transform: translateX(-50%) translateY(4px) !important;
     white-space: normal !important;
@@ -58,13 +58,49 @@
     transform: translateX(-50%) translateY(0) !important;
     pointer-events: auto;
   }
+
+  // Variant for elements on the left edge (like the alert column)
+  &.tooltip-left-aligned {
+    .tooltip-content {
+      left: 0 !important;
+      transform: translateY(4px) !important;
+
+      &::after {
+        left: 0.75rem !important;
+        transform: none !important;
+      }
+    }
+
+    &:hover .tooltip-content {
+      transform: translateY(0) !important;
+    }
+
+    // Special case for first rows to avoid cropping with header
+    &.tooltip-bottom {
+      .tooltip-content {
+        bottom: auto !important;
+        top: 140% !important;
+
+        &::after {
+          top: auto !important;
+          bottom: 100% !important;
+          border-top-color: transparent !important;
+          border-bottom-color: #ffffff !important;
+          transform: translateX(-50%) !important;
+        }
+      }
+
+      &:hover .tooltip-content {
+        transform: translateY(0) !important;
+      }
+    }
+  }
 }
 
 // Global adjustment for tooltips inside sticky columns
 .sticky-col-radicado .tooltip {
   overflow: visible !important;
-  z-index: 50 !important;
-  
+
   &::before, &::after {
     z-index: 100 !important;
   }
@@ -109,39 +145,95 @@
   thead th {
     position: sticky !important;
     top: var(--table-sticky-top) !important;
-    z-index: 20 !important;
+    z-index: 20 !important; /* Low priority for standard vertical stickiness */
     background: #24163E !important;
     background-color: #24163E !important;
     color: #fff !important;
     padding: 1rem !important;
-  }
-
-  thead th.sticky-col-radicado {
-    position: sticky !important;
-    top: var(--table-sticky-top) !important;
-    left: 0 !important;
-    z-index: 30 !important;
-    background: #24163E !important;
-    background-color: #24163E !important;
-    color: #fff !important;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
-    min-width: 280px !important; // Aumentado para el formato con guiones
-    max-width: 280px !important;
-    width: 280px !important;
+    border: none !important; /* No borders in header to avoid gaps */
+    /* Fill gaps with solid shadow */
+    box-shadow: 0 0 0 0.5px #24163E !important;
     transform: translateZ(0) !important;
   }
 
-  /* Celda sticky */
-  tbody td.sticky-col-radicado {
+  thead th.sticky-col-idx {
+    left: -1px !important;
+    z-index: 30 !important;
+    transform: translateZ(0) !important;
+    /* Seal right gap with same purple color */
+    box-shadow: 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
+    border: none !important;
+  }
+
+  thead th.sticky-col-alert {
+    left: 47px !important; 
+    z-index: 30 !important;
+    transform: translateZ(0) !important;
+    /* Seal right gap with same purple color */
+    box-shadow: 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
+    border: none !important;
+  }
+
+  thead th.sticky-col-radicado {
+    left: 127px !important;
+    z-index: 30 !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+    width: 280px !important;
+    transform: translateZ(0) !important;
+    /* Identity shadow + Same purple seal */
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1), 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
+    border: none !important;
+  }
+
+  /* Celda sticky idx */
+  tbody td.sticky-col-idx {
     position: sticky !important;
-    left: 0 !important;
+    left: -1px !important;
     z-index: 10 !important;
     background-color: #ffffff !important;
-    box-shadow: 2px 0 4px rgba(0,0,0,0.1) !important;
-    min-width: 280px !important; // Aumentado para el formato con guiones
+    overflow: visible !important;
+    transform: translateZ(0) !important;
+    /* Seal right gap with white background */
+    box-shadow: 1px 0 0 0 #ffffff !important;
+    border: none !important;
+  }
+
+  /* Celda sticky alert */
+  tbody td.sticky-col-alert {
+    position: sticky !important;
+    left: 47px !important;
+    z-index: 10 !important;
+    background-color: #ffffff !important;
+    overflow: visible !important;
+    transform: translateZ(0) !important;
+    /* Seal right gap with white background */
+    box-shadow: 1px 0 0 0 #ffffff !important;
+    border: none !important;
+
+    & .sticky-cell-bg {
+      position: absolute !important;
+      inset: 0 !important;
+      background: inherit !important;
+      z-index: 0;
+      pointer-events: none;
+    }
+  }
+
+  /* Celda sticky radicado */
+  tbody td.sticky-col-radicado {
+    position: sticky !important;
+    left: 127px !important;
+    z-index: 10 !important;
+    background-color: #ffffff !important;
+    /* Identity shadow + White seal */
+    box-shadow: 2px 0 4px rgba(0,0,0,0.1), 1px 0 0 0 #ffffff !important;
+    border: none !important;
+    min-width: 280px !important;
     max-width: 280px !important;
     width: 280px !important;
     white-space: nowrap !important;
+    overflow: visible !important;
     transform: translateZ(0) !important;
 
     & .sticky-cell-bg {
@@ -159,7 +251,9 @@
   }
 
   /* Filas pares (zebra) */
-  tbody tr:nth-child(2n) td.sticky-col-radicado {
+  tbody tr:nth-child(2n) td.sticky-col-radicado,
+  tbody tr:nth-child(2n) td.sticky-col-alert,
+  tbody tr:nth-child(2n) td.sticky-col-idx {
     background-color: #f9fafb !important;
   }
 }
@@ -215,7 +309,7 @@
   background-color: hsl(var(--b1));
   height: 2.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     border-color: hsl(var(--p));
     outline: 2px solid hsl(var(--p) / 0.2);
@@ -235,10 +329,76 @@
   font-weight: 700;
   font-size: 0.875rem;
   transition: all 0.2s;
-  
+
   &:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px hsl(var(--p) / 0.3);
     opacity: 0.9;
   }
+}
+
+// Semáforo / Alert Dots
+.alert-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+  display: inline-block;
+
+  &.alert-red {
+    background-color: #ef4444; // Red-500
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+  }
+
+  &.alert-yellow {
+    background-color: #f59e0b; // Amber-500
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+  }
+
+  &.alert-green {
+    background-color: #22c55e; // Green-500
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+  }
+}
+
+// Pulse animation for critical red alerts
+.alert-pulse {
+  animation: pulse-red 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: .7;
+    transform: scale(1.15);
+  }
+}
+
+// Efecto hover zebra para celdas sticky
+.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-alert,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-idx,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado::before,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-alert::before,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado .sticky-cell-bg,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-alert .sticky-cell-bg {
+  background-color: #F3F0F9 !important;
+  background: #F3F0F9 !important;
+}
+
+/*
+ * FIX DEFINITIVO DE CAPAS:
+ * Para que el tooltip flote por encima de TODO (celdas adyacentes y filas inferiores),
+ * aplicamos el boost de z-index a nivel de TD cuando la TR es hovered.
+ */
+.process-list-table tbody tr:hover td,
+.process-list-table tbody tr.process-row-hovered td {
+  z-index: 5 !important;
+}
+
+.process-list-table tbody tr:hover td.sticky-col-alert,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-alert {
+  z-index: 15 !important;
 }

@@ -59,7 +59,18 @@
 .process-list-table tbody tr.process-row-hovered,
 .process-list-table tbody tr.process-row-hovered td {
   background-color: #F3F0F9 !important;
-  /* light brand purple */
+}
+
+/* Hover específico para la celda sticky */
+.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-alert,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-idx,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado::before,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-alert::before,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado .sticky-cell-bg,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-alert .sticky-cell-bg {
+  background-color: #F3F0F9 !important;
+  background: #F3F0F9 !important;
 }
 
 /* IMPORTANTE: evitar que ancestros con overflow rompan el sticky del header */
@@ -74,6 +85,7 @@
   overflow-x: auto !important;
   overflow-y: auto !important;
   max-height: calc(100vh - 280px);
+  min-height: 380px; // Asegurar espacio para el tooltip cuando hay solo 1 fila
   -webkit-overflow-scrolling: touch;
   position: relative;
 
@@ -87,47 +99,90 @@
   thead th {
     position: sticky !important;
     top: var(--table-sticky-top) !important;
-    z-index: 20 !important;
-    background: #24163E !important;
+    z-index: 100 !important; /* Más alto que cualquier cuerpo hovered */
     background-color: #24163E !important;
-    color: #fff !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    border: none !important;
+    white-space: nowrap !important;
+    padding: 1rem !important;
+    transform: translateZ(0) !important;
+    box-shadow: 0 0 0 0.5px #24163E !important;
+  }
+
+  thead th.sticky-col-idx {
+    left: -1px !important;
+    z-index: 110 !important;
+    transform: translateZ(0) !important;
+    box-shadow: 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
+    border: none !important;
+  }
+
+  thead th.sticky-col-alert {
+    left: 47px !important; 
+    z-index: 110 !important;
+    transform: translateZ(0) !important;
+    box-shadow: 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
+    border: none !important;
   }
 
   thead th.sticky-col-radicado {
-    position: sticky !important;
-    top: var(--table-sticky-top) !important;
-    left: 0 !important;
-    z-index: 30 !important;
-    background: #24163E !important;
-    background-color: #24163E !important;
-    color: #fff !important;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
-    min-width: 280px !important;
-    max-width: 280px !important;
-    width: 280px !important;
+    left: 127px !important;
+    z-index: 110 !important; /* Header + Sticky */
+    min-width: 340px !important;
+    max-width: 340px !important;
+    width: 340px !important;
     transform: translateZ(0) !important;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1), 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
+    border: none !important;
   }
 
-  /* Colores sólidos para sticky sin hover (evitar transparencia al hacer scroll) */
-  $sticky-base: #ffffff;
-  $sticky-zebra: #f9fafb;
-  /* gris muy suave para que no destaque respecto al resto de la fila par */
-  $sticky-instance: #F3F0F9;
-  /* brand purple light */
+  /* Celda sticky idx */
+  tbody td.sticky-col-idx {
+    position: sticky !important;
+    left: -1px !important;
+    z-index: 10 !important;
+    background-color: #ffffff !important;
+    overflow: visible !important;
+    transform: translateZ(0) !important;
+    box-shadow: 1px 0 0 0 #ffffff !important;
+    border: none !important;
+  }
 
-  /* Celda sticky: color sólido 100% opaco para que el scroll no se vea por debajo */
+  /* Celda sticky alert */
+  tbody td.sticky-col-alert {
+    position: sticky !important;
+    left: 47px !important;
+    z-index: 10 !important;
+    background-color: #ffffff !important;
+    overflow: visible !important;
+    transform: translateZ(0) !important;
+    box-shadow: 1px 0 0 0 #ffffff !important;
+    border: none !important;
+
+    & .sticky-cell-bg {
+      position: absolute !important;
+      inset: 0 !important;
+      background: inherit !important;
+      z-index: 0;
+      pointer-events: none;
+    }
+  }
+
+  /* Celda sticky radicado */
   tbody td.sticky-col-radicado {
     position: sticky !important;
-    left: 0 !important;
+    left: 127px !important;
     z-index: 10 !important;
-    background-color: $sticky-base !important;
-    background: $sticky-base !important;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
-    min-width: 280px !important;
-    max-width: 280px !important;
-    width: 280px !important;
+    background-color: #ffffff !important;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.1), 1px 0 0 0 #ffffff !important;
+    border: none !important;
+    min-width: 340px !important;
+    max-width: 340px !important;
+    width: 340px !important;
     white-space: nowrap !important;
-    backface-visibility: hidden !important;
+    overflow: visible !important;
     transform: translateZ(0) !important;
 
     & .sticky-cell-bg {
@@ -142,63 +197,194 @@
       position: relative !important;
       z-index: 1;
     }
-
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: $sticky-base !important;
-      z-index: -1;
-      pointer-events: none;
-    }
   }
 
-  /* Filas pares (zebra): gris claro sólido */
-  tbody tr:nth-child(2n) td.sticky-col-radicado {
-    background-color: $sticky-zebra !important;
-    background: $sticky-zebra !important;
-
-    &::before {
-      background: $sticky-zebra !important;
-    }
-
-    & .sticky-cell-bg {
-      background: $sticky-zebra !important;
-    }
-  }
-
-  tbody tr:not(:nth-child(2n)) td.sticky-col-radicado .sticky-cell-bg {
-    background: $sticky-base !important;
+  /* Filas pares (zebra) */
+  tbody tr:nth-child(2n) td.sticky-col-radicado,
+  tbody tr:nth-child(2n) td.sticky-col-alert,
+  tbody tr:nth-child(2n) td.sticky-col-idx {
+    background-color: #f9fafb !important;
   }
 
   /* Filas de instancias: siempre el mismo accent claro (override zebra nth-child) */
   tbody tr.process-table-instance-row td,
   tbody tr.process-table-instance-row:nth-child(2n) td {
-    background-color: $sticky-instance !important;
-    background: $sticky-instance !important;
-  }
-
-  tbody tr.process-table-instance-row td.sticky-col-radicado,
-  tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-radicado {
-    background-color: $sticky-instance !important;
-    background: $sticky-instance !important;
-
-    &::before {
-      background: $sticky-instance !important;
-    }
-
-    & .sticky-cell-bg {
-      background: $sticky-instance !important;
-    }
-  }
-
-  /* Hover: color accent opaco (ya estaba bien) */
-  tbody tr.process-row-hovered td.sticky-col-radicado,
-  tbody tr.process-row-hovered td.sticky-col-radicado::before,
-  tbody tr.process-row-hovered td.sticky-col-radicado .sticky-cell-bg {
     background-color: #F3F0F9 !important;
     background: #F3F0F9 !important;
   }
+
+  tbody tr.process-table-instance-row td.sticky-col-radicado,
+  tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-radicado,
+  tbody tr.process-table-instance-row td.sticky-col-alert,
+  tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-alert,
+  tbody tr.process-table-instance-row td.sticky-col-idx,
+  tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-idx {
+    background-color: #F3F0F9 !important;
+    background: #F3F0F9 !important;
+    box-shadow: 1px 0 0 0 #F3F0F9 !important;
+    
+    &.sticky-col-radicado {
+      box-shadow: 2px 0 4px rgba(0,0,0,0.1), 1px 0 0 0 #F3F0F9 !important;
+    }
+  }
+
+  /* Hover universal para celdas sticky y normales */
+  tbody tr:hover td,
+  tbody tr.process-row-hovered td,
+  tbody tr.process-row-hovered td.sticky-col-radicado,
+  tbody tr.process-row-hovered td.sticky-col-alert,
+  tbody tr.process-row-hovered td.sticky-col-idx {
+    background-color: #F3F0F9 !important;
+    background: #F3F0F9 !important;
+  }
+
+  tbody tr.process-row-hovered td.sticky-col-radicado {
+    box-shadow: 2px 0 4px rgba(0,0,0,0.1), 1px 0 0 0 #F3F0F9 !important;
+  }
+}
+
+// Semáforo / Alert Dots
+.alert-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+  display: inline-block;
+
+  &.alert-red {
+    background-color: #ef4444; // Red-500
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+  }
+
+  &.alert-yellow {
+    background-color: #f59e0b; // Amber-500
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+  }
+
+  &.alert-green {
+    background-color: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+  }
+}
+
+// PREMIUM TOOLTIPS (Mirroring ActuacionesRecientes)
+.process-list-tooltip {
+  position: relative !important;
+  display: inline-flex !important;
+
+  .tooltip-content {
+    position: absolute !important;
+    bottom: 140% !important;
+    left: 50% !important;
+    transform: translateX(-50%) translateY(4px) !important;
+    white-space: normal !important;
+    width: max-content !important;
+    max-width: 280px !important;
+    z-index: 100 !important;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.15s ease-out;
+    pointer-events: none;
+    background-color: #ffffff !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    padding: 1rem !important;
+    border-radius: 0.75rem !important;
+
+    // Arrow pointing down
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #ffffff;
+      z-index: 101;
+    }
+  }
+
+  &:hover .tooltip-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0) !important;
+    pointer-events: auto;
+  }
+
+  &.tooltip-left-aligned {
+    .tooltip-content {
+      left: 0 !important;
+      transform: translateY(4px) !important;
+
+      &::after {
+        left: 0.75rem !important;
+        transform: none !important;
+      }
+    }
+
+    &:hover .tooltip-content {
+      transform: translateY(0) !important;
+    }
+
+    &.tooltip-bottom {
+      .tooltip-content {
+        bottom: auto !important;
+        top: 140% !important;
+
+        &::after {
+          top: auto !important;
+          bottom: 100% !important;
+          border-top-color: transparent !important;
+          border-bottom-color: #ffffff !important;
+          transform: translateX(-50%) !important;
+        }
+      }
+
+      &:hover .tooltip-content {
+        transform: translateY(0) !important;
+      }
+    }
+  }
+}
+
+// Pulse animation for critical red alerts
+.alert-pulse {
+  animation: pulse-red 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: .7;
+    transform: scale(1.15);
+  }
+}
+
+/*
+ * FIX DEFINITIVO DE CAPAS:
+ * Para que el tooltip flote por encima de TODO (celdas adyacentes y filas inferiores),
+ * aplicamos el boost de z-index a nivel de TD cuando la TR es hovered.
+ */
+.process-list-table tbody tr:hover td,
+.process-list-table tbody tr.process-row-hovered td {
+  z-index: 5 !important;
+}
+
+.process-list-table tbody tr:hover td.sticky-col-alert,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-alert {
+  z-index: 50 !important;
+}
+
+.process-list-table tbody tr:hover td.sticky-col-radicado,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado {
+  z-index: 30 !important;
+}
+
+.process-list-table tbody tr:hover td.sticky-col-idx,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-idx {
+  z-index: 25 !important;
 }
 
 // Pagination (misma estructura que data-table)

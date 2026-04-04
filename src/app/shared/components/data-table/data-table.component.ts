@@ -18,8 +18,8 @@ export interface DataTableColumn {
   sortable?: boolean;
   width?: string;
   align?: 'left' | 'center' | 'right';
-  /** Custom render: (value, row) => string */
-  render?: (value: any, row: any) => string;
+  /** Custom render: (value, row, index) => string */
+  render?: (value: any, row: any, index?: number) => string;
   /** When true, cell value is rendered as HTML (use with SafeHtml pipe). Only for app-generated HTML. */
   html?: boolean;
 }

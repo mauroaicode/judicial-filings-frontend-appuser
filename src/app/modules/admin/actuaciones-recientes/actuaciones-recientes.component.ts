@@ -7,10 +7,11 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { ProcessNumberPipe } from '../../../shared/pipes/process-number.pipe';
+import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoService, TranslocoPipe } from '@jsverse/transloco';
 import { NotificationDigestService } from '@app/core/services/notification/notification-digest.service';
 import {
   Movement,
@@ -31,6 +32,7 @@ import { LiveClockComponent } from '@app/shared/components/live-clock/live-clock
     TranslocoPipe,
     DateRangePickerComponent,
     ProcessNumberPipe,
+    SafeHtmlPipe,
     LiveClockComponent,
   ],
   templateUrl: './actuaciones-recientes.component.html',
@@ -43,6 +45,7 @@ export class ActuacionesRecientesComponent {
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
   private _fb = inject(FormBuilder);
+  private _transloco = inject(TranslocoService);
 
   // State
   public movements = signal<Movement[]>([]);
@@ -65,6 +68,8 @@ export class ActuacionesRecientesComponent {
   public pageSizeOptions = [10, 20, 50, 100];
   public copiedMessage = signal<string | null>(null);
   public hoveredRowId = signal<string | null>(null);
+  /** Control de la modal de leyenda en mobile */
+  public showLegendModal = signal<boolean>(false);
 
   // Filter Visibility
   public showFilters = signal<boolean>(false);
@@ -93,6 +98,14 @@ export class ActuacionesRecientesComponent {
 
   // Table columns
   public columns: DataTableColumn[] = [
+    {
+      key: 'alert_status',
+      label: 'actuacionesRecientes.table.alertLevel',
+      width: '80px',
+      align: 'center',
+      html: true,
+      render: (value: any, row: Movement, index?: number) => this._renderAlertCell(row, index),
+    },
     {
       key: 'process_number',
       label: 'actuacionesRecientes.table.processNumber',
@@ -142,10 +155,10 @@ export class ActuacionesRecientesComponent {
     },
     {
       key: 'action_text',
-      label: 'actuacionesRecientes.table.actionText',
+      label: 'actuacionesRecientes.table.action',
       width: '350px',
       html: true,
-      render: (value: string, row: Movement) => this._renderActionCell(row),
+      render: (value: string, row: Movement, index?: number) => this._renderActionCell(row, index),
     },
   ];
 
@@ -370,6 +383,77 @@ export class ActuacionesRecientesComponent {
   }
 
   /**
+   * Help to render alert level dot with tooltip
+   */
+  private _renderAlertCell(row: Movement, index?: number): string {
+    const isFirstRows = index !== undefined && index < 2;
+
+    // Si no hay nivel de alerta ni rol de abogado, mostramos un pequeño recordatorio/CTA
+    if (!row.alert_level || !row.lawyer_role) {
+      return `
+        <div class="flex justify-center items-center h-full w-full">
+          <span class="process-list-tooltip tooltip-left-aligned ${isFirstRows ? 'tooltip-bottom' : ''} cursor-pointer group/vincular">
+            <div class="tooltip-content text-left text-sm max-w-xs rounded-xl shadow-2xl bg-white border border-base-200 p-4 space-y-2 z-[1000]">
+              <div class="flex items-center gap-2">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                 </svg>
+                 <span class="font-extrabold text-[10px] uppercase text-base-content/40 tracking-wider">Activar alertas</span>
+              </div>
+              <p class="text-base-content leading-relaxed font-bold text-[12px]">
+                Para activar el semáforo de actividad, debe vincular su rol (Demandante o Demandado) ingresando al <b>detalle del proceso</b>.
+              </p>
+            </div>
+            <div class="flex flex-col items-center gap-1 opacity-50 group-hover/vincular:opacity-100 transition-opacity">
+               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40 group-hover/vincular:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+               </svg>
+               <span class="text-[8px] uppercase font-black tracking-widest text-base-content/60 text-center leading-none">
+                 Vincular rol
+               </span>
+            </div>
+          </span>
+        </div>
+      `;
+    }
+
+    const level = row.alert_level;
+    const role = row.lawyer_role;
+    
+    let tooltipKey = '';
+    
+    if (level === 'red') {
+      tooltipKey = role === 'Demandante' ? 'redDemandante' : 'redGeneral';
+    } else if (level === 'yellow') {
+      tooltipKey = role === 'Demandante' ? 'yellowDemandante' : 'yellowGeneral';
+    } else {
+      tooltipKey = role === 'Demandado' ? 'greenDemandado' : (role === 'Demandante' ? 'greenDemandante' : 'greenGeneral');
+    }
+    
+    const message = this._transloco.translate(`actuacionesRecientes.table.alerts.${tooltipKey}`);
+    
+    return `
+      <div class="flex justify-center items-center h-full w-full">
+        <span class="process-list-tooltip tooltip-left-aligned ${isFirstRows ? 'tooltip-bottom' : ''} cursor-pointer">
+          <div class="tooltip-content text-left text-sm max-w-xs rounded-xl shadow-2xl bg-white border border-base-200 p-4 space-y-2 z-[1000]">
+            <div class="flex items-center gap-2 mb-1">
+               <div class="w-3 h-3 rounded-full alert-dot alert-${level}"></div>
+               <span class="font-extrabold text-[10px] uppercase text-base-content/40 tracking-wider">
+                 ${this._transloco.translate('actuacionesRecientes.table.alertLevel')}
+               </span>
+            </div>
+            <p class="text-base-content leading-relaxed font-bold text-[13px]">
+              ${message}
+            </p>
+            ${role ? `<div class="mt-2 pt-2 border-t border-base-100 text-[10px] text-base-content/30 uppercase font-black tracking-tight">Rol del abogado: ${role}</div>` : ''}
+          </div>
+          <div class="alert-dot alert-${level} ${level === 'red' ? 'alert-pulse' : ''} shadow-sm border border-black/5"></div>
+        </span>
+      </div>
+    `;
+  }
+
+  /**
    * Help to render party cell with tooltip
    */
   private _renderPartyCell(value: string[] | null | undefined): string {
@@ -403,7 +487,7 @@ export class ActuacionesRecientesComponent {
   /**
    * Render action cell with highlights and annotation
    */
-  private _renderActionCell(row: Movement): string {
+  private _renderActionCell(row: Movement, index?: number): string {
     const show = this.showHighlights();
     
     const actionHtml = show 
@@ -474,5 +558,22 @@ export class ActuacionesRecientesComponent {
       this.copiedMessage.set('Radicado copiado!');
       setTimeout(() => this.copiedMessage.set(null), 3000);
     });
+  }
+
+  /**
+   * Abre la modal de leyenda (mismo contenido que el tooltip de escritorio)
+   */
+  public openLegendModal(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.showLegendModal.set(true);
+  }
+
+  /**
+   * Cierra la modal de leyenda
+   */
+  public closeLegendModal(): void {
+    this.showLegendModal.set(false);
   }
 }

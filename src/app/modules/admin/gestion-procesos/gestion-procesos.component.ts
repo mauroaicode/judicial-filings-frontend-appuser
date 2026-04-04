@@ -12,6 +12,7 @@ import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { ProcessAlertTooltipComponent } from '@app/shared/components/process-alert-tooltip/process-alert-tooltip.component';
 import { ProcessService } from '@app/core/services/process/process.service';
 import { Process, ProcessInstance, ProcessFilter, ProcessResponseMeta, CreateProcessResponse } from '@app/core/models/process/process.model';
 import { DataTableColumn } from '@app/shared/components/data-table/data-table.component';
@@ -34,6 +35,7 @@ import type { OrganizationNotificationRow } from '@app/core/models/notification/
     DashboardStatsCardsComponent,
     NotificationsDrawerComponent,
     ProcessNumberPipe,
+    ProcessAlertTooltipComponent,
   ],
   templateUrl: './gestion-procesos.component.html',
   styleUrls: ['./gestion-procesos.component.scss'],
@@ -70,6 +72,8 @@ export class GestionProcesosComponent {
   public isInfoModalOpen = signal<boolean>(false);
   public infoModalData = signal<CreateProcessResponse | null>(null);
   public copiedMessage = signal<string | null>(null);
+  /** Control de la modal de leyenda en mobile */
+  public showLegendModal = signal<boolean>(false);
 
   // Add process form
   public addProcessForm: FormGroup = this._fb.group({
@@ -113,21 +117,16 @@ export class GestionProcesosComponent {
   // Table columns
   public columns: DataTableColumn[] = [
     {
-      key: 'index',
-      label: 'gestionProcesos.table.index',
-      width: '60px',
-      align: 'center',
-    },
-    {
       key: 'process_number',
       label: 'gestionProcesos.table.processNumber',
-      width: '280px',
+      width: '340px',
       align: 'left',
       sortable: true,
     },
     {
       key: 'court',
       label: 'gestionProcesos.table.court',
+      width: '500px',
       sortable: true,
     },
     {
@@ -674,5 +673,23 @@ export class GestionProcesosComponent {
     }).catch(err => {
       console.error('Could not copy text: ', err);
     });
+  }
+
+  /**
+   * Abre la modal de leyenda (mismo contenido que el tooltip de escritorio)
+   */
+  public openLegendModal(event?: MouseEvent): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.showLegendModal.set(true);
+  }
+
+  /**
+   * Cierra la modal de leyenda
+   */
+  public closeLegendModal(): void {
+    this.showLegendModal.set(false);
   }
 }

@@ -21,6 +21,8 @@ export interface ProcessInstance {
   plaintiffs?: string[];
   defendants?: string[];
   speaker?: string | null;
+  alert_level?: 'red' | 'yellow' | 'green' | null;
+  lawyer_role?: string | null;
 }
 
 /**
@@ -50,6 +52,8 @@ export interface Process {
   /** Instancias del mismo radicado (expandible en la tabla) */
   instances?: ProcessInstance[];
   speaker?: string | null;
+  alert_level?: 'red' | 'yellow' | 'green' | null;
+  lawyer_role?: string | null;
 }
 
 /**
@@ -150,6 +154,8 @@ export interface ProcessDetail {
   status_label: string;
   created_at: string;
   updated_at: string;
+  alert_level?: 'red' | 'yellow' | 'green' | null;
+  lawyer_role?: string | null;
 }
 
 /**

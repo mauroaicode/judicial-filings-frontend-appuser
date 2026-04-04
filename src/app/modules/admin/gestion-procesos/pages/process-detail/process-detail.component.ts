@@ -29,6 +29,7 @@ import { buildTextWithHighlights } from '@app/core/utils/alert-highlight.utils';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
 import { DataTableComponent, DataTableColumn } from '@app/shared/components/data-table/data-table.component';
 import { ConfirmationDialogComponent } from '@app/shared/components/confirmation-dialog/confirmation-dialog.component';
+import { ProcessAlertTooltipComponent } from '@app/shared/components/process-alert-tooltip/process-alert-tooltip.component';
 
 @Component({
   selector: 'app-process-detail',
@@ -41,6 +42,7 @@ import { ConfirmationDialogComponent } from '@app/shared/components/confirmation
     DataTableComponent,
     ConfirmationDialogComponent,
     ProcessNumberPipe,
+    ProcessAlertTooltipComponent,
   ],
   templateUrl: './process-detail.component.html',
   styleUrls: ['./process-detail.component.scss'],
@@ -81,7 +83,10 @@ export class ProcessDetailComponent {
   public confirmModalTitle = signal<string>('');
   public confirmModalMessage = signal<string>('');
   public confirmModalAction = signal<'activate' | 'deactivate'>('deactivate');
-  /** Estado del toast */
+
+  /** Estado del mensaje de copiado (idéntico a Actuaciones Recientes) */
+  public copiedMessage = signal<string | null>(null);
+  /** Estado del toast (para otros mensajes) */
   public toastVisible = signal<boolean>(false);
   public toastType = signal<'success' | 'error'>('success');
   public toastMessage = signal<string>('');
@@ -223,6 +228,25 @@ export class ProcessDetailComponent {
   applyAlertFilter(slug: string): void {
     this.actionFilterForm.patchValue({ alert_slug: slug });
     this.loadActions(1, this.actionsPagination()?.per_page || 10);
+  }
+
+  /**
+   * Copy text to clipboard (removes spaces and dashes)
+   */
+  public copyToClipboard(text: string, event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    
+    if (!text || text === '–') return;
+    
+    // Remove dashes and spaces as requested
+    const cleanText = text.replace(/[^0-9]/g, '');
+    
+    navigator.clipboard.writeText(cleanText).then(() => {
+      this.copiedMessage.set('Radicado copiado!');
+      setTimeout(() => this.copiedMessage.set(null), 2500);
+    });
   }
 
   /**

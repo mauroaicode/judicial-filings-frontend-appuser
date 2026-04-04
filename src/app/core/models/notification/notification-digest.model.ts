@@ -19,6 +19,8 @@ export interface Movement {
   term_start_date?: string | null;
   term_end_date?: string | null;
   alert_highlights?: Array<{ start: number; end: number; text: string; source: string }>;
+  alert_level?: 'red' | 'yellow' | 'green' | null;
+  lawyer_role?: string | null;
   is_viewed?: boolean;
   digest_created_at?: string;
   [key: string]: any; 
