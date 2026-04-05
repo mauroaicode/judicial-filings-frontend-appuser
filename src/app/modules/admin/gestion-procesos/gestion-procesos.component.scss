@@ -412,3 +412,58 @@
     display: flex;
   }
 }
+
+// Checkbox visibility and contrast improvements (using native DaisyUI)
+.checkbox {
+  // Ultra-clean minimalist borders
+  border-width: 1.2px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-radius: 6px !important; // More professional rounded-corner
+
+  // Header checkbox (on dark purple background): Minimalist White Design
+  &[class*="border-white"] {
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    background-color: transparent !important;
+    
+    &:hover {
+      border-color: rgba(255, 255, 255, 1) !important;
+    }
+    
+    &:checked {
+      border-color: #ffffff !important;
+      background-color: rgba(255, 255, 255, 0.2) !important;
+      // Force white check icon (DaisyUI uses currentcolor for foreground check)
+      color: #ffffff !important;
+    }
+  }
+
+  // Row checkbox: Subtle and clear
+  &.checkbox-primary {
+    border-color: rgba(0, 0, 0, 0.15) !important; 
+    background-color: #ffffff !important;
+    
+    &:hover {
+      border-color: #7c4dff !important; // Slightly softer primary
+      background-color: #fbfaff !important;
+    }
+
+    &:checked {
+      // Professional Solid State (not neon)
+      border-color: #7c4dff !important;
+      background-color: #7c4dff !important;
+      color: #ffffff !important;
+    }
+  }
+}
+
+// Ensure row highlighting maintains clean checkbox borders
+tr[class*="bg-primary/5"] .checkbox-primary {
+  &:not(:checked) {
+    border-color: rgba(124, 77, 255, 0.4) !important;
+  }
+}
+
+// Mobile Card checkboxes
+.card .checkbox-primary {
+  border-width: 1.5px !important;
+}

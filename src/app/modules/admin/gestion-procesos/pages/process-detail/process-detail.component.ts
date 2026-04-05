@@ -30,6 +30,8 @@ import { DateRangePickerComponent, DateRange } from '@app/shared/components/date
 import { DataTableComponent, DataTableColumn } from '@app/shared/components/data-table/data-table.component';
 import { ConfirmationDialogComponent } from '@app/shared/components/confirmation-dialog/confirmation-dialog.component';
 import { ProcessAlertTooltipComponent } from '@app/shared/components/process-alert-tooltip/process-alert-tooltip.component';
+import { RoleSelectionModalComponent } from '../../components/role-selection-modal/role-selection-modal.component';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-process-detail',
@@ -43,6 +45,7 @@ import { ProcessAlertTooltipComponent } from '@app/shared/components/process-ale
     ConfirmationDialogComponent,
     ProcessNumberPipe,
     ProcessAlertTooltipComponent,
+    RoleSelectionModalComponent,
   ],
   templateUrl: './process-detail.component.html',
   styleUrls: ['./process-detail.component.scss'],
@@ -90,6 +93,9 @@ export class ProcessDetailComponent {
   public toastVisible = signal<boolean>(false);
   public toastType = signal<'success' | 'error'>('success');
   public toastMessage = signal<string>('');
+
+  /** Modal de asignación de rol */
+  public showRoleModal = signal<boolean>(false);
 
   /** Selector de instancia en móvil */
   public showInstanceSelector = signal<boolean>(false);
@@ -192,6 +198,34 @@ export class ProcessDetailComponent {
         this.loadActions();
       }
     });
+  }
+
+  /**
+   * Abre la modal de asignación de rol
+   */
+  public openRoleModal(): void {
+    this.showRoleModal.set(true);
+  }
+
+  /**
+   * Cierra la modal de asignación de rol
+   */
+  public closeRoleModal(): void {
+    this.showRoleModal.set(false);
+  }
+
+  /**
+   * Maneja el evento de guardado del rol
+   * @param role - Nuevo rol guardado
+   */
+  public onRoleSaved(role: string): void {
+    this.closeRoleModal();
+    const processId = this.process()?.id;
+    if (processId) {
+      this.loadProcessDetail(processId);
+    }
+    // Mostrar mensaje de éxito
+    this.showToast('success', 'Rol del abogado actualizado exitosamente.');
   }
 
   /**
@@ -566,4 +600,14 @@ export class ProcessDetailComponent {
     return kind === 'onlyTime' ? '' : trimmed;
   }
 
+  /**
+   * Helper para mostrar el rol del abogado en mayúsculas y legible (Demandante/Demandado)
+   */
+  public getRoleLabel(role: string | null | undefined): string {
+    if (!role) return '';
+    const r = role.toLowerCase();
+    if (r === 'plaintiff' || r.includes('demandante')) return 'DEMANDANTE';
+    if (r === 'defendant' || r.includes('demandado')) return 'DEMANDADO';
+    return role.toUpperCase();
+  }
 }

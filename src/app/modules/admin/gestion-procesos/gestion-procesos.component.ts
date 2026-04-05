@@ -5,6 +5,7 @@ import {
   inject,
   signal,
   ViewEncapsulation,
+  computed,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
@@ -24,6 +25,8 @@ import { NotificationsDrawerStateService } from '@app/core/services/notification
 import { NotificationService } from '@app/core/services/notification/notification.service';
 import type { OrganizationNotificationRow } from '@app/core/models/notification/organization-notification.model';
 
+import { RoleSelectionModalComponent } from './components/role-selection-modal/role-selection-modal.component';
+
 @Component({
   selector: 'app-gestion-procesos',
   standalone: true,
@@ -36,6 +39,7 @@ import type { OrganizationNotificationRow } from '@app/core/models/notification/
     NotificationsDrawerComponent,
     ProcessNumberPipe,
     ProcessAlertTooltipComponent,
+    RoleSelectionModalComponent,
   ],
   templateUrl: './gestion-procesos.component.html',
   styleUrls: ['./gestion-procesos.component.scss'],
@@ -50,6 +54,7 @@ export class GestionProcesosComponent {
   private _fb = inject(FormBuilder);
   private _notificationService = inject(NotificationService);
   private _destroyRef = inject(DestroyRef);
+  protected readonly Array = Array;
   private _transloco = inject(TranslocoService);
 
   readonly stats = this._dashboardService.stats;
@@ -63,6 +68,16 @@ export class GestionProcesosComponent {
   public loading = signal<boolean>(false);
   public pagination = signal<ProcessResponseMeta | null>(null);
 
+  // Selection
+  public selectedProcessIds = signal<Set<string>>(new Set());
+  public isAllSelected = computed(() => {
+    const list = this.processes();
+    if (list.length === 0) return false;
+    const selected = this.selectedProcessIds();
+    return list.every(p => selected.has(p.id));
+  });
+  public selectedCount = computed(() => this.selectedProcessIds().size);
+
   // Modal state
   public isModalOpen = signal<boolean>(false);
   public submitting = signal<boolean>(false);
@@ -75,9 +90,21 @@ export class GestionProcesosComponent {
   /** Control de la modal de leyenda en mobile */
   public showLegendModal = signal<boolean>(false);
 
+  // Bulk Edit Session State
+  public isBulkRoleModalOpen = signal(false);
+  public bulkUpdateResult = signal<import('@app/core/models/process/process.model').BulkRoleUpdateResponse | null>(null);
+  public isBulkResultModalOpen = signal(false);
+
+  // Roles for selection
+  public readonly roles = [
+    { value: 'plaintiff', label: 'Demandante' },
+    { value: 'defendant', label: 'Demandado' },
+  ];
+
   // Add process form
   public addProcessForm: FormGroup = this._fb.group({
     process_number: ['', [Validators.required, this.validateProcessNumber]],
+    lawyer_role: ['', [Validators.required]],
   });
 
   // Filter form
@@ -89,6 +116,8 @@ export class GestionProcesosComponent {
     defendant: [''],
     status: [''],
     has_multiple_instances: [null as boolean | null],
+    lawyer_role: [''],
+    severity_color: [''],
     process_date_range: [null as DateRange | null],
     created_at_range: [null as DateRange | null],
     last_api_update_range: [null as DateRange | null],
@@ -217,6 +246,12 @@ export class GestionProcesosComponent {
     if (isValidValue(queryParams['has_multiple_instances'])) {
       this.filterForm.patchValue({ has_multiple_instances: queryParams['has_multiple_instances'] === 'true' });
     }
+    if (isValidValue(queryParams['lawyer_role'])) {
+      this.filterForm.patchValue({ lawyer_role: queryParams['lawyer_role'] });
+    }
+    if (isValidValue(queryParams['severity_color'])) {
+      this.filterForm.patchValue({ severity_color: queryParams['severity_color'] });
+    }
     // Load date ranges from query params - only if they have valid values
     if (isValidValue(queryParams['process_date_from']) || isValidValue(queryParams['process_date_to'])) {
       const dateRange: DateRange = {
@@ -268,6 +303,12 @@ export class GestionProcesosComponent {
     }
     if (filters.has_multiple_instances !== undefined && filters.has_multiple_instances !== null) {
       queryParams['has_multiple_instances'] = filters.has_multiple_instances.toString();
+    }
+    if (filters.lawyer_role && filters.lawyer_role.trim()) {
+      queryParams['lawyer_role'] = filters.lawyer_role;
+    }
+    if (filters.severity_color && filters.severity_color.trim()) {
+      queryParams['severity_color'] = filters.severity_color;
     }
     if (filters.process_date_from && filters.process_date_from.trim()) {
       queryParams['process_date_from'] = filters.process_date_from;
@@ -330,6 +371,8 @@ export class GestionProcesosComponent {
       defendant: formValue.defendant?.trim() || undefined,
       status: formValue.status?.trim() || undefined,
       has_multiple_instances: formValue.has_multiple_instances !== null && formValue.has_multiple_instances !== '' ? formValue.has_multiple_instances : undefined,
+      lawyer_role: formValue.lawyer_role?.trim() || undefined,
+      severity_color: formValue.severity_color?.trim() || undefined,
       process_date_from: processDateRange?.from && processDateRange.from.trim() ? processDateRange.from : undefined,
       process_date_to: processDateRange?.to && processDateRange.to.trim() ? processDateRange.to : undefined,
       created_at_from: createdAtRange?.from && createdAtRange.from.trim() ? createdAtRange.from : undefined,
@@ -392,6 +435,8 @@ export class GestionProcesosComponent {
       defendant: '',
       status: '',
       has_multiple_instances: null,
+      lawyer_role: '',
+      severity_color: '',
       process_date_range: null,
       created_at_range: null,
       last_api_update_range: null,
@@ -569,8 +614,9 @@ export class GestionProcesosComponent {
     this.error.set(null);
 
     const processNumber = this.addProcessForm.get('process_number')?.value?.trim();
+    const lawyerRole = this.addProcessForm.get('lawyer_role')?.value;
 
-    this._processService.createProcess(processNumber).subscribe({
+    this._processService.createProcess(processNumber, lawyerRole).subscribe({
       next: (response) => {
         this.submitting.set(false);
         this.closeAddProcessModal();
@@ -691,5 +737,73 @@ export class GestionProcesosComponent {
    */
   public closeLegendModal(): void {
     this.showLegendModal.set(false);
+  }
+
+  // --- Selección y Acciones Masivas ---
+
+  /**
+   * Alternar selección de una fila
+   */
+  public toggleSelect(processId: string, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    const next = new Set(this.selectedProcessIds());
+    if (next.has(processId)) {
+      next.delete(processId);
+    } else {
+      next.add(processId);
+    }
+    this.selectedProcessIds.set(next);
+  }
+
+  /**
+   * Seleccionar/Deseleccionar todas las filas de la página actual
+   */
+  public toggleSelectAll(): void {
+    const next = new Set(this.selectedProcessIds());
+    const list = this.processes();
+    const allOnPageSelected = list.every(p => next.has(p.id));
+
+    if (allOnPageSelected) {
+      list.forEach(p => next.delete(p.id));
+    } else {
+      list.forEach(p => next.add(p.id));
+    }
+    this.selectedProcessIds.set(next);
+  }
+
+  /**
+   * Limpiar selección
+   */
+  public clearSelection(): void {
+    this.selectedProcessIds.set(new Set());
+  }
+
+  /**
+   * Abrir modal de asignación de rol masiva
+   */
+  public openBulkRoleModal(): void {
+    if (this.selectedCount() === 0) return;
+    this.isBulkRoleModalOpen.set(true);
+  }
+
+  /**
+   * Al guardar el rol masivo exitosamente
+   */
+  public onBulkRoleSaved(result: any): void {
+    this.isBulkRoleModalOpen.set(false);
+    this.bulkUpdateResult.set(result);
+    this.isBulkResultModalOpen.set(true);
+    this.clearSelection();
+    this.loadProcesses(this.pagination()?.current_page || 1, this.pagination()?.per_page || 20);
+  }
+
+  /**
+   * Cerrar modal de resultados masivos
+   */
+  public closeBulkResultModal(): void {
+    this.isBulkResultModalOpen.set(false);
+    this.bulkUpdateResult.set(null);
   }
 }

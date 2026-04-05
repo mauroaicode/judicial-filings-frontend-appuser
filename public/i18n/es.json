@@ -1,7 +1,10 @@
 {
   "common": {
     "actions": "Acciones",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "cancel": "Cancelar"
   },
   "generics": {
     "spanish": "Español",
@@ -222,15 +225,15 @@
     "table": {
       "empty": "No hay procesos disponibles",
       "index": "#",
-      "processNumber": "Número de Radicación",
+      "processNumber": "Número de radicado",
       "court": "Despacho",
-      "processClass": "Clase de Proceso",
+      "processClass": "Clase de proceso",
       "status": "Estado",
       "plaintiff": "Demandante (S)",
-      "defendant": "Demandados (S)",
+      "defendant": "Demandado (S)",
       "multipleInstances": "Múltiples instancias",
-      "processDate": "Fecha de Registro",
-      "lastActivityDate": "Fecha Ultima Actuación",
+      "processDate": "Fecha de registro",
+      "lastActivityDate": "Fecha última actuación",
       "copyTooltip": "Copiar número"
     },
     "infoModal": {
@@ -248,7 +251,28 @@
       "processDetails": {
         "title": "Detalles del Proceso",
         "totalProcesses": "Total de Procesos",
-        "registeredCount": "Procesos Registrados"
+        "registeredCount": "Procesos Registrados",
+        "privateCount": "Procesos Privados"
+      }
+    },
+    "roleModal": {
+      "title": "Asignar Rol del Abogado",
+      "subtitle": "Define si su cliente es demandante o demandado en este proceso",
+      "infoTitle": "Importancia del Rol",
+      "infoDesc": "El rol asignado permite que el sistema personalice las alertas y notificaciones según la posición jurídica de su cliente.",
+      "save": "Guardar Configuración",
+      "saving": "Guardando...",
+      "plaintiffDesc": "Su cliente es quien demanda",
+      "defendantDesc": "Su cliente es el demandado"
+    },
+    "bulk": {
+      "results": {
+        "title": "Resultados de la Operación",
+        "success": "Exitosos",
+        "failed": "Fallidos",
+        "impact": "Impacto en Semaforización",
+        "understand": "Entendido",
+        "issue": "Radicados con Incidencias"
       }
     }
   },

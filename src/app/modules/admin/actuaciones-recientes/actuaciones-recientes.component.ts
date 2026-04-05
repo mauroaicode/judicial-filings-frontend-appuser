@@ -389,32 +389,54 @@ export class ActuacionesRecientesComponent {
     const isFirstRows = index !== undefined && index < 2;
 
     // Si no hay nivel de alerta ni rol de abogado, mostramos un pequeño recordatorio/CTA
-    if (!row.alert_level || !row.lawyer_role) {
-      return `
-        <div class="flex justify-center items-center h-full w-full">
-          <span class="process-list-tooltip tooltip-left-aligned ${isFirstRows ? 'tooltip-bottom' : ''} cursor-pointer group/vincular">
-            <div class="tooltip-content text-left text-sm max-w-xs rounded-xl shadow-2xl bg-white border border-base-200 p-4 space-y-2 z-[1000]">
-              <div class="flex items-center gap-2">
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    if (!row.alert_level) {
+      if (!row.lawyer_role) {
+        return `
+          <div class="flex justify-center items-center h-full w-full">
+            <span class="process-list-tooltip tooltip-left-aligned ${isFirstRows ? 'tooltip-bottom' : ''} cursor-pointer group/vincular">
+              <div class="tooltip-content text-left text-sm max-w-xs rounded-xl shadow-2xl bg-white border border-base-200 p-4 space-y-2 z-[1000]">
+                <div class="flex items-center gap-2">
+                   <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                   </svg>
+                   <span class="font-extrabold text-[10px] uppercase text-base-content/40 tracking-wider">Activar alertas</span>
+                </div>
+                <p class="text-base-content leading-relaxed font-bold text-[12px]">
+                  Para activar el semáforo de actividad, debe vincular su rol (Demandante o Demandado) desde las <b>acciones del proceso</b> o de forma <b>masiva</b>.
+                </p>
+              </div>
+              <div class="flex flex-col items-center gap-1 opacity-50 group-hover/vincular:opacity-100 transition-opacity">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40 group-hover/vincular:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                  </svg>
-                 <span class="font-extrabold text-[10px] uppercase text-base-content/40 tracking-wider">Activar alertas</span>
+                 <span class="text-[8px] uppercase font-black tracking-widest text-base-content/60 text-center leading-none">
+                   Vincular rol
+                 </span>
               </div>
-              <p class="text-base-content leading-relaxed font-bold text-[12px]">
-                Para activar el semáforo de actividad, debe vincular su rol (Demandante o Demandado) ingresando al <b>detalle del proceso</b>.
-              </p>
-            </div>
-            <div class="flex flex-col items-center gap-1 opacity-50 group-hover/vincular:opacity-100 transition-opacity">
-               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40 group-hover/vincular:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-               </svg>
-               <span class="text-[8px] uppercase font-black tracking-widest text-base-content/60 text-center leading-none">
-                 Vincular rol
-               </span>
-            </div>
-          </span>
-        </div>
-      `;
+            </span>
+          </div>
+        `;
+      } else {
+        // Estado de Escucha (Rol vinculado pero sin alerta aún)
+        const roleText = row.lawyer_role.toLowerCase();
+        const threshold = roleText.includes('demandado') || roleText.includes('defendant') ? '+90 días' : '+45 días';
+        
+        return `
+          <div class="flex justify-center items-center h-full w-full">
+            <span class="process-list-tooltip tooltip-left-aligned ${isFirstRows ? 'tooltip-bottom' : ''} cursor-help group/escucha">
+              <div class="tooltip-content text-left text-sm max-w-xs rounded-xl shadow-2xl bg-white border border-base-200 p-4 z-[1000]">
+                 <p class="text-[11px] font-bold text-base-content leading-tight">
+                   Esperando actividad (${threshold})
+                 </p>
+              </div>
+              <div class="flex flex-col items-center gap-1.5 opacity-40 group-hover/escucha:opacity-100 transition-opacity">
+                <div class="w-3.5 h-3.5 rounded-full bg-base-300 ring-2 ring-base-200 shadow-inner"></div>
+                <span class="text-[9px] font-bold uppercase tracking-tight text-base-content/40">En espera</span>
+              </div>
+            </span>
+          </div>
+        `;
+      }
     }
 
     const level = row.alert_level;

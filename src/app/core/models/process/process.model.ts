@@ -54,6 +54,8 @@ export interface Process {
   speaker?: string | null;
   alert_level?: 'red' | 'yellow' | 'green' | null;
   lawyer_role?: string | null;
+  /** UI State: si la fila está seleccionada */
+  selected?: boolean;
 }
 
 /**
@@ -67,6 +69,8 @@ export interface ProcessFilter {
   defendant?: string;
   status?: string; // 'active' | 'inactive'
   has_multiple_instances?: boolean;
+  lawyer_role?: string; // 'plaintiff' | 'defendant'
+  severity_color?: string; // 'red' | 'yellow' | 'green'
   process_date_from?: string;
   process_date_to?: string;
   created_at_from?: string;
@@ -165,8 +169,11 @@ export interface ProcessDetailInstance {
   id: string;
   court: string;
   actions_count: number;
+  last_activity_date: string | null;
   last_api_update: string;
   status_label: string;
+  lawyer_role?: string | null;
+  inactivity_alert_level?: 'red' | 'yellow' | 'green' | null;
 }
 
 /**
@@ -279,6 +286,35 @@ export interface ActionResponse {
   prev_page_url: string | null;
   to: number;
   total: number;
+}
+
+/**
+ * Bulk Role Update Alert Data
+ */
+export interface BulkRoleUpdateAlert {
+  count: number;
+  process_ids: string[];
+}
+
+/**
+ * Bulk Role Update Failure Data
+ */
+export interface BulkRoleUpdateFailure {
+  count: number;
+  process_numbers: string[];
+}
+
+/**
+ * Bulk Role Update Response
+ */
+export interface BulkRoleUpdateResponse {
+  message: string;
+  total_updated: number;
+  red_alerts: BulkRoleUpdateAlert;
+  yellow_alerts: BulkRoleUpdateAlert;
+  green_alerts: BulkRoleUpdateAlert;
+  no_alerts: BulkRoleUpdateAlert;
+  failed: BulkRoleUpdateFailure;
 }
 
 /**

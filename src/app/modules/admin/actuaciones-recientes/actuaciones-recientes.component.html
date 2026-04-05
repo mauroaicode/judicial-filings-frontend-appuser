@@ -199,6 +199,12 @@
                            [class.alert-yellow]="(row.alert_level === 'yellow')"
                            [class.alert-green]="(row.alert_level === 'green')"
                            [class.alert-pulse]="(row.alert_level === 'red')"></div>
+                    } @else if (row.lawyer_role) {
+                      <!-- Estado de Escucha (Mobile) -->
+                      <div class="flex flex-col items-center opacity-40">
+                        <div class="w-3 h-3 rounded-full bg-base-300 ring-1 ring-base-200 shadow-inner"></div>
+                        <span class="text-[7px] font-black uppercase tracking-tighter text-base-content/40 mt-0.5">Espera</span>
+                      </div>
                     } @else {
                       <div class="flex flex-col items-center opacity-40">
                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -449,7 +455,7 @@
               <div>
                 <h4 class="font-extrabold text-[11px] uppercase text-primary mb-1.5 tracking-wider">¿Cómo activar el semáforo?</h4>
                 <p class="text-[12px] leading-relaxed text-base-content/80 font-semibold">
-                  Para que el sistema analice sus procesos, debe <b>vincular su rol</b> (Demandante o Demandado) ingresando al <b>detalle del proceso</b>.
+                  Para que el sistema analice sus procesos, debe <b>vincular su rol</b> (Demandante o Demandado) desde las <b>acciones del proceso</b> o de forma <b>masiva</b> en el módulo de gestión.
                 </p>
               </div>
             </div>

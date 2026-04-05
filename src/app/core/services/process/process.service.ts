@@ -77,6 +77,12 @@ export class ProcessService {
     if (filters.last_api_update_to) {
       params = params.set('last_api_update_to', filters.last_api_update_to);
     }
+    if (filters.lawyer_role) {
+      params = params.set('lawyer_role', filters.lawyer_role);
+    }
+    if (filters.severity_color) {
+      params = params.set('severity_color', filters.severity_color);
+    }
 
     const url = `${environment.apiBaseUrl}/processes`;
 
@@ -103,12 +109,14 @@ export class ProcessService {
    * Create a new process
    *
    * @param processNumber - Process number (23 digits)
+   * @param lawyerRole - Lawyer role (plaintiff or defendant)
    * @returns Observable with created process response
    */
-  createProcess(processNumber: string): Observable<CreateProcessResponse> {
+  createProcess(processNumber: string, lawyerRole: string): Observable<CreateProcessResponse> {
     const url = `${environment.apiBaseUrl}/processes`;
     return this._http.post<CreateProcessResponse>(url, {
       process_number: processNumber,
+      lawyer_role: lawyerRole,
     });
   }
 
@@ -206,5 +214,42 @@ export class ProcessService {
   updateProcessStatus(id: string, isActive: boolean): Observable<{ message: string }> {
     const url = `${environment.apiBaseUrl}/processes/${id}/status`;
     return this._http.patch<{ message: string }>(url, { is_active: isActive });
+  }
+
+  /**
+   * Get available roles for processes
+   * 
+   * @returns Observable with list of roles (value, label)
+   */
+  getProcessRoles(): Observable<{ value: string; label: string }[]> {
+    const url = `${environment.apiBaseUrl}/config/processes/roles`;
+    return this._http.get<{ value: string; label: string }[]>(url);
+  }
+
+  /**
+   * Update lawyer role for a process
+   * 
+   * @param id - Process ID
+   * @param role - Role value (e.g. 'plaintiff', 'defendant')
+   * @returns Observable with message response
+   */
+  updateProcessRole(id: string, role: string): Observable<{ message: string }> {
+    const url = `${environment.apiBaseUrl}/processes/${id}/config/roles`;
+    return this._http.post<{ message: string }>(url, { lawyer_role: role });
+  }
+
+  /**
+   * Update lawyer role for multiple processes in bulk
+   * 
+   * @param processIds - Array of process IDs
+   * @param role - Role value (e.g. 'plaintiff', 'defendant')
+   * @returns Observable with bulk update response (message, counts, alerts)
+   */
+  updateBulkProcessRoles(processIds: string[], role: string): Observable<import('@app/core/models/process/process.model').BulkRoleUpdateResponse> {
+    const url = `${environment.apiBaseUrl}/processes/bulk-config/roles`;
+    return this._http.patch<import('@app/core/models/process/process.model').BulkRoleUpdateResponse>(url, { 
+      process_ids: processIds,
+      lawyer_role: role 
+    });
   }
 }
