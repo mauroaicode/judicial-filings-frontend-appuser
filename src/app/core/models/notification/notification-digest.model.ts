@@ -23,6 +23,10 @@ export interface Movement {
   lawyer_role?: string | null;
   is_viewed?: boolean;
   digest_created_at?: string;
+  notified_action_id?: string | null;
+  fijacion_action_id?: string | null;
+  process_action_id?: string | null;
+  related_action?: Movement | null;
   [key: string]: any; 
 }
 

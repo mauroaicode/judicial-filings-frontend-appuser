@@ -225,6 +225,9 @@ export interface Action {
   updated_at?: string;
   /** Optional: ranges to highlight in annotation (e.g. keywords like "Sentencia") */
   alert_highlights?: AlertHighlight[] | null;
+  notified_action_id?: string | null;
+  fijacion_action_id?: string | null;
+  related_action?: Action | null;
 }
 
 /**

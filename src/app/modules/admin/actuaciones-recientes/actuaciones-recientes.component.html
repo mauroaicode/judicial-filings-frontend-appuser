@@ -179,10 +179,10 @@
           <div class="block lg:hidden w-full bg-base-200/30 p-3 sm:p-4 space-y-4">
             @for (row of pagedMovements(); track (row.id || $index)) {
               <div class="card bg-base-100 border border-base-200 shadow-sm overflow-hidden transition-all duration-200 cursor-pointer hover:border-primary/40 hover:shadow-md active:scale-[0.98]"
-                   (click)="onRowDblClick(row)">
+                   (click)="openMovementModal(row)">
                 <!-- Header: Radicado + Alert -->
                 <div class="bg-base-100 p-3 sm:p-4 flex justify-between items-center border-b border-base-200">
-                  <div class="flex items-center gap-1.5 group/card-radicado">
+                  <div class="flex items-center gap-1.5 group/card-radicado" (click)="onRowDblClick(row); $event.stopPropagation()">
                     <span class="text-sm font-bold text-primary tracking-tight">{{ row.process_number | processNumber }}</span>
                     <button type="button" class="btn btn-ghost btn-xs btn-circle text-primary/40 hover:bg-primary/5 hover:text-primary transition-all"
                       (click)="copyToClipboard(row.process_number, $event)">
@@ -227,7 +227,7 @@
                   <div class="flex flex-col bg-base-200/40 p-3 rounded-xl border border-base-200/50">
                     <span class="text-[10px] text-base-content/40 uppercase font-black tracking-widest mb-1.5">{{ 'actuacionesRecientes.table.action' | transloco }}</span>
                     <div class="text-base-content leading-relaxed font-semibold" 
-                         [innerHTML]="columns[3].render ? (columns[3].render(row.action_text, row, 0) | safeHtml) : row.action_text"></div>
+                         [innerHTML]="renderActionCell(row) | safeHtml"></div>
                   </div>
 
                   <!-- Dates Flex Layout (Safer than grid for long mobile labels) -->
@@ -284,7 +284,7 @@
                     (mouseenter)="hoveredRowId.set(row.id || null)"
                     (mouseleave)="hoveredRowId.set(null)"
                     [attr.title]="'actuacionesRecientes.table.dblClickNavigation' | transloco"
-                    (dblclick)="onRowDblClick(row)">
+                    (click)="openMovementModal(row)">
                     <td class="sticky-col-idx text-center align-middle font-bold text-[11px] text-base-content/40 bg-white" style="width: 48px;">
                       {{ ((pagination()?.current_page || 1) - 1) * (pagination()?.per_page || 10) + i + 1 }}
                     </td>
@@ -298,9 +298,9 @@
                         <span class="sticky-cell-bg" *ngIf="col.key === 'process_number' || col.key === 'alert_status'" aria-hidden="true"></span>
                         <div class="sticky-cell-txt">
                           @if (col.key === 'process_number') {
-                            <div class="flex flex-col" [class.py-1]="!!row.lawyer_role">
+                            <div class="flex flex-col" [class.py-1]="!!row.lawyer_role" (click)="onRowDblClick(row); $event.stopPropagation()">
                               <div class="flex items-center gap-4">
-                                <span class="text-base-content/80 font-bold tracking-tight text-[13px] whitespace-nowrap">{{ row.process_number | processNumber }}</span>
+                                <span class="text-primary font-bold tracking-tight text-[13px] whitespace-nowrap hover:underline">{{ row.process_number | processNumber }}</span>
                                 <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
                                   <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary transition-all scale-110"
                                     (click)="copyToClipboard(row.process_number, $event)">
@@ -474,6 +474,116 @@
         </div>
       </div>
       <form method="dialog" class="modal-backdrop bg-black/40 backdrop-blur-[2px]" (click)="closeLegendModal()">
+        <button type="button">Close</button>
+      </form>
+    </dialog>
+
+    <!-- Movement Details Modal (Mobile Bottom, Desktop Middle) -->
+    <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="showMovementModal()">
+      @if (selectedMovement(); as m) {
+        <div class="modal-box p-0 bg-white shadow-2xl rounded-t-[2.5rem] rounded-b-none sm:rounded-2xl flex flex-col max-h-[95vh] sm:max-h-[85vh] w-full max-w-2xl">
+          <!-- Decoration Bar for Mobile -->
+          <div class="flex justify-center pt-3 pb-1 sm:hidden flex-none">
+            <div class="w-12 h-1.5 bg-base-200 rounded-full"></div>
+          </div>
+
+          <!-- Header -->
+          <div class="flex items-center justify-between p-6 sm:p-8 border-b border-base-100 flex-none bg-white">
+            <div class="flex flex-col">
+              <span class="text-[10px] uppercase font-black tracking-widest text-primary mb-1">Detalle de Actuación</span>
+              <h3 class="font-bold text-xl sm:text-2xl text-base-content tracking-tight">
+                {{ m.process_number | processNumber }}
+              </h3>
+            </div>
+            <button class="btn btn-ghost btn-sm btn-circle text-base-content/40 hover:bg-base-200"
+              (click)="closeMovementModal()">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="overflow-y-auto flex-1 custom-scrollbar p-6 sm:p-8 space-y-8">
+            <!-- Context Info -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+               <div class="flex flex-col gap-1">
+                 <span class="text-[10px] uppercase font-black tracking-widest text-base-content/30 italic">Despacho</span>
+                 <span class="font-bold text-base-content leading-snug">{{ m.court }}</span>
+               </div>
+               <div class="flex flex-col gap-1">
+                 <span class="text-[10px] uppercase font-black tracking-widest text-base-content/30 italic">Fecha de fijación</span>
+                 <span class="font-bold text-base-content">{{ m.action_date }}</span>
+               </div>
+            </div>
+
+            <!-- Action Content -->
+            <div class="space-y-6">
+              <!-- Fijación -->
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="badge badge-sm bg-primary/10 text-primary border-none font-black text-[9px] px-2 h-5 uppercase tracking-widest">Fijación en Estado</span>
+                </div>
+                <div class="p-4 rounded-2xl bg-base-200/30 border border-base-200/50 font-bold text-base-content leading-relaxed">
+                  {{ m.action_text }}
+                </div>
+              </div>
+
+              <!-- Auto Related -->
+              @if (m.related_action; as related) {
+                <div class="flex flex-col gap-2">
+                  <div class="flex items-center gap-2">
+                    <span class="badge badge-sm bg-accent/10 text-accent border-none font-black text-[9px] px-2 h-5 uppercase tracking-widest">Auto Notificado</span>
+                  </div>
+                  <div class="p-5 rounded-2xl bg-accent/[0.03] border border-accent/10">
+                    <h4 class="font-black text-base sm:text-lg text-accent mb-3 leading-tight">{{ related.action_text }}</h4>
+                    
+                    @if (related.annotation && related.annotation !== '---' && related.annotation !== '–') {
+                      <div class="divider opacity-30 my-4"></div>
+                      <div class="space-y-3">
+                        <span class="text-[10px] uppercase font-black tracking-widest text-accent/40 block">Anotación / Providencia</span>
+                        <p class="text-[13px] sm:text-sm leading-relaxed text-base-content/80 font-medium whitespace-pre-wrap"
+                           [innerHTML]="getHighlightedText(related.annotation, related.alert_highlights, 'annotation') | safeHtml">
+                        </p>
+                      </div>
+                    }
+                  </div>
+                </div>
+              } @else if (m.annotation && m.annotation !== '---' && m.annotation !== '–') {
+                <div class="flex flex-col gap-2">
+                  <div class="flex items-center gap-2">
+                    <span class="badge badge-sm bg-base-200 text-base-content/60 border-none font-black text-[9px] px-2 h-5 uppercase tracking-widest">Anotación</span>
+                  </div>
+                  <div class="p-5 rounded-2xl bg-base-100 border border-base-200 shadow-inner">
+                    <p class="text-[13px] sm:text-sm leading-relaxed text-base-content/80 font-medium whitespace-pre-wrap"
+                       [innerHTML]="getHighlightedText(m.annotation, m.alert_highlights, 'annotation') | safeHtml">
+                    </p>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Footer Meta -->
+            <div class="flex flex-wrap gap-4 pt-6 border-t border-base-100">
+               <div class="flex flex-col gap-0.5 min-w-[140px]">
+                 <span class="text-[9px] uppercase font-black tracking-widest text-base-content/20">Inicio de término</span>
+                 <span class="text-xs font-bold text-base-content/60">{{ m.term_start_date || '–' }}</span>
+               </div>
+               <div class="flex flex-col gap-0.5 min-w-[140px]">
+                 <span class="text-[9px] uppercase font-black tracking-widest text-base-content/20">Final de término</span>
+                 <span class="text-xs font-bold text-base-content/60">{{ m.term_end_date || '–' }}</span>
+               </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action -->
+          <div class="p-6 sm:p-8 pt-4 flex-none bg-white border-t border-base-100 sm:border-none">
+            <button class="btn btn-primary btn-block rounded-2xl font-bold h-14 shadow-xl shadow-primary/20 text-base" (click)="closeMovementModal()">
+              Cerrar Detalle
+            </button>
+          </div>
+        </div>
+      }
+      <form method="dialog" class="modal-backdrop bg-black/50 backdrop-blur-[4px]" (click)="closeMovementModal()">
         <button type="button">Close</button>
       </form>
     </dialog>

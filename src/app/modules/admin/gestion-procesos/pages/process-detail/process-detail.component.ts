@@ -142,15 +142,48 @@ export class ProcessDetailComponent {
         label: 'processDetail.actions.table.action',
         sortable: true,
         html: true,
-        render: (value: string | null, row: Action) =>
-          buildTextWithHighlights(row.action ?? value, row.alert_highlights, 'action'),
+        render: (value: string | null, row: Action) => {
+          const mainAction = row.action ?? value;
+          const related = row.related_action;
+          
+          const actionHtml = buildTextWithHighlights(mainAction, row.alert_highlights, 'action');
+          
+          if (related) {
+            const relatedActionHtml = buildTextWithHighlights(related.action ?? '', related.alert_highlights, 'action');
+            return `
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-1.5">
+                   <span class="badge badge-sm bg-primary/10 text-primary border-none font-bold text-[9px] px-1.5 h-4 uppercase tracking-tighter">Fijación</span>
+                   <div class="font-bold text-base-content/90 leading-tight">${actionHtml}</div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                   <span class="badge badge-sm bg-accent/10 text-accent border-none font-bold text-[9px] px-1.5 h-4 uppercase tracking-tighter">Auto</span>
+                   <div class="font-bold text-base-content leading-tight">${relatedActionHtml}</div>
+                </div>
+              </div>
+            `;
+          }
+          return actionHtml;
+        },
       },
       {
         key: 'annotation',
         label: 'processDetail.actions.table.annotation',
         html: true,
-        render: (value: string | null, row: Action) =>
-          buildTextWithHighlights(row.annotation ?? value, row.alert_highlights, 'annotation'),
+        render: (value: string | null, row: Action) => {
+          const related = row.related_action;
+          let annotationToUse = row.annotation ?? value;
+          let highlightsToUse = row.alert_highlights;
+
+          if (related && related.annotation && related.annotation !== '---' && related.annotation !== '–') {
+            annotationToUse = related.annotation;
+            highlightsToUse = related.alert_highlights;
+          }
+
+          if (!annotationToUse || annotationToUse === '---' || annotationToUse === '–') return '–';
+          
+          return buildTextWithHighlights(annotationToUse, highlightsToUse, 'annotation');
+        },
       },
       {
         key: 'term_start_date',
@@ -389,14 +422,37 @@ export class ProcessDetailComponent {
 
     this._processService.getProcessActions(process.id, filters).subscribe({
       next: (response) => {
-        this.actions.set(response.data);
+        const rawActions = response.data;
+        const actionMap = new Map<string, Action>();
+        rawActions.forEach(a => actionMap.set(a.id, a));
+
+        const finalActions: Action[] = [];
+        const groupedIds = new Set<string>();
+
+        rawActions.forEach(a => {
+          if (groupedIds.has(a.id)) return;
+
+          // If it's a Fijacion Estado that points to an Auto
+          if (a.action?.toLowerCase().includes('fijacion estado') && a.notified_action_id) {
+            const auto = actionMap.get(a.notified_action_id);
+            if (auto && auto.id !== a.id) {
+              a.related_action = auto;
+              groupedIds.add(auto.id);
+            }
+          }
+          finalActions.push(a);
+        });
+
+        const filteredActions = finalActions.filter(a => !groupedIds.has(a.id));
+
+        this.actions.set(filteredActions);
         this.actionsPagination.set({
           current_page: response.current_page,
           per_page: response.per_page,
-          total: response.total,
-          last_page: response.last_page,
+          total: response.total - groupedIds.size, // Adjust total count since we grouped some
+          last_page: Math.ceil((response.total - groupedIds.size) / response.per_page),
           from: response.from,
-          to: response.to,
+          to: Math.min(response.to, response.total - groupedIds.size),
         });
         this.loadingActions.set(false);
       },

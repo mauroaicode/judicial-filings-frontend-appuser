@@ -70,6 +70,9 @@ export class ActuacionesRecientesComponent {
   public hoveredRowId = signal<string | null>(null);
   /** Control de la modal de leyenda en mobile */
   public showLegendModal = signal<boolean>(false);
+  /** Control de la modal de detalle del movimiento */
+  public showMovementModal = signal<boolean>(false);
+  public selectedMovement = signal<Movement | null>(null);
 
   // Filter Visibility
   public showFilters = signal<boolean>(false);
@@ -116,7 +119,7 @@ export class ActuacionesRecientesComponent {
     {
       key: 'court',
       label: 'actuacionesRecientes.table.court',
-      width: '500px', // Aumentado aún más como se solicitó
+      width: '750px', // Aumentado aún más a petición del usuario
       sortable: true,
     },
     {
@@ -158,7 +161,7 @@ export class ActuacionesRecientesComponent {
       label: 'actuacionesRecientes.table.action',
       width: '350px',
       html: true,
-      render: (value: string, row: Movement, index?: number) => this._renderActionCell(row, index),
+      render: (value: string, row: Movement, index?: number) => this.renderActionCell(row, index),
     },
   ];
 
@@ -247,13 +250,60 @@ export class ActuacionesRecientesComponent {
 
     this._digestService.getNotificationDigests(filters).subscribe({
       next: (response) => {
-        const allMovements = response.data.flatMap((digest, dIndex) => 
+        const rawMovements = response.data.flatMap((digest, dIndex) => 
           digest.data.map((m, mIndex) => ({ 
             ...m, 
             id: m.id || `${digest.id}-${mIndex}`, // Garantizar ID único para el hover
             digest_created_at: digest.created_at 
           }))
         );
+
+        // Grouping logic: Consolidate "Fijacion Estado" with its "Auto"
+        const movementMap = new Map<string, Movement>();
+        rawMovements.forEach(m => {
+          if (m.id) movementMap.set(m.id, m);
+          // Also index by process_action_id if present (backend uses this for notified_action_id)
+          if (m.process_action_id) movementMap.set(m.process_action_id, m);
+        });
+
+        const finalMovements: Movement[] = [];
+        const groupedIds = new Set<string>();
+
+        rawMovements.forEach(m => {
+          if (groupedIds.has(m.id!)) return;
+
+          // If it's a Fijacion Estado that points to an Auto
+          if (m.action_text?.toLowerCase().includes('fijacion estado') && m.notified_action_id) {
+            const auto = movementMap.get(m.notified_action_id);
+            if (auto && auto.id !== m.id) {
+              m.related_action = auto;
+              groupedIds.add(auto.id!);
+            }
+          } 
+          // If it's an Auto that points back to a Fijacion Estado (redundant check but safe)
+          else if (m.fijacion_action_id) {
+              const fijacion = movementMap.get(m.fijacion_action_id);
+              if (fijacion && fijacion.id !== m.id) {
+                  // If we find the fijacion, we prefer to group under the fijacion
+                  // So we skip this auto if it hasn't been grouped yet (it will be grouped when we process the fijacion)
+                  // But wait, what if the fijacion is NOT in this list? 
+                  // If the fijacion IS in this list, it will eventually process it and group this auto.
+                  // If the fijacion is NOT in this list, we keep the auto as is.
+                  
+                  // Optimization: If fijacion is in list, we'll handle it there.
+                  if (rawMovements.find(rm => rm.id === fijacion!.id || rm.process_action_id === m.fijacion_action_id)) {
+                      // We'll let the Fijacion handle the grouping.
+                      // But we don't know if the Fijacion has already been processed or will be.
+                      // So we just check if it's already in groupedIds.
+                  }
+              }
+          }
+
+          finalMovements.push(m);
+        });
+
+        // Filter out the ones that were grouped into another row
+        const allMovements = finalMovements.filter(m => !groupedIds.has(m.id!));
         
         this.movements.set(allMovements);
         
@@ -509,22 +559,54 @@ export class ActuacionesRecientesComponent {
   /**
    * Render action cell with highlights and annotation
    */
-  private _renderActionCell(row: Movement, index?: number): string {
+  public renderActionCell(row: Movement, index?: number): string {
     const show = this.showHighlights();
+    const related = row.related_action;
     
+    // Main action text (Fijación)
     const actionHtml = show 
       ? buildTextWithHighlights(row.action_text, row.alert_highlights, 'action_text')
       : row.action_text;
       
-    const annotationHtml = show 
-      ? buildTextWithHighlights(row.annotation, row.alert_highlights, 'annotation')
-      : row.annotation;
-      
-    let html = `<div class="font-bold text-base-content/90 mb-0.5 leading-snug">${actionHtml}</div>`;
+    // Annotation (prefer Auto's annotation if available and not empty, otherwise Fijación's)
+    let annotationToUse = row.annotation;
+    let highlightsToUse = row.alert_highlights;
     
-    if (row.annotation && row.annotation !== '–') {
-       html += `<div class="text-xs text-base-content/60 leading-relaxed italic line-clamp-2" title="${row.annotation}">${annotationHtml}</div>`;
+    if (related && related.annotation && related.annotation !== '---' && related.annotation !== '–') {
+        annotationToUse = related.annotation;
+        highlightsToUse = related.alert_highlights;
     }
+      
+    let html = `<div class="flex flex-col gap-1.5 py-1">`;
+    
+    if (related) {
+        const relatedActionHtml = show 
+          ? buildTextWithHighlights(related.action_text, related.alert_highlights, 'action_text')
+          : related.action_text;
+          
+        html += `
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center gap-1.5">
+               <span class="badge badge-sm bg-primary/10 text-primary border-none font-bold text-[8px] px-1 h-3.5 uppercase tracking-tighter shrink-0">Fijación</span>
+               <div class="font-bold text-base-content/80 leading-tight text-[11px] truncate">${actionHtml}</div>
+            </div>
+            <div class="flex items-center gap-1.5">
+               <span class="badge badge-sm bg-accent/10 text-accent border-none font-bold text-[8px] px-1 h-3.5 uppercase tracking-tighter shrink-0">Auto</span>
+               <div class="font-bold text-base-content leading-tight text-[12px] truncate max-w-[180px]">
+                 ${relatedActionHtml}
+               </div>
+            </div>
+          </div>
+        `;
+    } else {
+        html += `
+          <div class="flex flex-col gap-0.5">
+            <div class="font-bold text-base-content/90 leading-snug truncate">${actionHtml}</div>
+          </div>
+        `;
+    }
+    
+    html += `</div>`;
     
     return html;
   }
@@ -597,5 +679,33 @@ export class ActuacionesRecientesComponent {
    */
   public closeLegendModal(): void {
     this.showLegendModal.set(false);
+  }
+
+  /**
+   * Abre la modal de detalle del movimiento
+   */
+  public openMovementModal(row: Movement, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.selectedMovement.set(row);
+    this.showMovementModal.set(true);
+  }
+
+  /**
+   * Cierra la modal de detalle del movimiento
+   */
+  public closeMovementModal(): void {
+    this.showMovementModal.set(false);
+    this.selectedMovement.set(null);
+  }
+
+  /**
+   * Helper for template to build highlighted text
+   */
+  public getHighlightedText(text: string | null | undefined, highlights: any[] | null | undefined, source: string): string {
+    if (!text) return '';
+    if (!highlights || highlights.length === 0 || !this.showHighlights()) return text;
+    return buildTextWithHighlights(text, highlights, source);
   }
 }
