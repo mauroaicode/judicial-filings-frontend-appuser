@@ -21,6 +21,8 @@ export interface ProcessInstance {
   plaintiffs?: string[];
   defendants?: string[];
   speaker?: string | null;
+  alert_level?: 'red' | 'yellow' | 'green' | null;
+  lawyer_role?: string | null;
 }
 
 /**
@@ -50,6 +52,10 @@ export interface Process {
   /** Instancias del mismo radicado (expandible en la tabla) */
   instances?: ProcessInstance[];
   speaker?: string | null;
+  alert_level?: 'red' | 'yellow' | 'green' | null;
+  lawyer_role?: string | null;
+  /** UI State: si la fila está seleccionada */
+  selected?: boolean;
 }
 
 /**
@@ -63,6 +69,8 @@ export interface ProcessFilter {
   defendant?: string;
   status?: string; // 'active' | 'inactive'
   has_multiple_instances?: boolean;
+  lawyer_role?: string; // 'plaintiff' | 'defendant'
+  severity_color?: string; // 'red' | 'yellow' | 'green'
   process_date_from?: string;
   process_date_to?: string;
   created_at_from?: string;
@@ -150,6 +158,8 @@ export interface ProcessDetail {
   status_label: string;
   created_at: string;
   updated_at: string;
+  alert_level?: 'red' | 'yellow' | 'green' | null;
+  lawyer_role?: string | null;
 }
 
 /**
@@ -159,8 +169,11 @@ export interface ProcessDetailInstance {
   id: string;
   court: string;
   actions_count: number;
+  last_activity_date: string | null;
   last_api_update: string;
   status_label: string;
+  lawyer_role?: string | null;
+  inactivity_alert_level?: 'red' | 'yellow' | 'green' | null;
 }
 
 /**
@@ -212,6 +225,9 @@ export interface Action {
   updated_at?: string;
   /** Optional: ranges to highlight in annotation (e.g. keywords like "Sentencia") */
   alert_highlights?: AlertHighlight[] | null;
+  notified_action_id?: string | null;
+  fijacion_action_id?: string | null;
+  related_action?: Action | null;
 }
 
 /**
@@ -273,6 +289,35 @@ export interface ActionResponse {
   prev_page_url: string | null;
   to: number;
   total: number;
+}
+
+/**
+ * Bulk Role Update Alert Data
+ */
+export interface BulkRoleUpdateAlert {
+  count: number;
+  process_ids: string[];
+}
+
+/**
+ * Bulk Role Update Failure Data
+ */
+export interface BulkRoleUpdateFailure {
+  count: number;
+  process_numbers: string[];
+}
+
+/**
+ * Bulk Role Update Response
+ */
+export interface BulkRoleUpdateResponse {
+  message: string;
+  total_updated: number;
+  red_alerts: BulkRoleUpdateAlert;
+  yellow_alerts: BulkRoleUpdateAlert;
+  green_alerts: BulkRoleUpdateAlert;
+  no_alerts: BulkRoleUpdateAlert;
+  failed: BulkRoleUpdateFailure;
 }
 
 /**

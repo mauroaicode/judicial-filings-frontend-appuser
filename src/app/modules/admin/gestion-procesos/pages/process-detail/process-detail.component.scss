@@ -150,8 +150,35 @@
 }
 
 // Mobile specific refinements
-@media (max-width: 640px) {
+@media (max-width: 767px) {
+  .detail-header-card {
+    padding-top: 1.5rem !important;
+    
+    .dropdown {
+      top: 1.25rem;
+      right: 1.25rem;
+    }
+  }
+
   .collapse-title {
     padding-right: 4rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  // Instance Card specific mobile tweaks
+  .instance-details-mobile {
+    margin-left: 0 !important;
+    margin-top: 1rem;
+    
+    .detail-row {
+      align-items: flex-start !important;
+      
+      .icon-box {
+        width: 1.5rem !important;
+        height: 1.5rem !important;
+        margin-top: 0.125rem;
+      }
+    }
   }
 }

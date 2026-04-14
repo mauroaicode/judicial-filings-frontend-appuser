@@ -1,6 +1,18 @@
 {
   "common": {
-    "actions": "Actions"
+    "actions": "Actions",
+    "loading": "Loading...",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel"
+  },
+  "generics": {
+    "email": "Email",
+    "password": "Password",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "spanish": "Spanish",
+    "english": "English"
   },
   "auth": {
     "signIn": {
@@ -63,14 +75,6 @@
       "mustChangePassword": "For security, you must change your password. Please update it as soon as possible."
     }
   },
-  "generics": {
-    "email": "Email",
-    "password": "Password",
-    "confirm": "Confirm",
-    "cancel": "Cancel",
-    "spanish": "Spanish",
-    "english": "English"
-  },
   "navigation": {
     "dashboard": "Dashboard",
     "gestionProcesos": "Process Management",
@@ -129,6 +133,7 @@
     "markSelectedAsViewed": "Mark selected as viewed",
     "markSelectedAsViewedWithCount": "Mark selected as viewed ({{count}})",
     "markedCountSuccess": "{{count}} marked as viewed",
+    "copiedToClipboard": "Copied to clipboard",
     "confirm": {
       "markAllTitle": "Mark all as viewed",
       "markAllMessage": "Do you want to mark {{total}} notifications as viewed?",
@@ -143,6 +148,8 @@
       "annotation": "Annotation",
       "actionDate": "Action date",
       "registrationDate": "Registration date",
+      "termStartDate": "Term start date",
+      "termEndDate": "Term end date",
       "notifiedWhen": "Notified",
       "subjects": "Parties",
       "seeMoreSubjects": "See more ({{count}})",
@@ -214,15 +221,15 @@
     "table": {
       "empty": "No processes available",
       "index": "#",
-      "processNumber": "Process Number",
+      "processNumber": "Process number",
       "court": "Court",
-      "processClass": "Process Class",
+      "processClass": "Process class",
       "status": "Status",
       "plaintiff": "Plaintiff (S)",
       "defendant": "Defendant (S)",
-      "multipleInstances": "Multiple Instances",
-      "processDate": "Registration Date",
-      "lastActivityDate": "Last Activity Date"
+      "multipleInstances": "Multiple instances",
+      "processDate": "Registration date",
+      "lastActivityDate": "Last activity date"
     },
     "infoModal": {
       "title": "Registered Process Information",
@@ -239,8 +246,19 @@
       "processDetails": {
         "title": "Process Details",
         "totalProcesses": "Total Processes",
-        "registeredCount": "Registered Processes"
+        "registeredCount": "Registered Processes",
+        "privateCount": "Private Processes"
       }
+    },
+    "roleModal": {
+      "title": "Assign Lawyer Role",
+      "subtitle": "Define if your client is plaintiff or defendant in this process",
+      "infoTitle": "Importance of the Role",
+      "infoDesc": "The assigned role allows the system to customize alerts and notifications according to your client's legal position.",
+      "save": "Save Configuration",
+      "saving": "Saving...",
+      "plaintiffDesc": "Your client is the one suing",
+      "defendantDesc": "Your client is the被告"
     }
   },
   "processDetail": {
@@ -265,6 +283,7 @@
     "lastUpdate": "Last Update",
     "createdAt": "Created At",
     "updatedAt": "Updated At",
+    "lawyerRole": "Lawyer Role",
     "yes": "Yes",
     "no": "No",
     "subjects": {

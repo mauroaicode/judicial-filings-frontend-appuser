@@ -1,0 +1,162 @@
+<dialog class="modal modal-bottom lg:modal-middle" [class.modal-open]="true">
+    <div class="modal-box p-0 flex flex-col bg-base-100 shadow-2xl lg:max-w-2xl w-full lg:rounded-2xl rounded-t-3xl rounded-b-none pb-8 lg:pb-0 max-h-[95vh] sm:max-h-[90vh]">
+        
+        <!-- Header -->
+        <div class="p-6 sm:p-8 border-b border-base-200 flex-none">
+            <h3 class="font-bold text-2xl text-base-content">{{ (task() ? 'tasks.edit' : 'tasks.add') | transloco }}</h3>
+            <p class="text-sm text-base-content/60 mt-1">
+                {{ (task() ? 'Actualice la información de la tarea para su gestión' : 'Cree una nueva tarea para llevar el seguimiento de sus procesos') }}
+            </p>
+        </div>
+
+        <div class="p-6 sm:p-8 overflow-y-auto flex-1">
+            <form [formGroup]="taskForm" (ngSubmit)="onSave()" class="space-y-6">
+                <!-- Title -->
+                <div class="form-control">
+                    <label class="label pb-1">
+                        <span class="label-standard uppercase tracking-widest text-[10px] font-black text-base-content/40">{{ 'tasks.form.title' | transloco }}</span>
+                    </label>
+                    <input type="text" formControlName="title"
+                        [placeholder]="'tasks.form.titlePlaceholder' | transloco"
+                        class="input-standard input w-full"
+                        [class.input-error]="(taskForm.get('title')?.touched && taskForm.get('title')?.invalid) || getBackendError('title')">
+                </div>
+
+                <!-- Description -->
+                <div class="form-control">
+                    <label class="label pb-1">
+                        <span class="label-standard uppercase tracking-widest text-[10px] font-black text-base-content/40">{{ 'tasks.form.description' | transloco }}</span>
+                    </label>
+                    <textarea formControlName="description"
+                        [placeholder]="'tasks.form.descriptionPlaceholder' | transloco"
+                        class="input-standard input w-full min-h-[120px] py-3 leading-relaxed focus:border-primary transition-all"
+                        [class.input-error]="(taskForm.get('description')?.touched && taskForm.get('description')?.invalid) || getBackendError('description')"></textarea>
+                </div>
+
+                <!-- Process Associated Search (Cleaner approach) -->
+                <div class="form-control">
+                    <label class="label pb-1">
+                        <span class="label-standard uppercase tracking-widest text-[10px] font-black text-base-content/40">{{ 'tasks.form.process' | transloco }}</span>
+                    </label>
+                    <div class="relative group w-full">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-base-content/30 z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        
+                        <input type="text" formControlName="process_search"
+                            [placeholder]="'tasks.form.processPlaceholder' | transloco"
+                            class="input-standard input w-full pl-10 pr-10 cursor-pointer focus:cursor-text"
+                            (focus)="onProcessSearchFocus()"
+                            [class.input-error]="getBackendError('process_id')">
+
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-base-content/20 z-10 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200" 
+                                [class.rotate-180]="showProcessDropdown()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+
+                        @if (taskForm.get('process_id')?.value) {
+                            <button type="button" class="absolute inset-y-0 right-8 pr-1 flex items-center text-error/40 hover:text-error transition-colors z-20" (click)="clearProcess(); $event.stopPropagation()">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        }
+
+                        <!-- Dropdown List with Results (Positioned relative to the div wrapping the input) -->
+                        @if (showProcessDropdown()) {
+                            <div class="absolute top-full left-0 right-0 mt-1 bg-base-100 border border-base-200 shadow-2xl rounded-2xl z-[1100] max-h-72 overflow-y-auto overflow-x-hidden py-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                                @if (isSearchingProcesses()) {
+                                    <div class="px-5 py-4 flex items-center gap-3">
+                                        <span class="loading loading-spinner loading-xs text-primary"></span>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-base-content/40">Buscando procesos...</span>
+                                    </div>
+                                } @else if (processes().length === 0) {
+                                    <div class="px-5 py-8 text-center opacity-40">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <p class="text-xs font-bold uppercase tracking-wider">No se encontraron procesos</p>
+                                    </div>
+                                }
+
+                                @for (p of processes(); track p.id) {
+                                    <button type="button" 
+                                        class="w-full text-left px-5 py-3 hover:bg-primary/5 border-b border-base-100 last:border-0 group transition-all flex items-center gap-4 active:bg-primary/10"
+                                        [class.bg-primary/5]="taskForm.get('process_id')?.value === p.id"
+                                        (click)="selectProcess(p)">
+                                        <div class="w-10 h-10 rounded-xl bg-base-100 border border-base-200 group-hover:border-primary/20 flex items-center justify-center transition-all shadow-sm font-black text-xs text-base-content/20 group-hover:text-primary/40 uppercase"
+                                            [class.border-primary/30]="taskForm.get('process_id')?.value === p.id"
+                                            [class.text-primary/60]="taskForm.get('process_id')?.value === p.id">
+                                            {{ (p.despacho || '-').charAt(0) }}
+                                        </div>
+                                        <div class="flex flex-col min-w-0 flex-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm font-black text-base-content group-hover:text-primary transition-colors"
+                                                    [class.text-primary]="taskForm.get('process_id')?.value === p.id">
+                                                    {{ p.number | processNumber }}
+                                                </span>
+                                                @if (taskForm.get('process_id')?.value === p.id) {
+                                                    <div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                                                }
+                                            </div>
+                                            <span class="text-[10px] font-bold text-base-content/40 truncate uppercase tracking-tight leading-tight mt-0.5">{{ p.despacho }}</span>
+                                        </div>
+                                        <div class="ml-auto flex items-center opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                                            <div class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    @if (getBackendError('process_id')) {
+                        <label class="label pt-1.5">
+                            <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ getBackendError('process_id') }}</span>
+                        </label>
+                    }
+                </div>
+
+                <!-- Actions -->
+                <div class="modal-action mt-6 pt-6 border-t border-base-200">
+                    <button type="button" class="btn btn-ghost btn-sm sm:btn-md h-11 px-8 rounded-xl font-bold normal-case"
+                        (click)="onClose()" [disabled]="isSaving()">
+                        {{ 'common.cancel' | transloco }}
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm sm:btn-md h-11 px-10 rounded-xl font-bold normal-case"
+                        [disabled]="taskForm.invalid || isSaving()">
+                        @if (isSaving()) {
+                            <span class="loading loading-spinner loading-xs"></span>
+                            {{ 'common.saving' | transloco }}
+                        } @else {
+                            {{ (task() ? 'common.save' : 'tasks.add') | transloco }}
+                        }
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop" (click)="onClose()">
+        <button type="button">close</button>
+    </form>
+</dialog>
+
+<!-- Confirmation Dialog BEFORE actual saving (Matches Desactivar Proceso flow) -->
+<app-confirmation-dialog
+    [open]="showConfirmDialog()"
+    [title]="(task() ? 'Actualizar Tarea' : 'Crear Tarea')"
+    [message]="(task() ? '¿Está seguro de actualizar la información de esta tarea?' : '¿Desea crear esta nueva tarea para iniciar el seguimiento?') "
+    [confirmLabel]="'Confirmar'"
+    [cancelLabel]="'Cancelar'"
+    confirmClass="btn-primary text-white h-11 px-8 rounded-xl font-bold normal-case"
+    (confirm)="onConfirmSave()"
+    (cancel)="showConfirmDialog.set(false)" />
+

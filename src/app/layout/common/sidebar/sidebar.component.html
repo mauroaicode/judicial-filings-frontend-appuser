@@ -44,11 +44,11 @@
         </li>
         } @else if (item.type === 'collapsable' && item.children) {
         <li>
-          <button type="button" class="w-full" [class.active]="isItemActive(item)" [class.disabled]="item.disabled"
+          <button type="button" class="w-full" [class.active]="activeIds().has(item.id)" [class.disabled]="item.disabled"
             (click)="toggleItem(item)">
             <div class="sidebar-item flex items-center rounded-lg py-2 text-left transition-colors"
               [class.gap-3]="isOpen()" [class.px-3]="isOpen()" [class.justify-center]="!isOpen()"
-              [class.px-2]="!isOpen()" [class.sidebar-item-active]="isItemActive(item)">
+              [class.px-2]="!isOpen()" [class.sidebar-item-active]="activeIds().has(item.id)">
               @if (item.icon && getIconPath(item)) {
               <span class="flex-shrink-0 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -71,10 +71,10 @@
           <ul class="ml-4 mt-1 space-y-1 border-l border-brand-neutral-content/10 pl-2">
             @for (child of item.children; track child.id) {
             <li>
-              <a [routerLink]="child.link" routerLinkActive="sidebar-item-active"
-                [routerLinkActiveOptions]="{ exact: false }"
+              <a [routerLink]="child.link"
+                [class.sidebar-item-active]="isItemSelected(child.id)"
                 class="sidebar-item flex items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors font-medium"
-                (click)="closeSidebar()">
+                (click)="onMenuItemClick(child)">
                 @if (child.icon && getIconPath(child)) {
                 <span class="flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -93,10 +93,12 @@
         } @else {
         <!-- Basic Item -->
         <li>
-          <a [routerLink]="item.link" [class.disabled]="item.disabled"
+          <a [routerLink]="item.link"
+            [class.sidebar-item-active]="isItemSelected(item.id)"
+            [class.disabled]="item.disabled"
             class="sidebar-item flex items-center rounded-lg py-2 text-left transition-colors" [class.gap-3]="isOpen()"
             [class.px-3]="isOpen()" [class.justify-center]="!isOpen()" [class.px-2]="!isOpen()"
-            [class.sidebar-item-active]="isItemActive(item)" (click)="navigateTo(item)">
+            (click)="onMenuItemClick(item)">
             @if (item.icon && getIconPath(item)) {
             <span class="flex-shrink-0 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"

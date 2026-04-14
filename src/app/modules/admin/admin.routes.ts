@@ -14,9 +14,19 @@ export default [
       import('./gestion-procesos/gestion-procesos.routes').then((m) => m.default),
   },
   {
+    path: 'actuaciones-recientes',
+    loadChildren: () =>
+      import('./actuaciones-recientes/actuaciones-recientes.routes').then((m) => m.default),
+  },
+  {
     path: 'palabras-clave',
     loadChildren: () =>
       import('./keywords/keywords.routes').then((m) => m.default),
+  },
+  {
+    path: 'tareas',
+    loadChildren: () =>
+      import('./tasks/tasks.routes').then((m) => m.default),
   },
   {
     path: 'perfil',

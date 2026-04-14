@@ -18,8 +18,8 @@ export interface DataTableColumn {
   sortable?: boolean;
   width?: string;
   align?: 'left' | 'center' | 'right';
-  /** Custom render: (value, row) => string */
-  render?: (value: any, row: any) => string;
+  /** Custom render: (value, row, index) => string */
+  render?: (value: any, row: any, index?: number) => string;
   /** When true, cell value is rendered as HTML (use with SafeHtml pipe). Only for app-generated HTML. */
   html?: boolean;
 }
@@ -56,6 +56,7 @@ export class DataTableComponent {
   // Outputs
   public pageChange = output<{ page: number; perPage: number }>();
   public rowClick = output<any>();
+  public rowDblClick = output<any>();
 
   // Page size options
   public pageSizeOptions = [10, 20, 25, 50, 100];
@@ -72,6 +73,13 @@ export class DataTableComponent {
    */
   onRowClick(row: any): void {
     this.rowClick.emit(row);
+  }
+
+  /**
+   * Handle row double click
+   */
+  onRowDblClick(row: any): void {
+    this.rowDblClick.emit(row);
   }
 
   /**

@@ -6,7 +6,7 @@
   <div class="flex flex-1 flex-col h-screen min-w-0 transition-all duration-300">
 
     <!-- Header (Fixed at top) -->
-    <div class="w-full flex-none z-30">
+    <div class="relative w-full flex-none z-[100]">
       <app-header [pageTitle]="pageTitle()" [sidebar]="sidebar" [isScrolled]="pageScrolled()"
         (toggleSidebar)="onToggleSidebar()"></app-header>
     </div>

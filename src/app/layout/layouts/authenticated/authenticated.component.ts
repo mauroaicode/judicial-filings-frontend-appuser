@@ -2,16 +2,16 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   inject,
   signal,
   ViewChild,
   ViewEncapsulation,
   OnInit,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterOutlet, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs';
+import { Router, RouterOutlet, NavigationEnd, ActivatedRouteSnapshot } from '@angular/router';
+import { filter, tap } from 'rxjs';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { SidebarComponent } from '@app/layout/common/sidebar/sidebar.component';
 import { HeaderComponent } from '@app/layout/common/header/header.component';
@@ -30,8 +30,8 @@ import { AlertComponent } from '@app/shared/components/alert/alert.component';
 })
 export class AuthenticatedLayoutComponent implements OnInit {
   private _router = inject(Router);
-  private _activatedRoute = inject(ActivatedRoute);
   private _authService = inject(AuthService);
+  private _cdr = inject(ChangeDetectorRef);
 
   @ViewChild(SidebarComponent) sidebar!: SidebarComponent;
 
@@ -47,37 +47,64 @@ export class AuthenticatedLayoutComponent implements OnInit {
   public pageTitle = computed(() => {
     const url = this._currentUrl();
 
-    // 1. Try to get title from route data (Deep traversal)
-    let route = this._router.routerState.root;
-    while (route.firstChild) {
-      route = route.firstChild;
-    }
-    const dataTitle = route.snapshot.data['title'];
+    // 1. title en data de la ruta hoja o de un ancestro (lazy + path '' suelen dejar el título en el padre)
+    const dataTitle = this._titleFromSnapshot(this._router.routerState.snapshot.root);
     if (dataTitle) {
       return dataTitle;
     }
 
-    // 2. Fallback to explicit mapping if route data is missing
+    // 2. Fallback si falta data en rutas
     if (url.includes('/gestion-procesos/')) return 'processDetail.title';
     if (url.includes('/gestion-procesos')) return 'navigation.gestionProcesos';
+    if (url.includes('/actuaciones-recientes')) return 'actuacionesRecientes.title';
     if (url.includes('/palabras-clave')) return 'navigation.keywords';
+    if (url.includes('/tareas')) return 'tasks.title';
+    if (url.includes('/perfil')) return 'header.profile';
     if (url.includes('/dashboard')) return 'navigation.dashboard';
 
     return '';
   });
 
+  private _titleFromSnapshot(root: ActivatedRouteSnapshot): string | undefined {
+    let deepest = root;
+    while (deepest.firstChild) {
+      deepest = deepest.firstChild;
+    }
+    let s: ActivatedRouteSnapshot | null = deepest;
+    while (s) {
+      const t = s.data['title'];
+      if (typeof t === 'string' && t.length > 0) {
+        return t;
+      }
+      s = s.parent;
+    }
+    return undefined;
+  }
+  
   constructor() {
-    // Initial scroll reset and title update will happen in ngOnInit
+    // Explicitly force change detection on every navigation end
+    this._router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        tap((event) => {
+          this._currentUrl.set(event.urlAfterRedirects || event.url);
+          this._cdr.detectChanges();
+        })
+      )
+      .subscribe();
   }
 
   ngOnInit(): void {
-    // Update state on navigation
+    // Initial sync
+    setTimeout(() => {
+      this._currentUrl.set(this._router.url);
+      this._cdr.detectChanges();
+    }, 100);
+
+    // Initial scroll reset
     this._router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
-      .subscribe((event) => {
-        // Sync URL signal
-        this._currentUrl.set(event.urlAfterRedirects || event.url);
-
+      .subscribe(() => {
         // Reset scroll state
         this.pageScrolled.set(false);
 
@@ -87,11 +114,6 @@ export class AuthenticatedLayoutComponent implements OnInit {
           mainEl.scrollTo(0, 0);
         }
       });
-
-    // Initial sync
-    setTimeout(() => {
-      this._currentUrl.set(this._router.url);
-    }, 100);
   }
 
   /**

@@ -13,11 +13,25 @@ export const DEFAULT_NAVIGATION: NavigationItem[] = [
     link: '/gestion-procesos',
   },
   {
+    id: 'actuaciones-recientes',
+    title: 'actuacionesRecientes.title',
+    type: 'basic',
+    icon: 'bell',
+    link: '/actuaciones-recientes',
+  },
+  {
     id: 'keywords',
     title: 'navigation.keywords',
     type: 'basic',
     icon: 'keywords',
     link: '/palabras-clave',
+  },
+  {
+    id: 'tasks',
+    title: 'tasks.title',
+    type: 'basic',
+    icon: 'tasks',
+    link: '/tareas',
   },
   // More items will be added here as needed
 ];

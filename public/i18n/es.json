@@ -1,6 +1,10 @@
 {
   "common": {
-    "actions": "Acciones"
+    "actions": "Acciones",
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "cancel": "Cancelar"
   },
   "generics": {
     "spanish": "Español",
@@ -132,6 +136,7 @@
     "markSelectedAsViewed": "Marcar seleccionadas como vistas",
     "markSelectedAsViewedWithCount": "Marcar seleccionadas como vistas ({{count}})",
     "markedCountSuccess": "Se marcaron {{count}} como vistas",
+    "copiedToClipboard": "Copiado al portapapeles",
     "confirm": {
       "markAllTitle": "Marcar todas como vistas",
       "markAllMessage": "¿Desea marcar las {{total}} notificaciones como vistas?",
@@ -146,6 +151,8 @@
       "annotation": "Anotación",
       "actionDate": "Fecha de actuación",
       "registrationDate": "Fecha de registro",
+      "termStartDate": "Fecha inicio término",
+      "termEndDate": "Fecha finaliza término",
       "notifiedWhen": "Notificado",
       "subjects": "Sujetos procesales",
       "seeMoreSubjects": "Ver más ({{count}})",
@@ -172,7 +179,8 @@
         "title": "Recomendaciones",
         "rule1": "El número de radicado debe contener exactamente 23 dígitos",
         "rule2": "Solo se permiten números enteros (0-9)",
-        "rule3": "No se permiten espacios, letras o caracteres especiales"
+        "rule3": "No se permiten espacios, letras o caracteres especiales",
+        "rule4": "Ejemplo: 76001333301320170009301 (Sin puntos ni guiones)"
       },
       "errors": {
         "required": "El número de radicado es requerido",
@@ -217,15 +225,16 @@
     "table": {
       "empty": "No hay procesos disponibles",
       "index": "#",
-      "processNumber": "Número de Radicación",
+      "processNumber": "Número de radicado",
       "court": "Despacho",
-      "processClass": "Clase de Proceso",
+      "processClass": "Clase de proceso",
       "status": "Estado",
       "plaintiff": "Demandante (S)",
-      "defendant": "Demandados (S)",
+      "defendant": "Demandado (S)",
       "multipleInstances": "Múltiples instancias",
-      "processDate": "Fecha de Registro",
-      "lastActivityDate": "Fecha Ultima Actuación"
+      "processDate": "Fecha de registro",
+      "lastActivityDate": "Fecha última actuación",
+      "copyTooltip": "Copiar número"
     },
     "infoModal": {
       "title": "Información del Proceso Registrado",
@@ -242,7 +251,28 @@
       "processDetails": {
         "title": "Detalles del Proceso",
         "totalProcesses": "Total de Procesos",
-        "registeredCount": "Procesos Registrados"
+        "registeredCount": "Procesos Registrados",
+        "privateCount": "Procesos Privados"
+      }
+    },
+    "roleModal": {
+      "title": "Asignar Rol del Abogado",
+      "subtitle": "Define si su cliente es demandante o demandado en este proceso",
+      "infoTitle": "Importancia del Rol",
+      "infoDesc": "El rol asignado permite que el sistema personalice las alertas y notificaciones según la posición jurídica de su cliente.",
+      "save": "Guardar Configuración",
+      "saving": "Guardando...",
+      "plaintiffDesc": "Su cliente es quien demanda",
+      "defendantDesc": "Su cliente es el demandado"
+    },
+    "bulk": {
+      "results": {
+        "title": "Resultados de la Operación",
+        "success": "Exitosos",
+        "failed": "Fallidos",
+        "impact": "Impacto en Semaforización",
+        "understand": "Entendido",
+        "issue": "Radicados con Incidencias"
       }
     }
   },
@@ -268,6 +298,8 @@
     "lastUpdate": "Última Actualización",
     "createdAt": "Fecha de Creación",
     "updatedAt": "Fecha de Actualización",
+    "lawyerRole": "Rol del Abogado",
+    "alertStatus": "Semáforo de Alerta",
     "yes": "Sí",
     "no": "No",
     "subjects": {
@@ -401,5 +433,105 @@
   "process": {
     "import_finished_title": "Importación Finalizada",
     "import_finished_description": "El proceso de importación de radicados ha terminado satisfactoriamente."
+  },
+  "actuacionesRecientes": {
+    "title": "Actuaciones Recientes",
+    "description": "Consulta los últimos movimientos de todos tus procesos judiciales",
+    "filters": {
+      "title": "Filtros de Búsqueda",
+      "processNumber": "Número de radicado",
+      "processNumberPlaceholder": "Ej: 76001...",
+      "registrationDate": "Fecha de registro",
+      "registrationDatePlaceholder": "Filtro por registro",
+      "termStartDate": "Rango fecha inicio término",
+      "termEndDate": "Rango fecha finaliza término",
+      "termDatePlaceholder": "Seleccionar rango",
+      "search": "Buscar",
+      "reset": "Limpiar Filtros"
+    },
+    "table": {
+      "processNumber": "Número de radicado",
+      "court": "Despacho",
+      "action": "Actuación",
+      "actionDate": "Fecha de actuación",
+      "registrationDate": "Fecha de registro",
+      "plaintiff": "Demandante (S)",
+      "defendant": "Demandado (S)",
+      "termStartDate": "Fecha inicio término",
+      "termEndDate": "Fecha finaliza término",
+      "alertLevel": "Estado",
+      "alerts": {
+        "legend": "Guía de estados y alertas procesales",
+        "redDemandante": "Alerta Crítica: Riesgo de desistimiento o parálisis grave (+90 días de inactividad).",
+        "yellowDemandante": "Alerta Temprana: Seguimiento necesario para evitar mora (+45 días de inactividad).",
+        "greenDemandante": "Proceso con actividad reciente y saludable.",
+        "redGeneral": "Alerta Crítica: Sentencia, mandamiento o terminación detectada.",
+        "yellowGeneral": "Alerta de Trámite: Traslado, memorial u oficio detectado.",
+        "greenGeneral": "Informativo: Constancia o archivo detectado.",
+        "greenDemandado": "Informativo Favorable: El proceso en contra no avanza (+90 días de inactividad)."
+      },
+      "empty": "No hay actuaciones que coincidan con los filtros aplicados",
+      "emptyToday": "Hoy no se han reportado nuevas actuaciones",
+      "emptyTodayDescription": "Nuestro sistema monitorea tus procesos en tiempo real. Si hay novedades, las verás reflejadas aquí automáticamente.",
+      "dblClickNavigation": "Doble clic para ver detalle del proceso",
+      "linkRole": "Vincular rol",
+      "linkRoleDesc": "Vincule su rol para activar alertas procesales inteligentes"
+    },
+    "legend": {
+      "title": "Leyenda de Estados",
+      "green": {
+        "title": "Saludable / Informativo",
+        "desc": "Procesos con actividad reciente o inactividad favorable para su rol."
+      },
+      "yellow": {
+        "title": "Alerta Temprana",
+        "desc": "Seguimiento preventivo (+45 días) o trámites judiciales en curso."
+      },
+      "red": {
+        "title": "Alerta Crítica",
+        "desc": "Inactividad prolongada (+90 días) o hitos procesales determinantes."
+      }
+    }
+  },
+  "tasks": {
+    "title": "Tareas",
+    "description": "Gestiona tus tareas y compromisos relacionados con los procesos judiciales",
+    "add": "Agregar Tarea",
+    "edit": "Editar Tarea",
+    "delete": "Eliminar Tarea",
+    "empty": "No hay tareas registradas",
+    "loading": "Cargando tareas...",
+    "loadMore": "Cargar más",
+    "form": {
+      "title": "Título de la Tarea",
+      "titlePlaceholder": "Ej: Revisar términos del proceso",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Detalles adicionales de la tarea...",
+      "isAdmin": "Visible para Admin",
+      "process": "Proceso Asociado (Opcional)",
+      "processPlaceholder": "Buscar por número de radicado o despacho",
+      "noProcessesFound": "No se encontraron procesos activos",
+      "searching": "Buscando procesos..."
+    },
+    "messages": {
+      "created": "Tarea creada satisfactoriamente",
+      "updated": "Tarea actualizada satisfactoriamente",
+      "deleted": "Tarea eliminada satisfactoriamente",
+      "error": "Ha ocurrido un error al procesar la solicitud",
+      "confirmDelete": "¿Estás seguro de que deseas eliminar esta tarea?",
+      "confirmDeleteTitle": "Eliminar Tarea"
+    }
+  },
+  "aiChat": {
+    "title": "Asistente Judicial IA",
+    "newChat": "Nuevo Chat",
+    "recentHistory": "Historial Reciente",
+    "placeholder": "Escribe tu consulta sobre el proceso...",
+    "disclaimer": "La IA puede cometer errores. Verifica siempre la información jurídica.",
+    "welcomeTitle": "¿En qué puedo ayudarte hoy?",
+    "welcomeDesc": "Puedo analizar expedientes, resumir actuaciones o buscar información específica sobre este proceso judicial.",
+    "statusActive": "IA Judicial Activa",
+    "selectChat": "Selecciona un chat",
+    "emptySession": "Empieza una conversación..."
   }
 }

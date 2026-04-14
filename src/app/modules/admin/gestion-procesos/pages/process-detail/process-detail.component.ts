@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProcessService } from '@app/core/services/process/process.service';
 import {
@@ -28,6 +29,10 @@ import { buildTextWithHighlights } from '@app/core/utils/alert-highlight.utils';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
 import { DataTableComponent, DataTableColumn } from '@app/shared/components/data-table/data-table.component';
 import { ConfirmationDialogComponent } from '@app/shared/components/confirmation-dialog/confirmation-dialog.component';
+import { ProcessAlertTooltipComponent } from '@app/shared/components/process-alert-tooltip/process-alert-tooltip.component';
+import { RoleSelectionModalComponent } from '../../components/role-selection-modal/role-selection-modal.component';
+// import { ProcessAiChatComponent } from '../../components/process-ai-chat/process-ai-chat.component';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-process-detail',
@@ -39,6 +44,10 @@ import { ConfirmationDialogComponent } from '@app/shared/components/confirmation
     DateRangePickerComponent,
     DataTableComponent,
     ConfirmationDialogComponent,
+    ProcessNumberPipe,
+    ProcessAlertTooltipComponent,
+    RoleSelectionModalComponent,
+    // ProcessAiChatComponent,
   ],
   templateUrl: './process-detail.component.html',
   styleUrls: ['./process-detail.component.scss'],
@@ -79,13 +88,22 @@ export class ProcessDetailComponent {
   public confirmModalTitle = signal<string>('');
   public confirmModalMessage = signal<string>('');
   public confirmModalAction = signal<'activate' | 'deactivate'>('deactivate');
-  /** Estado del toast */
+
+  /** Estado del mensaje de copiado (idéntico a Actuaciones Recientes) */
+  public copiedMessage = signal<string | null>(null);
+  /** Estado del toast (para otros mensajes) */
   public toastVisible = signal<boolean>(false);
   public toastType = signal<'success' | 'error'>('success');
   public toastMessage = signal<string>('');
 
+  /** Modal de asignación de rol */
+  public showRoleModal = signal<boolean>(false);
+
   /** Selector de instancia en móvil */
   public showInstanceSelector = signal<boolean>(false);
+
+  /** Estado del chat de IA */
+  public showAiChat = signal<boolean>(false);
 
   /** Instancia actualmente seleccionada */
   public selectedInstance = computed(() =>
@@ -129,15 +147,48 @@ export class ProcessDetailComponent {
         label: 'processDetail.actions.table.action',
         sortable: true,
         html: true,
-        render: (value: string | null, row: Action) =>
-          buildTextWithHighlights(row.action ?? value, row.alert_highlights, 'action'),
+        render: (value: string | null, row: Action) => {
+          const mainAction = row.action ?? value;
+          const related = row.related_action;
+          
+          const actionHtml = buildTextWithHighlights(mainAction, row.alert_highlights, 'action');
+          
+          if (related) {
+            const relatedActionHtml = buildTextWithHighlights(related.action ?? '', related.alert_highlights, 'action');
+            return `
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-1.5">
+                   <span class="badge badge-sm bg-primary/10 text-primary border-none font-bold text-[9px] px-1.5 h-4 uppercase tracking-tighter">Fijación</span>
+                   <div class="font-bold text-base-content/90 leading-tight">${actionHtml}</div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                   <span class="badge badge-sm bg-accent/10 text-accent border-none font-bold text-[9px] px-1.5 h-4 uppercase tracking-tighter">Auto</span>
+                   <div class="font-bold text-base-content leading-tight">${relatedActionHtml}</div>
+                </div>
+              </div>
+            `;
+          }
+          return actionHtml;
+        },
       },
       {
         key: 'annotation',
         label: 'processDetail.actions.table.annotation',
         html: true,
-        render: (value: string | null, row: Action) =>
-          buildTextWithHighlights(row.annotation ?? value, row.alert_highlights, 'annotation'),
+        render: (value: string | null, row: Action) => {
+          const related = row.related_action;
+          let annotationToUse = row.annotation ?? value;
+          let highlightsToUse = row.alert_highlights;
+
+          if (related && related.annotation && related.annotation !== '---' && related.annotation !== '–') {
+            annotationToUse = related.annotation;
+            highlightsToUse = related.alert_highlights;
+          }
+
+          if (!annotationToUse || annotationToUse === '---' || annotationToUse === '–') return '–';
+          
+          return buildTextWithHighlights(annotationToUse, highlightsToUse, 'annotation');
+        },
       },
       {
         key: 'term_start_date',
@@ -188,6 +239,34 @@ export class ProcessDetailComponent {
   }
 
   /**
+   * Abre la modal de asignación de rol
+   */
+  public openRoleModal(): void {
+    this.showRoleModal.set(true);
+  }
+
+  /**
+   * Cierra la modal de asignación de rol
+   */
+  public closeRoleModal(): void {
+    this.showRoleModal.set(false);
+  }
+
+  /**
+   * Maneja el evento de guardado del rol
+   * @param role - Nuevo rol guardado
+   */
+  public onRoleSaved(role: string): void {
+    this.closeRoleModal();
+    const processId = this.process()?.id;
+    if (processId) {
+      this.loadProcessDetail(processId);
+    }
+    // Mostrar mensaje de éxito
+    this.showToast('success', 'Rol del abogado actualizado exitosamente.');
+  }
+
+  /**
    * Load alert keywords for the process (for filter select)
    */
   loadAlertKeywords(processId: string): void {
@@ -221,6 +300,25 @@ export class ProcessDetailComponent {
   applyAlertFilter(slug: string): void {
     this.actionFilterForm.patchValue({ alert_slug: slug });
     this.loadActions(1, this.actionsPagination()?.per_page || 10);
+  }
+
+  /**
+   * Copy text to clipboard (removes spaces and dashes)
+   */
+  public copyToClipboard(text: string, event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    
+    if (!text || text === '–') return;
+    
+    // Remove dashes and spaces as requested
+    const cleanText = text.replace(/[^0-9]/g, '');
+    
+    navigator.clipboard.writeText(cleanText).then(() => {
+      this.copiedMessage.set('Radicado copiado!');
+      setTimeout(() => this.copiedMessage.set(null), 2500);
+    });
   }
 
   /**
@@ -295,6 +393,13 @@ export class ProcessDetailComponent {
   }
 
   /**
+   * Alterna la visibilidad del chat de IA
+   */
+  public toggleAiChat(): void {
+    this.showAiChat.update(v => !v);
+  }
+
+  /**
    * Load actions with current filters
    */
   loadActions(page: number = 1, perPage: number = 10): void {
@@ -329,14 +434,37 @@ export class ProcessDetailComponent {
 
     this._processService.getProcessActions(process.id, filters).subscribe({
       next: (response) => {
-        this.actions.set(response.data);
+        const rawActions = response.data;
+        const actionMap = new Map<string, Action>();
+        rawActions.forEach(a => actionMap.set(a.id, a));
+
+        const finalActions: Action[] = [];
+        const groupedIds = new Set<string>();
+
+        rawActions.forEach(a => {
+          if (groupedIds.has(a.id)) return;
+
+          // If it's a Fijacion Estado that points to an Auto
+          if (a.action?.toLowerCase().includes('fijacion estado') && a.notified_action_id) {
+            const auto = actionMap.get(a.notified_action_id);
+            if (auto && auto.id !== a.id) {
+              a.related_action = auto;
+              groupedIds.add(auto.id);
+            }
+          }
+          finalActions.push(a);
+        });
+
+        const filteredActions = finalActions.filter(a => !groupedIds.has(a.id));
+
+        this.actions.set(filteredActions);
         this.actionsPagination.set({
           current_page: response.current_page,
           per_page: response.per_page,
-          total: response.total,
-          last_page: response.last_page,
+          total: response.total - groupedIds.size, // Adjust total count since we grouped some
+          last_page: Math.ceil((response.total - groupedIds.size) / response.per_page),
           from: response.from,
-          to: response.to,
+          to: Math.min(response.to, response.total - groupedIds.size),
         });
         this.loadingActions.set(false);
       },
@@ -393,7 +521,7 @@ export class ProcessDetailComponent {
     this.confirmModalTitle.set(isCurrentlyActive ? 'Desactivar Proceso' : 'Activar Proceso');
     this.confirmModalMessage.set(
       isCurrentlyActive
-        ? '¿Está seguro de desactivar este proceso? Ya no se realizará seguimiento automático de las actualizaciones desde la Rama Judicial.'
+        ? '¿Está seguro de desactivar este proceso? Ya no se realizará seguimiento automático de las actualizaciones.'
         : '¿Está seguro de activar este proceso? Se reanudará el seguimiento automático de las actualizaciones.'
     );
     this.confirmModalAction.set(isCurrentlyActive ? 'deactivate' : 'activate');
@@ -540,4 +668,14 @@ export class ProcessDetailComponent {
     return kind === 'onlyTime' ? '' : trimmed;
   }
 
+  /**
+   * Helper para mostrar el rol del abogado en mayúsculas y legible (Demandante/Demandado)
+   */
+  public getRoleLabel(role: string | null | undefined): string {
+    if (!role) return '';
+    const r = role.toLowerCase();
+    if (r === 'plaintiff' || r.includes('demandante')) return 'DEMANDANTE';
+    if (r === 'defendant' || r.includes('demandado')) return 'DEMANDADO';
+    return role.toUpperCase();
+  }
 }

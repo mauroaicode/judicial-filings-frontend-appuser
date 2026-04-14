@@ -50,6 +50,8 @@ export class DashboardService {
     if (filters.created_at_to) params = params.set('created_at_to', filters.created_at_to);
     if (filters.last_api_update_from) params = params.set('last_api_update_from', filters.last_api_update_from);
     if (filters.last_api_update_to) params = params.set('last_api_update_to', filters.last_api_update_to);
+    if (filters.lawyer_role) params = params.set('lawyer_role', filters.lawyer_role);
+    if (filters.severity_color) params = params.set('severity_color', filters.severity_color);
 
     this._http
       .get<DashboardStats>(url, { params })
@@ -60,7 +62,19 @@ export class DashboardService {
             this._isLoading.set(false);
           },
           error: (err) => {
-            this._error.set(err?.message ?? 'Error al cargar estadísticas');
+            let errorMsg = 'Error al cargar estadísticas';
+            if (err.error?.messages && Array.isArray(err.error.messages)) {
+              errorMsg = err.error.messages.join('. ');
+            } else if (err.error?.errors) {
+              // Standard Laravel validation errors (Object with arrays)
+              const allErrors = Object.values(err.error.errors).flat();
+              errorMsg = allErrors.join('. ');
+            } else if (err.error?.message) {
+              errorMsg = err.error.message;
+            } else if (err.message) {
+              errorMsg = err.message;
+            }
+            this._error.set(errorMsg);
             this._isLoading.set(false);
           },
         })

@@ -8,8 +8,9 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { filter } from 'rxjs';
 import { NavigationService } from '@app/core/navigation/navigation.service';
 import { NavigationItem } from '@app/core/models/navigation/navigation-item.model';
 import { STORAGE } from '@app/core/constants/storage.constant';
@@ -28,7 +29,6 @@ import { IconService } from '@app/core/services/icon/icon.service';
 export class SidebarComponent {
   private _navigationService = inject(NavigationService);
   private _router = inject(Router);
-  private _activatedRoute = inject(ActivatedRoute);
   private _iconService = inject(IconService);
 
   // Sidebar state - load from localStorage or default to true
@@ -43,19 +43,50 @@ export class SidebarComponent {
 
   // Track expanded items for collapsable menus
   private _expandedItems = signal<Set<string>>(new Set());
-
-  // Track current URL to force reactivity on route changes
   public currentUrl = signal<string>(this._router.url);
+  public selectedMenuId = signal<string | null>(null);
+
+  // Computed set of active item IDs based on current URL
+  public activeIds = computed(() => {
+    const url = this.currentUrl();
+    const nav = this.navigation();
+    const ids = new Set<string>();
+
+    const normalizedUrl = url.split('?')[0].replace(/\/$/, '');
+
+    const checkActive = (item: NavigationItem): boolean => {
+      let active = false;
+      if (item.link) {
+        const normalizedLink = item.link.replace(/\/$/, '');
+        active = normalizedUrl === normalizedLink || normalizedUrl.startsWith(normalizedLink + '/');
+      }
+      if (!active && item.children) {
+        active = item.children.some(child => checkActive(child));
+      }
+      if (active) ids.add(item.id);
+      return active;
+    };
+
+    nav.default.forEach(item => checkActive(item));
+    return ids;
+  });
 
   constructor() {
-    // Monitor router events
-    this._router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        this.currentUrl.set(event.urlAfterRedirects);
-      }
-    });
+    // Initial active menu from current URL
+    this._syncSelectedMenuFromUrl(this._router.url);
+
+    // Keep selected menu synced with router URL
+    this._router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        const nextUrl = event.urlAfterRedirects || event.url || this._router.url;
+        this.currentUrl.set(nextUrl);
+        this._syncSelectedMenuFromUrl(nextUrl);
+      });
+
     // Check if mobile on init and resize
     this._checkMobile();
+
     window.addEventListener('resize', () => {
       const wasMobile = this.isMobile();
       this._checkMobile();
@@ -87,6 +118,7 @@ export class SidebarComponent {
         this._saveSidebarState(isOpenValue);
       }
     });
+
   }
 
   /**
@@ -129,18 +161,77 @@ export class SidebarComponent {
    * Check if item is active
    */
   isItemActive(item: NavigationItem): boolean {
-    if (!item.link) return false;
+    if (!item.link && (!item.children || item.children.length === 0)) return false;
 
     // Read the currentUrl signal so Angular re-evaluates this function 
     // when the route changes under OnPush change detection
     this.currentUrl();
 
-    return this._router.isActive(item.link, {
+    // If the item has a link, check if it's active
+    if (item.link && this._router.isActive(item.link, {
       paths: 'subset',
       queryParams: 'subset',
       fragment: 'ignored',
       matrixParams: 'ignored',
-    });
+    })) {
+      return true;
+    }
+
+    // If the item has children, check if any of them are active
+    if (item.children) {
+      return item.children.some(child => this.isItemActive(child));
+    }
+
+    return false;
+  }
+
+  /**
+   * Check if a link should be highlighted as active.
+   * Uses currentUrl signal directly to avoid one-step lag in zoneless mode.
+   */
+  isLinkActive(link?: string): boolean {
+    if (!link) return false;
+    const current = this._normalizePath(this.currentUrl());
+    const target = this._normalizePath(link);
+    return this._matchesPath(current, target);
+  }
+
+  isItemSelected(itemId: string): boolean {
+    return this.selectedMenuId() === itemId;
+  }
+
+  private _normalizePath(url: string): string {
+    return (url || '').split('?')[0].split('#')[0].replace(/\/$/, '') || '/';
+  }
+
+  private _matchesPath(current: string, target: string): boolean {
+    return current === target || current.startsWith(`${target}/`);
+  }
+
+  onMenuItemClick(item: NavigationItem): void {
+    this.selectedMenuId.set(item.id);
+    if (this.isMobile()) this.closeSidebar();
+  }
+
+  private _syncSelectedMenuFromUrl(url: string): void {
+    const normalized = this._normalizePath(url);
+    const navItems = this.navigation().default;
+
+    for (const item of navItems) {
+      if (item.link && this._matchesPath(normalized, this._normalizePath(item.link))) {
+        this.selectedMenuId.set(item.id);
+        return;
+      }
+
+      if (item.children?.length) {
+        for (const child of item.children) {
+          if (child.link && this._matchesPath(normalized, this._normalizePath(child.link))) {
+            this.selectedMenuId.set(child.id);
+            return;
+          }
+        }
+      }
+    }
   }
 
   /**

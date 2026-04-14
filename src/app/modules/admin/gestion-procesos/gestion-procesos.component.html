@@ -142,6 +142,33 @@
           </select>
         </div>
 
+        <!-- Lawyer Role Filter -->
+        <div class="form-control">
+          <label class="label pt-0 pb-1">
+            <span class="label-standard">Rol</span>
+          </label>
+          <select formControlName="lawyer_role" class="select-standard select w-full">
+            <option value="">{{ 'gestionProcesos.filters.all' | transloco }}</option>
+            <option value="plaintiff">Demandante</option>
+            <option value="defendant">Demandado</option>
+            <option value="none">Sin Rol Asignado</option>
+          </select>
+        </div>
+
+        <!-- Severity Color Filter -->
+        <div class="form-control">
+          <label class="label pt-0 pb-1">
+            <span class="label-standard">Semáforo</span>
+          </label>
+          <select formControlName="severity_color" class="select-standard select w-full">
+            <option value="">{{ 'gestionProcesos.filters.all' | transloco }}</option>
+            <option value="green">Verde (Reciente)</option>
+            <option value="yellow">Amarillo (Alerta)</option>
+            <option value="red">Rojo (Urgente)</option>
+            <option value="none">Sin Color (En Espera)</option>
+          </select>
+        </div>
+
         <!-- Radicación Date Range -->
         <div class="form-control">
           <app-date-range-picker [label]="'gestionProcesos.filters.createdAtRange' | transloco"
@@ -185,8 +212,59 @@
   }
 
   <!-- Table Card -->
-  <div class="card bg-base-100 shadow-sm process-list-card">
-    <div class="card-body p-0 process-list-card-body">
+  <div class="card bg-base-100 shadow-sm border border-base-200 process-list-card relative">
+    <!-- Bulk Actions Sticky Bar -->
+    @if (selectedCount() > 0) {
+      <div class="sticky top-0 z-[100] w-full bg-primary/95 backdrop-blur-md text-white p-3 sm:px-6 shadow-xl animate-fade-in flex flex-wrap items-center justify-between gap-4 border-b border-white/10">
+        <div class="flex items-center gap-4">
+          <button class="btn btn-ghost btn-sm btn-circle text-white hover:bg-white/10" (click)="clearSelection()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div class="flex flex-col">
+            <span class="text-sm font-black uppercase tracking-widest leading-none">{{ selectedCount() }} Seleccionados</span>
+            <span class="text-[10px] text-white/60 font-bold uppercase tracking-wider">Acciones disponibles para procesos</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
+          <button class="btn btn-sm bg-white/5 hover:bg-white/15 border border-white/35 text-white font-semibold normal-case rounded-xl h-10 px-4 transition-all" (click)="openBulkRoleModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Asignar Rol
+          </button>
+          
+          <!-- 
+          <button class="btn btn-sm bg-white/5 hover:bg-white/15 border border-white/35 text-white font-semibold normal-case rounded-xl h-10 px-4 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17v-2a4 4 0 014-4h4m-4 4l-4-4m4 4l4-4" />
+            </svg>
+            Exportar
+          </button>
+
+          <button class="btn btn-sm bg-white/5 hover:bg-white/15 border border-white/35 text-white font-semibold normal-case rounded-xl h-10 px-4 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636" />
+            </svg>
+            Inactivar
+          </button>
+
+          <div class="divider divider-horizontal divider-white/10 mx-1"></div>
+
+          <button class="btn btn-sm bg-error/10 hover:bg-error/30 border border-error/35 text-white font-semibold normal-case rounded-xl h-10 px-4 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Eliminar
+          </button>
+          -->
+        </div>
+      </div>
+    }
+
+    <div class="card-body p-0 process-list-card-body relative">
       @if (loading()) {
       <div class="flex items-center justify-center py-12">
         <span class="loading loading-spinner loading-lg text-primary"></span>
@@ -205,26 +283,79 @@
       <div class="block lg:hidden w-full bg-base-100/50 p-3 sm:p-4 space-y-4">
         @for (process of processes(); track process.id) {
         <div
-          class="card bg-base-100 border border-base-200 shadow-sm overflow-hidden transition-all duration-200 cursor-pointer hover:border-primary/40 hover:shadow-md"
+          class="card border border-base-200 shadow-sm overflow-hidden transition-all duration-200 cursor-pointer hover:border-primary/40 hover:shadow-md"
+          [class.bg-primary/5]="selectedProcessIds().has(process.id)"
+          [class.border-primary/40]="selectedProcessIds().has(process.id)"
           [class.border-primary]="hoveredRowId() === process.id" (click)="onRowDblClick(process)">
           <!-- Header -->
           <div class="bg-base-200/50 p-3 sm:p-4 flex justify-between items-center border-b border-base-200">
-            <div class="flex items-center gap-2">
-              <span class="font-bold text-primary">{{ process.process_number }}</span>
+            <div class="flex items-center gap-3">
+              <input type="checkbox" 
+                     class="checkbox checkbox-primary checkbox-sm rounded-lg"
+                     [checked]="selectedProcessIds().has(process.id)"
+                     (change)="toggleSelect(process.id)"
+                     (click)="$event.stopPropagation()" />
+              
+              @if (process.alert_level) {
+                <button type="button" (click)="openLegendModal($event)" class="relative p-1">
+                  <span class="alert-dot" [ngClass]="{
+                    'alert-red alert-pulse': process.alert_level === 'red',
+                    'alert-yellow': process.alert_level === 'yellow',
+                    'alert-green': process.alert_level === 'green'
+                  }"></span>
+                </button>
+              }
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-primary">{{ process.process_number | processNumber }}</span>
+                <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                  <button type="button" class="btn btn-ghost btn-xs btn-circle text-primary/40 hover:bg-primary/5 hover:text-primary"
+                    (click)="copyToClipboard(process.process_number, $event)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                    </svg>
+                  </button>
+                </span>
+              </div>
             </div>
             <!-- status badge -->
-            <span class="badge badge-sm font-semibold" [ngClass]="{
-                      'badge-success': process.status_label === 'Activo',
-                      'badge-warning': process.status_label === 'Pendiente',
-                      'badge-neutral': process.status_label === 'Cerrado',
-                      'badge-error': process.status_label === 'Inactivo'
-                    }">
-              {{ process.status_label }}
-            </span>
+            <div class="flex flex-col items-end gap-1">
+              <span class="badge badge-sm font-semibold" [ngClass]="{
+                        'badge-success': process.status_label === 'Activo',
+                        'badge-warning': process.status_label === 'Pendiente',
+                        'badge-neutral': process.status_label === 'Cerrado',
+                        'badge-error': process.status_label === 'Inactivo'
+                      }">
+                {{ process.status_label }}
+              </span>
+            </div>
           </div>
 
           <!-- Body -->
           <div class="p-3 sm:p-4 space-y-4 text-sm">
+            @if (!process.alert_level || !process.lawyer_role) {
+              <div class="bg-primary/5 rounded-xl p-3 border border-primary/10 flex items-center justify-between group" (click)="onRowDblClick(process)">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13.828 10.122a3 3 0 00-4.244 0m-2.122 2.122a3 3 0 000 4.244m10.608-10.608L15.314 7.33M6.686 16.67L4.414 18.943m1.414-8.486L10.586 15.172" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-xs font-bold text-primary uppercase tracking-wider">{{ 'actuacionesRecientes.table.linkRole' | transloco }}</div>
+                    <div class="text-[10px] text-primary/60">{{ 'actuacionesRecientes.table.linkRoleDesc' | transloco }}</div>
+                  </div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary/40 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            }
+
+            @if (process.lawyer_role) {
+              <div class="flex items-center mb-3 px-3 sm:px-4">
+                <span class="px-2 py-0.5 rounded-md bg-base-200/60 text-[9px] uppercase font-black tracking-widest text-base-content/40">{{ process.lawyer_role }}</span>
+              </div>
+            }
             <!-- Court & Class -->
             <div class="grid grid-cols-2 gap-3">
               <div class="flex flex-col">
@@ -320,7 +451,17 @@
                 <div class="flex flex-col min-w-0">
                   <span class="text-[10px] text-base-content/50 uppercase font-bold tracking-wider mb-0.5"># Radicación
                     (Inst. {{ instance.index }})</span>
-                  <span class="font-bold text-base-content text-sm truncate">{{ instance.process_number }}</span>
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-base-content text-sm truncate">{{ instance.process_number | processNumber }}</span>
+                    <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                      <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/30 hover:bg-primary/5 hover:text-primary"
+                        (click)="copyToClipboard(instance.process_number, $event)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                        </svg>
+                      </button>
+                    </span>
+                  </div>
                 </div>
                 <span class="badge badge-sm font-semibold whitespace-nowrap" [ngClass]="{
                             'badge-success': instance.status_label === 'Activo',
@@ -355,10 +496,20 @@
 
       <!-- Desktop layout: Table view -->
       <div class="hidden lg:block overflow-x-auto w-full process-list-table">
-        <table class="table table-zebra" style="min-width: 1000px;">
+        <table class="table table-zebra" style="min-width: 1900px;">
           <thead style="background-color: #24163E; color: #ffffff;">
             <tr>
-              <th style="width: 48px;" class="text-center"></th>
+              <th style="width: 40px;" class="text-center">
+                <input type="checkbox" 
+                       class="checkbox checkbox-sm border-white/40 rounded-lg"
+                       [checked]="isAllSelected()"
+                       (change)="toggleSelectAll()" />
+              </th>
+              <th style="width: 48px;" class="text-center"></th> <!-- Expander header -->
+              <th style="width: 48px;" class="text-center sticky-col-idx">#</th>
+              <th style="width: 80px;" class="text-center sticky-col-alert">
+                {{ 'actuacionesRecientes.table.alertLevel' | transloco }}
+              </th>
               @for (column of columns; track column.key) {
               <th [class.sticky-col-radicado]="column.key === 'process_number'"
                 [class.text-left]="!column.align || column.align === 'left'"
@@ -370,14 +521,21 @@
             </tr>
           </thead>
           <tbody>
-            @for (process of processes(); track process.id) {
-            <tr class="cursor-pointer group process-table-main-row"
+            @for (process of processes(); track process.id; let i = $index) {
+            <tr class="cursor-pointer group process-table-main-row transition-colors"
               [class.process-row-hovered]="hoveredRowId() === process.id"
+              [class.bg-primary/5]="selectedProcessIds().has(process.id)"
               [class.rounded-b-none]="isExpanded(process) && process.instances?.length"
               [class.border-b-0]="isExpanded(process) && process.instances?.length"
-              [class.bg-base-200/30]="isExpanded(process) && process.instances?.length"
               (mouseenter)="hoveredRowId.set(process.id)" (mouseleave)="hoveredRowId.set(null)"
-              (click)="toggleExpand(process)" (dblclick)="onRowDblClick(process)">
+              (dblclick)="onRowDblClick(process)">
+              <td class="text-center align-middle p-2">
+                <input type="checkbox" 
+                       class="checkbox checkbox-primary checkbox-sm rounded-lg"
+                       [checked]="selectedProcessIds().has(process.id)"
+                       (change)="toggleSelect(process.id)"
+                       (click)="$event.stopPropagation()" />
+              </td>
               <td class="text-center align-middle p-2">
                 @if (process.has_multiple_instances && process.instances && process.instances.length > 1) {
                 <button type="button" class="btn btn-ghost btn-xs btn-square"
@@ -399,10 +557,85 @@
                 <span class="opacity-0 group-hover:opacity-30">–</span>
                 }
               </td>
-              <td class="text-center align-middle">{{ process.index }}</td>
+              <td class="text-center align-middle sticky-col-idx font-bold text-[11px] text-base-content/40">{{ process.index }}</td>
+              <td class="text-center align-middle sticky-col-alert">
+                <span class="sticky-cell-bg" aria-hidden="true"></span>
+                <div class="sticky-cell-txt flex justify-center">
+                  @if (process.alert_level && process.lawyer_role) {
+                  <div class="flex justify-center items-center h-full w-full">
+                    <app-process-alert-tooltip 
+                      [alertLevel]="process.alert_level" 
+                      [lawyerRole]="process.lawyer_role"
+                      [position]="i < 2 ? 'bottom' : 'top'"
+                      [leftAligned]="true"
+                      (click)="openLegendModal($event)">
+                    </app-process-alert-tooltip>
+                  </div>
+                  } @else {
+                    <div class="flex justify-center items-center h-full w-full">
+                      @if (!process.lawyer_role) {
+                        <span class="process-list-tooltip tooltip-left-aligned" [class.tooltip-bottom]="i < 2">
+                          <div class="tooltip-content text-left text-sm max-w-xs rounded-xl shadow-2xl bg-white border border-base-200 p-4 space-y-2 z-[1000]">
+                            <div class="flex items-center gap-2 mb-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <span class="font-extrabold text-[10px] uppercase text-base-content/40 tracking-wider">Activar alertas</span>
+                            </div>
+                            <p class="text-base-content leading-relaxed font-bold text-[12px]">
+                              Para activar el semáforo de actividad, debe vincular su rol (Demandante o Demandado) desde las <b>acciones del proceso</b> o de forma <b>masiva</b>.
+                            </p>
+                          </div>
+                          <div class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="text-[8px] uppercase font-black tracking-widest text-base-content/60 text-center leading-none">
+                              {{ 'actuacionesRecientes.table.linkRole' | transloco }}
+                            </span>
+                          </div>
+                        </span>
+                      } @else {
+                        <!-- Estado de Escucha para Fila Principal -->
+                        <div class="flex flex-col items-center gap-1.5 opacity-40 cursor-help group relative">
+                          <div class="w-3.5 h-3.5 rounded-full bg-base-300 ring-2 ring-base-200 shadow-inner"></div>
+                          <span class="text-[9px] font-bold uppercase tracking-tight text-base-content/40">En espera</span>
+                          
+                          <!-- Tooltip Informativo Simplificado (Con lógica de posicionamiento dinamico) -->
+                          <div [class]="(i < 2 ? 'absolute top-full left-1/2 -translate-x-1/2 mt-3 w-48 p-3 bg-white border border-base-200 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[100]' : 'absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-48 p-3 bg-white border border-base-200 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[100]')">
+                            <p class="text-[11px] font-bold text-base-content leading-tight">
+                              {{ process.lawyer_role === 'plaintiff' ? 'Esperando actividad (+45 días)' : 'Esperando actividad (+90 días)' }}
+                            </p>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </td>
               <td class="whitespace-nowrap align-middle sticky-col-radicado">
                 <span class="sticky-cell-bg" aria-hidden="true"></span>
-                <span class="sticky-cell-txt">{{ process.process_number }}</span>
+                <div class="sticky-cell-txt">
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold">{{ process.process_number | processNumber }}</span>
+                    <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                      <button type="button"
+                        class="btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary"
+                        (click)="copyToClipboard(process.process_number, $event)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
+                          stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                        </svg>
+                      </button>
+                    </span>
+                  </div>
+                  @if (process.lawyer_role) {
+                  <div class="flex items-center mt-1">
+                    <span class="px-2 py-0.5 rounded-md bg-base-200/60 text-[9px] uppercase font-black tracking-widest text-base-content/40">{{ process.lawyer_role }}</span>
+                  </div>
+                  }
+                </div>
               </td>
               <td class="align-middle">{{ process.court }}</td>
               <td class="align-middle">{{ process.process_class }}</td>
@@ -481,7 +714,7 @@
             </tr>
 
             @if (isExpanded(process) && process.instances && process.instances.length > 0) {
-            @for (instance of process.instances; track instance.id) {
+            @for (instance of process.instances; track instance.id; let idx = $index) {
             <tr class="cursor-pointer bg-primary/5 process-table-instance-row border-l-4 border-primary"
               [class.process-row-hovered]="hoveredRowId() === instance.id" (mouseenter)="hoveredRowId.set(instance.id)"
               (mouseleave)="hoveredRowId.set(null)" (dblclick)="onRowDblClick(instance)">
@@ -492,10 +725,74 @@
                   ↳
                 </span>
               </td>
-              <td class="text-center align-middle text-base-content/70">{{ instance.index }}</td>
+              <td class="text-center align-middle p-2"></td>
+              <td class="text-center align-middle sticky-col-idx font-bold text-[11px] text-base-content/40">{{ instance.index }}</td>
+              <td class="text-center align-middle sticky-col-alert">
+                <span class="sticky-cell-bg" aria-hidden="true"></span>
+                <div class="sticky-cell-txt flex justify-center">
+                  @if (instance.alert_level) {
+                  <div class="flex justify-center items-center h-full w-full">
+                    <app-process-alert-tooltip 
+                      [alertLevel]="instance.alert_level" 
+                      [lawyerRole]="instance.lawyer_role"
+                      [position]="i < 2 ? 'bottom' : 'top'"
+                      [leftAligned]="true"
+                      (click)="openLegendModal($event)">
+                    </app-process-alert-tooltip>
+                  </div>
+                  } @else {
+                    <div class="flex justify-center items-center h-full w-full">
+                      @if (!instance.lawyer_role) {
+                        <span class="process-list-tooltip tooltip-left-aligned" [class.tooltip-bottom]="i < 2">
+                          <div class="tooltip-content text-left text-sm max-w-xs rounded-xl shadow-2xl bg-white border border-base-200 p-4 space-y-2 z-[1000]">
+                            <div class="flex items-center gap-2 mb-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <span class="font-extrabold text-[10px] uppercase text-base-content/40 tracking-wider">Activar alertas</span>
+                            </div>
+                            <p class="text-base-content leading-relaxed font-bold text-[12px]">
+                              Para activar el semáforo de actividad, debe vincular su rol (Demandante o Demandado) desde las <b>acciones del proceso</b> o de forma <b>masiva</b>.
+                            </p>
+                          </div>
+                          <div class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="text-[8px] uppercase font-black tracking-widest text-base-content/60 text-center leading-none">Vincular rol</span>
+                          </div>
+                        </span>
+                      } @else {
+                        <!-- Estado de Escucha (Rol vinculado pero sin alerta aún) -->
+                        <div class="flex flex-col items-center gap-1.5 opacity-40 cursor-help group relative">
+                          <div class="w-3.5 h-3.5 rounded-full bg-base-300 ring-2 ring-base-200 shadow-inner"></div>
+                          <span class="text-[9px] font-bold uppercase tracking-tight text-base-content/40">En espera</span>
+                          
+                          <!-- Tooltip Informativo Simplificado -->
+                          <div [class]="(i < 2 ? 'absolute top-full left-1/2 -translate-x-1/2 mt-3 w-48 p-3 bg-white border border-base-200 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[100]' : 'absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-48 p-3 bg-white border border-base-200 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[100]')">
+                            <p class="text-[11px] font-bold text-base-content leading-tight">
+                              {{ instance.lawyer_role === 'plaintiff' ? 'Esperando actividad (+45 días)' : 'Esperando actividad (+90 días)' }}
+                            </p>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </td>
               <td class="whitespace-nowrap align-middle text-base-content/80 sticky-col-radicado">
                 <span class="sticky-cell-bg" aria-hidden="true"></span>
-                <span class="sticky-cell-txt">{{ instance.process_number }}</span>
+                <div class="sticky-cell-txt flex items-center gap-2">
+                  <span>{{ instance.process_number | processNumber }}</span>
+                  <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                    <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary"
+                      (click)="copyToClipboard(instance.process_number, $event)">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                      </svg>
+                    </button>
+                  </span>
+                </div>
               </td>
               <td class="align-middle text-base-content/80">{{ instance.court }}</td>
               <td class="align-middle text-base-content/80">{{ instance.process_class }}</td>
@@ -683,6 +980,10 @@
                 <div class="w-1 h-1 rounded-full bg-info"></div>
                 {{ 'gestionProcesos.addProcess.recommendations.rule3' | transloco }}
               </li>
+              <li class="flex items-center gap-2 text-info font-bold text-sm">
+                <div class="w-1.5 h-1.5 rounded-full bg-info"></div>
+                {{ 'gestionProcesos.addProcess.recommendations.rule4' | transloco }}
+              </li>
             </ul>
           </div>
         </div>
@@ -717,6 +1018,51 @@
                 {{ getProcessNumberError() | transloco }}
               </span>
             </label>
+            }
+          </div>
+
+          <!-- Role Selection -->
+          <div class="space-y-4 pt-2">
+            <label class="label pb-0">
+              <span class="label-standard uppercase tracking-widest text-[10px] font-black text-base-content/40">Seleccione su Rol</span>
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              @for (role of roles; track role.value) {
+                <label class="relative flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 group hover:border-primary/40 active:scale-[0.98]"
+                       [class.border-primary]="addProcessForm.get('lawyer_role')?.value === role.value"
+                       [class.bg-primary/5]="addProcessForm.get('lawyer_role')?.value === role.value"
+                       [class.border-base-200]="addProcessForm.get('lawyer_role')?.value !== role.value"
+                       [class.hover:bg-base-200/30]="addProcessForm.get('lawyer_role')?.value !== role.value">
+                  
+                  <input type="radio" 
+                         formControlName="lawyer_role" 
+                         [value]="role.value" 
+                         class="radio radio-primary border-base-300 w-5 h-5" />
+                  
+                  <div class="ml-3 flex flex-col">
+                    <span class="font-bold text-sm text-base-content group-hover:text-primary transition-colors">{{ role.label }}</span>
+                    <span class="text-[9px] uppercase font-bold tracking-tight text-base-content/30">
+                      {{ (role.value === 'plaintiff' ? 'gestionProcesos.roleModal.plaintiffDesc' : 'gestionProcesos.roleModal.defendantDesc') | transloco }}
+                    </span>
+                  </div>
+
+                  @if (addProcessForm.get('lawyer_role')?.value === role.value) {
+                    <div class="absolute right-4 animate-in fade-in zoom-in duration-300">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  }
+                </label>
+              }
+            </div>
+            @if (addProcessForm.get('lawyer_role')?.invalid && addProcessForm.get('lawyer_role')?.touched) {
+              <div class="flex items-center gap-2 px-1 text-error animate-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-[10px] font-bold uppercase tracking-wider">El rol es obligatorio para registrar el proceso</span>
+              </div>
             }
           </div>
 
@@ -820,10 +1166,19 @@
                         <p class="text-[10px] font-medium text-base-content/40 leading-tight mt-1 truncate">{{ proc?.speaker }}</p>
                       }
                       <div class="flex items-center gap-2 mt-1.5">
-                        <span class="text-[9px] font-bold text-base-content/30 uppercase tracking-tighter">Radicación:</span>
-                        <span class="text-[11px] font-semibold text-primary bg-primary/5 px-2 py-0.5 rounded border border-primary/10">
-                          {{ proc?.process_number }}
-                        </span>
+                        <div class="flex items-center gap-2">
+                          <span class="text-[11px] font-semibold text-primary bg-primary/5 px-2 py-0.5 rounded border border-primary/10">
+                            {{ proc?.process_number }}
+                          </span>
+                          <span class="tooltip tooltip-top" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                            <button type="button" class="btn btn-ghost btn-xs btn-circle text-primary/40 hover:bg-primary/5 hover:text-primary"
+                              (click)="copyToClipboard(proc?.process_number!, $event)">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                              </svg>
+                            </button>
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -874,7 +1229,168 @@
       </div>
     </div>
     <form method="dialog" class="modal-backdrop" (click)="closeInfoModal()">
-      <button type="button">{{ 'gestionProcesos.infoModal.close' | transloco }}</button>
+      <button type="button">{{ 'common.close' | transloco }}</button>
+    </form>
+  </dialog>
+
+  <!-- Legend Modal (Mobile Only) -->
+  <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="showLegendModal()">
+    <div class="modal-box p-0 bg-base-100 overflow-hidden rounded-t-3xl sm:rounded-2xl">
+      <div class="p-6 border-b border-base-200">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg text-base-content capitalize">{{ 'actuacionesRecientes.legend.title' | transloco }}</h3>
+            <p class="text-xs text-base-content/50 uppercase font-bold tracking-widest mt-1">{{ 'common.details' | transloco }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="p-6 space-y-6">
+        <div class="space-y-4">
+          <div class="flex items-start gap-4 p-4 rounded-2xl bg-success/5 border border-success/10">
+            <div class="w-3 h-3 rounded-full bg-success mt-1.5 shrink-0"></div>
+            <div>
+              <h4 class="font-bold text-success text-sm">{{ 'actuacionesRecientes.legend.green.title' | transloco }}</h4>
+              <p class="text-xs text-base-content/70 mt-1 leading-relaxed">{{ 'actuacionesRecientes.legend.green.desc' | transloco }}</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 p-4 rounded-2xl bg-warning/5 border border-warning/10">
+            <div class="w-3 h-3 rounded-full bg-warning mt-1.5 shrink-0"></div>
+            <div>
+              <h4 class="font-bold text-warning text-sm">{{ 'actuacionesRecientes.legend.yellow.title' | transloco }}</h4>
+              <p class="text-xs text-base-content/70 mt-1 leading-relaxed">{{ 'actuacionesRecientes.legend.yellow.desc' | transloco }}</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 p-4 rounded-2xl bg-error/5 border border-error/10">
+            <div class="w-3 h-3 rounded-full bg-error mt-1.5 shrink-0 alert-pulse"></div>
+            <div>
+              <h4 class="font-bold text-error text-sm">{{ 'actuacionesRecientes.legend.red.title' | transloco }}</h4>
+              <p class="text-xs text-base-content/70 mt-1 leading-relaxed">{{ 'actuacionesRecientes.legend.red.desc' | transloco }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-6 pt-0">
+        <button class="btn btn-primary w-full rounded-xl font-bold" (click)="closeLegendModal()">
+          {{ 'common.close' | transloco }}
+        </button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop" (click)="closeLegendModal()">
+      <button type="button">close</button>
+    </form>
+  </dialog>
+
+  <!-- Toast: éxito al copiar al portapapeles -->
+  @if (copiedMessage()) {
+    <div class="toast toast-end toast-bottom z-[10000] pointer-events-none">
+      <div class="alert alert-success shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>{{ copiedMessage() }}</span>
+      </div>
+    </div>
+  }
+
+  <!-- Modales de Acciones Masivas -->
+  <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="isBulkRoleModalOpen()">
+    @if (isBulkRoleModalOpen()) {
+      <app-role-selection-modal
+        [bulkProcessIds]="Array.from(selectedProcessIds())"
+        (saved)="onBulkRoleSaved($event)"
+        (closed)="isBulkRoleModalOpen.set(false)">
+      </app-role-selection-modal>
+    }
+    <form method="dialog" class="modal-backdrop" (click)="isBulkRoleModalOpen.set(false)">
+      <button type="button">close</button>
+    </form>
+  </dialog>
+
+  <!-- Modal de Resultados Masivos (Premium Report) -->
+  <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="isBulkResultModalOpen()">
+    <div class="modal-box p-0 bg-base-100 overflow-hidden rounded-t-3xl sm:rounded-2xl border border-base-200 shadow-2xl max-w-lg">
+      <div class="p-6 border-b border-base-200 bg-primary/5">
+        <h3 class="text-xl font-bold text-primary flex items-center gap-3 tracking-tight">
+          <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          {{ 'gestionProcesos.bulk.results.title' | transloco }}
+        </h3>
+      </div>
+      
+      <div class="p-6 space-y-6">
+        @if (bulkUpdateResult()) {
+          <!-- General Summary -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-success/10 p-5 rounded-2xl border border-success/20 text-center">
+              <div class="text-3xl font-black text-success">{{ bulkUpdateResult()?.total_updated || 0 }}</div>
+              <div class="text-xs font-bold text-success/60 mt-1">{{ 'gestionProcesos.bulk.results.success' | transloco }}</div>
+            </div>
+            <div class="bg-error/10 p-5 rounded-2xl border border-error/20 text-center">
+              <div class="text-3xl font-black text-error">{{ bulkUpdateResult()?.failed?.count || 0 }}</div>
+              <div class="text-xs font-bold text-error/60 mt-1">{{ 'gestionProcesos.bulk.results.failed' | transloco }}</div>
+            </div>
+          </div>
+
+          <!-- Alert Categories Breakdown -->
+          <div class="space-y-4">
+            <p class="text-[11px] font-bold text-base-content/40 uppercase tracking-wider text-center">
+              {{ 'gestionProcesos.bulk.results.impact' | transloco }}
+            </p>
+            <div class="grid grid-cols-4 gap-2">
+              <div class="flex flex-col items-center p-3 rounded-2xl bg-base-200/50 border border-base-300/50">
+                <div class="w-2.5 h-2.5 rounded-full bg-error mb-2 shadow-[0_0_8px_rgba(239,68,68,0.4)]"></div>
+                <span class="text-lg font-black text-error">{{ bulkUpdateResult()?.red_alerts?.count || 0 }}</span>
+              </div>
+              <div class="flex flex-col items-center p-3 rounded-2xl bg-base-200/50 border border-base-300/50">
+                <div class="w-2.5 h-2.5 rounded-full bg-warning mb-2 shadow-[0_0_8px_rgba(245,158,11,0.4)]"></div>
+                <span class="text-lg font-black text-warning">{{ bulkUpdateResult()?.yellow_alerts?.count || 0 }}</span>
+              </div>
+              <div class="flex flex-col items-center p-3 rounded-2xl bg-base-200/50 border border-base-300/50">
+                <div class="w-2.5 h-2.5 rounded-full bg-success mb-2 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></div>
+                <span class="text-lg font-black text-success">{{ bulkUpdateResult()?.green_alerts?.count || 0 }}</span>
+              </div>
+              <div class="flex flex-col items-center p-3 rounded-2xl bg-base-200/50 border border-base-300/50">
+                <div class="w-2.5 h-2.5 rounded-full bg-base-content/20 mb-2"></div>
+                <span class="text-lg font-black text-base-content/40">{{ bulkUpdateResult()?.no_alerts?.count || 0 }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Details -->
+          @if (bulkUpdateResult()?.failed?.process_numbers?.length) {
+            <div class="p-4 bg-error/5 rounded-2xl max-h-40 overflow-y-auto border border-error/10">
+              <p class="text-[10px] font-bold text-error/60 uppercase tracking-widest mb-3">
+                {{ 'gestionProcesos.bulk.results.issue' | transloco }}
+              </p>
+              <div class="grid grid-cols-1 gap-2">
+                @for (num of bulkUpdateResult()?.failed?.process_numbers; track num) {
+                  <div class="text-[11px] text-error/80 font-bold flex items-center gap-2">
+                    <div class="w-1.5 h-1.5 rounded-full bg-error/40 animate-pulse"></div>
+                    <span>{{ num }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="p-6 pt-0">
+        <button class="btn btn-primary w-full rounded-2xl font-bold shadow-lg shadow-primary/20 h-12 normal-case text-base" (click)="closeBulkResultModal()">
+          {{ 'gestionProcesos.bulk.results.understand' | transloco }}
+        </button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop" (click)="closeBulkResultModal()">
+      <button type="button">close</button>
     </form>
   </dialog>
 </div>
