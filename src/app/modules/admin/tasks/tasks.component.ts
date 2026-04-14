@@ -140,6 +140,28 @@ export class TasksComponent implements OnInit, OnDestroy {
         return this._iconService.getIconPath(iconName);
     }
 
+    /**
+     * Copy process number to clipboard without hyphens
+     */
+    public copyToClipboard(text: string, event?: Event): void {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        if (!text) return;
+
+        // Strip hyphens
+        const cleanText = text.replace(/-/g, '').trim();
+
+        navigator.clipboard.writeText(cleanText).then(() => {
+            this.showAlert('success', 'Número de radicado copiado al portapapeles.');
+        }).catch(err => {
+            console.error('Could not copy text: ', err);
+            this.showAlert('error', 'No se pudo copiar el número.');
+        });
+    }
+
     @HostListener('window:scroll', [])
     onWindowScroll() {
         if (this.isLoading() || !this.hasMore()) return;

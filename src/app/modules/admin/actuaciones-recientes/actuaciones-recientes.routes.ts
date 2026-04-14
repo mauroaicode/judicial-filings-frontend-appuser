@@ -5,5 +5,8 @@ export default [
   {
     path: '',
     component: ActuacionesRecientesComponent,
+    data: {
+      title: 'actuacionesRecientes.title',
+    },
   },
 ] as Routes;

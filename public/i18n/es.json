@@ -521,5 +521,17 @@
       "confirmDelete": "¿Estás seguro de que deseas eliminar esta tarea?",
       "confirmDeleteTitle": "Eliminar Tarea"
     }
+  },
+  "aiChat": {
+    "title": "Asistente Judicial IA",
+    "newChat": "Nuevo Chat",
+    "recentHistory": "Historial Reciente",
+    "placeholder": "Escribe tu consulta sobre el proceso...",
+    "disclaimer": "La IA puede cometer errores. Verifica siempre la información jurídica.",
+    "welcomeTitle": "¿En qué puedo ayudarte hoy?",
+    "welcomeDesc": "Puedo analizar expedientes, resumir actuaciones o buscar información específica sobre este proceso judicial.",
+    "statusActive": "IA Judicial Activa",
+    "selectChat": "Selecciona un chat",
+    "emptySession": "Empieza una conversación..."
   }
 }

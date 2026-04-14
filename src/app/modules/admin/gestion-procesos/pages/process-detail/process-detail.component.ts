@@ -31,6 +31,7 @@ import { DataTableComponent, DataTableColumn } from '@app/shared/components/data
 import { ConfirmationDialogComponent } from '@app/shared/components/confirmation-dialog/confirmation-dialog.component';
 import { ProcessAlertTooltipComponent } from '@app/shared/components/process-alert-tooltip/process-alert-tooltip.component';
 import { RoleSelectionModalComponent } from '../../components/role-selection-modal/role-selection-modal.component';
+// import { ProcessAiChatComponent } from '../../components/process-ai-chat/process-ai-chat.component';
 import { finalize } from 'rxjs/operators';
 
 @Component({
@@ -46,6 +47,7 @@ import { finalize } from 'rxjs/operators';
     ProcessNumberPipe,
     ProcessAlertTooltipComponent,
     RoleSelectionModalComponent,
+    // ProcessAiChatComponent,
   ],
   templateUrl: './process-detail.component.html',
   styleUrls: ['./process-detail.component.scss'],
@@ -99,6 +101,9 @@ export class ProcessDetailComponent {
 
   /** Selector de instancia en móvil */
   public showInstanceSelector = signal<boolean>(false);
+
+  /** Estado del chat de IA */
+  public showAiChat = signal<boolean>(false);
 
   /** Instancia actualmente seleccionada */
   public selectedInstance = computed(() =>
@@ -385,6 +390,13 @@ export class ProcessDetailComponent {
 
   toggleInstanceSelector(): void {
     this.showInstanceSelector.update(v => !v);
+  }
+
+  /**
+   * Alterna la visibilidad del chat de IA
+   */
+  public toggleAiChat(): void {
+    this.showAiChat.update(v => !v);
   }
 
   /**

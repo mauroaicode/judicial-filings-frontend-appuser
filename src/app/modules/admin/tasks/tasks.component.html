@@ -68,17 +68,51 @@
                                     <span class="text-[9px] font-black uppercase text-base-content/30 tracking-wider">Creado el</span>
                                     <span class="text-[10px] font-bold text-base-content/60">{{ task.created_at | date:'dd MMM yyyy' }}</span>
                                 </div>
-                                <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
-                                    <button class="btn btn-ghost btn-sm btn-circle text-primary hover:bg-primary/10" (click)="openEditModal(task)" title="Editar">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getIconPath('pencil')" />
-                                        </svg>
-                                    </button>
-                                    <button class="btn btn-ghost btn-sm btn-circle text-error hover:bg-error/10" (click)="confirmDelete(task)" title="Eliminar">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getIconPath('trash')" />
-                                        </svg>
-                                    </button>
+                                <div class="flex gap-1 group-hover:translate-x-0 transition-all">
+                                    <!-- Desktop Actions (Hover) -->
+                                    <div class="hidden sm:flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button class="btn btn-ghost btn-sm btn-circle text-primary hover:bg-primary/10" (click)="openEditModal(task)" title="Editar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getIconPath('pencil')" />
+                                            </svg>
+                                        </button>
+                                        <button class="btn btn-ghost btn-sm btn-circle text-error hover:bg-error/10" (click)="confirmDelete(task)" title="Eliminar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getIconPath('trash')" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <!-- Mobile Actions (Dropdown) -->
+                                    <div class="dropdown dropdown-end sm:hidden">
+                                        <button tabindex="0" class="btn btn-ghost btn-xs btn-circle text-base-content/40 hover:text-primary active:scale-90 transition-all">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getIconPath('ellipsis-vertical')" />
+                                            </svg>
+                                        </button>
+                                        <ul tabindex="0" class="dropdown-content z-[20] menu p-2 shadow-2xl bg-base-100 rounded-xl w-44 border border-base-200 mt-2 animate-in fade-in zoom-in duration-200">
+                                            <li>
+                                                <button (click)="openEditModal(task)" class="flex items-center gap-3 py-3 active:bg-primary/10">
+                                                    <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getIconPath('pencil')" />
+                                                        </svg>
+                                                    </div>
+                                                    <span class="font-bold text-sm">Editar</span>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button (click)="confirmDelete(task)" class="flex items-center gap-3 py-3 text-error active:bg-error/10">
+                                                    <div class="w-8 h-8 rounded-lg bg-error/10 flex items-center justify-center text-error">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getIconPath('trash')" />
+                                                        </svg>
+                                                    </div>
+                                                    <span class="font-bold text-sm">Eliminar</span>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
 
@@ -99,9 +133,21 @@
                                     </div>
                                     <div class="flex flex-col min-w-0 flex-1">
                                         <span class="text-[9px] uppercase font-black text-secondary/50 tracking-widest">Proceso Relacionado</span>
-                                        <span class="text-xs font-black truncate text-base-content group-hover:text-primary transition-colors">
-                                            {{ task.process_number ? (task.process_number | processNumber) : ('ID: ' + task.process_id) }}
-                                        </span>
+                                        <div class="flex items-center gap-2 group/copy">
+                                            <span class="text-xs font-black truncate text-base-content group-hover/copy:text-primary transition-colors">
+                                                {{ task.process_number ? (task.process_number | processNumber) : ('ID: ' + task.process_id) }}
+                                            </span>
+                                            @if (task.process_number) {
+                                                <div class="tooltip tooltip-right" data-tip="Copiar número">
+                                                    <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary active:scale-90 transition-all opacity-0 group-hover:opacity-100"
+                                                        (click)="copyToClipboard(task.process_number, $event)">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getIconPath('copy')" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             } @else {

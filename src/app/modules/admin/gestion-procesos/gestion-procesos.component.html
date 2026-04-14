@@ -452,7 +452,7 @@
                   <span class="text-[10px] text-base-content/50 uppercase font-bold tracking-wider mb-0.5"># Radicación
                     (Inst. {{ instance.index }})</span>
                   <div class="flex items-center gap-2">
-                    <span class="font-bold text-base-content text-sm truncate">{{ instance.process_number }}</span>
+                    <span class="font-bold text-base-content text-sm truncate">{{ instance.process_number | processNumber }}</span>
                     <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
                       <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/30 hover:bg-primary/5 hover:text-primary"
                         (click)="copyToClipboard(instance.process_number, $event)">
@@ -725,7 +725,8 @@
                   ↳
                 </span>
               </td>
-              <td class="text-center align-middle text-base-content/70">{{ instance.index }}</td>
+              <td class="text-center align-middle p-2"></td>
+              <td class="text-center align-middle sticky-col-idx font-bold text-[11px] text-base-content/40">{{ instance.index }}</td>
               <td class="text-center align-middle sticky-col-alert">
                 <span class="sticky-cell-bg" aria-hidden="true"></span>
                 <div class="sticky-cell-txt flex justify-center">
@@ -782,7 +783,7 @@
               <td class="whitespace-nowrap align-middle text-base-content/80 sticky-col-radicado">
                 <span class="sticky-cell-bg" aria-hidden="true"></span>
                 <div class="sticky-cell-txt flex items-center gap-2">
-                  <span>{{ instance.process_number }}</span>
+                  <span>{{ instance.process_number | processNumber }}</span>
                   <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
                     <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary"
                       (click)="copyToClipboard(instance.process_number, $event)">
