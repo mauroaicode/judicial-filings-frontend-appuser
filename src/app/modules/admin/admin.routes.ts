@@ -24,6 +24,11 @@ export default [
       import('./keywords/keywords.routes').then((m) => m.default),
   },
   {
+    path: 'tareas',
+    loadChildren: () =>
+      import('./tasks/tasks.routes').then((m) => m.default),
+  },
+  {
     path: 'perfil',
     loadChildren: () =>
       import('./profile/profile.routes').then((m) => m.default),

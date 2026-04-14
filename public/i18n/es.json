@@ -492,5 +492,34 @@
         "desc": "Inactividad prolongada (+90 días) o hitos procesales determinantes."
       }
     }
+  },
+  "tasks": {
+    "title": "Tareas",
+    "description": "Gestiona tus tareas y compromisos relacionados con los procesos judiciales",
+    "add": "Agregar Tarea",
+    "edit": "Editar Tarea",
+    "delete": "Eliminar Tarea",
+    "empty": "No hay tareas registradas",
+    "loading": "Cargando tareas...",
+    "loadMore": "Cargar más",
+    "form": {
+      "title": "Título de la Tarea",
+      "titlePlaceholder": "Ej: Revisar términos del proceso",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Detalles adicionales de la tarea...",
+      "isAdmin": "Visible para Admin",
+      "process": "Proceso Asociado (Opcional)",
+      "processPlaceholder": "Buscar por número de radicado o despacho",
+      "noProcessesFound": "No se encontraron procesos activos",
+      "searching": "Buscando procesos..."
+    },
+    "messages": {
+      "created": "Tarea creada satisfactoriamente",
+      "updated": "Tarea actualizada satisfactoriamente",
+      "deleted": "Tarea eliminada satisfactoriamente",
+      "error": "Ha ocurrido un error al procesar la solicitud",
+      "confirmDelete": "¿Estás seguro de que deseas eliminar esta tarea?",
+      "confirmDeleteTitle": "Eliminar Tarea"
+    }
   }
 }
