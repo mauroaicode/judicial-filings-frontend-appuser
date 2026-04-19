@@ -155,10 +155,13 @@ export class ProcessDetailComponent {
           
           if (related) {
             const relatedActionHtml = buildTextWithHighlights(related.action ?? '', related.alert_highlights, 'action');
+            const lowerAction = mainAction?.toLowerCase() || '';
+            const badgeLabel = lowerAction.includes('notificacion') || lowerAction.includes('notificación') ? 'Notificación' : 'Fijación';
+            
             return `
               <div class="flex flex-col gap-1">
                 <div class="flex items-center gap-1.5">
-                   <span class="badge badge-sm bg-primary/10 text-primary border-none font-bold text-[9px] px-1.5 h-4 uppercase tracking-tighter">Fijación</span>
+                   <span class="badge badge-sm bg-primary/10 text-primary border-none font-bold text-[9px] px-1.5 h-4 uppercase tracking-tighter">${badgeLabel}</span>
                    <div class="font-bold text-base-content/90 leading-tight">${actionHtml}</div>
                 </div>
                 <div class="flex items-center gap-1.5">
@@ -444,8 +447,14 @@ export class ProcessDetailComponent {
         rawActions.forEach(a => {
           if (groupedIds.has(a.id)) return;
 
-          // If it's a Fijacion Estado that points to an Auto
-          if (a.action?.toLowerCase().includes('fijacion estado') && a.notified_action_id) {
+          // If it's a notification (Fijacion, Notificacion por estado, etc.) that points to an Auto
+          const actionText = a.action?.toLowerCase() || '';
+          const isNotification = actionText.includes('fijacion') || 
+                                actionText.includes('notificacion') || 
+                                actionText.includes('notificación') || 
+                                actionText.includes('estado');
+
+          if (isNotification && a.notified_action_id) {
             const auto = actionMap.get(a.notified_action_id);
             if (auto && auto.id !== a.id) {
               a.related_action = auto;

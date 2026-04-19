@@ -46,6 +46,6 @@ export class ProcessAlertTooltipComponent {
       tooltipKey = role === 'Demandado' ? 'greenDemandado' : (role === 'Demandante' ? 'greenDemandante' : 'greenGeneral');
     }
     
-    return `actuacionesRecientes.table.alerts.${tooltipKey}`;
+    return `alertSemafor.alerts.${tooltipKey}`;
   }
 }

@@ -276,6 +276,39 @@
       }
     }
   },
+  "actuacionesRecientes": {
+    "title": "Actuaciones Recientes",
+    "description": "Historial de consolidado de notificaciones emitidas por el sistema"
+  },
+  "alertSemafor": {
+    "alertLevel": "Estado",
+    "linkRole": "Vincular rol",
+    "linkRoleDesc": "Vincule su rol para activar alertas procesales inteligentes",
+    "alerts": {
+      "redDemandante": "Alerta Crítica: Riesgo de desistimiento o parálisis grave (+90 días de inactividad).",
+      "yellowDemandante": "Alerta Temprana: Seguimiento necesario para evitar mora (+45 días de inactividad).",
+      "greenDemandante": "Proceso con actividad reciente y saludable.",
+      "redGeneral": "Alerta Crítica: Sentencia, mandamiento o terminación detectada.",
+      "yellowGeneral": "Alerta de Trámite: Traslado, memorial u oficio detectado.",
+      "greenGeneral": "Informativo: Constancia o archivo detectado.",
+      "greenDemandado": "Informativo Favorable: El proceso en contra no avanza (+90 días de inactividad)."
+    },
+    "legend": {
+      "title": "Leyenda de Estados",
+      "green": {
+        "title": "Saludable / Informativo",
+        "desc": "Procesos con actividad reciente o inactividad favorable para su rol."
+      },
+      "yellow": {
+        "title": "Alerta Temprana",
+        "desc": "Seguimiento preventivo (+45 días) o trámites judiciales en curso."
+      },
+      "red": {
+        "title": "Alerta Crítica",
+        "desc": "Inactividad prolongada (+90 días) o hitos procesales determinantes."
+      }
+    }
+  },
   "processDetail": {
     "title": "Detalle del Proceso",
     "activateProcess": "Activar Seguimiento",
@@ -433,65 +466,6 @@
   "process": {
     "import_finished_title": "Importación Finalizada",
     "import_finished_description": "El proceso de importación de radicados ha terminado satisfactoriamente."
-  },
-  "actuacionesRecientes": {
-    "title": "Actuaciones Recientes",
-    "description": "Consulta los últimos movimientos de todos tus procesos judiciales",
-    "filters": {
-      "title": "Filtros de Búsqueda",
-      "processNumber": "Número de radicado",
-      "processNumberPlaceholder": "Ej: 76001...",
-      "registrationDate": "Fecha de registro",
-      "registrationDatePlaceholder": "Filtro por registro",
-      "termStartDate": "Rango fecha inicio término",
-      "termEndDate": "Rango fecha finaliza término",
-      "termDatePlaceholder": "Seleccionar rango",
-      "search": "Buscar",
-      "reset": "Limpiar Filtros"
-    },
-    "table": {
-      "processNumber": "Número de radicado",
-      "court": "Despacho",
-      "action": "Actuación",
-      "actionDate": "Fecha de actuación",
-      "registrationDate": "Fecha de registro",
-      "plaintiff": "Demandante (S)",
-      "defendant": "Demandado (S)",
-      "termStartDate": "Fecha inicio término",
-      "termEndDate": "Fecha finaliza término",
-      "alertLevel": "Estado",
-      "alerts": {
-        "legend": "Guía de estados y alertas procesales",
-        "redDemandante": "Alerta Crítica: Riesgo de desistimiento o parálisis grave (+90 días de inactividad).",
-        "yellowDemandante": "Alerta Temprana: Seguimiento necesario para evitar mora (+45 días de inactividad).",
-        "greenDemandante": "Proceso con actividad reciente y saludable.",
-        "redGeneral": "Alerta Crítica: Sentencia, mandamiento o terminación detectada.",
-        "yellowGeneral": "Alerta de Trámite: Traslado, memorial u oficio detectado.",
-        "greenGeneral": "Informativo: Constancia o archivo detectado.",
-        "greenDemandado": "Informativo Favorable: El proceso en contra no avanza (+90 días de inactividad)."
-      },
-      "empty": "No hay actuaciones que coincidan con los filtros aplicados",
-      "emptyToday": "Hoy no se han reportado nuevas actuaciones",
-      "emptyTodayDescription": "Nuestro sistema monitorea tus procesos en tiempo real. Si hay novedades, las verás reflejadas aquí automáticamente.",
-      "dblClickNavigation": "Doble clic para ver detalle del proceso",
-      "linkRole": "Vincular rol",
-      "linkRoleDesc": "Vincule su rol para activar alertas procesales inteligentes"
-    },
-    "legend": {
-      "title": "Leyenda de Estados",
-      "green": {
-        "title": "Saludable / Informativo",
-        "desc": "Procesos con actividad reciente o inactividad favorable para su rol."
-      },
-      "yellow": {
-        "title": "Alerta Temprana",
-        "desc": "Seguimiento preventivo (+45 días) o trámites judiciales en curso."
-      },
-      "red": {
-        "title": "Alerta Crítica",
-        "desc": "Inactividad prolongada (+90 días) o hitos procesales determinantes."
-      }
-    }
   },
   "tasks": {
     "title": "Tareas",
