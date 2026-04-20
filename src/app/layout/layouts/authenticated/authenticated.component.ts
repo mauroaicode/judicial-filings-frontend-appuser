@@ -127,6 +127,16 @@ export class AuthenticatedLayoutComponent implements OnInit {
   }
 
   /**
+   * Force close sidebar
+   */
+  closeSidebar(): void {
+    if (this.sidebar && this.sidebar.isOpen()) {
+      this.sidebar.closeSidebar();
+      this.sidebarOpen.set(false);
+    }
+  }
+
+  /**
    * Handle scrolling on the main content area
    */
   onMainScroll(event: Event): void {

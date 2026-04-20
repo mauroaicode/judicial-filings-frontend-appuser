@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthenticatedLayoutComponent } from '@app/layout/layouts/authenticated/authenticated.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
@@ -31,8 +32,8 @@ import { DataTableComponent, DataTableColumn } from '@app/shared/components/data
 import { ConfirmationDialogComponent } from '@app/shared/components/confirmation-dialog/confirmation-dialog.component';
 import { ProcessAlertTooltipComponent } from '@app/shared/components/process-alert-tooltip/process-alert-tooltip.component';
 import { RoleSelectionModalComponent } from '../../components/role-selection-modal/role-selection-modal.component';
-// import { ProcessAiChatComponent } from '../../components/process-ai-chat/process-ai-chat.component';
-import { finalize } from 'rxjs/operators';
+import { ProcessAiChatComponent } from '../../components/process-ai-chat/process-ai-chat.component';
+import { AiCoreService } from '@app/core/services/ai-chat/ai-core.service';
 
 @Component({
   selector: 'app-process-detail',
@@ -47,7 +48,7 @@ import { finalize } from 'rxjs/operators';
     ProcessNumberPipe,
     ProcessAlertTooltipComponent,
     RoleSelectionModalComponent,
-    // ProcessAiChatComponent,
+    ProcessAiChatComponent,
   ],
   templateUrl: './process-detail.component.html',
   styleUrls: ['./process-detail.component.scss'],
@@ -60,6 +61,11 @@ export class ProcessDetailComponent {
   private _router = inject(Router);
   private _fb = inject(FormBuilder);
   private _destroyRef = inject(DestroyRef);
+  private _layout = inject(AuthenticatedLayoutComponent, { optional: true });
+  private _aiCoreService = inject(AiCoreService);
+
+  // AI Permission State
+  public isAiEnabled = this._aiCoreService.isAiEnabled;
 
   // State
   public process = signal<ProcessDetail | null>(null);
@@ -104,6 +110,7 @@ export class ProcessDetailComponent {
 
   /** Estado del chat de IA */
   public showAiChat = signal<boolean>(false);
+  public isChatPinned = signal<boolean>(false);
 
   /** Instancia actualmente seleccionada */
   public selectedInstance = computed(() =>
@@ -226,6 +233,9 @@ export class ProcessDetailComponent {
         const id = params.get('id');
         this.loadProcessDetail(id);
       });
+
+    // Validar estado de IA para la organización
+    this._aiCoreService.checkAiStatus().subscribe();
 
     // Load alert keywords, stats and actions when process is loaded
     effect(() => {
@@ -396,7 +406,20 @@ export class ProcessDetailComponent {
    * Alterna la visibilidad del chat de IA
    */
   public toggleAiChat(): void {
-    this.showAiChat.update(v => !v);
+    const newState = !this.showAiChat();
+    this.showAiChat.set(newState);
+
+    // automatically close global sidebar when opening chat
+    if (newState && this._layout) {
+      this._layout.closeSidebar();
+    }
+
+    // if closing chat, unpin it
+    if (!newState) this.isChatPinned.set(false);
+  }
+
+  public onChatPinnedChanged(pinned: boolean): void {
+    this.isChatPinned.set(pinned);
   }
 
   /**

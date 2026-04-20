@@ -15,6 +15,7 @@ export interface User {
   profile_image: string | null;
   roles: Role[];
   must_change_password: boolean;
+  organization_id: string;
 }
 
 export interface Role {
