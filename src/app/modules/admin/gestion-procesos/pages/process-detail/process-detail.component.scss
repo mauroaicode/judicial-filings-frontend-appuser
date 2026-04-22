@@ -182,3 +182,63 @@
     }
   }
 }
+
+// ─── Lexa AI Floating Button (FAB) ───────────────────────────────────────────
+// Fixed bottom-right, scoped to process-detail — NOT a global element.
+// Uses explicit hex colors (#4B2A7D → #371B58) to avoid CSS-variable resolution
+// failures that caused the transparent background issue.
+
+.lexa-fab {
+  position: fixed !important;
+  bottom: 28px !important;
+  right: 28px !important;
+  z-index: 130 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  height: 48px !important;
+  padding: 0 22px 0 18px !important;
+  border-radius: 24px !important;
+  border: none !important;
+  cursor: pointer !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  white-space: nowrap !important;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+
+  // Closed: brand gradient (explict hex — no CSS var needed)
+  background: linear-gradient(135deg, #4B2A7D 0%, #371B58 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 24px -4px rgba(75, 42, 125, 0.55),
+              0 2px 8px -2px rgba(0, 0, 0, 0.12),
+              inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+
+  &:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 10px 32px -4px rgba(75, 42, 125, 0.6),
+                0 4px 12px -2px rgba(0, 0, 0, 0.14) !important;
+  }
+  &:active { transform: translateY(0) scale(0.97) !important; }
+
+  // Open: neutral white, panel already open
+  &--open {
+    background: #ffffff !important;
+    color: #374151 !important;
+    border: 1.5px solid #E5E7EB !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+
+    &:hover {
+      background: #F9FAFB !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10) !important;
+    }
+  }
+}
+
+.lexa-fab__label {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+}

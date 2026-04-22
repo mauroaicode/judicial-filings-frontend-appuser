@@ -2,6 +2,7 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessC
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { provideTransloco, TranslocoService } from '@jsverse/transloco';
+import { provideMarkdown } from 'ngx-markdown';
 import { firstValueFrom } from 'rxjs';
 
 import { routes } from './app.routes';
@@ -41,5 +42,7 @@ export const appConfig: ApplicationConfig = {
       
       return firstValueFrom(translocoService.load(defaultLang));
     }),
+
+    provideMarkdown(),
   ]
 };
