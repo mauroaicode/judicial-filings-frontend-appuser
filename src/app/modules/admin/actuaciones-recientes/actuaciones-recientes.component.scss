@@ -1,21 +1,77 @@
-// Actuaciones Recientes component styles
-
-.animate-fade-in-up {
-  animation: fadeInUp 0.3s ease-out;
+.history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+.history-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 8px 24px -4px rgb(0 0 0 / 0.08);
+    border-color: #c7d2fe;
   }
 }
 
-// Tooltip de sujetos procesales: por encima del texto (evitar cortes al final de la tabla)
+.period-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+
+  &.period-manana {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+
+  &.period-tarde {
+    background: #fff3cd;
+    color: #b45309;
+  }
+
+  &.period-noche {
+    background: #e0e7ff;
+    color: #4338ca;
+  }
+}
+
+.loading-trigger {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  text-align: center;
+  background: white;
+  border-radius: 1rem;
+  border-radius: 1rem;
+  border: 1px dashed #cbd5e1;
+}
+
+// ----------------------------------------------------
+// TABLA Y TOOLTIPS (Portados desde Gestión de Procesos)
+// ----------------------------------------------------
+
 .process-list-tooltip {
   position: relative !important;
   display: inline-flex !important;
@@ -39,7 +95,6 @@
     padding: 1rem !important;
     border-radius: 0.75rem !important;
 
-    // Arrow pointing down
     &::after {
       content: '';
       position: absolute;
@@ -59,7 +114,6 @@
     pointer-events: auto;
   }
 
-  // Variant for elements on the left edge (like the alert column)
   &.tooltip-left-aligned {
     .tooltip-content {
       left: 0 !important;
@@ -75,7 +129,6 @@
       transform: translateY(0) !important;
     }
 
-    // Special case for first rows to avoid cropping with header
     &.tooltip-bottom {
       .tooltip-content {
         bottom: auto !important;
@@ -97,42 +150,10 @@
   }
 }
 
-// Global adjustment for tooltips inside sticky columns
-.sticky-col-radicado .tooltip {
-  overflow: visible !important;
-
-  &::before, &::after {
-    z-index: 100 !important;
-  }
-}
-
-// Hover accent en todas las filas (igual que gestion-procesos)
-.process-list-table tbody tr.process-row-hovered,
-.process-list-table tbody tr.process-row-hovered td {
-  background-color: #F3F0F9 !important;
-}
-
-/* Hover específico para la celda sticky */
-.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado,
-.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado::before,
-.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado .sticky-cell-bg {
-  background-color: #F3F0F9 !important;
-  background: #F3F0F9 !important;
-}
-
-/* IMPORTANTE: evitar que ancestros con overflow rompan el sticky del header */
-.process-list-card,
-.process-list-card-body {
-  overflow: visible !important;
-}
-
-// Columna Número de Radicación sticky en scroll horizontal
 .process-list-table {
   --table-sticky-top: 0px;
   overflow-x: auto !important;
-  overflow-y: auto !important;
-  max-height: calc(100vh - 280px);
-  -webkit-overflow-scrolling: touch;
+  overflow-y: visible !important;
   position: relative;
 
   &>table {
@@ -141,257 +162,70 @@
     border-spacing: 0 !important;
   }
 
-  /* Header sticky global (todas las columnas) */
   thead th {
     position: sticky !important;
     top: var(--table-sticky-top) !important;
-    z-index: 20 !important; /* Low priority for standard vertical stickiness */
-    background: #24163E !important;
+    z-index: 100 !important;
     background-color: #24163E !important;
-    color: #fff !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    border: none !important;
+    white-space: nowrap !important;
     padding: 1rem !important;
-    border: none !important; /* No borders in header to avoid gaps */
-    /* Fill gaps with solid shadow */
-    box-shadow: 0 0 0 0.5px #24163E !important;
     transform: translateZ(0) !important;
+    box-shadow: 0 0 0 0.5px #24163E !important;
   }
 
   thead th.sticky-col-idx {
     left: -1px !important;
-    z-index: 30 !important;
-    transform: translateZ(0) !important;
-    /* Seal right gap with same purple color */
-    box-shadow: 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
-    border: none !important;
+    z-index: 110 !important;
   }
 
   thead th.sticky-col-alert {
     left: 47px !important; 
-    z-index: 30 !important;
-    transform: translateZ(0) !important;
-    /* Seal right gap with same purple color */
-    box-shadow: 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
-    border: none !important;
+    z-index: 110 !important;
   }
 
   thead th.sticky-col-radicado {
     left: 127px !important;
-    z-index: 30 !important;
-    min-width: 280px !important;
-    max-width: 280px !important;
-    width: 280px !important;
-    transform: translateZ(0) !important;
-    /* Identity shadow + Same purple seal */
+    z-index: 110 !important;
     box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1), 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
-    border: none !important;
   }
 
-  /* Celda sticky idx */
   tbody td.sticky-col-idx {
     position: sticky !important;
     left: -1px !important;
     z-index: 10 !important;
     background-color: #ffffff !important;
-    overflow: visible !important;
-    transform: translateZ(0) !important;
-    /* Seal right gap with white background */
-    box-shadow: 1px 0 0 0 #ffffff !important;
-    border: none !important;
   }
 
-  /* Celda sticky alert */
   tbody td.sticky-col-alert {
     position: sticky !important;
     left: 47px !important;
     z-index: 10 !important;
     background-color: #ffffff !important;
-    overflow: visible !important;
-    transform: translateZ(0) !important;
-    /* Seal right gap with white background */
-    box-shadow: 1px 0 0 0 #ffffff !important;
-    border: none !important;
-
-    & .sticky-cell-bg {
-      position: absolute !important;
-      inset: 0 !important;
-      background: inherit !important;
-      z-index: 0;
-      pointer-events: none;
-    }
+    box-shadow: none !important;
+    border-right: 0 !important;
   }
 
-  /* Celda sticky radicado */
   tbody td.sticky-col-radicado {
     position: sticky !important;
     left: 127px !important;
     z-index: 10 !important;
     background-color: #ffffff !important;
-    /* Identity shadow + White seal */
-    box-shadow: 2px 0 4px rgba(0,0,0,0.1), 1px 0 0 0 #ffffff !important;
-    border: none !important;
-    min-width: 280px !important;
-    max-width: 280px !important;
-    width: 280px !important;
-    white-space: nowrap !important;
-    overflow: visible !important;
-    transform: translateZ(0) !important;
-
-    & .sticky-cell-bg {
-      position: absolute !important;
-      inset: 0 !important;
-      background: inherit !important;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    & .sticky-cell-txt {
-      position: relative !important;
-      z-index: 1;
-    }
+    box-shadow: none !important;
+    border-left: 0 !important;
   }
 
-  /* Filas pares (zebra) */
-  tbody tr:nth-child(2n) td.sticky-col-radicado,
-  tbody tr:nth-child(2n) td.sticky-col-alert,
-  tbody tr:nth-child(2n) td.sticky-col-idx {
-    background-color: #f9fafb !important;
+  tbody tr:hover td {
+    background-color: #F3F0F9 !important;
   }
-}
-
-// Pagination (misma estructura que gestion-procesos)
-.pagination-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem;
-  width: 100%;
-
-  @media (min-width: 768px) {
-    flex-direction: row;
-  }
-
-  .pagination-results-info {
-    font-size: 0.875rem;
-    color: hsl(var(--bc) / 0.7);
-    order: 2;
-    @media (min-width: 768px) {
-      order: 1;
-    }
-  }
-
-  .pagination-controls {
-    display: flex;
-    order: 1;
-    @media (min-width: 768px) {
-      order: 2;
-    }
-  }
-
-  .pagination-page-size {
-    order: 3;
-  }
-}
-
-// Label styles match project standards
-.label-standard {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: hsl(var(--bc) / 0.6);
-}
-
-.input-standard {
-  border-radius: 0.75rem;
-  border-color: hsl(var(--bc) / 0.1);
-  background-color: hsl(var(--b1));
-  height: 2.5rem;
-  font-size: 0.875rem;
-
-  &:focus {
-    border-color: hsl(var(--p));
-    outline: 2px solid hsl(var(--p) / 0.2);
-    outline-offset: 1px;
-  }
-}
-
-.btn-standard-search {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: hsl(var(--p));
-  color: hsl(var(--pc));
-  padding: 0 1.5rem;
-  height: 2.5rem;
-  border-radius: 0.75rem;
-  font-weight: 700;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px hsl(var(--p) / 0.3);
-    opacity: 0.9;
-  }
-}
-
-// Semáforo / Alert Dots
-.alert-dot {
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 9999px;
-  display: inline-block;
-
-  &.alert-red {
-    background-color: #ef4444; // Red-500
-    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
-  }
-
-  &.alert-yellow {
-    background-color: #f59e0b; // Amber-500
-    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
-  }
-
-  &.alert-green {
-    background-color: #22c55e; // Green-500
-    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
-  }
-}
-
-// Pulse animation for critical red alerts
-.alert-pulse {
-  animation: pulse-red 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse-red {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: .7;
-    transform: scale(1.15);
-  }
-}
-
-// Efecto hover zebra para celdas sticky
-.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado,
-.process-list-table tbody tr.process-row-hovered td.sticky-col-alert,
-.process-list-table tbody tr.process-row-hovered td.sticky-col-idx,
-.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado::before,
-.process-list-table tbody tr.process-row-hovered td.sticky-col-alert::before,
-.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado .sticky-cell-bg,
-.process-list-table tbody tr.process-row-hovered td.sticky-col-alert .sticky-cell-bg {
-  background-color: #F3F0F9 !important;
-  background: #F3F0F9 !important;
 }
 
 /*
- * FIX DEFINITIVO DE CAPAS:
- * Para que el tooltip flote por encima de TODO (celdas adyacentes y filas inferiores),
- * aplicamos el boost de z-index a nivel de TD cuando la TR es hovered.
+ * Fix de capas para tooltip dentro de columnas sticky.
+ * Evita que el popup se recorte o quede detrás de celdas vecinas.
  */
 .process-list-table tbody tr:hover td,
 .process-list-table tbody tr.process-row-hovered td {
@@ -400,5 +234,45 @@
 
 .process-list-table tbody tr:hover td.sticky-col-alert,
 .process-list-table tbody tr.process-row-hovered td.sticky-col-alert {
-  z-index: 15 !important;
+  z-index: 50 !important;
+}
+
+.process-list-table tbody tr:hover td.sticky-col-radicado,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado {
+  z-index: 30 !important;
+}
+
+.process-list-table tbody tr:hover td.sticky-col-idx,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-idx {
+  z-index: 25 !important;
+}
+
+// Paginación del modal de consolidado (misma estructura que gestión de procesos / data-table)
+.digest-modal-pagination.pagination-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0;
+  padding: 1rem;
+  width: 100%;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .pagination-results-info {
+    font-size: 0.875rem;
+    color: hsl(var(--bc) / 0.7);
+  }
+
+  .pagination-controls {
+    display: flex;
+  }
+
+  .pagination-page-size {
+    flex-shrink: 0;
+  }
 }

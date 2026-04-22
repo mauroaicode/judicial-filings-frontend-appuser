@@ -261,6 +261,61 @@
       "defendantDesc": "Your client is the被告"
     }
   },
+  "actuacionesRecientes": {
+    "title": "Recent Actions",
+    "description": "History of consolidated notifications issued by the system",
+    "digest": {
+      "titleWithDate": "Digest for {{date}} - {{period}}",
+      "titleFallback": "Notification digest",
+      "movementsLabel": "Movements detected"
+    },
+    "actionDetail": {
+      "title": "Action detail",
+      "autoNotified": "Notified order",
+      "close": "Close detail",
+      "viewMore": "VIEW DETAILS"
+    },
+    "filters": {
+      "title": "Search Filters",
+      "dateRange": "Date Range",
+      "dateFromPlaceholder": "Start",
+      "dateToPlaceholder": "End",
+      "processNumber": "Process number",
+      "processNumberPlaceholder": "Ex. 76001...",
+      "apply": "Filter Results",
+      "clear": "Clear Filters",
+      "noResults": "No consolidated outcomes found for the applied filters."
+    }
+  },
+  "alertSemafor": {
+    "alertLevel": "Status",
+    "linkRole": "Link role",
+    "linkRoleDesc": "Link your role to activate intelligent procedural alerts",
+    "alerts": {
+      "redDemandante": "Critical Alert: Risk of withdrawal or serious paralysis (+90 days of inactivity).",
+      "yellowDemandante": "Early Alert: Follow-up needed to avoid default (+45 days of inactivity).",
+      "greenDemandante": "Process with recent and healthy activity.",
+      "redGeneral": "Critical Alert: Judgment, order or termination detected.",
+      "yellowGeneral": "Process Alert: Transfer, memorial or notice detected.",
+      "greenGeneral": "Informational: Record or file detected.",
+      "greenDemandado": "Favorable Informational: The case against is not advancing (+90 days of inactivity)."
+    },
+    "legend": {
+      "title": "Status Legend",
+      "green": {
+        "title": "Healthy / Informational",
+        "desc": "Processes with recent activity or favorable inactivity for your role."
+      },
+      "yellow": {
+        "title": "Early Alert",
+        "desc": "Preventive monitoring (+45 days) or ongoing judicial proceedings."
+      },
+      "red": {
+        "title": "Critical Alert",
+        "desc": "Prolonged inactivity (+90 days) or decisive procedural milestones."
+      }
+    }
+  },
   "processDetail": {
     "title": "Process Detail",
     "activateProcess": "Activate Tracking",
