@@ -12,7 +12,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
@@ -35,6 +35,7 @@ import { ErrorHandlerService } from '@app/core/services/error/error-handler.serv
 })
 export class SignInComponent implements OnInit {
   private _router = inject(Router);
+  private _activatedRoute = inject(ActivatedRoute);
   private _formBuilder = inject(FormBuilder);
   private _authService = inject(AuthService);
   private _errorHandler = inject(ErrorHandlerService);
@@ -47,8 +48,10 @@ export class SignInComponent implements OnInit {
   public alertType = signal<'success' | 'error'>('error');
   public currentYear = new Date().getFullYear();
   private _isDirectMessage = signal<boolean>(false);
+  private _returnUrl = signal<string | null>(null);
 
   ngOnInit(): void {
+    this._returnUrl.set(this.getSafeReturnUrl(this._activatedRoute.snapshot.queryParamMap.get('returnUrl')));
     this.signInForm = this._formBuilder.group({
       identification: ['', [Validators.required]],
       password: ['', [Validators.required]],
@@ -178,6 +181,14 @@ export class SignInComponent implements OnInit {
    * @returns A promise that resolves once the navigation is complete.
    */
   async redirectToAdmin(user: any): Promise<void> {
+    const returnUrl = this._returnUrl();
+    if (returnUrl) {
+      setTimeout(() => {
+        this._router.navigateByUrl(returnUrl);
+      }, 1000);
+      return;
+    }
+
     const userRoles = user?.roles ?? [];
 
     for (const role of userRoles) {
@@ -198,6 +209,14 @@ export class SignInComponent implements OnInit {
     setTimeout(() => {
       this._router.navigate([ROUTES_ADMIN.GESTION_PROCESOS]);
     }, 1000);
+  }
+
+  private getSafeReturnUrl(value: string | null): string | null {
+    if (!value) return null;
+    // Only allow internal absolute paths to avoid open redirects
+    if (!value.startsWith('/')) return null;
+    if (value.startsWith('//')) return null;
+    return value;
   }
 }
 

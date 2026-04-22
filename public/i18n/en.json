@@ -263,7 +263,29 @@
   },
   "actuacionesRecientes": {
     "title": "Recent Actions",
-    "description": "History of consolidated notifications issued by the system"
+    "description": "History of consolidated notifications issued by the system",
+    "digest": {
+      "titleWithDate": "Digest for {{date}} - {{period}}",
+      "titleFallback": "Notification digest",
+      "movementsLabel": "Movements detected"
+    },
+    "actionDetail": {
+      "title": "Action detail",
+      "autoNotified": "Notified order",
+      "close": "Close detail",
+      "viewMore": "VIEW DETAILS"
+    },
+    "filters": {
+      "title": "Search Filters",
+      "dateRange": "Date Range",
+      "dateFromPlaceholder": "Start",
+      "dateToPlaceholder": "End",
+      "processNumber": "Process number",
+      "processNumberPlaceholder": "Ex. 76001...",
+      "apply": "Filter Results",
+      "clear": "Clear Filters",
+      "noResults": "No consolidated outcomes found for the applied filters."
+    }
   },
   "alertSemafor": {
     "alertLevel": "Status",

@@ -278,7 +278,29 @@
   },
   "actuacionesRecientes": {
     "title": "Actuaciones Recientes",
-    "description": "Historial de consolidado de notificaciones emitidas por el sistema"
+    "description": "Historial de consolidado de notificaciones emitidas por el sistema",
+    "digest": {
+      "titleWithDate": "Consolidado del {{date}} - {{period}}",
+      "titleFallback": "Consolidado de notificaciones",
+      "movementsLabel": "Movimientos detectados"
+    },
+    "actionDetail": {
+      "title": "Detalle de actuación",
+      "autoNotified": "Auto notificado",
+      "close": "Cerrar detalle",
+      "viewMore": "VER DETALLE"
+    },
+    "filters": {
+      "title": "Filtros de Búsqueda",
+      "dateRange": "Rango de fechas",
+      "dateFromPlaceholder": "Inicio",
+      "dateToPlaceholder": "Fin",
+      "processNumber": "Número de radicado",
+      "processNumberPlaceholder": "Ej. 76001...",
+      "apply": "Filtrar Resultados",
+      "clear": "Limpiar Filtros",
+      "noResults": "No se encontraron consolidados para los filtros aplicados."
+    }
   },
   "alertSemafor": {
     "alertLevel": "Estado",

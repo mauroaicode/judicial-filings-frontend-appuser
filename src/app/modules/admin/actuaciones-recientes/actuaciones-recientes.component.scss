@@ -64,5 +64,215 @@
   text-align: center;
   background: white;
   border-radius: 1rem;
+  border-radius: 1rem;
   border: 1px dashed #cbd5e1;
+}
+
+// ----------------------------------------------------
+// TABLA Y TOOLTIPS (Portados desde Gestión de Procesos)
+// ----------------------------------------------------
+
+.process-list-tooltip {
+  position: relative !important;
+  display: inline-flex !important;
+
+  .tooltip-content {
+    position: absolute !important;
+    bottom: 140% !important;
+    left: 50% !important;
+    transform: translateX(-50%) translateY(4px) !important;
+    white-space: normal !important;
+    width: max-content !important;
+    max-width: 280px !important;
+    z-index: 100 !important;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.15s ease-out;
+    pointer-events: none;
+    background-color: #ffffff !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    padding: 1rem !important;
+    border-radius: 0.75rem !important;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #ffffff;
+      z-index: 101;
+    }
+  }
+
+  &:hover .tooltip-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0) !important;
+    pointer-events: auto;
+  }
+
+  &.tooltip-left-aligned {
+    .tooltip-content {
+      left: 0 !important;
+      transform: translateY(4px) !important;
+
+      &::after {
+        left: 0.75rem !important;
+        transform: none !important;
+      }
+    }
+
+    &:hover .tooltip-content {
+      transform: translateY(0) !important;
+    }
+
+    &.tooltip-bottom {
+      .tooltip-content {
+        bottom: auto !important;
+        top: 140% !important;
+
+        &::after {
+          top: auto !important;
+          bottom: 100% !important;
+          border-top-color: transparent !important;
+          border-bottom-color: #ffffff !important;
+          transform: translateX(-50%) !important;
+        }
+      }
+
+      &:hover .tooltip-content {
+        transform: translateY(0) !important;
+      }
+    }
+  }
+}
+
+.process-list-table {
+  --table-sticky-top: 0px;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  position: relative;
+
+  &>table {
+    position: relative;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+  }
+
+  thead th {
+    position: sticky !important;
+    top: var(--table-sticky-top) !important;
+    z-index: 100 !important;
+    background-color: #24163E !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    border: none !important;
+    white-space: nowrap !important;
+    padding: 1rem !important;
+    transform: translateZ(0) !important;
+    box-shadow: 0 0 0 0.5px #24163E !important;
+  }
+
+  thead th.sticky-col-idx {
+    left: -1px !important;
+    z-index: 110 !important;
+  }
+
+  thead th.sticky-col-alert {
+    left: 47px !important; 
+    z-index: 110 !important;
+  }
+
+  thead th.sticky-col-radicado {
+    left: 127px !important;
+    z-index: 110 !important;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1), 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
+  }
+
+  tbody td.sticky-col-idx {
+    position: sticky !important;
+    left: -1px !important;
+    z-index: 10 !important;
+    background-color: #ffffff !important;
+  }
+
+  tbody td.sticky-col-alert {
+    position: sticky !important;
+    left: 47px !important;
+    z-index: 10 !important;
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+    border-right: 0 !important;
+  }
+
+  tbody td.sticky-col-radicado {
+    position: sticky !important;
+    left: 127px !important;
+    z-index: 10 !important;
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+    border-left: 0 !important;
+  }
+
+  tbody tr:hover td {
+    background-color: #F3F0F9 !important;
+  }
+}
+
+/*
+ * Fix de capas para tooltip dentro de columnas sticky.
+ * Evita que el popup se recorte o quede detrás de celdas vecinas.
+ */
+.process-list-table tbody tr:hover td,
+.process-list-table tbody tr.process-row-hovered td {
+  z-index: 5 !important;
+}
+
+.process-list-table tbody tr:hover td.sticky-col-alert,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-alert {
+  z-index: 50 !important;
+}
+
+.process-list-table tbody tr:hover td.sticky-col-radicado,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-radicado {
+  z-index: 30 !important;
+}
+
+.process-list-table tbody tr:hover td.sticky-col-idx,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-idx {
+  z-index: 25 !important;
+}
+
+// Paginación del modal de consolidado (misma estructura que gestión de procesos / data-table)
+.digest-modal-pagination.pagination-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0;
+  padding: 1rem;
+  width: 100%;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .pagination-results-info {
+    font-size: 0.875rem;
+    color: hsl(var(--bc) / 0.7);
+  }
+
+  .pagination-controls {
+    display: flex;
+  }
+
+  .pagination-page-size {
+    flex-shrink: 0;
+  }
 }
