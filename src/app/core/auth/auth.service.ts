@@ -52,6 +52,13 @@ export class AuthService {
   }
 
   /**
+   * Getter for organization ID
+   */
+  get organizationId(): string | null {
+    return this._user()?.organization_id || null;
+  }
+
+  /**
    * Getter for current user
    */
   get currentUser(): User | null {

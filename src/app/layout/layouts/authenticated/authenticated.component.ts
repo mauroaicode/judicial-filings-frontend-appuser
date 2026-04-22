@@ -56,7 +56,6 @@ export class AuthenticatedLayoutComponent implements OnInit {
     // 2. Fallback si falta data en rutas
     if (url.includes('/gestion-procesos/')) return 'processDetail.title';
     if (url.includes('/gestion-procesos')) return 'navigation.gestionProcesos';
-    if (url.includes('/actuaciones-recientes')) return 'actuacionesRecientes.title';
     if (url.includes('/palabras-clave')) return 'navigation.keywords';
     if (url.includes('/tareas')) return 'tasks.title';
     if (url.includes('/perfil')) return 'header.profile';
@@ -123,6 +122,16 @@ export class AuthenticatedLayoutComponent implements OnInit {
     if (this.sidebar) {
       this.sidebar.toggleSidebar();
       this.sidebarOpen.set(this.sidebar.isOpen());
+    }
+  }
+
+  /**
+   * Force close sidebar
+   */
+  closeSidebar(): void {
+    if (this.sidebar && this.sidebar.isOpen()) {
+      this.sidebar.closeSidebar();
+      this.sidebarOpen.set(false);
     }
   }
 

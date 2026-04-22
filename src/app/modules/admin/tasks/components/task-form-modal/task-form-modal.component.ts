@@ -100,7 +100,7 @@ export class TaskFormModalComponent implements OnInit, OnDestroy {
         this.isSaving.set(true);
         this.backendErrors.set({});
 
-        const organizationId = this.task()?.organization_id || 'c93bde00-8456-4b43-9bd4-07fac136c864';
+        const organizationId = this.task()?.organization_id || this._authService.organizationId || '';
 
         const payload: TaskCreateRequest = {
             title: this.taskForm.value.title,

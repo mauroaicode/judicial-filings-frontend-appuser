@@ -1,68 +1,19 @@
-<div class="w-full space-y-6 pb-8">
+<div class="w-full space-y-6">
+
   <!-- Page Header -->
-  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-    <div class="flex flex-col md:flex-row md:items-center gap-6 flex-1 min-w-0">
-      <div class="min-w-0 flex-1">
-        <h1 class="text-2xl font-bold text-base-content md:text-3xl truncate">
-          {{ 'actuacionesRecientes.title' | transloco }}
-        </h1>
-        <p class="mt-1 text-sm text-base-content/70 line-clamp-1">
-          {{ 'actuacionesRecientes.description' | transloco }}
-        </p>
-      </div>
-
-      <!-- Live Clock Component -->
-      <app-live-clock class="flex-none"></app-live-clock>
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-base-content md:text-3xl">
+        {{ 'actuacionesRecientes.title' | transloco }}
+      </h1>
+      <p class="mt-1 text-sm text-base-content/70">
+        {{ 'actuacionesRecientes.description' | transloco }}
+      </p>
     </div>
-    <div class="flex flex-wrap items-center gap-3 shrink-0">
-      <!-- Toggle Highlights Switch -->
-      <div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-base-200/40 hover:bg-base-200/60 transition-all cursor-pointer group"
-           (click)="toggleHighlights()"
-           [attr.title]="(showHighlights() ? 'Desactivar resaltado' : 'Activar resaltado')">
-        <span class="text-[10px] uppercase font-black tracking-widest text-base-content/30 group-hover:text-base-content/50 hidden sm:inline">Resaltar palabras</span>
-        <input type="checkbox" class="toggle toggle-primary toggle-sm sm:toggle-md pointer-events-none" [checked]="showHighlights()" />
-      </div>
-
-      <!-- Legend Info (Tooltip) -->
-      <div class="dropdown dropdown-end">
-        <label tabindex="0" class="btn btn-ghost btn-circle btn-sm sm:btn-md text-base-content/40 hover:text-primary transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </label>
-        <div tabindex="0" class="dropdown-content z-[100] card card-compact w-80 p-2 shadow-2xl bg-white border border-base-200 mt-2">
-          <div class="card-body">
-            <h3 class="font-black text-[10px] uppercase tracking-widest text-base-content/30 mb-4 border-b border-base-100 pb-2">
-              {{ 'actuacionesRecientes.table.alerts.legend' | transloco }}
-            </h3>
-            <div class="space-y-5">
-              <div class="flex gap-4">
-                <div class="w-3 h-3 rounded-full alert-dot alert-red mt-1 shrink-0 alert-pulse"></div>
-                <div>
-                  <h4 class="font-black text-[11px] uppercase text-red-600 mb-1 leading-none tracking-tight">Alerta Crítica</h4>
-                  <p class="text-[11px] leading-relaxed text-base-content/70 font-medium">Inactividad <b>+90 días</b> para demandantes o movimientos críticos (Sentencias, Terminaciones).</p>
-                </div>
-              </div>
-              <div class="flex gap-4">
-                <div class="w-3 h-3 rounded-full alert-dot alert-yellow mt-1 shrink-0"></div>
-                <div>
-                  <h4 class="font-black text-[11px] uppercase text-amber-600 mb-1 leading-none tracking-tight">Alerta Temprana</h4>
-                  <p class="text-[11px] leading-relaxed text-base-content/70 font-medium">Inactividad <b>+45 días</b> o trámites de seguimiento (Traslados, Memoriales, Oficios).</p>
-                </div>
-              </div>
-              <div class="flex gap-4">
-                <div class="w-3 h-3 rounded-full alert-dot alert-green mt-1 shrink-0"></div>
-                <div>
-                  <h4 class="font-black text-[11px] uppercase text-green-600 mb-1 leading-none tracking-tight">Informativo</h4>
-                  <p class="text-[11px] leading-relaxed text-base-content/70 font-medium">Procesos con actividad reciente o inactividad favorable para demandados.</p>
-                </div>
-              </div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-base-100 italic text-[10px] text-base-content/30 leading-snug">
-              Nuestro motor procesal analiza automáticamente el tiempo transcurrido y el contenido de cada actuación.
-            </div>
-          </div>
-        </div>
+    <div class="flex gap-2 items-center">
+      <div class="hidden sm:flex items-center gap-2 text-sm text-base-content/50 bg-base-100 border border-base-200 px-4 py-2 rounded-xl mr-2">
+        <span class="font-medium">Total:</span>
+        <span class="font-black text-primary">{{ totalItems() }}</span>
       </div>
 
       <button type="button" class="btn btn-sm sm:btn-md rounded-xl px-4 transition-all border"
@@ -76,28 +27,23 @@
         <span class="hidden sm:inline font-bold">{{ 'actuacionesRecientes.filters.title' | transloco }}</span>
       </button>
 
-      <!-- FAB Mobile Actions Container (Consistent with Gestion de Procesos) -->
-      <div class="lg:hidden fixed bottom-10 right-4 z-[500] flex flex-col gap-3">
-        <!-- Filter FAB -->
-        <button type="button" class="btn btn-circle btn-lg shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-2 transition-all"
-          [ngClass]="showFilters() ? 'bg-primary text-white border-primary' : 'bg-base-100 text-primary border-primary/20'"
-          (click)="toggleFilters()">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-          </svg>
-        </button>
-      </div>
+      <!-- FAB filter (mobile) -->
+      <button type="button" class="sm:hidden btn btn-circle btn-sm border transition-all"
+        [ngClass]="showFilters() ? 'bg-primary text-white border-primary' : 'bg-base-100 text-primary border-primary/20'"
+        (click)="toggleFilters()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+        </svg>
+      </button>
     </div>
   </div>
 
   <!-- Filters Card -->
   @if (showFilters()) {
-  <div id="filters-section" class="card bg-white shadow-sm border border-base-200 animate-fade-in-up mb-4">
-    <div class="card-body p-4 sm:p-6 text-xs sm:text-sm">
-      <h2 class="label-standard mb-4">{{ 'actuacionesRecientes.filters.title' | transloco }}</h2>
-      <form [formGroup]="filterForm"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3" autocomplete="off">
+  <div class="card bg-white shadow-sm border border-base-200 animate-fade-in-up">
+    <div class="card-body p-6">
+      <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4" autocomplete="off">
 
         <!-- Process Number Filter -->
         <div class="form-control">
@@ -108,483 +54,599 @@
             [placeholder]="'actuacionesRecientes.filters.processNumberPlaceholder' | transloco" inputmode="numeric" />
         </div>
 
-        <!-- Registration Date Range -->
+        <!-- Date Range Filter -->
         <div class="form-control">
-          <app-date-range-picker [label]="'actuacionesRecientes.filters.registrationDate' | transloco"
-            [placeholder]="'actuacionesRecientes.filters.termDatePlaceholder' | transloco"
-            formControlName="registration_date_range"></app-date-range-picker>
+          <app-date-range-picker 
+            [label]="'actuacionesRecientes.filters.dateRange' | transloco"
+            [placeholder]="'Seleccionar rango de fechas'"
+            formControlName="created_at_range">
+          </app-date-range-picker>
         </div>
 
-        <!-- Term Start Date Range -->
-        <div class="form-control">
-          <app-date-range-picker [label]="'actuacionesRecientes.filters.termStartDate' | transloco"
-            [placeholder]="'actuacionesRecientes.filters.termDatePlaceholder' | transloco"
-            formControlName="term_start_date_range"></app-date-range-picker>
-        </div>
-
-        <!-- Term End Date Range -->
-        <div class="form-control">
-          <app-date-range-picker [label]="'actuacionesRecientes.filters.termEndDate' | transloco"
-            [placeholder]="'actuacionesRecientes.filters.termDatePlaceholder' | transloco"
-            formControlName="term_end_date_range"></app-date-range-picker>
-        </div>
-
-        <!-- Actions -->
-        <div class="md:col-span-2 lg:col-span-2 flex justify-end items-end gap-4">
+        <!-- Filter Actions -->
+        <div class="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 flex justify-end items-center gap-4 mt-4">
           <button type="button"
-            class="btn btn-link btn-sm normal-case text-base-content/60 no-underline hover:text-base-content font-bold mb-1"
-            (click)="onResetFilters()">
-            {{ 'actuacionesRecientes.filters.reset' | transloco }}
+            class="btn btn-link btn-sm normal-case text-base-content/60 no-underline hover:text-base-content font-bold"
+            (click)="clearFilters()">
+            {{ 'actuacionesRecientes.filters.clear' | transloco }}
           </button>
-          <button type="button" class="btn-standard-search mb-1" (click)="onSearch()">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            {{ 'actuacionesRecientes.filters.search' | transloco }}
+          <button type="submit" class="btn-standard-search" (click)="applyFilters()">
+            {{ 'actuacionesRecientes.filters.apply' | transloco }}
           </button>
         </div>
+
       </form>
     </div>
   </div>
   }
 
-    <!-- Re-using classes from Gestion de Procesos to ensure fixed header -->
-    <div class="card bg-base-100 shadow-sm border-none rounded-2xl animate-fade-in-up process-list-card">
-      <div class="card-body p-0 process-list-card-body">
-        
-        @if (loading()) {
-          <div class="flex items-center justify-center py-24">
-            <span class="loading loading-spinner loading-lg text-primary"></span>
-          </div>
-        } @else if (movements().length === 0) {
-          <div class="flex flex-col items-center justify-center py-20 px-6 text-center max-w-2xl mx-auto">
-            <div class="w-16 h-16 bg-base-200/50 rounded-2xl flex items-center justify-center mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-base-content/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-              </svg>
-            </div>
-            
-            <h3 class="text-xl font-bold text-base-content mb-2">
-              {{ (isFiltered() ? 'actuacionesRecientes.table.empty' : 'actuacionesRecientes.table.emptyToday') | transloco }}
-            </h3>
-            
-            <p class="text-xs sm:text-sm text-base-content/50 leading-relaxed max-w-md">
-              {{ (isFiltered() ? 'Pruebe ajustando los filtros de búsqueda para encontrar lo que necesita.' : 'actuacionesRecientes.table.emptyTodayDescription' | transloco) }}
-            </p>
-          </div>
-        } @else {
-          <!-- Mobile layout: Cards view (Idéntico a Gestion de Procesos) -->
-          <div class="block lg:hidden w-full bg-base-200/30 p-3 sm:p-4 space-y-4">
-            @for (row of pagedMovements(); track (row.id || $index)) {
-              <div class="card bg-base-100 border border-base-200 shadow-sm overflow-hidden transition-all duration-200 cursor-pointer hover:border-primary/40 hover:shadow-md active:scale-[0.98]"
-                   (click)="openMovementModal(row)">
-                <!-- Header: Radicado + Alert -->
-                <div class="bg-base-100 p-3 sm:p-4 flex justify-between items-center border-b border-base-200">
-                  <div class="flex items-center gap-1.5 group/card-radicado" (click)="onRowDblClick(row); $event.stopPropagation()">
-                    <span class="text-sm font-bold text-primary tracking-tight">{{ row.process_number | processNumber }}</span>
-                    <button type="button" class="btn btn-ghost btn-xs btn-circle text-primary/40 hover:bg-primary/5 hover:text-primary transition-all"
-                      (click)="copyToClipboard(row.process_number, $event)">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
-                      </svg>
-                    </button>
-                  </div>
-                  <!-- Semaphore Dot (Clickable in Mobile) -->
-                  <div class="flex items-center gap-2 cursor-pointer p-1 -m-1" (click)="openLegendModal($event)">
-                    @if (row.alert_level) {
-                      <div class="w-3 h-3 rounded-full alert-dot" 
-                           [class.alert-red]="(row.alert_level === 'red')"
-                           [class.alert-yellow]="(row.alert_level === 'yellow')"
-                           [class.alert-green]="(row.alert_level === 'green')"
-                           [class.alert-pulse]="(row.alert_level === 'red')"></div>
-                    } @else if (row.lawyer_role) {
-                      <!-- Estado de Escucha (Mobile) -->
-                      <div class="flex flex-col items-center opacity-40">
-                        <div class="w-3 h-3 rounded-full bg-base-300 ring-1 ring-base-200 shadow-inner"></div>
-                        <span class="text-[7px] font-black uppercase tracking-tighter text-base-content/40 mt-0.5">Espera</span>
-                      </div>
-                    } @else {
-                      <div class="flex flex-col items-center opacity-40">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                         </svg>
-                      </div>
-                    }
-                  </div>
-                </div>
-
-                <!-- Body -->
-                <div class="p-3 sm:p-4 space-y-4 text-[13px]">
-                  <!-- Court -->
-                  <div class="flex flex-col">
-                    <span class="text-[10px] text-base-content/40 uppercase font-black tracking-widest mb-1">{{ 'actuacionesRecientes.table.court' | transloco }}</span>
-                    <span class="text-base-content font-bold leading-snug">{{ row.court }}</span>
-                  </div>
-
-                  <!-- Action Text (Highlighted) -->
-                  <div class="flex flex-col bg-base-200/40 p-3 rounded-xl border border-base-200/50">
-                    <span class="text-[10px] text-base-content/40 uppercase font-black tracking-widest mb-1.5">{{ 'actuacionesRecientes.table.action' | transloco }}</span>
-                    <div class="text-base-content leading-relaxed font-semibold" 
-                         [innerHTML]="renderActionCell(row) | safeHtml"></div>
-                  </div>
-
-                  <!-- Dates Flex Layout (Safer than grid for long mobile labels) -->
-                  <div class="flex flex-wrap gap-y-4 gap-x-8 pt-2">
-                    <div class="flex flex-col min-w-[120px]">
-                      <span class="text-[10px] text-base-content/40 uppercase font-black tracking-widest mb-1">
-                        {{ 'actuacionesRecientes.table.actionDate' | transloco }}
-                      </span>
-                      <span class="text-base-content/80 font-bold text-sm">{{ row.action_date }}</span>
-                    </div>
-
-                    <div class="flex flex-col min-w-[120px]">
-                      <span class="text-[10px] text-base-content/40 uppercase font-black tracking-widest mb-1">
-                        {{ 'actuacionesRecientes.table.termEndDate' | transloco }}
-                      </span>
-                      <span class="text-base-content/80 font-bold text-sm">{{ row.term_end_date || '–' }}</span>
-                    </div>
-                  </div>
-
-                  @if (row.lawyer_role) {
-                    <div class="pt-2 border-t border-base-100">
-                      <span class="px-2.5 py-1 rounded-lg bg-primary/5 text-[10px] uppercase font-black tracking-widest text-primary/60 border border-primary/10">
-                        {{ row.lawyer_role }}
-                      </span>
-                    </div>
-                  }
-                </div>
-              </div>
-            }
-          </div>
-
-          <!-- Desktop layout: Table view -->
-          <div class="hidden lg:block process-list-table">
-            <table class="table table-zebra w-full" style="border-collapse: separate !important; border-spacing: 0 !important; min-width: 1800px;">
-              <thead>
-                <tr>
-                  <th class="sticky-col-idx text-center" style="width: 48px;">#</th>
-                  @for (col of columns; track col.key) {
-                    <th [class.sticky-col-radicado]="col.key === 'process_number'"
-                        [class.sticky-col-alert]="col.key === 'alert_status'"
-                        [class.text-left]="!col.align || col.align === 'left'"
-                        [class.text-center]="col.align === 'center'"
-                        [class.text-right]="col.align === 'right'"
-                        [style.width]="col.width">
-                      {{ col.label | transloco }}
-                    </th>
-                  }
-                </tr>
-              </thead>
-              <tbody>
-                @for (row of pagedMovements(); track (row.id || $index); let i = $index) {
-                  <tr class="cursor-pointer group" 
-                    [class.process-row-hovered]="hoveredRowId() === row.id"
-                    (mouseenter)="hoveredRowId.set(row.id || null)"
-                    (mouseleave)="hoveredRowId.set(null)"
-                    [attr.title]="'actuacionesRecientes.table.dblClickNavigation' | transloco"
-                    (click)="openMovementModal(row)">
-                    <td class="sticky-col-idx text-center align-middle font-bold text-[11px] text-base-content/40 bg-white" style="width: 48px;">
-                      {{ ((pagination()?.current_page || 1) - 1) * (pagination()?.per_page || 10) + i + 1 }}
-                    </td>
-                    @for (col of columns; track col.key) {
-                      <td [class.sticky-col-radicado]="col.key === 'process_number'"
-                          [class.sticky-col-alert]="col.key === 'alert_status'"
-                          [class.text-left]="!col.align || col.align === 'left'"
-                          [class.text-center]="col.align === 'center'"
-                          [class.text-right]="col.align === 'right'"
-                          class="align-middle">
-                        <span class="sticky-cell-bg" *ngIf="col.key === 'process_number' || col.key === 'alert_status'" aria-hidden="true"></span>
-                        <div class="sticky-cell-txt">
-                          @if (col.key === 'process_number') {
-                            <div class="flex flex-col" [class.py-1]="!!row.lawyer_role" (click)="onRowDblClick(row); $event.stopPropagation()">
-                              <div class="flex items-center gap-4">
-                                <span class="text-primary font-bold tracking-tight text-[13px] whitespace-nowrap hover:underline">{{ row.process_number | processNumber }}</span>
-                                <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
-                                  <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary transition-all scale-110"
-                                    (click)="copyToClipboard(row.process_number, $event)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
-                                    </svg>
-                                  </button>
-                                </span>
-                              </div>
-                              @if (row.lawyer_role) {
-                                <div class="flex items-center mt-1">
-                                  <span class="px-2 py-0.5 rounded-md bg-base-200/60 text-[9px] uppercase font-black tracking-widest text-base-content/40">{{ row.lawyer_role }}</span>
-                                </div>
-                              }
-                            </div>
-                          } @else if (col.html) {
-                            <div [innerHTML]="col.render ? (col.render($any(row)[col.key], row, i) | safeHtml) : $any(row)[col.key]"></div>
-                          } @else {
-                            {{ col.render ? col.render($any(row)[col.key], row, i) : $any(row)[col.key] }}
-                          }
-                        </div>
-                      </td>
-                    }
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Pagination EXACT as Gestion de Procesos -->
-          @if (pagination(); as paginationInfo) {
-            <div class="pagination-container border-t border-base-300 bg-base-100">
-              <div class="pagination-results-info">
-                {{ 'table.showing' | transloco }}
-                <span class="font-semibold">{{ paginationInfo.from }}</span>
-                {{ 'table.to' | transloco }}
-                <span class="font-semibold">{{ paginationInfo.to }}</span>
-                {{ 'table.of' | transloco }}
-                <span class="font-semibold">{{ paginationInfo.total }}</span>
-                {{ 'table.results' | transloco }}
-              </div>
-              <div class="pagination-controls join">
-                <button class="join-item btn btn-sm" [class.btn-disabled]="paginationInfo.current_page === 1"
-                  (click)="onPageChange({ page: 1, perPage: paginationInfo.per_page })"
-                  [disabled]="paginationInfo.current_page === 1">««</button>
-                <button class="join-item btn btn-sm" [class.btn-disabled]="paginationInfo.current_page === 1"
-                  (click)="onPageChange({ page: paginationInfo.current_page - 1, perPage: paginationInfo.per_page })"
-                  [disabled]="paginationInfo.current_page === 1">«</button>
-                
-                @for (page of getPageNumbers(); track page) {
-                <button class="join-item btn btn-sm" [class.btn-active]="page === paginationInfo.current_page"
-                  (click)="onPageChange({ page, perPage: paginationInfo.per_page })">
-                  {{ page }}
-                </button>
-                }
-                
-                <button class="join-item btn btn-sm"
-                  [class.btn-disabled]="paginationInfo.current_page === paginationInfo.last_page"
-                  (click)="onPageChange({ page: paginationInfo.current_page + 1, perPage: paginationInfo.per_page })"
-                  [disabled]="paginationInfo.current_page === paginationInfo.last_page">»</button>
-                <button class="join-item btn btn-sm"
-                  [class.btn-disabled]="paginationInfo.current_page === paginationInfo.last_page"
-                  (click)="onPageChange({ page: paginationInfo.last_page, perPage: paginationInfo.per_page })"
-                  [disabled]="paginationInfo.current_page === paginationInfo.last_page">»»</button>
-              </div>
-              <div class="pagination-page-size">
-                <select class="select select-bordered select-sm" [value]="paginationInfo.per_page"
-                  (change)="onPageChange({ page: 1, perPage: +$any($event.target).value })">
-                  @for (size of pageSizeOptions; track size) {
-                  <option [value]="size" [attr.selected]="size === paginationInfo.per_page ? '' : null">
-                    {{ size }} {{ 'table.perPage' | transloco }}
-                  </option>
-                  }
-                </select>
-              </div>
-            </div>
-          }
-        }
-      </div>
+  <!-- Grid -->
+  @if (loading() && historyItems().length === 0) {
+    <div class="flex items-center justify-center py-16">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
     </div>
+  }
 
-    <!-- Toast: éxito al copiar al portapapeles -->
-    @if (copiedMessage()) {
-      <div class="toast toast-end toast-bottom z-[10000] pointer-events-none">
-        <div class="alert alert-success shadow-lg border-none bg-success text-success-content rounded-2xl animate-fade-in-up">
-          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span class="font-bold">{{ copiedMessage() }}</span>
+  @if (historyItems().length > 0) {
+    <div class="history-grid">
+      @for (item of historyItems(); track item.id) {
+        <div class="history-card" (click)="openDigestModal(item)">
+          <div class="p-5 flex flex-col gap-3">
+
+            <!-- Row 1: Date -->
+            <div>
+              <p class="text-[9px] font-black uppercase tracking-widest text-base-content/30 mb-0.5">Publicación</p>
+              <p class="text-base font-bold text-base-content capitalize leading-snug">{{ item.date }}</p>
+            </div>
+
+            <!-- Row 2: Time + Period badge side by side -->
+            <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1.5 text-sm text-base-content/70 font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{{ item.time }}</span>
+              </div>
+              <span [class]="'period-badge period-' + getPeriodClass(item.period)">{{ item.period }}</span>
+            </div>
+
+            <!-- Divider -->
+            <div class="border-t border-base-200"></div>
+
+            <!-- Row 3: Actions count -->
+            <div>
+              <p class="text-[9px] font-black uppercase tracking-widest text-base-content/30 mb-0.5">Actuaciones detectadas</p>
+              <p class="text-2xl font-black text-primary">{{ item.actions_count }}</p>
+            </div>
+
+            <!-- Row 4: Notification channels -->
+            <div class="flex items-center gap-2 pt-1">
+              <span class="text-[9px] font-black uppercase tracking-widest text-base-content/30 mr-1">Notificado</span>
+
+              <!-- Email -->
+              <div class="relative group/email">
+                <div [ngClass]="item.email_notified_at ? 'text-success bg-success/10 border-success/20' : 'text-base-content/20 bg-base-200 border-base-200'"
+                     class="w-7 h-7 rounded-lg flex items-center justify-center border transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[180px] text-center bg-slate-800 text-white text-[10px] font-semibold py-1.5 px-3 rounded-lg opacity-0 group-hover/email:opacity-100 transition-opacity z-[200] shadow-xl whitespace-nowrap">
+                  {{ item.email_notified_at ? item.email_notified_at : 'Pendiente' }}
+                  <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                </div>
+              </div>
+
+              <!-- WhatsApp (ready for when available) -->
+              <div class="relative group/wa">
+                <div [ngClass]="item.whatsapp_notified_at ? 'text-success bg-success/10 border-success/20' : 'text-base-content/20 bg-base-200 border-base-200'"
+                     class="w-7 h-7 rounded-lg flex items-center justify-center border transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.125.555 4.122 1.527 5.854L0 24l6.29-1.508A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.372l-.36-.214-3.732.894.944-3.637-.234-.374A9.818 9.818 0 1112 21.818z"/>
+                  </svg>
+                </div>
+                <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[180px] text-center bg-slate-800 text-white text-[10px] font-semibold py-1.5 px-3 rounded-lg opacity-0 group-hover/wa:opacity-100 transition-opacity z-[200] shadow-xl whitespace-nowrap">
+                  Próximamente
+                  <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                </div>
+              </div>
+
+              <!-- SMS (ready for when available) -->
+              <div class="relative group/sms">
+                <div [ngClass]="item.sms_notified_at ? 'text-success bg-success/10 border-success/20' : 'text-base-content/20 bg-base-200 border-base-200'"
+                     class="w-7 h-7 rounded-lg flex items-center justify-center border transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                  </svg>
+                </div>
+                <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[180px] text-center bg-slate-800 text-white text-[10px] font-semibold py-1.5 px-3 rounded-lg opacity-0 group-hover/sms:opacity-100 transition-opacity z-[200] shadow-xl whitespace-nowrap">
+                  Próximamente
+                  <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
+      }
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && historyItems().length === 0) {
+    <div class="empty-state">
+      <div class="w-16 h-16 bg-base-200 rounded-full flex items-center justify-center mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
       </div>
+      <h3 class="text-lg font-bold text-base-content/60 mb-1">{{ 'actuacionesRecientes.filters.noResults' | transloco }}</h3>
+      <p class="text-sm text-base-content/40 max-w-xs">Intenta cambiar los filtros para ver más resultados.</p>
+    </div>
+  }
+
+  <!-- Infinite Scroll Trigger -->
+  <div #loadingTrigger class="loading-trigger">
+    @if (loading() && historyItems().length > 0) {
+      <span class="loading loading-spinner loading-md text-primary"></span>
     }
+    @if (!loading() && !hasMorePages() && historyItems().length > 0) {
+      <p class="text-xs font-bold text-base-content/30 uppercase tracking-widest">Has llegado al final del historial</p>
+    }
+  </div>
 
-    <!-- Bottom Modal: Leyenda del Semáforo (Mobile Only) -->
-    <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="showLegendModal()">
-      <div class="modal-box p-0 bg-white shadow-2xl rounded-t-[2.5rem] rounded-b-none sm:rounded-2xl flex flex-col max-h-[95vh] sm:max-h-[90vh]">
-        <!-- Decoration Bar for Mobile -->
-        <div class="flex justify-center pt-3 pb-1 sm:hidden flex-none">
-          <div class="w-12 h-1.5 bg-base-200 rounded-full"></div>
-        </div>
+  <!-- Detail Modal -->
+  <dialog class="modal" [class.modal-open]="isModalOpen()">
+    <div class="modal-box w-[min(98vw,1720px)] max-w-none h-[90vh] max-h-screen p-0 flex flex-col bg-base-100 rounded-2xl overflow-hidden shadow-2xl relative">
+      @if (selectedDigest()) {
+        <div class="flex flex-col flex-1 min-h-0 overflow-hidden">
+        <!-- Modal Sticky Header -->
+        <div class="sticky top-0 z-50 shrink-0 bg-white border-b border-base-200 px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+          <div class="space-y-1">
+            @if (selectedDigest()!.date) {
+              <h2 class="text-2xl font-bold text-base-content tracking-tight">{{ 'actuacionesRecientes.digest.titleWithDate' | transloco: { date: selectedDigest()!.date, period: selectedDigest()!.period } }}</h2>
+            } @else {
+              <h2 class="text-2xl font-bold text-base-content tracking-tight">{{ 'actuacionesRecientes.digest.titleFallback' | transloco }}</h2>
+            }
+            <div class="flex items-center gap-2">
+              <span class="badge badge-primary font-bold">{{ selectedDigest()!.actions_count }}</span>
+              <span class="text-xs font-bold text-base-content/50 uppercase tracking-widest leading-none">{{ 'actuacionesRecientes.digest.movementsLabel' | transloco }}</span>
+            </div>
+          </div>
 
-        <!-- Header: Fijo al hacer scroll (Título y X) -->
-        <div class="flex items-center justify-between p-6 sm:p-8 border-b border-base-100 flex-none bg-white">
-          <h3 class="font-bold text-2xl text-base-content tracking-tight">
-            Guía de Alertas Procesales
-          </h3>
-          <button class="btn btn-ghost btn-sm btn-circle text-base-content/40 hover:bg-base-200"
-            (click)="closeLegendModal()">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+          <button type="button" class="btn btn-sm btn-circle btn-ghost bg-base-200/50 hover:bg-base-200" (click)="closeDigestModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <div class="overflow-y-auto flex-1 custom-scrollbar">
-          <div class="p-6 sm:p-8 pt-4 sm:pt-6">
-            <p class="text-sm text-base-content/60 leading-snug mb-8">
-              Entienda el significado de cada color y active el seguimiento automático.
-            </p>
-            <div class="space-y-6">
-            <div class="flex gap-4 p-4 rounded-2xl bg-red-50 border border-red-100/50">
-              <div class="w-4 h-4 rounded-full alert-dot alert-red mt-1 shrink-0 alert-pulse shadow-sm"></div>
-              <div>
-                <h4 class="font-black text-xs uppercase text-red-700 mb-1 leading-none tracking-tight">Alerta Crítica</h4>
-                <p class="text-[12px] leading-relaxed text-red-900/70 font-bold">Inactividad <b>+90 días</b> para demandantes o movimientos que requieren acción inmediata.</p>
-              </div>
+        <div class="flex-1 min-h-0 overflow-y-auto p-6 bg-base-100/50">
+          @if (isLoadingDetails()) {
+            <div class="flex justify-center items-center h-48">
+              <span class="loading loading-spinner loading-lg text-primary"></span>
             </div>
+          } @else if (selectedDigestDetails().length > 0) {
             
-            <div class="flex gap-4 p-4 rounded-2xl bg-amber-50 border border-amber-100/50">
-              <div class="w-4 h-4 rounded-full alert-dot alert-yellow mt-1 shrink-0 shadow-sm"></div>
-              <div>
-                <h4 class="font-black text-xs uppercase text-amber-700 mb-1 leading-none tracking-tight">Alerta Temprana</h4>
-                <p class="text-[12px] leading-relaxed text-amber-900/70 font-bold">Inactividad <b>+45 días</b> o trámites procesales de seguimiento obligatorio.</p>
-              </div>
-            </div>
-            
-            <div class="flex gap-4 p-4 rounded-2xl bg-green-50 border border-green-100/50">
-              <div class="w-4 h-4 rounded-full alert-dot alert-green mt-1 shrink-0 shadow-sm"></div>
-              <div>
-                <h4 class="font-black text-xs uppercase text-green-700 mb-1 leading-none tracking-tight">Informativo</h4>
-                <p class="text-[12px] leading-relaxed text-green-900/70 font-bold">Procesos con actividad reciente o inactividad que no afecta negativamente el proceso.</p>
-              </div>
+            <div class="overflow-x-auto w-full process-list-table border border-base-200 rounded-xl bg-white shadow-sm">
+              <table class="table table-zebra" style="min-width: 1500px;">
+                <thead style="background-color: #24163E; color: #ffffff;">
+                  <tr>
+                    <th style="width: 48px;" class="text-center sticky-col-idx">{{ 'processDetail.actions.table.index' | transloco }}</th>
+                    <th style="width: 80px;" class="text-center sticky-col-alert">{{ 'alertSemafor.alertLevel' | transloco }}</th>
+                    <th style="width: 280px;" class="text-left sticky-col-radicado">{{ 'gestionProcesos.table.processNumber' | transloco }}</th>
+                    <th style="width: 260px;" class="text-left">{{ 'gestionProcesos.table.court' | transloco }}</th>
+                    <th style="width: 180px;" class="text-left">{{ 'gestionProcesos.table.plaintiff' | transloco }}</th>
+                    <th style="width: 180px;" class="text-left">{{ 'gestionProcesos.table.defendant' | transloco }}</th>
+                    <th style="width: 130px;" class="text-center">{{ 'processDetail.actions.table.registrationDate' | transloco }}</th>
+                    <th style="width: 130px;" class="text-center">{{ 'processDetail.actions.table.termStartDate' | transloco }}</th>
+                    <th style="width: 130px;" class="text-center">{{ 'processDetail.actions.table.termEndDate' | transloco }}</th>
+                    <th class="text-left min-w-[300px]">{{ 'processDetail.actions.table.action' | transloco }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (action of selectedDigestDetails(); track digestRowTrack(action, i); let i = $index) {
+                    <tr class="hover:bg-primary/5 transition-colors cursor-default border-b border-base-200/60">
+                      
+                      <td class="text-center align-middle sticky-col-idx font-bold text-[11px] text-base-content/40">
+                        {{ digestRowIndex(i) }}
+                      </td>
+                      
+                      <td class="text-center align-middle sticky-col-alert bg-base-100">
+                        <span class="sticky-cell-bg" aria-hidden="true"></span>
+                        <div class="sticky-cell-txt flex justify-center w-full">
+                          @if (action.alert_level && action.lawyer_role) {
+                            <app-process-alert-tooltip 
+                              [alertLevel]="action.alert_level" 
+                              [lawyerRole]="action.lawyer_role"
+                              [position]="i < 3 ? 'bottom' : 'top'"
+                              [leftAligned]="true"
+                              (click)="openLegendModal($event)">
+                            </app-process-alert-tooltip>
+                          } @else {
+                            @if (!action.lawyer_role) {
+                              <span class="process-list-tooltip tooltip-left-aligned" [class.tooltip-bottom]="i < 2">
+                                <div class="tooltip-content text-left text-sm max-w-xs rounded-xl shadow-2xl bg-white border border-base-200 p-4 space-y-2 z-[1000]">
+                                  <div class="flex items-center gap-2 mb-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="font-extrabold text-[10px] uppercase text-base-content/40 tracking-wider">Activar alertas</span>
+                                  </div>
+                                  <p class="text-base-content leading-relaxed font-bold text-[12px]">
+                                    Para activar el semáforo de actividad, debe vincular su rol (Demandante o Demandado) desde las <b>acciones del proceso</b> o de forma <b>masiva</b>.
+                                  </p>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                  <span class="text-[8px] uppercase font-black tracking-widest text-base-content/60 text-center leading-none">
+                                    {{ 'alertSemafor.linkRole' | transloco }}
+                                  </span>
+                                </div>
+                              </span>
+                            } @else {
+                              <div class="flex flex-col items-center gap-1.5 opacity-40">
+                                <div class="w-3.5 h-3.5 rounded-full bg-base-300 ring-2 ring-base-200 shadow-inner"></div>
+                                <span class="text-[8px] uppercase font-black tracking-widest text-base-content/40 text-center leading-none">
+                                  En<br />Espera
+                                </span>
+                              </div>
+                            }
+                          }
+                        </div>
+                      </td>
+
+                      <!-- Número de radicado (mismo patrón que gestión desktop) -->
+                      <td class="whitespace-nowrap align-middle sticky-col-radicado">
+                        <span class="sticky-cell-bg" aria-hidden="true"></span>
+                        <div class="sticky-cell-txt">
+                          <div class="flex items-center gap-2">
+                            @if (action.process_id) {
+                              <button
+                                type="button"
+                                class="font-bold text-primary cursor-pointer hover:underline underline-offset-2 decoration-primary/40 transition-colors"
+                                (click)="goToProcessDetail(action.process_id, $event)">
+                                {{ action.process_number | processNumber }}
+                              </button>
+                            } @else {
+                              <span class="font-bold text-primary">{{ action.process_number | processNumber }}</span>
+                            }
+                            <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                              <button type="button"
+                                class="btn btn-ghost btn-xs btn-circle text-primary/40 hover:bg-primary/10 hover:text-primary transition-colors"
+                                (click)="copyToClipboard(action.process_number, $event)">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                                </svg>
+                              </button>
+                            </span>
+                          </div>
+                          @if (action.lawyer_role) {
+                            <div class="flex items-center mt-1">
+                              <span class="px-2 py-0.5 rounded-md bg-base-200/60 text-[9px] uppercase font-black tracking-widest text-base-content/40">{{ action.lawyer_role }}</span>
+                            </div>
+                          }
+                        </div>
+                      </td>
+
+                      <td class="align-middle text-sm font-medium text-base-content/90 max-w-[260px]">
+                        {{ action.court || '–' }}
+                      </td>
+
+                      <td class="align-middle text-sm text-base-content/80 max-w-[180px]">
+                        @let plaintiffDisplay = getPartyDisplay(action.plaintiffs ?? (action.plaintiff ? [action.plaintiff] : []));
+                        @if (plaintiffDisplay.mainText || plaintiffDisplay.extraCount > 0) {
+                        <span>
+                          <span class="truncate block max-w-full" [title]="plaintiffDisplay.mainText">{{ plaintiffDisplay.mainText }}</span>
+                          @if (plaintiffDisplay.extraCount > 0) {
+                          <span class="tooltip tooltip-top tooltip-primary process-list-tooltip" (click)="$event.stopPropagation()">
+                            <div class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
+                              @for (name of plaintiffDisplay.fullList; track name; let j = $index) {
+                              <div class="text-base-content">{{ j + 1 }}. {{ name }}</div>
+                              }
+                            </div>
+                            <span class="text-primary font-bold cursor-pointer whitespace-nowrap underline decoration-primary/50 decoration-dotted underline-offset-1">
+                              (+{{ plaintiffDisplay.extraCount }})
+                            </span>
+                          </span>
+                          }
+                        </span>
+                        } @else {
+                        <span class="opacity-50">–</span>
+                        }
+                      </td>
+
+                      <td class="align-middle text-sm text-base-content/80 max-w-[180px]">
+                        @let defendantDisplay = getPartyDisplay(action.defendants ?? (action.defendant ? [action.defendant] : []));
+                        @if (defendantDisplay.mainText || defendantDisplay.extraCount > 0) {
+                        <span>
+                          <span class="truncate block max-w-full" [title]="defendantDisplay.mainText">{{ defendantDisplay.mainText }}</span>
+                          @if (defendantDisplay.extraCount > 0) {
+                          <span class="tooltip tooltip-top tooltip-primary process-list-tooltip" (click)="$event.stopPropagation()">
+                            <div class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
+                              @for (name of defendantDisplay.fullList; track name; let j = $index) {
+                              <div class="text-base-content">{{ j + 1 }}. {{ name }}</div>
+                              }
+                            </div>
+                            <span class="text-primary font-bold cursor-pointer whitespace-nowrap underline decoration-primary/50 decoration-dotted underline-offset-1">
+                              (+{{ defendantDisplay.extraCount }})
+                            </span>
+                          </span>
+                          }
+                        </span>
+                        } @else {
+                        <span class="opacity-50">–</span>
+                        }
+                      </td>
+
+                      <td class="text-center align-middle text-sm font-semibold text-base-content/80 whitespace-nowrap">
+                        {{ action.registration_date || '–' }}
+                      </td>
+
+                      <td class="text-center align-middle text-sm font-medium whitespace-nowrap">
+                        {{ action.term_start_date || '–' }}
+                      </td>
+
+                      <td class="text-center align-middle text-sm font-medium whitespace-nowrap">
+                        {{ action.term_end_date || '–' }}
+                      </td>
+
+                      <!-- Actuación: fijación + auto (is_merged en API o emparejado en cliente) -->
+                      <td class="align-middle text-sm text-base-content leading-snug min-w-[300px] max-w-[520px]">
+                        <button
+                          type="button"
+                          class="w-full text-left rounded-lg p-1.5 -m-1.5 hover:bg-primary/5 transition-colors cursor-pointer"
+                          (click)="openActionDetailModal(action, $event)">
+                        <div class="flex flex-col gap-2">
+                          <div class="min-w-0 flex-1 flex flex-col gap-1.5">
+                          @if (action.is_merged) {
+                            <div class="flex flex-col gap-1.5">
+                              <div class="flex items-start gap-1.5">
+                                <span class="badge badge-sm bg-primary/10 text-primary border-none font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0">{{ getFijacionBadgeLabel(action.action_text || action.action) }}</span>
+                                <span class="font-semibold text-base-content/90">{{ digestActionLineText(action) }}</span>
+                              </div>
+                              @if (action.linked_action_text) {
+                              <div class="flex flex-col gap-0.5">
+                                <div class="flex items-start gap-1.5">
+                                  <span class="badge badge-sm bg-accent/10 text-accent border-none font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0">Auto</span>
+                                  <span class="font-semibold text-base-content leading-snug">{{ digestLinkedActionText(action) }}</span>
+                                </div>
+                              </div>
+                              }
+                            </div>
+                          } @else if (action.related_action) {
+                            <div class="flex flex-col gap-1.5">
+                              <div class="flex items-start gap-1.5">
+                                <span class="badge badge-sm bg-primary/10 text-primary border-none font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0">{{ getFijacionBadgeLabel(action.action_text || action.action) }}</span>
+                                <span class="font-semibold text-base-content/90">{{ digestActionLineText(action) }}</span>
+                              </div>
+                              <div class="flex items-start gap-1.5">
+                                <span class="badge badge-sm bg-accent/10 text-accent border-none font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0">Auto</span>
+                                <span class="font-semibold text-base-content">{{ digestActionLineText(action.related_action) }}</span>
+                              </div>
+                            </div>
+                          } @else {
+                            <span class="font-medium">{{ digestActionLineText(action) }}</span>
+                          }
+                          </div>
+                          <div class="self-end inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary/70 hover:text-primary transition-colors">
+                            <span>{{ 'actuacionesRecientes.actionDetail.viewMore' | transloco }}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
+                        </div>
+                        </button>
+                      </td>
+
+                    </tr>
+                  }
+                </tbody>
+              </table>
             </div>
 
-            <!-- Active Alerts Info (Vincular Rol) -->
-            <div class="flex items-center gap-5 p-5 rounded-2xl bg-primary/5 border border-primary/20 mt-4 shadow-inner">
-              <div class="bg-primary/10 p-3 rounded-xl text-primary shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <h4 class="font-extrabold text-[11px] uppercase text-primary mb-1.5 tracking-wider">¿Cómo activar el semáforo?</h4>
-                <p class="text-[12px] leading-relaxed text-base-content/80 font-semibold">
-                  Para que el sistema analice sus procesos, debe <b>vincular su rol</b> (Demandante o Demandado) desde las <b>acciones del proceso</b> o de forma <b>masiva</b> en el módulo de gestión.
-                </p>
-              </div>
+          } @else {
+            <div class="flex flex-col items-center justify-center h-48 text-center text-base-content/50">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
+              No hay actuaciones detalladas disponibles para este periodo.
             </div>
-          </div>
-
-            <div class="mt-8 pt-8 border-t border-base-200">
-               <p class="text-[13px] leading-relaxed font-semibold text-base-content/40 mb-8 px-2">
-                  <span class="text-primary/70 block mb-1 uppercase text-[11px] font-black tracking-widest italic">Nota importante:</span> 
-                  El motor procesal analiza automáticamente el contenido y el tiempo transcurrido desde la última actuación para asignar el nivel de alerta correspondiente.
-               </p>
-              <button class="btn btn-primary btn-block rounded-2xl font-bold h-14 shadow-xl shadow-primary/20 text-base" (click)="closeLegendModal()">
-                Entendido
-              </button>
-            </div>
-          </div>
+          }
         </div>
-      </div>
-      <form method="dialog" class="modal-backdrop bg-black/40 backdrop-blur-[2px]" (click)="closeLegendModal()">
-        <button type="button">Close</button>
-      </form>
-    </dialog>
 
-    <!-- Movement Details Modal (Mobile Bottom, Desktop Middle) -->
-    <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="showMovementModal()">
-      @if (selectedMovement(); as m) {
-        <div class="modal-box p-0 bg-white shadow-2xl rounded-t-[2.5rem] rounded-b-none sm:rounded-2xl flex flex-col max-h-[95vh] sm:max-h-[85vh] w-full max-w-2xl">
-          <!-- Decoration Bar for Mobile -->
-          <div class="flex justify-center pt-3 pb-1 sm:hidden flex-none">
-            <div class="w-12 h-1.5 bg-base-200 rounded-full"></div>
-          </div>
-
-          <!-- Header -->
-          <div class="flex items-center justify-between p-6 sm:p-8 border-b border-base-100 flex-none bg-white">
-            <div class="flex flex-col">
-              <span class="text-[10px] uppercase font-black tracking-widest text-primary mb-1">Detalle de Actuación</span>
-              <h3 class="font-bold text-xl sm:text-2xl text-base-content tracking-tight">
-                {{ m.process_number | processNumber }}
-              </h3>
+        @if (digestDetailPagination(); as paginationInfo) {
+          <div class="digest-modal-pagination pagination-container border-t border-base-300 bg-base-100 shrink-0">
+            <div class="pagination-results-info">
+              {{ 'table.showing' | transloco }}
+              <span class="font-semibold">{{ paginationInfo.from }}</span>
+              {{ 'table.to' | transloco }}
+              <span class="font-semibold">{{ paginationInfo.to }}</span>
+              {{ 'table.of' | transloco }}
+              <span class="font-semibold">{{ paginationInfo.total }}</span>
+              {{ 'table.results' | transloco }}
             </div>
-            <button class="btn btn-ghost btn-sm btn-circle text-base-content/40 hover:bg-base-200"
-              (click)="closeMovementModal()">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="pagination-controls join">
+              <button type="button" class="join-item btn btn-sm" [class.btn-disabled]="paginationInfo.current_page === 1"
+                (click)="onDigestDetailPageChange({ page: 1, perPage: paginationInfo.per_page })"
+                [disabled]="paginationInfo.current_page === 1">««</button>
+              <button type="button" class="join-item btn btn-sm" [class.btn-disabled]="paginationInfo.current_page === 1"
+                (click)="onDigestDetailPageChange({ page: paginationInfo.current_page - 1, perPage: paginationInfo.per_page })"
+                [disabled]="paginationInfo.current_page === 1">«</button>
+              @for (page of getDigestPageNumbers(); track page) {
+              <button type="button" class="join-item btn btn-sm" [class.btn-active]="page === paginationInfo.current_page"
+                (click)="onDigestDetailPageChange({ page, perPage: paginationInfo.per_page })">
+                {{ page }}
+              </button>
+              }
+              <button type="button" class="join-item btn btn-sm"
+                [class.btn-disabled]="paginationInfo.current_page === paginationInfo.last_page"
+                (click)="onDigestDetailPageChange({ page: paginationInfo.current_page + 1, perPage: paginationInfo.per_page })"
+                [disabled]="paginationInfo.current_page === paginationInfo.last_page">»</button>
+              <button type="button" class="join-item btn btn-sm"
+                [class.btn-disabled]="paginationInfo.current_page === paginationInfo.last_page"
+                (click)="onDigestDetailPageChange({ page: paginationInfo.last_page, perPage: paginationInfo.per_page })"
+                [disabled]="paginationInfo.current_page === paginationInfo.last_page">»»</button>
+            </div>
+            <div class="pagination-page-size">
+              <select class="select select-bordered select-sm" [value]="paginationInfo.per_page"
+                (change)="onDigestDetailPageChange({ page: 1, perPage: +$any($event.target).value })">
+                @for (size of digestPageSizeOptions; track size) {
+                <option [value]="size" [attr.selected]="size === paginationInfo.per_page ? '' : null">
+                  {{ size }} {{ 'table.perPage' | transloco }}
+                </option>
+                }
+              </select>
+            </div>
+          </div>
+        }
+        </div>
+      }
+    </div>
+    
+    <form method="dialog" class="modal-backdrop">
+      <button (click)="closeDigestModal()">close</button>
+    </form>
+  </dialog>
+
+  <!-- Action Detail Modal -->
+  <dialog class="modal" [class.modal-open]="showActionDetailModal()">
+    @if (selectedActionDetail(); as detail) {
+      <div class="modal-box w-11/12 max-w-4xl bg-base-100 rounded-3xl p-0 overflow-hidden shadow-2xl">
+        <div class="p-5 md:p-6">
+          <div class="flex items-start justify-between gap-4 mb-6">
+            <div>
+              <p class="text-[11px] uppercase tracking-[0.25em] font-black text-primary mb-2">{{ 'actuacionesRecientes.actionDetail.title' | transloco }}</p>
+              <h3 class="text-lg md:text-xl font-bold text-base-content">{{ detail.process_number | processNumber }}</h3>
+            </div>
+            <button type="button" class="btn btn-ghost btn-circle text-base-content/40 hover:text-base-content" (click)="closeActionDetailModal()">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          <div class="overflow-y-auto flex-1 custom-scrollbar p-6 sm:p-8 space-y-8">
-            <!-- Context Info -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-               <div class="flex flex-col gap-1">
-                 <span class="text-[10px] uppercase font-black tracking-widest text-base-content/30 italic">Despacho</span>
-                 <span class="font-bold text-base-content leading-snug">{{ m.court }}</span>
-               </div>
-               <div class="flex flex-col gap-1">
-                 <span class="text-[10px] uppercase font-black tracking-widest text-base-content/30 italic">Fecha de fijación</span>
-                 <span class="font-bold text-base-content">{{ m.action_date }}</span>
-               </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+            <div>
+              <p class="text-[11px] uppercase tracking-[0.25em] font-black text-base-content/35 mb-2">{{ 'gestionProcesos.table.court' | transloco }}</p>
+              <p class="text-base md:text-lg font-semibold leading-tight text-base-content">{{ detail.court || '–' }}</p>
             </div>
+            <div>
+              <p class="text-[11px] uppercase tracking-[0.25em] font-black text-base-content/35 mb-2">{{ 'processDetail.actions.table.actionDate' | transloco }}</p>
+              <p class="text-base md:text-lg font-semibold leading-tight text-base-content">{{ detail.action_date || '–' }}</p>
+            </div>
+          </div>
 
-            <!-- Action Content -->
-            <div class="space-y-6">
-              <!-- Fijación -->
-              <div class="flex flex-col gap-2">
-                <div class="flex items-center gap-2">
-                  <span class="badge badge-sm bg-primary/10 text-primary border-none font-black text-[9px] px-2 h-5 uppercase tracking-widest">Fijación en Estado</span>
-                </div>
-                <div class="p-4 rounded-2xl bg-base-200/30 border border-base-200/50 font-bold text-base-content leading-relaxed">
-                  {{ m.action_text }}
-                </div>
-              </div>
-
-              <!-- Auto Related -->
-              @if (m.related_action; as related) {
-                <div class="flex flex-col gap-2">
-                  <div class="flex items-center gap-2">
-                    <span class="badge badge-sm bg-accent/10 text-accent border-none font-black text-[9px] px-2 h-5 uppercase tracking-widest">Auto Notificado</span>
-                  </div>
-                  <div class="p-5 rounded-2xl bg-accent/[0.03] border border-accent/10">
-                    <h4 class="font-black text-base sm:text-lg text-accent mb-3 leading-tight">{{ related.action_text }}</h4>
-                    
-                    @if (related.annotation && related.annotation !== '---' && related.annotation !== '–') {
-                      <div class="divider opacity-30 my-4"></div>
-                      <div class="space-y-3">
-                        <span class="text-[10px] uppercase font-black tracking-widest text-accent/40 block">Anotación / Providencia</span>
-                        <p class="text-[13px] sm:text-sm leading-relaxed text-base-content/80 font-medium whitespace-pre-wrap"
-                           [innerHTML]="getHighlightedText(related.annotation, related.alert_highlights, 'annotation') | safeHtml">
-                        </p>
-                      </div>
-                    }
-                  </div>
-                </div>
-              } @else if (m.annotation && m.annotation !== '---' && m.annotation !== '–') {
-                <div class="flex flex-col gap-2">
-                  <div class="flex items-center gap-2">
-                    <span class="badge badge-sm bg-base-200 text-base-content/60 border-none font-black text-[9px] px-2 h-5 uppercase tracking-widest">Anotación</span>
-                  </div>
-                  <div class="p-5 rounded-2xl bg-base-100 border border-base-200 shadow-inner">
-                    <p class="text-[13px] sm:text-sm leading-relaxed text-base-content/80 font-medium whitespace-pre-wrap"
-                       [innerHTML]="getHighlightedText(m.annotation, m.alert_highlights, 'annotation') | safeHtml">
-                    </p>
-                  </div>
-                </div>
+          <div class="space-y-3 mb-6">
+            <div>
+              <span class="badge bg-primary/10 text-primary border-none font-bold text-[11px] px-3 py-2 uppercase tracking-wider">{{ getFijacionBadgeLabel(detail.action_text || detail.action) }}</span>
+            </div>
+            <div class="rounded-2xl border border-base-200 bg-base-100 px-5 py-4">
+              <p class="text-base md:text-lg font-semibold text-base-content">{{ digestActionLineText(detail) }}</p>
+              @if (shouldShowMainAnnotation(detail)) {
+                <p class="mt-2 text-xs md:text-sm text-base-content/75 leading-relaxed">{{ formatMainAnnotation(detail) }}</p>
               }
             </div>
+          </div>
 
-            <!-- Footer Meta -->
-            <div class="flex flex-wrap gap-4 pt-6 border-t border-base-100">
-               <div class="flex flex-col gap-0.5 min-w-[140px]">
-                 <span class="text-[9px] uppercase font-black tracking-widest text-base-content/20">Inicio de término</span>
-                 <span class="text-xs font-bold text-base-content/60">{{ m.term_start_date || '–' }}</span>
-               </div>
-               <div class="flex flex-col gap-0.5 min-w-[140px]">
-                 <span class="text-[9px] uppercase font-black tracking-widest text-base-content/20">Final de término</span>
-                 <span class="text-xs font-bold text-base-content/60">{{ m.term_end_date || '–' }}</span>
-               </div>
+          @if (detail.is_merged && detail.linked_action_text) {
+            <div class="space-y-3 mb-6">
+              <div>
+                <span class="badge bg-accent/10 text-accent border-none font-bold text-[11px] px-3 py-2 uppercase tracking-wider">{{ 'actuacionesRecientes.actionDetail.autoNotified' | transloco }}</span>
+              </div>
+              <div class="rounded-2xl border border-accent/30 bg-accent/5 px-5 py-4">
+                <p class="text-base md:text-lg font-semibold text-accent">{{ digestLinkedActionText(detail) }}</p>
+                @if (shouldShowLinkedAnnotation(detail)) {
+                  <p class="mt-2 text-xs md:text-sm text-base-content/80 leading-relaxed">{{ formatLinkedAnnotation(detail) }}</p>
+                }
+              </div>
+            </div>
+          } @else if (detail.related_action) {
+            <div class="space-y-3 mb-6">
+              <div>
+                <span class="badge bg-accent/10 text-accent border-none font-bold text-[11px] px-3 py-2 uppercase tracking-wider">{{ 'actuacionesRecientes.actionDetail.autoNotified' | transloco }}</span>
+              </div>
+              <div class="rounded-2xl border border-accent/30 bg-accent/5 px-5 py-4">
+                <p class="text-base md:text-lg font-semibold text-accent">{{ digestActionLineText(detail.related_action) }}</p>
+                @if (shouldShowMainAnnotation(detail.related_action)) {
+                  <p class="mt-2 text-xs md:text-sm text-base-content/80 leading-relaxed">{{ formatMainAnnotation(detail.related_action) }}</p>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-7">
+            <div>
+              <p class="text-[11px] uppercase tracking-[0.25em] font-black text-base-content/35 mb-1">{{ 'processDetail.actions.table.termStartDate' | transloco }}</p>
+              <p class="text-base md:text-lg font-semibold text-base-content/70">{{ detail.term_start_date || '–' }}</p>
+            </div>
+            <div>
+              <p class="text-[11px] uppercase tracking-[0.25em] font-black text-base-content/35 mb-1">{{ 'processDetail.actions.table.termEndDate' | transloco }}</p>
+              <p class="text-base md:text-lg font-semibold text-base-content/70">{{ detail.term_end_date || '–' }}</p>
             </div>
           </div>
 
-          <!-- Bottom Action -->
-          <div class="p-6 sm:p-8 pt-4 flex-none bg-white border-t border-base-100 sm:border-none">
-            <button class="btn btn-primary btn-block rounded-2xl font-bold h-14 shadow-xl shadow-primary/20 text-base" (click)="closeMovementModal()">
-              Cerrar Detalle
-            </button>
+          <button type="button" class="btn btn-primary w-full rounded-2xl text-base font-bold h-12 normal-case" (click)="closeActionDetailModal()">
+            {{ 'actuacionesRecientes.actionDetail.close' | transloco }}
+          </button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop bg-base-content/45" (click)="closeActionDetailModal()">
+        <button type="button">close</button>
+      </form>
+    }
+  </dialog>
+
+  <!-- Legend Modal for Semaphore (Re-used pattern from Gestión) -->
+  <dialog class="modal" [class.modal-open]="showLegendModal()">
+    <div class="modal-box p-0 rounded-2xl max-w-sm">
+      <div class="p-4 border-b border-base-200">
+        <h3 class="font-bold text-base text-base-content">Semaforización de Actividad</h3>
+      </div>
+      <div class="p-6 space-y-5">
+        <div class="flex items-start gap-4">
+          <div class="w-4 h-4 rounded-full bg-success mt-0.5 shrink-0 shadow-sm shadow-success/40"></div>
+          <div>
+            <div class="text-sm font-bold text-base-content">Verde (Día 0 - Día 20)</div>
+            <div class="text-xs text-base-content/60 mt-1 leading-relaxed">El proceso presenta actividad muy reciente, el riesgo de inactividad es bajo.</div>
           </div>
         </div>
-      }
-      <form method="dialog" class="modal-backdrop bg-black/50 backdrop-blur-[4px]" (click)="closeMovementModal()">
-        <button type="button">Close</button>
-      </form>
-    </dialog>
+        <div class="flex items-start gap-4">
+          <div class="w-4 h-4 rounded-full bg-warning mt-0.5 shrink-0 shadow-sm shadow-warning/40"></div>
+          <div>
+            <div class="text-sm font-bold text-base-content">Amarillo (Día 21 - Día 40)</div>
+            <div class="text-xs text-base-content/60 mt-1 leading-relaxed">Considerar acciones preventivas; el proceso está entrando a un periodo de alerta por inactividad.</div>
+          </div>
+        </div>
+        <div class="flex items-start gap-4">
+          <div class="w-4 h-4 rounded-full bg-error mt-0.5 shrink-0 shadow-sm shadow-error/40 animate-pulse"></div>
+          <div>
+            <div class="text-sm font-bold text-base-content">Rojo (Día 41+)</div>
+            <div class="text-xs font-medium text-error mt-1 leading-relaxed">Riesgo Alto por inactividad prolongada; acción urgente requerida.</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-4 bg-base-200/50 text-right">
+        <button class="btn btn-sm btn-ghost hover:bg-base-200 font-bold px-6" (click)="closeLegendModal()">Entendido</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop bg-base-content/20 backdrop-blur-[1px]">
+      <button (click)="closeLegendModal()">close</button>
+    </form>
+  </dialog>
+
+  <!-- Global Toast -->
+  @if (copiedMessage()) {
+    <div class="toast toast-end toast-bottom z-[10000] pointer-events-none">
+      <div class="alert alert-success shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>{{ copiedMessage() }}</span>
+      </div>
+    </div>
+  }
+
 </div>
