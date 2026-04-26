@@ -282,7 +282,16 @@
     "digest": {
       "titleWithDate": "Consolidado del {{date}} - {{period}}",
       "titleFallback": "Consolidado de notificaciones",
-      "movementsLabel": "Movimientos detectados"
+      "movementsLabel": "Movimientos detectados",
+      "publicationLabel": "Publicación",
+      "notifiedLabel": "Notificado",
+      "pending": "Pendiente",
+      "comingSoon": "Próximamente",
+      "titleWithDateOnly": "Consolidado del {{date}}",
+      "expandRow": "Abrir",
+      "collapseRow": "Cerrar",
+      "showSummary": "Ver resumen",
+      "hideSummary": "Ocultar resumen"
     },
     "actionDetail": {
       "title": "Detalle de actuación",
@@ -295,11 +304,24 @@
       "dateRange": "Rango de fechas",
       "dateFromPlaceholder": "Inicio",
       "dateToPlaceholder": "Fin",
-      "processNumber": "Número de radicado",
-      "processNumberPlaceholder": "Ej. 76001...",
-      "apply": "Filtrar Resultados",
+      "processNumber": "Número de proceso (radicado)",
+      "processNumberPlaceholder": "Ej. 76001... o últimos dígitos",
+      "apply": "Buscar",
       "clear": "Limpiar Filtros",
-      "noResults": "No se encontraron consolidados para los filtros aplicados."
+      "noResults": "No se encontraron consolidados para los filtros aplicados.",
+      "createdAtRange": "Fecha de creación del consolidado",
+      "createdAtRangePlaceholder": "Seleccionar rango de publicación del consolidado",
+      "createdAtRangeHelp": "Filtra por la fecha en que se generó/publicó el consolidado de notificaciones.",
+      "processNumberHelp": "Busca en qué consolidados hubo movimientos del proceso/radicado ingresado.",
+      "termStartRange": "Rango de inicio de término judicial",
+      "termStartRangePlaceholder": "Seleccionar rango de fecha de inicio de término",
+      "termStartRangeHelp": "Filtra por la fecha en que inicia el término judicial del movimiento.",
+      "termEndRange": "Rango de finaliza término judicial",
+      "termEndRangePlaceholder": "Seleccionar rango de fecha de finalización de término",
+      "termEndRangeHelp": "Filtra por la fecha en que finaliza el término judicial del movimiento.",
+      "actionDateRange": "Rango de fecha de actuación judicial",
+      "actionDateRangePlaceholder": "Seleccionar rango de fecha de actuación",
+      "actionDateRangeHelp": "Filtra por la fecha de la actuación judicial registrada en cada movimiento."
     }
   },
   "alertSemafor": {

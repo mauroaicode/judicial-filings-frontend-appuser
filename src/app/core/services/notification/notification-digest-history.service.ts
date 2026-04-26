@@ -30,6 +30,12 @@ export class NotificationDigestHistoryService {
       if (filters.created_at_from) params = params.set('created_at_from', filters.created_at_from);
       if (filters.created_at_to) params = params.set('created_at_to', filters.created_at_to);
       if (filters.process_number) params = params.set('process_number', filters.process_number);
+      if (filters.action_date_from) params = params.set('action_date_from', filters.action_date_from);
+      if (filters.action_date_to) params = params.set('action_date_to', filters.action_date_to);
+      if (filters.term_start_date_from) params = params.set('term_start_date_from', filters.term_start_date_from);
+      if (filters.term_start_date_to) params = params.set('term_start_date_to', filters.term_start_date_to);
+      if (filters.term_end_date_from) params = params.set('term_end_date_from', filters.term_end_date_from);
+      if (filters.term_end_date_to) params = params.set('term_end_date_to', filters.term_end_date_to);
     }
 
     const url = `${environment.apiBaseUrl}/notification-digests/history`;

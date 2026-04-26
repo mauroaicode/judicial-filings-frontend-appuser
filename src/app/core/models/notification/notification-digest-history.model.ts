@@ -34,6 +34,12 @@ export interface NotificationDigestHistoryFilter {
   created_at_from?: string;
   created_at_to?: string;
   process_number?: string;
+  action_date_from?: string;
+  action_date_to?: string;
+  term_start_date_from?: string;
+  term_start_date_to?: string;
+  term_end_date_from?: string;
+  term_end_date_to?: string;
 }
 
 export interface NotificationDigestDetailItem {
