@@ -5,8 +5,9 @@ export interface NotificationData {
     title: string;
     description: string;
     type: string; // e.g., 'import-report'
-    id: string;   // Recource related ID (like batch import UUID)
-    status: string;
+    id?: string;   // Resource related ID (like batch import UUID)
+    digest_id?: string;
+    status?: string;
 }
 
 /**
@@ -19,6 +20,7 @@ export interface AppNotification {
     notifiable_id: string;
     data: NotificationData;
     read_at: string | null;
+    opened_at?: string | null;
     created_at: string;
     created_at_human: string;
 }
@@ -37,4 +39,5 @@ export interface NotificationResponse {
  */
 export interface UnreadCountResponse {
     unread_count: number;
+    new_count: number;
 }

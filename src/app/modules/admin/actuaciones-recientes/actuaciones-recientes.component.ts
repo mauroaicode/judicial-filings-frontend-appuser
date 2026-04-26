@@ -10,7 +10,7 @@ import {
   ViewEncapsulation,
   OnDestroy
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslocoModule } from '@jsverse/transloco';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
@@ -70,12 +70,15 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
 
   @ViewChild('loadingTrigger') loadingTrigger!: ElementRef;
   private _observer!: IntersectionObserver;
+  private _queryParamsSubscription?: { unsubscribe: () => void };
 
   ngOnInit(): void {
     this.initForm();
     this.loadHistory();
     this.setupInfiniteScroll();
-    queueMicrotask(() => this.tryOpenDigestFromQueryParams());
+    this._queryParamsSubscription = this._activatedRoute.queryParamMap.subscribe((params) => {
+      this.tryOpenDigestFromQueryParams(params);
+    });
   }
 
   private initForm(): void {
@@ -149,6 +152,7 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     if (this._observer) {
       this._observer.disconnect();
     }
+    this._queryParamsSubscription?.unsubscribe();
   }
 
   /**
@@ -291,8 +295,7 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     }, 300);
   }
 
-  private tryOpenDigestFromQueryParams(): void {
-    const q = this._activatedRoute.snapshot.queryParamMap;
+  private tryOpenDigestFromQueryParams(q: ParamMap): void {
     const digestId = q.get('digest');
     if (!digestId) return;
 
@@ -313,6 +316,15 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
       whatsapp_notified_at: null,
       sms_notified_at: null,
     };
+
+    const currentPagination = this.digestDetailPagination();
+    const isSameDigest = this.selectedDigest()?.id === digestId;
+    const isSamePage = currentPagination?.current_page === page;
+    const isSamePerPage = currentPagination?.per_page === perPage;
+
+    if (this.isModalOpen() && isSameDigest && isSamePage && isSamePerPage) {
+      return;
+    }
 
     this.selectedDigest.set(stub);
     this.isModalOpen.set(true);

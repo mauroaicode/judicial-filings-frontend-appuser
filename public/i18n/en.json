@@ -422,10 +422,14 @@
   "notifications": {
     "title": "Notifications",
     "unread": "unread",
+    "new": "new",
     "noNotificationsTitle": "You're all caught up!",
     "noNotifications": "You have no notifications",
-    "viewAll": "View all notifications",
-    "clickToViewDetails": "Click to view details"
+    "clickToViewDetails": "Click to view details",
+    "tabs": {
+      "all": "All",
+      "unread": "Unread"
+    }
   },
   "keywords": {
     "title": "Procedural Stages",

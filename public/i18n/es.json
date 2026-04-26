@@ -438,10 +438,14 @@
   "notifications": {
     "title": "Notificaciones",
     "unread": "sin leer",
+    "new": "sin abrir",
     "noNotificationsTitle": "¡Todo al día!",
     "noNotifications": "No tienes notificaciones",
-    "viewAll": "Ver todas las notificaciones",
-    "clickToViewDetails": "Haz clic para ver más detalles"
+    "clickToViewDetails": "Haz clic para ver más detalles",
+    "tabs": {
+      "all": "Todas",
+      "unread": "No leídas"
+    }
   },
   "keywords": {
     "title": "Etapas Procesales",

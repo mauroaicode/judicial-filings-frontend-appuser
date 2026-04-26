@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { Observable, Subject, tap } from 'rxjs';
+import { Observable, Subject, catchError, of, tap } from 'rxjs';
 import { environment } from '@app/core/config/environment.config';
 import { AppNotification, NotificationResponse, UnreadCountResponse } from '@app/core/models/notification/notification.model';
 
@@ -13,6 +13,7 @@ export class NotificationService {
     // State
     private _notifications = signal<AppNotification[]>([]);
     private _unreadCount = signal<number>(0);
+    private _newCount = signal<number>(0);
 
     // Events
     private _refreshProcesses$ = new Subject<void>();
@@ -20,6 +21,7 @@ export class NotificationService {
 
     public readonly notifications = this._notifications.asReadonly();
     public readonly unreadCount = this._unreadCount.asReadonly();
+    public readonly newCount = this._newCount.asReadonly();
 
     /**
      * Fetch unread count from API
@@ -27,7 +29,10 @@ export class NotificationService {
     getUnreadCount(): Observable<UnreadCountResponse> {
         const url = `${environment.apiBaseUrl}/notifications/unread-count`;
         return this._httpClient.get<UnreadCountResponse>(url).pipe(
-            tap(res => this._unreadCount.set(res.unread_count))
+            tap(res => {
+                this._unreadCount.set(res.unread_count);
+                this._newCount.set(res.new_count ?? res.unread_count ?? 0);
+            })
         );
     }
 
@@ -49,6 +54,31 @@ export class NotificationService {
       })
     );
   }
+
+    /**
+     * Mark all pending notifications as opened.
+     * The backend endpoint is expected to handle opened_at.
+     */
+    markAllAsOpened(): Observable<unknown> {
+        const url = `${environment.apiBaseUrl}/notifications/mark-all-opened`;
+        const openedAt = new Date().toISOString();
+
+        // Optimistic UI: hide "new" counter immediately
+        this._newCount.set(0);
+        this._notifications.update(current =>
+            current.map(notification =>
+                notification.opened_at ? notification : { ...notification, opened_at: openedAt }
+            )
+        );
+
+        return this._httpClient.post(url, {}).pipe(
+            catchError((error) => {
+                console.error('Error marking notifications as opened:', error);
+                this.getUnreadCount().subscribe();
+                return of(null);
+            })
+        );
+    }
 
     /**
      * Mark a notification as read
@@ -104,6 +134,7 @@ export class NotificationService {
         // Update state live
         this._notifications.update(current => [newNotification, ...current]);
         this._unreadCount.update(count => count + 1);
+        this._newCount.update(count => count + 1);
 
         /**
          * Refresh Logic
