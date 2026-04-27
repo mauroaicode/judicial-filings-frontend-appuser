@@ -75,9 +75,19 @@
       "mustChangePassword": "For security, you must change your password. Please update it as soon as possible."
     }
   },
+  "sessionLock": {
+    "title": "Session locked",
+    "description": "Due to inactivity, your session was locked. Enter your password to continue.",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "unlockButton": "Unlock",
+    "unlocking": "Unlocking...",
+    "retryIn": "You can retry in"
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "gestionProcesos": "Process Management",
+    "importHistory": "Import History",
     "keywords": "Procedural Stages",
     "toggleSidebar": "Toggle sidebar"
   },
@@ -86,6 +96,7 @@
     "search": "Search",
     "messages": "Messages",
     "notifications": "Notifications",
+    "lockSession": "Lock session",
     "userMenu": "User menu",
     "profile": "Profile",
     "settings": "Settings",
@@ -267,7 +278,18 @@
     "digest": {
       "titleWithDate": "Digest for {{date}} - {{period}}",
       "titleFallback": "Notification digest",
-      "movementsLabel": "Movements detected"
+      "movementsLabel": "Movements detected",
+      "publicationLabel": "Publication",
+      "notifiedLabel": "Notified",
+      "pending": "Pending",
+      "comingSoon": "Coming soon",
+      "titleWithDateOnly": "Digest for {{date}}",
+      "expandRow": "Expand",
+      "collapseRow": "Collapse",
+      "showSummary": "Show summary",
+      "hideSummary": "Hide summary",
+      "horizontalScrollHint": "You can scroll horizontally in this table",
+      "horizontalScrollHintShort": "Swipe left / right"
     },
     "actionDetail": {
       "title": "Action detail",
@@ -280,11 +302,52 @@
       "dateRange": "Date Range",
       "dateFromPlaceholder": "Start",
       "dateToPlaceholder": "End",
-      "processNumber": "Process number",
-      "processNumberPlaceholder": "Ex. 76001...",
-      "apply": "Filter Results",
+      "processNumber": "Process number (case filing)",
+      "processNumberPlaceholder": "Ex. 76001... or trailing digits",
+      "apply": "Search",
       "clear": "Clear Filters",
-      "noResults": "No consolidated outcomes found for the applied filters."
+      "noResults": "No consolidated outcomes found for the applied filters.",
+      "createdAtRange": "Digest creation date",
+      "createdAtRangePlaceholder": "Select digest publication date range",
+      "createdAtRangeHelp": "Filter by the date when the notification digest was created/published.",
+      "processNumberHelp": "Find which digests include movements for the entered process/case number.",
+      "termStartRange": "Judicial term start date range",
+      "termStartRangePlaceholder": "Select term start date range",
+      "termStartRangeHelp": "Filter by the date when the judicial term starts for the movement.",
+      "termEndRange": "Judicial term end date range",
+      "termEndRangePlaceholder": "Select term end date range",
+      "termEndRangeHelp": "Filter by the date when the judicial term ends for the movement.",
+      "actionDateRange": "Judicial action date range",
+      "actionDateRangePlaceholder": "Select action date range",
+      "actionDateRangeHelp": "Filter by the judicial action date recorded for each movement."
+    }
+  },
+  "historialImportaciones": {
+    "title": "Import History",
+    "description": "Review the result of each bulk filing import.",
+    "empty": "No imports have been registered yet.",
+    "copied": "Copied to clipboard",
+    "stats": {
+      "imports": "Imports",
+      "total": "Total processed",
+      "success": "Successful",
+      "failed": "Failed"
+    },
+    "table": {
+      "file": "File / Batch",
+      "status": "Status",
+      "total": "Total",
+      "success": "Successful",
+      "failed": "Failed",
+      "multipleInstances": "Multiple instances",
+      "createdAt": "Created",
+      "completedAt": "Completed",
+      "showProcesses": "Show processes",
+      "hideProcesses": "Hide processes"
+    },
+    "processesTitle": "Filings in this import ({{count}})",
+    "status": {
+      "unknown": "Unknown"
     }
   },
   "alertSemafor": {
@@ -400,10 +463,14 @@
   "notifications": {
     "title": "Notifications",
     "unread": "unread",
+    "new": "new",
     "noNotificationsTitle": "You're all caught up!",
     "noNotifications": "You have no notifications",
-    "viewAll": "View all notifications",
-    "clickToViewDetails": "Click to view details"
+    "clickToViewDetails": "Click to view details",
+    "tabs": {
+      "all": "All",
+      "unread": "Unread"
+    }
   },
   "keywords": {
     "title": "Procedural Stages",
@@ -464,7 +531,9 @@
       "updated": "Profile updated successfully",
       "errorLoading": "Error loading profile data",
       "errorUpdating": "Error updating profile",
-      "passwordMismatch": "Passwords do not match"
+      "passwordMismatch": "Passwords do not match",
+      "passwordMinLength": "Password must be at least 8 characters long",
+      "passwordRequirements": "To change your password: minimum 8 characters and it must match the confirmation."
     },
     "submit": "Update Profile",
     "updating": "Updating..."

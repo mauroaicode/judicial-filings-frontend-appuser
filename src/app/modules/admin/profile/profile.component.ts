@@ -4,6 +4,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ProfileService } from '@app/core/services/user/profile.service';
 import { ProfileUpdateRequest, User } from '@app/core/models/auth/auth.model';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
 import { AuthService } from '@app/core/auth/auth.service';
 
@@ -26,6 +27,7 @@ export class ProfileComponent implements OnInit {
     public isSaving = signal<boolean>(false);
     public feedbackMessage = signal<string | null>(null);
     public feedbackType = signal<'success' | 'error'>('success');
+    public validationErrors = signal<Record<string, string>>({});
     
     public currentUser = this._authService.user;
 
@@ -35,7 +37,7 @@ export class ProfileComponent implements OnInit {
             last_name: ['', [Validators.required]],
             email: ['', [Validators.required, Validators.email]],
             identification: ['', [Validators.required]],
-            password: [''],
+            password: ['', [Validators.minLength(8)]],
             password_confirmation: ['']
         }, {
             validators: this._passwordMatchValidator
@@ -83,6 +85,7 @@ export class ProfileComponent implements OnInit {
         }
 
         this.isSaving.set(true);
+        this.validationErrors.set({});
         this._profileService.updateProfile(updateData).pipe(
             finalize(() => this.isSaving.set(false))
         ).subscribe({
@@ -92,7 +95,14 @@ export class ProfileComponent implements OnInit {
                 this.profileForm.get('password')?.reset();
                 this.profileForm.get('password_confirmation')?.reset();
             },
-            error: () => this._showFeedback('profile.messages.errorUpdating', 'error')
+            error: (error: HttpErrorResponse) => {
+                if (error.status === 422) {
+                    this._handleValidationErrors(error);
+                    return;
+                }
+
+                this._showFeedback('profile.messages.errorUpdating', 'error');
+            }
         });
     }
 
@@ -111,5 +121,49 @@ export class ProfileComponent implements OnInit {
         this.feedbackMessage.set(this._transloco.translate(key));
         this.feedbackType.set(type);
         setTimeout(() => this.feedbackMessage.set(null), 4000);
+    }
+
+    private _handleValidationErrors(error: HttpErrorResponse): void {
+        const apiError = error.error as {
+            errors?: Record<string, string[] | string>;
+            messages?: string[] | string;
+            message?: string;
+        } | null;
+
+        const normalizedErrors: Record<string, string> = {};
+
+        if (apiError?.errors) {
+            Object.entries(apiError.errors).forEach(([field, value]) => {
+                if (Array.isArray(value) && value.length > 0) {
+                    normalizedErrors[field] = value[0];
+                } else if (typeof value === 'string' && value.trim()) {
+                    normalizedErrors[field] = value;
+                }
+            });
+        }
+
+        this.validationErrors.set(normalizedErrors);
+
+        const firstMessage = Array.isArray(apiError?.messages)
+            ? apiError?.messages[0]
+            : typeof apiError?.messages === 'string'
+                ? apiError.messages
+                : apiError?.message;
+
+        if (firstMessage) {
+            this.feedbackMessage.set(firstMessage);
+            this.feedbackType.set('error');
+            setTimeout(() => this.feedbackMessage.set(null), 4000);
+            return;
+        }
+
+        if (Object.values(normalizedErrors).length > 0) {
+            this.feedbackMessage.set(Object.values(normalizedErrors)[0]);
+            this.feedbackType.set('error');
+            setTimeout(() => this.feedbackMessage.set(null), 4000);
+            return;
+        }
+
+        this._showFeedback('profile.messages.errorUpdating', 'error');
     }
 }

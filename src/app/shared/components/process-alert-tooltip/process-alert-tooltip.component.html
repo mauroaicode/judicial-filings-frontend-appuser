@@ -15,7 +15,12 @@
     
     @if (lawyerRole()) {
       <div class="mt-2 pt-2 border-t border-base-100 text-[10px] text-base-content/30 uppercase font-black tracking-tight text-left">
-        Rol del abogado: {{ lawyerRole() }}
+        Rol del abogado:
+        @if (getLawyerRoleLabelKey(); as roleLabelKey) {
+          {{ roleLabelKey | transloco }}
+        } @else {
+          {{ lawyerRole() }}
+        }
       </div>
     }
   </div>

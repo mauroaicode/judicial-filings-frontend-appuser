@@ -40,8 +40,10 @@ export const authInterceptor = (
   // Response
   return next(newReq).pipe(
     catchError((error) => {
+      const isVerifyPasswordRequest = req.url.includes('/verify-password');
+
       // Catch "401 Unauthorized" responses
-      if (error instanceof HttpErrorResponse && error.status === 401) {
+      if (error instanceof HttpErrorResponse && error.status === 401 && !isVerifyPasswordRequest) {
         // Sign out
         authService.signOut();
 

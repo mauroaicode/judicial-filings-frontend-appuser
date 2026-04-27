@@ -16,6 +16,7 @@ export interface User {
   roles: Role[];
   must_change_password: boolean;
   organization_id: string;
+  session_lock_timeout?: number | null;
 }
 
 export interface Role {
@@ -46,5 +47,13 @@ export interface ResetPasswordRequest {
   token: string;
   password: string;
   password_confirmation: string;
+}
+
+export interface VerifyPasswordRequest {
+  password: string;
+}
+
+export interface VerifyPasswordResponse {
+  message: string;
 }
 

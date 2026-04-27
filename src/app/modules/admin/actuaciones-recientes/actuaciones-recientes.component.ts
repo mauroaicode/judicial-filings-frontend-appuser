@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy, 
   Component, 
   ElementRef, 
+  HostListener,
   inject, 
   OnInit, 
   signal, 
@@ -9,7 +10,7 @@ import {
   ViewEncapsulation,
   OnDestroy
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslocoModule } from '@jsverse/transloco';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
@@ -65,26 +66,41 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
   public showActionDetailModal = signal<boolean>(false);
   public selectedActionDetail = signal<NotificationDigestDisplayRow | null>(null);
   public copiedMessage = signal<string | null>(null);
+  public mobileDigestSummaryExpanded = signal<boolean>(false);
 
   @ViewChild('loadingTrigger') loadingTrigger!: ElementRef;
   private _observer!: IntersectionObserver;
+  private _queryParamsSubscription?: { unsubscribe: () => void };
 
   ngOnInit(): void {
     this.initForm();
     this.loadHistory();
     this.setupInfiniteScroll();
-    queueMicrotask(() => this.tryOpenDigestFromQueryParams());
+    this._queryParamsSubscription = this._activatedRoute.queryParamMap.subscribe((params) => {
+      this.tryOpenDigestFromQueryParams(params);
+    });
   }
 
   private initForm(): void {
     this.filterForm = this._fb.group({
       created_at_range: [null as DateRange | null],
-      process_number: ['']
+      process_number: [''],
+      action_date_range: [null as DateRange | null],
+      term_start_date_range: [null as DateRange | null],
+      term_end_date_range: [null as DateRange | null],
     });
   }
 
   public toggleFilters(): void {
-    this.showFilters.set(!this.showFilters());
+    this.showFilters.update((v) => !v);
+    if (this.showFilters()) {
+      setTimeout(() => {
+        document.getElementById('actuaciones-filters-section')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 50);
+    }
   }
 
   public applyFilters(): void {
@@ -95,6 +111,21 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     if (rawForm.created_at_range) {
       if (rawForm.created_at_range.from) filters.created_at_from = rawForm.created_at_range.from;
       if (rawForm.created_at_range.to) filters.created_at_to = rawForm.created_at_range.to;
+    }
+
+    if (rawForm.action_date_range) {
+      if (rawForm.action_date_range.from) filters.action_date_from = rawForm.action_date_range.from;
+      if (rawForm.action_date_range.to) filters.action_date_to = rawForm.action_date_range.to;
+    }
+
+    if (rawForm.term_start_date_range) {
+      if (rawForm.term_start_date_range.from) filters.term_start_date_from = rawForm.term_start_date_range.from;
+      if (rawForm.term_start_date_range.to) filters.term_start_date_to = rawForm.term_start_date_range.to;
+    }
+
+    if (rawForm.term_end_date_range) {
+      if (rawForm.term_end_date_range.from) filters.term_end_date_from = rawForm.term_end_date_range.from;
+      if (rawForm.term_end_date_range.to) filters.term_end_date_to = rawForm.term_end_date_range.to;
     }
     
     if (rawForm.process_number) filters.process_number = rawForm.process_number.trim();
@@ -121,6 +152,7 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     if (this._observer) {
       this._observer.disconnect();
     }
+    this._queryParamsSubscription?.unsubscribe();
   }
 
   /**
@@ -175,10 +207,10 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
    */
   public getPeriodClass(period: string): string {
     switch (period.toLowerCase()) {
-      case 'mañana': return 'morning';
-      case 'tarde': return 'afternoon';
-      case 'noche': return 'night';
-      default: return 'morning';
+      case 'mañana': return 'manana';
+      case 'tarde': return 'tarde';
+      case 'noche': return 'noche';
+      default: return 'manana';
     }
   }
 
@@ -205,6 +237,7 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
       perPage ?? this.digestDetailPagination()?.per_page ?? this.defaultDigestPerPage
     );
     this.selectedDigest.set(item);
+    this.mobileDigestSummaryExpanded.set(false);
     this.isModalOpen.set(true);
     this.isLoadingDetails.set(true);
     this.syncDigestQueryParams(item.id, page, pp);
@@ -254,6 +287,7 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     this.isModalOpen.set(false);
     this.showActionDetailModal.set(false);
     this.selectedActionDetail.set(null);
+    this.mobileDigestSummaryExpanded.set(false);
     this.digestDetailPagination.set(null);
     setTimeout(() => {
       this.selectedDigest.set(null);
@@ -261,8 +295,7 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     }, 300);
   }
 
-  private tryOpenDigestFromQueryParams(): void {
-    const q = this._activatedRoute.snapshot.queryParamMap;
+  private tryOpenDigestFromQueryParams(q: ParamMap): void {
     const digestId = q.get('digest');
     if (!digestId) return;
 
@@ -283,6 +316,15 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
       whatsapp_notified_at: null,
       sms_notified_at: null,
     };
+
+    const currentPagination = this.digestDetailPagination();
+    const isSameDigest = this.selectedDigest()?.id === digestId;
+    const isSamePage = currentPagination?.current_page === page;
+    const isSamePerPage = currentPagination?.per_page === perPage;
+
+    if (this.isModalOpen() && isSameDigest && isSamePage && isSamePerPage) {
+      return;
+    }
 
     this.selectedDigest.set(stub);
     this.isModalOpen.set(true);
@@ -324,6 +366,7 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
 
   private fetchDigestDetails(digestId: string, page: number, perPage: number): void {
     this.digestDetailPagination.set(null);
+    this.mobileDigestSummaryExpanded.set(false);
     this._historyService
       .getDigestDetails(digestId, page, perPage)
       .pipe(finalize(() => this.isLoadingDetails.set(false)))
@@ -377,6 +420,29 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     window.open(url, '_blank', 'noopener,noreferrer');
   }
 
+  public getProcessNavigationId(
+    row: NotificationDigestDetailItem & {
+      indicator?: string | null;
+      process_indicator?: string | null;
+      process_uuid?: string | null;
+      id_process?: string | null;
+    }
+  ): string | null {
+    const direct = this.resolveProcessNavigationId(row)?.trim();
+    if (direct) return direct;
+
+    const processNumber = row.process_number?.trim();
+    if (!processNumber) return null;
+
+    // Fallback: en algunas respuestas una fila no trae ID, pero otra fila
+    // del mismo radicado sí lo incluye.
+    const sibling = this.selectedDigestDetails().find(
+      (item) => item.process_number?.trim() === processNumber
+    );
+    const siblingId = sibling ? this.resolveProcessNavigationId(sibling)?.trim() : null;
+    return siblingId || null;
+  }
+
   public openLegendModal(event?: MouseEvent): void {
     if (event) {
       event.preventDefault();
@@ -401,6 +467,25 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
   public closeActionDetailModal(): void {
     this.showActionDetailModal.set(false);
     this.selectedActionDetail.set(null);
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  public handleEscapeKey(event: Event): void {
+    if (!this.isModalOpen() && !this.showActionDetailModal() && !this.showLegendModal()) {
+      return;
+    }
+    event.preventDefault();
+    if (this.showActionDetailModal()) {
+      this.closeActionDetailModal();
+      return;
+    }
+    if (this.showLegendModal()) {
+      this.closeLegendModal();
+      return;
+    }
+    if (this.isModalOpen()) {
+      this.closeDigestModal();
+    }
   }
 
   public getPartyDisplay(parties: string[]): { mainText: string, extraCount: number, fullList: string[] } {
@@ -461,6 +546,14 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     return `${main}_${rel}`;
   }
 
+  public toggleMobileDigestSummary(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.mobileDigestSummaryExpanded.update((v) => !v);
+  }
+
   /**
    * Une en una sola fila fijación/notificación + auto vía notified_action_id / fijacion_action_id
    * (misma idea que process-detail loadActions).
@@ -470,6 +563,7 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
 
     const rows: NotificationDigestDisplayRow[] = raw.map((r) => ({
       ...r,
+      process_id: this.resolveProcessNavigationId(r),
       related_action: undefined,
     }));
     // Regla actual:
@@ -477,6 +571,44 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     // - Si backend manda fijación y auto por separado (sin is_merged), NO agrupar en cliente.
     //   Esto preserva el per_page real del endpoint (ej: 20 actuaciones => 20 filas renderizadas).
     return rows;
+  }
+
+  /**
+   * El backend puede enviar el id de navegación como `process_id` o como `indicator`.
+   * Normalizamos para que el click al número de radicado siempre abra /gestion-procesos/{id}.
+   */
+  private resolveProcessNavigationId(
+    row: NotificationDigestDetailItem & {
+      indicator?: string | null;
+      process_indicator?: string | null;
+      process_uuid?: string | null;
+      id_process?: string | null;
+      process?: {
+        id?: string | null;
+        indicator?: string | null;
+        uuid?: string | null;
+        process_id?: string | null;
+      } | null;
+      process_data?: {
+        id?: string | null;
+        indicator?: string | null;
+        uuid?: string | null;
+      } | null;
+    }
+  ): string | null {
+    return row.process_id
+      ?? row.indicator
+      ?? row.process_indicator
+      ?? row.process_uuid
+      ?? row.id_process
+      ?? row.process?.id
+      ?? row.process?.indicator
+      ?? row.process?.uuid
+      ?? row.process?.process_id
+      ?? row.process_data?.id
+      ?? row.process_data?.indicator
+      ?? row.process_data?.uuid
+      ?? null;
   }
 
   private normalizeDigestDetailPayload(response: any): NotificationDigestDetailItem[] {

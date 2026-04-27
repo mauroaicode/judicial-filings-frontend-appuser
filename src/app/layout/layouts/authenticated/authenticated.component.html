@@ -1,4 +1,4 @@
-<div class="flex h-screen w-full bg-base-200 overflow-hidden">
+<div class="flex h-screen w-full bg-base-200 overflow-hidden" [attr.inert]="sessionLocked() ? '' : null" [attr.aria-hidden]="sessionLocked() ? 'true' : null">
   <!-- Sidebar -->
   <app-sidebar #sidebar></app-sidebar>
 
@@ -44,3 +44,5 @@
   <!-- WebSocket Notifications Listener -->
   <app-notifications></app-notifications>
 </div>
+
+<app-session-lock-modal></app-session-lock-modal>

@@ -27,29 +27,46 @@
 
   <!-- Layout principal con scroll independiente para el contenido -->
   <div class="flex flex-col lg:flex-row gap-0 h-[calc(100vh-64px)] overflow-hidden">
-    <div class="flex-1 min-w-0 w-full h-full overflow-y-auto p-6 pt-6">
+    <!-- Mismo ancho que Gestión: solo el padding del <main> (p-4), sin p-5 extra a los lados -->
+    <div class="flex-1 min-w-0 w-full h-full overflow-y-auto px-0 py-5 pb-8 sm:py-6">
+      <!-- Mobile page header title -->
+      <div class="sm:hidden mb-3">
+        <h1 class="text-2xl font-bold text-base-content">
+          {{ 'processDetail.title' | transloco }}
+        </h1>
+      </div>
+
       <!-- Page Header -->
-  <div class="detail-header-card mb-6 p-5 sm:p-6 bg-base-100 border border-base-200 rounded-2xl shadow-sm relative">
+  <div class="detail-header-card mb-6 sm:mb-7 p-4 sm:p-6 bg-base-100 border border-base-200 rounded-2xl shadow-sm relative">
+    <!-- Mobile: kebab fijo en esquina superior derecha (más ancho para el radicado) -->
+    @if (process()) {
+    <div class="md:hidden absolute end-2 top-2 z-20">
+      <ng-container *ngTemplateOutlet="processHeaderKebabMenu" />
+    </div>
+    }
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
+        <div
+          class="w-8 h-8 sm:w-12 sm:h-12 bg-primary/10 text-primary rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         </div>
-        <div>
-          <h1 class="text-xl font-bold text-base-content md:text-2xl">
+        <div class="min-w-0 flex-1 max-md:pe-9">
+          <h1 class="hidden sm:block text-xl font-bold text-base-content md:text-2xl">
             {{ 'processDetail.title' | transloco }}
           </h1>
           @if (process()) {
           <div class="flex flex-wrap items-center gap-2 mt-1">
-            <div class="flex items-center gap-1.5 group/header-radicado cursor-default max-w-full">
-              <span class="text-xs sm:text-sm font-bold text-primary tracking-tight break-all">
+            <div
+              class="flex w-full min-w-0 max-w-full items-center gap-1.5 group/header-radicado cursor-default">
+              <span
+                class="min-w-0 flex-1 text-xs sm:text-sm font-bold text-primary tracking-tight break-words sm:break-all">
                 {{ process()!.process_number | processNumber }}
               </span>
               <button (click)="copyToClipboard(process()!.process_number, $event)" 
-                      class="btn btn-ghost btn-circle btn-xs opacity-20 group-hover/header-radicado:opacity-100 transition-all hover:bg-primary/20 text-primary active:scale-90"
+                      class="btn btn-ghost btn-circle btn-xs shrink-0 max-md:ms-auto max-md:translate-x-1 sm:translate-x-0 sm:ms-0 opacity-20 group-hover/header-radicado:opacity-100 transition-all hover:bg-primary/20 text-primary active:scale-90"
                       title="Copiar radicado (solo números)">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
@@ -140,46 +157,9 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-2 absolute top-5 right-5 md:static">
-
-            <div class="dropdown dropdown-end">
-              <button tabindex="0" class="btn btn-sm btn-circle btn-ghost bg-base-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                  stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                </svg>
-              </button>
-              <ul tabindex="0" class="dropdown-content z-[111] menu p-2 shadow-2xl bg-base-100 rounded-2xl w-64 border border-base-200 mt-2">
-                <li class="menu-title text-[10px] uppercase font-bold text-base-content/30 tracking-widest px-4 py-2">
-                  Acciones
-                </li>
-                <li class="mb-1">
-                  <button (click)="openRoleModal()" class="flex items-center gap-3 py-3 px-4 hover:bg-primary/5 hover:text-primary transition-all group">
-                    <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform shadow-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                    <span class="font-bold text-sm tracking-tight">{{ process()?.lawyer_role ? 'Cambiar Rol' : 'Asignar Rol' }}</span>
-                  </button>
-                </li>
-                <li>
-                  <button (click)="toggleProcessStatus()" 
-                          [class.text-error]="!isProcessInactive()"
-                          [class.text-success]="isProcessInactive()"
-                          class="flex items-center gap-3 py-3 px-4 hover:bg-base-200/50 transition-all group">
-                    <div [class]="isProcessInactive() ? 'bg-success/10 text-success' : 'bg-error/10 text-error'" 
-                         class="w-8 h-8 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="isProcessInactive() ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636'" />
-                      </svg>
-                    </div>
-                    <span class="font-bold text-sm tracking-tight">{{ isProcessInactive() ? 'Activar Seguimiento' : 'Desactivar Seguimiento' }}</span>
-                  </button>
-                </li>
-              </ul>
-            </div>
+          <!-- Desktop: menú en la fila de fechas -->
+          <div class="hidden md:flex items-center gap-2 shrink-0 self-start md:pt-0">
+            <ng-container *ngTemplateOutlet="processHeaderKebabMenu" />
           </div>
         </div>
       }
@@ -586,6 +566,47 @@
     </div>
   </div>
   }
+
+  <ng-template #processHeaderKebabMenu>
+    <div class="dropdown dropdown-end">
+      <button type="button" tabindex="0" class="btn btn-xs sm:btn-sm btn-circle btn-ghost bg-base-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+        </svg>
+      </button>
+      <ul tabindex="0" class="dropdown-content z-[111] menu p-2 shadow-2xl bg-base-100 rounded-2xl w-64 border border-base-200 mt-2">
+        <li class="menu-title text-[10px] uppercase font-bold text-base-content/30 tracking-widest px-4 py-2">
+          Acciones
+        </li>
+        <li class="mb-1">
+          <button (click)="openRoleModal()" class="flex items-center gap-3 py-3 px-4 hover:bg-primary/5 hover:text-primary transition-all group w-full text-left">
+            <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform shadow-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <span class="font-bold text-sm tracking-tight">{{ process()?.lawyer_role ? 'Cambiar Rol' : 'Asignar Rol' }}</span>
+          </button>
+        </li>
+        <li>
+          <button (click)="toggleProcessStatus()"
+            [class.text-error]="!isProcessInactive()"
+            [class.text-success]="isProcessInactive()"
+            class="flex items-center gap-3 py-3 px-4 hover:bg-base-200/50 transition-all group w-full text-left">
+            <div [class]="isProcessInactive() ? 'bg-success/10 text-success' : 'bg-error/10 text-error'"
+              class="w-8 h-8 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="isProcessInactive() ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636'" />
+              </svg>
+            </div>
+            <span class="font-bold text-sm tracking-tight">{{ isProcessInactive() ? 'Activar Seguimiento' : 'Desactivar Seguimiento' }}</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </ng-template>
 
   <!-- TEMPLATE: INSTANCE CARD (IMPROVED LEGIBILITY) -->
   <ng-template #instanceCard let-instance>

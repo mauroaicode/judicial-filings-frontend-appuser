@@ -2,7 +2,15 @@ import {HttpClient} from '@angular/common/http';
 import {inject, Injectable, signal} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {environment} from '@app/core/config/environment.config';
-import {AuthResponse, ForgotPasswordRequest, LoginRequest, ResetPasswordRequest, User} from '@app/core/models/auth/auth.model';
+import {
+  AuthResponse,
+  ForgotPasswordRequest,
+  LoginRequest,
+  ResetPasswordRequest,
+  User,
+  VerifyPasswordRequest,
+  VerifyPasswordResponse
+} from '@app/core/models/auth/auth.model';
 import {SessionStorageService} from '@app/core/services/storage/session-storage.service';
 import {STORAGE} from '@app/core/constants/storage.constant';
 
@@ -115,6 +123,17 @@ export class AuthService {
   resetPassword(data: ResetPasswordRequest): Observable<any> {
     const url = `${environment.apiBaseUrl}/reset-password`;
     return this._httpClient.post(url, data);
+  }
+
+  /**
+   * Verify current user password to unlock session
+   *
+   * @param data - Password verification payload
+   * @returns Observable with unlock result message
+   */
+  verifyPassword(data: VerifyPasswordRequest): Observable<VerifyPasswordResponse> {
+    const url = `${environment.apiBaseUrl}/verify-password`;
+    return this._httpClient.post<VerifyPasswordResponse>(url, data);
   }
 
   /**

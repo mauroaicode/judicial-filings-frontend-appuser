@@ -1,4 +1,4 @@
-<header class="sticky top-0 z-[100] flex h-16 items-center justify-between bg-base-100 shadow-md">
+<header class="sticky top-0 z-[20000] flex h-16 items-center justify-between bg-base-100 shadow-md">
   <div class="flex flex-1 items-center gap-4 px-4 md:px-6">
     <!-- Menu Toggle Button (Mobile) -->
     <button type="button" class="btn btn-ghost btn-sm md:hidden" (click)="onToggleSidebar()"
@@ -23,6 +23,21 @@
 
 
 
+    <!-- Manual Session Lock (Desktop only) -->
+    <button
+      type="button"
+      class="btn btn-ghost btn-circle hidden md:inline-flex"
+      (click)="lockSession()"
+      [attr.aria-label]="'header.lockSession' | transloco"
+      [attr.title]="'header.lockSession' | transloco">
+      <svg xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6 text-base-content/80 transition-colors hover:text-base-content" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+          d="M16.5 10.5V7.875a4.5 4.5 0 10-9 0V10.5m-.75 0h10.5a1.5 1.5 0 011.5 1.5v7.5a1.5 1.5 0 01-1.5 1.5H6.75a1.5 1.5 0 01-1.5-1.5V12a1.5 1.5 0 011.5-1.5z" />
+      </svg>
+    </button>
+
     <!-- Notifications -->
     <app-notification-bell></app-notification-bell>
 
@@ -39,11 +54,11 @@
           }
         </div>
       </label>
-      <ul tabindex="0" class="dropdown-content menu rounded-box z-[1] mt-3 w-52 bg-base-100 p-2 shadow-lg">
-        <li class="menu-title">
+      <ul tabindex="0" class="dropdown-content menu rounded-box z-[1] mt-3 w-72 max-w-[calc(100vw-2rem)] bg-base-100 p-2 shadow-lg">
+        <li class="menu-title !whitespace-normal">
           @if (currentUser(); as user) {
-          <span>{{ user.name }} {{ user.last_name }}</span>
-          <span class="text-xs text-base-content/70">{{ user.email }}</span>
+          <span class="block max-w-full break-words leading-snug">{{ user.name }} {{ user.last_name }}</span>
+          <span class="block max-w-full break-all text-xs text-base-content/70 leading-snug">{{ user.email }}</span>
           }
         </li>
         <li>

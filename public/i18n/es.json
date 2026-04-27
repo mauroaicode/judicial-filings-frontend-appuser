@@ -78,9 +78,19 @@
       "mustChangePassword": "Por seguridad, debes cambiar tu contraseña. Por favor, actualízala lo antes posible."
     }
   },
+  "sessionLock": {
+    "title": "Sesión bloqueada",
+    "description": "Por inactividad, la sesión fue bloqueada. Ingresa tu contraseña para continuar.",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Ingresa tu contraseña",
+    "unlockButton": "Desbloquear",
+    "unlocking": "Desbloqueando...",
+    "retryIn": "Puedes intentar de nuevo en"
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "gestionProcesos": "Gestión de Procesos",
+    "importHistory": "Historial de Importaciones",
     "keywords": "Etapas Procesales",
     "toggleSidebar": "Alternar menú lateral"
   },
@@ -89,6 +99,7 @@
     "search": "Buscar",
     "messages": "Mensajes",
     "notifications": "Notificaciones",
+    "lockSession": "Bloquear sesión",
     "userMenu": "Menú de usuario",
     "profile": "Perfil",
     "settings": "Configuración",
@@ -282,7 +293,18 @@
     "digest": {
       "titleWithDate": "Consolidado del {{date}} - {{period}}",
       "titleFallback": "Consolidado de notificaciones",
-      "movementsLabel": "Movimientos detectados"
+      "movementsLabel": "Movimientos detectados",
+      "publicationLabel": "Publicación",
+      "notifiedLabel": "Notificado",
+      "pending": "Pendiente",
+      "comingSoon": "Próximamente",
+      "titleWithDateOnly": "Consolidado del {{date}}",
+      "expandRow": "Abrir",
+      "collapseRow": "Cerrar",
+      "showSummary": "Ver resumen",
+      "hideSummary": "Ocultar resumen",
+      "horizontalScrollHint": "Puede desplazarse horizontalmente en la tabla",
+      "horizontalScrollHintShort": "Desliza izquierda / derecha"
     },
     "actionDetail": {
       "title": "Detalle de actuación",
@@ -295,11 +317,52 @@
       "dateRange": "Rango de fechas",
       "dateFromPlaceholder": "Inicio",
       "dateToPlaceholder": "Fin",
-      "processNumber": "Número de radicado",
-      "processNumberPlaceholder": "Ej. 76001...",
-      "apply": "Filtrar Resultados",
+      "processNumber": "Número de proceso (radicado)",
+      "processNumberPlaceholder": "Ej. 76001... o últimos dígitos",
+      "apply": "Buscar",
       "clear": "Limpiar Filtros",
-      "noResults": "No se encontraron consolidados para los filtros aplicados."
+      "noResults": "No se encontraron consolidados para los filtros aplicados.",
+      "createdAtRange": "Fecha de creación del consolidado",
+      "createdAtRangePlaceholder": "Seleccionar rango de publicación del consolidado",
+      "createdAtRangeHelp": "Filtra por la fecha en que se generó/publicó el consolidado de notificaciones.",
+      "processNumberHelp": "Busca en qué consolidados hubo movimientos del proceso/radicado ingresado.",
+      "termStartRange": "Rango de inicio de término judicial",
+      "termStartRangePlaceholder": "Seleccionar rango de fecha de inicio de término",
+      "termStartRangeHelp": "Filtra por la fecha en que inicia el término judicial del movimiento.",
+      "termEndRange": "Rango de finaliza término judicial",
+      "termEndRangePlaceholder": "Seleccionar rango de fecha de finalización de término",
+      "termEndRangeHelp": "Filtra por la fecha en que finaliza el término judicial del movimiento.",
+      "actionDateRange": "Rango de fecha de actuación judicial",
+      "actionDateRangePlaceholder": "Seleccionar rango de fecha de actuación",
+      "actionDateRangeHelp": "Filtra por la fecha de la actuación judicial registrada en cada movimiento."
+    }
+  },
+  "historialImportaciones": {
+    "title": "Historial de Importaciones",
+    "description": "Consulta el resultado de cada carga masiva de radicados.",
+    "empty": "No hay importaciones registradas por el momento.",
+    "copied": "Copiado al portapapeles",
+    "stats": {
+      "imports": "Importaciones",
+      "total": "Total procesados",
+      "success": "Exitosos",
+      "failed": "Fallidos"
+    },
+    "table": {
+      "file": "Archivo / Lote",
+      "status": "Estado",
+      "total": "Total",
+      "success": "Exitosos",
+      "failed": "Fallidos",
+      "multipleInstances": "Múltiples instancias",
+      "createdAt": "Creado",
+      "completedAt": "Finalizado",
+      "showProcesses": "Ver Procesos",
+      "hideProcesses": "Ocultar procesos"
+    },
+    "processesTitle": "Radicados de la importación ({{count}})",
+    "status": {
+      "unknown": "Sin estado"
     }
   },
   "alertSemafor": {
@@ -416,10 +479,14 @@
   "notifications": {
     "title": "Notificaciones",
     "unread": "sin leer",
+    "new": "sin abrir",
     "noNotificationsTitle": "¡Todo al día!",
     "noNotifications": "No tienes notificaciones",
-    "viewAll": "Ver todas las notificaciones",
-    "clickToViewDetails": "Haz clic para ver más detalles"
+    "clickToViewDetails": "Haz clic para ver más detalles",
+    "tabs": {
+      "all": "Todas",
+      "unread": "No leídas"
+    }
   },
   "keywords": {
     "title": "Etapas Procesales",
@@ -480,7 +547,9 @@
       "updated": "Perfil actualizado exitosamente",
       "errorLoading": "Error al cargar los datos del perfil",
       "errorUpdating": "Error al actualizar el perfil",
-      "passwordMismatch": "Las contraseñas no coinciden"
+      "passwordMismatch": "Las contraseñas no coinciden",
+      "passwordMinLength": "La contraseña debe tener al menos 8 caracteres",
+      "passwordRequirements": "Para cambiar la contraseña: mínimo 8 caracteres y debe coincidir con la confirmación."
     },
     "submit": "Actualizar Perfil",
     "updating": "Actualizando..."

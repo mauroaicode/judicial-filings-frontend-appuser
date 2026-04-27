@@ -99,7 +99,7 @@
   thead th {
     position: sticky !important;
     top: var(--table-sticky-top) !important;
-    z-index: 100 !important; /* Más alto que cualquier cuerpo hovered */
+    z-index: 10 !important; /* Header por encima del body sticky */
     background-color: #24163E !important;
     color: #ffffff !important;
     font-weight: 700 !important;
@@ -107,33 +107,33 @@
     border: none !important;
     white-space: nowrap !important;
     padding: 1rem !important;
-    transform: translateZ(0) !important;
+    transform: none !important;
     box-shadow: 0 0 0 0.5px #24163E !important;
   }
 
   thead th.sticky-col-idx {
     left: -1px !important;
-    z-index: 110 !important;
-    transform: translateZ(0) !important;
+    z-index: 11 !important;
+    transform: none !important;
     box-shadow: 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
     border: none !important;
   }
 
   thead th.sticky-col-alert {
     left: 47px !important; 
-    z-index: 110 !important;
-    transform: translateZ(0) !important;
+    z-index: 11 !important;
+    transform: none !important;
     box-shadow: 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
     border: none !important;
   }
 
   thead th.sticky-col-radicado {
     left: 127px !important;
-    z-index: 110 !important; /* Header + Sticky */
+    z-index: 11 !important; /* Header + Sticky */
     min-width: 340px !important;
     max-width: 340px !important;
     width: 340px !important;
-    transform: translateZ(0) !important;
+    transform: none !important;
     box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1), 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
     border: none !important;
   }
@@ -142,10 +142,10 @@
   tbody td.sticky-col-idx {
     position: sticky !important;
     left: -1px !important;
-    z-index: 10 !important;
+    z-index: 1 !important;
     background-color: #ffffff !important;
     overflow: visible !important;
-    transform: translateZ(0) !important;
+    transform: none !important;
     box-shadow: 1px 0 0 0 #ffffff !important;
     border: none !important;
   }
@@ -154,10 +154,10 @@
   tbody td.sticky-col-alert {
     position: sticky !important;
     left: 47px !important;
-    z-index: 10 !important;
+    z-index: 3 !important; /* Debe poder mostrar tooltip sobre radicado */
     background-color: #ffffff !important;
     overflow: visible !important;
-    transform: translateZ(0) !important;
+    transform: none !important;
     box-shadow: 1px 0 0 0 #ffffff !important;
     border: none !important;
 
@@ -174,7 +174,7 @@
   tbody td.sticky-col-radicado {
     position: sticky !important;
     left: 127px !important;
-    z-index: 10 !important;
+    z-index: 2 !important;
     background-color: #ffffff !important;
     box-shadow: 2px 0 4px rgba(0,0,0,0.1), 1px 0 0 0 #ffffff !important;
     border: none !important;
@@ -183,7 +183,7 @@
     width: 340px !important;
     white-space: nowrap !important;
     overflow: visible !important;
-    transform: translateZ(0) !important;
+    transform: none !important;
 
     & .sticky-cell-bg {
       position: absolute !important;
@@ -369,22 +369,22 @@
  */
 .process-list-table tbody tr:hover td,
 .process-list-table tbody tr.process-row-hovered td {
-  z-index: 5 !important;
+  z-index: 1 !important;
 }
 
 .process-list-table tbody tr:hover td.sticky-col-alert,
 .process-list-table tbody tr.process-row-hovered td.sticky-col-alert {
-  z-index: 50 !important;
+  z-index: 4 !important; /* Tooltip de semaforo visible sobre columna radicado */
 }
 
 .process-list-table tbody tr:hover td.sticky-col-radicado,
 .process-list-table tbody tr.process-row-hovered td.sticky-col-radicado {
-  z-index: 30 !important;
+  z-index: 2 !important;
 }
 
 .process-list-table tbody tr:hover td.sticky-col-idx,
 .process-list-table tbody tr.process-row-hovered td.sticky-col-idx {
-  z-index: 25 !important;
+  z-index: 2 !important;
 }
 
 // Pagination (misma estructura que data-table)

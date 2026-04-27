@@ -1,5 +1,7 @@
 .date-range-picker-input {
   cursor: pointer;
+  padding-right: 2.75rem !important; // reserve space for calendar icon
+  text-overflow: ellipsis;
 
   &:disabled {
     cursor: not-allowed;
@@ -12,5 +14,24 @@
 
   .relative {
     width: 100%;
+  }
+}
+
+.date-range-icon {
+  color: hsl(var(--bc) / 0.35);
+}
+
+@media (max-width: 640px) {
+  .date-range-picker-input {
+    padding-right: 2.5rem !important;
+    font-size: 0.95rem;
+  }
+
+  .date-range-icon {
+    right: 0.7rem !important;
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
   }
 }

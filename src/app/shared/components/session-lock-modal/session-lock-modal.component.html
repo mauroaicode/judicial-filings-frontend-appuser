@@ -1,0 +1,50 @@
+@if (isLocked()) {
+  <div class="fixed inset-0 z-[2147483647] flex items-center justify-center bg-base-300/80 px-4 backdrop-blur-sm">
+    <div data-session-lock-modal class="w-full max-w-md rounded-2xl border border-base-content/10 bg-base-100 p-7 shadow-2xl">
+      <div class="mb-6">
+        <h2 class="text-xl font-bold text-base-content">{{ 'sessionLock.title' | transloco }}</h2>
+        <p class="mt-2 text-sm text-base-content/70">{{ 'sessionLock.description' | transloco }}</p>
+      </div>
+
+      <form [formGroup]="unlockForm" (ngSubmit)="unlockSession()" class="space-y-6">
+        <label class="form-control gap-2">
+          <span class="text-sm font-semibold text-base-content">{{ 'sessionLock.passwordLabel' | transloco }}</span>
+          <input
+            type="password"
+            formControlName="password"
+            [placeholder]="'sessionLock.passwordPlaceholder' | transloco"
+            class="input input-bordered w-full"
+            [class.input-error]="!!errorMessage()"
+            autocomplete="current-password" />
+          @if (errorMessage()) {
+            <span class="mt-1 text-xs font-semibold text-error">{{ errorMessage() }}</span>
+          }
+        </label>
+
+        @if (globalMessage()) {
+          <div class="alert alert-warning">
+            <span>{{ globalMessage() }}</span>
+          </div>
+        }
+        @if (isRateLimited()) {
+          <div class="text-center text-xs font-semibold text-warning">
+            {{ 'sessionLock.retryIn' | transloco }} {{ rateLimitSeconds() }}s
+          </div>
+        }
+
+        <button
+          type="submit"
+          class="btn btn-primary w-full mt-2"
+          [disabled]="isSubmitting() || unlockForm.invalid || isRateLimited()">
+          @if (isSubmitting()) {
+            <span class="loading loading-spinner loading-xs"></span>
+            {{ 'sessionLock.unlocking' | transloco }}
+          }
+          @if (!isSubmitting()) {
+            {{ 'sessionLock.unlockButton' | transloco }}
+          }
+        </button>
+      </form>
+    </div>
+  </div>
+}

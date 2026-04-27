@@ -18,11 +18,21 @@ import { HeaderComponent } from '@app/layout/common/header/header.component';
 import { NotificationsComponent } from '@app/layout/common/notifications/notifications.component';
 import { AuthService } from '@app/core/auth/auth.service';
 import { AlertComponent } from '@app/shared/components/alert/alert.component';
+import { SessionLockService } from '@app/core/services/session-lock/session-lock.service';
+import { SessionLockModalComponent } from '@app/shared/components/session-lock-modal/session-lock-modal.component';
 
 @Component({
   selector: 'app-authenticated-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent, HeaderComponent, NotificationsComponent, AlertComponent],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    SidebarComponent,
+    HeaderComponent,
+    NotificationsComponent,
+    AlertComponent,
+    SessionLockModalComponent,
+  ],
   templateUrl: './authenticated.component.html',
   styleUrls: ['./authenticated.component.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -31,6 +41,7 @@ import { AlertComponent } from '@app/shared/components/alert/alert.component';
 export class AuthenticatedLayoutComponent implements OnInit {
   private _router = inject(Router);
   private _authService = inject(AuthService);
+  private _sessionLockService = inject(SessionLockService);
   private _cdr = inject(ChangeDetectorRef);
 
   @ViewChild(SidebarComponent) sidebar!: SidebarComponent;
@@ -42,6 +53,7 @@ export class AuthenticatedLayoutComponent implements OnInit {
   private _currentUrl = signal<string>(this._router.url);
   public sidebarOpen = signal<boolean>(true);
   public pageScrolled = signal<boolean>(false);
+  public sessionLocked = this._sessionLockService.isLocked;
 
   // Computed page title - Always in sync with URL and Router State
   public pageTitle = computed(() => {
@@ -94,6 +106,8 @@ export class AuthenticatedLayoutComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this._sessionLockService.initializeFromCurrentUser();
+
     // Initial sync
     setTimeout(() => {
       this._currentUrl.set(this._router.url);
