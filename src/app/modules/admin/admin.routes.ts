@@ -29,6 +29,11 @@ export default [
       import('./tasks/tasks.routes').then((m) => m.default),
   },
   {
+    path: 'historial-importaciones',
+    loadChildren: () =>
+      import('./historial-importaciones/historial-importaciones.routes').then((m) => m.default),
+  },
+  {
     path: 'perfil',
     loadChildren: () =>
       import('./profile/profile.routes').then((m) => m.default),

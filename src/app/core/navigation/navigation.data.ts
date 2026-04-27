@@ -33,6 +33,13 @@ export const DEFAULT_NAVIGATION: NavigationItem[] = [
     icon: 'tasks',
     link: '/tareas',
   },
+  {
+    id: 'historial-importaciones',
+    title: 'navigation.importHistory',
+    type: 'basic',
+    icon: 'import-history',
+    link: '/historial-importaciones',
+  },
   // More items will be added here as needed
 ];
 

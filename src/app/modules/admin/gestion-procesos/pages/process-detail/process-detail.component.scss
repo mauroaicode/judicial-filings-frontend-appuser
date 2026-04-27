@@ -151,15 +151,6 @@
 
 // Mobile specific refinements
 @media (max-width: 767px) {
-  .detail-header-card {
-    padding-top: 1.5rem !important;
-    
-    .dropdown {
-      top: 1.25rem;
-      right: 1.25rem;
-    }
-  }
-
   .collapse-title {
     padding-right: 4rem !important;
   }

@@ -215,7 +215,7 @@
   <div class="card bg-base-100 shadow-sm border border-base-200 process-list-card relative">
     <!-- Bulk Actions Sticky Bar -->
     @if (selectedCount() > 0) {
-      <div class="sticky top-0 z-[100] w-full bg-primary/95 backdrop-blur-md text-white p-3 sm:px-6 shadow-xl animate-fade-in flex flex-wrap items-center justify-between gap-4 border-b border-white/10">
+      <div class="sticky top-0 z-[15] w-full bg-primary/95 backdrop-blur-md text-white p-3 sm:px-6 shadow-xl animate-fade-in flex flex-wrap items-center justify-between gap-4 border-b border-white/10">
         <div class="flex items-center gap-4">
           <button class="btn btn-ghost btn-sm btn-circle text-white hover:bg-white/10" (click)="clearSelection()">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -296,12 +296,17 @@
                      (change)="toggleSelect(process.id)"
                      (click)="$event.stopPropagation()" />
               
-              @if (process.alert_level) {
-                <button type="button" (click)="openLegendModal($event)" class="relative p-1">
+              @if (process.lawyer_role) {
+                <button
+                  type="button"
+                  (click)="openLegendModal($event)"
+                  class="relative p-1 tooltip tooltip-right"
+                  [attr.data-tip]="process.alert_level ? ('alertSemafor.legend.' + process.alert_level + '.title' | transloco) : 'En espera'">
                   <span class="alert-dot" [ngClass]="{
                     'alert-red alert-pulse': process.alert_level === 'red',
                     'alert-yellow': process.alert_level === 'yellow',
-                    'alert-green': process.alert_level === 'green'
+                    'alert-green': process.alert_level === 'green',
+                    'bg-base-300 ring-2 ring-base-200': !process.alert_level
                   }"></span>
                 </button>
               }
@@ -332,7 +337,7 @@
 
           <!-- Body -->
           <div class="p-3 sm:p-4 space-y-4 text-sm">
-            @if (!process.alert_level || !process.lawyer_role) {
+            @if (!process.lawyer_role) {
               <div class="bg-primary/5 rounded-xl p-3 border border-primary/10 flex items-center justify-between group" (click)="onRowDblClick(process)">
                 <div class="flex items-center gap-3">
                   <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
@@ -597,12 +602,12 @@
                         </span>
                       } @else {
                         <!-- Estado de Escucha para Fila Principal -->
-                        <div class="flex flex-col items-center gap-1.5 opacity-40 cursor-help group relative">
+                        <div class="flex flex-col items-center gap-1.5 text-base-content/40 cursor-help group relative">
                           <div class="w-3.5 h-3.5 rounded-full bg-base-300 ring-2 ring-base-200 shadow-inner"></div>
                           <span class="text-[9px] font-bold uppercase tracking-tight text-base-content/40">En espera</span>
                           
                           <!-- Tooltip Informativo Simplificado (Con lógica de posicionamiento dinamico) -->
-                          <div [class]="(i < 2 ? 'absolute top-full left-1/2 -translate-x-1/2 mt-3 w-48 p-3 bg-white border border-base-200 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[100]' : 'absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-48 p-3 bg-white border border-base-200 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[100]')">
+                          <div [class]="(i < 2 ? 'absolute top-full left-1/2 -translate-x-1/2 mt-3 w-52 p-3 bg-base-100 border border-base-300 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[500]' : 'absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-52 p-3 bg-base-100 border border-base-300 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[500]')">
                             <p class="text-[11px] font-bold text-base-content leading-tight">
                               {{ process.lawyer_role === 'plaintiff' ? 'Esperando actividad (+45 días)' : 'Esperando actividad (+90 días)' }}
                             </p>
@@ -764,12 +769,12 @@
                         </span>
                       } @else {
                         <!-- Estado de Escucha (Rol vinculado pero sin alerta aún) -->
-                        <div class="flex flex-col items-center gap-1.5 opacity-40 cursor-help group relative">
+                        <div class="flex flex-col items-center gap-1.5 text-base-content/40 cursor-help group relative">
                           <div class="w-3.5 h-3.5 rounded-full bg-base-300 ring-2 ring-base-200 shadow-inner"></div>
                           <span class="text-[9px] font-bold uppercase tracking-tight text-base-content/40">En espera</span>
                           
                           <!-- Tooltip Informativo Simplificado -->
-                          <div [class]="(i < 2 ? 'absolute top-full left-1/2 -translate-x-1/2 mt-3 w-48 p-3 bg-white border border-base-200 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[100]' : 'absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-48 p-3 bg-white border border-base-200 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[100]')">
+                          <div [class]="(i < 2 ? 'absolute top-full left-1/2 -translate-x-1/2 mt-3 w-52 p-3 bg-base-100 border border-base-300 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[500]' : 'absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-52 p-3 bg-base-100 border border-base-300 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[500]')">
                             <p class="text-[11px] font-bold text-base-content leading-tight">
                               {{ instance.lawyer_role === 'plaintiff' ? 'Esperando actividad (+45 días)' : 'Esperando actividad (+90 días)' }}
                             </p>

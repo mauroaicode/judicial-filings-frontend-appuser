@@ -81,6 +81,7 @@
   "navigation": {
     "dashboard": "Dashboard",
     "gestionProcesos": "Gestión de Procesos",
+    "importHistory": "Historial de Importaciones",
     "keywords": "Etapas Procesales",
     "toggleSidebar": "Alternar menú lateral"
   },
@@ -291,7 +292,9 @@
       "expandRow": "Abrir",
       "collapseRow": "Cerrar",
       "showSummary": "Ver resumen",
-      "hideSummary": "Ocultar resumen"
+      "hideSummary": "Ocultar resumen",
+      "horizontalScrollHint": "Puede desplazarse horizontalmente en la tabla",
+      "horizontalScrollHintShort": "Desliza izquierda / derecha"
     },
     "actionDetail": {
       "title": "Detalle de actuación",
@@ -322,6 +325,34 @@
       "actionDateRange": "Rango de fecha de actuación judicial",
       "actionDateRangePlaceholder": "Seleccionar rango de fecha de actuación",
       "actionDateRangeHelp": "Filtra por la fecha de la actuación judicial registrada en cada movimiento."
+    }
+  },
+  "historialImportaciones": {
+    "title": "Historial de Importaciones",
+    "description": "Consulta el resultado de cada carga masiva de radicados.",
+    "empty": "No hay importaciones registradas por el momento.",
+    "copied": "Copiado al portapapeles",
+    "stats": {
+      "imports": "Importaciones",
+      "total": "Total procesados",
+      "success": "Exitosos",
+      "failed": "Fallidos"
+    },
+    "table": {
+      "file": "Archivo / Lote",
+      "status": "Estado",
+      "total": "Total",
+      "success": "Exitosos",
+      "failed": "Fallidos",
+      "multipleInstances": "Múltiples instancias",
+      "createdAt": "Creado",
+      "completedAt": "Finalizado",
+      "showProcesses": "Ver Procesos",
+      "hideProcesses": "Ocultar procesos"
+    },
+    "processesTitle": "Radicados de la importación ({{count}})",
+    "status": {
+      "unknown": "Sin estado"
     }
   },
   "alertSemafor": {
@@ -506,7 +537,9 @@
       "updated": "Perfil actualizado exitosamente",
       "errorLoading": "Error al cargar los datos del perfil",
       "errorUpdating": "Error al actualizar el perfil",
-      "passwordMismatch": "Las contraseñas no coinciden"
+      "passwordMismatch": "Las contraseñas no coinciden",
+      "passwordMinLength": "La contraseña debe tener al menos 8 caracteres",
+      "passwordRequirements": "Para cambiar la contraseña: mínimo 8 caracteres y debe coincidir con la confirmación."
     },
     "submit": "Actualizar Perfil",
     "updating": "Actualizando..."

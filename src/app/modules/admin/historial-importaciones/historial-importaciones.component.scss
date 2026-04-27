@@ -1,0 +1,53 @@
+.pagination-container {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+}
+
+.import-history-table thead {
+  background-color: #24163e;
+}
+
+.import-history-table thead th {
+  color: #fff;
+  font-weight: 700;
+}
+
+.import-history-row {
+  transition: background-color 0.2s ease;
+}
+
+.import-history-table tbody tr.import-history-row.import-history-row-highlight > td {
+  background-color: color-mix(in srgb, var(--color-primary) 14%, white) !important;
+  animation: import-row-fade-highlight 9s ease-out forwards;
+}
+
+.import-history-table tbody tr.import-history-row:hover > td,
+.import-history-table tbody tr.import-history-row.import-history-row-hover > td {
+  background-color: #f3f0f9 !important;
+}
+
+.pagination-results-info {
+  color: rgb(var(--bc) / 0.7);
+  font-size: 0.875rem;
+}
+
+.pagination-controls {
+  align-items: center;
+  display: inline-flex;
+}
+
+@keyframes import-row-fade-highlight {
+  0% {
+    background-color: color-mix(in srgb, var(--color-primary) 20%, white);
+  }
+  70% {
+    background-color: color-mix(in srgb, var(--color-primary) 8%, white);
+  }
+  100% {
+    background-color: transparent;
+  }
+}

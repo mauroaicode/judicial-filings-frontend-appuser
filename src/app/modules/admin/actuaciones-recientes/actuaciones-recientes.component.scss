@@ -223,6 +223,35 @@
   }
 }
 
+/* En detalle de consolidado mostramos siempre el scroll horizontal para dar pista visual */
+.digest-detail-table-scroll {
+  overflow-x: scroll !important;
+  overflow-y: auto !important;
+  scrollbar-gutter: stable both-edges;
+  padding-bottom: 2px; // evita que el thumb se recorte visualmente
+
+  &::-webkit-scrollbar {
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(36, 22, 62, 0.45);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background: rgba(36, 22, 62, 0.65);
+    background-clip: content-box;
+  }
+}
+
 /*
  * Fix de capas para tooltip dentro de columnas sticky.
  * Evita que el popup se recorte o quede detrás de celdas vecinas.

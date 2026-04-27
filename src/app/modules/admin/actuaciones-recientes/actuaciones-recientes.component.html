@@ -410,7 +410,7 @@
           </div>
         </div>
 
-        <div class="flex-1 min-h-0 overflow-y-auto p-6 bg-base-100/50">
+        <div class="flex-1 min-h-0 overflow-y-auto lg:overflow-y-hidden p-6 bg-base-100/50">
           @if (isLoadingDetails()) {
             <div class="flex justify-center items-center h-48">
               <span class="loading loading-spinner loading-lg text-primary"></span>
@@ -568,7 +568,22 @@
             </div>
 
             <!-- Desktop layout: table -->
-            <div class="hidden lg:block overflow-x-auto w-full process-list-table border border-base-200 rounded-xl bg-white shadow-sm">
+            <div class="hidden lg:flex lg:flex-col space-y-2 h-full">
+              <div class="flex items-center justify-between rounded-xl border border-warning/30 bg-warning/10 px-3 py-2">
+                <div class="inline-flex items-center gap-2 text-warning">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 12h18m0 0l-4-4m4 4l-4 4M3 12l4-4m-4 4l4 4" />
+                  </svg>
+                  <span class="text-[11px] font-black uppercase tracking-widest">
+                    {{ 'actuacionesRecientes.digest.horizontalScrollHint' | transloco }}
+                  </span>
+                </div>
+                <div class="text-[10px] font-bold text-warning/80 uppercase tracking-wider">
+                  {{ 'actuacionesRecientes.digest.horizontalScrollHintShort' | transloco }}
+                </div>
+              </div>
+
+              <div class="overflow-x-scroll overflow-y-auto w-full h-full min-h-0 process-list-table digest-detail-table-scroll border border-base-200 rounded-xl bg-white shadow-sm">
               <table class="table table-zebra" style="min-width: 1500px;">
                 <thead style="background-color: #24163E; color: #ffffff;">
                   <tr>
@@ -786,6 +801,7 @@
                   }
                 </tbody>
               </table>
+              </div>
             </div>
 
           } @else {

@@ -75,6 +75,11 @@
                   <input type="text" formControlName="name" class="input input-bordered w-full focus:input-primary transition-all" 
                     [placeholder]="'profile.placeholders.name' | transloco"
                     [class.input-error]="profileForm.get('name')?.invalid && profileForm.get('name')?.touched">
+                  @if (validationErrors()['name']) {
+                    <label class="label">
+                      <span class="label-text-alt text-error italic">{{ validationErrors()['name'] }}</span>
+                    </label>
+                  }
                   @if (profileForm.get('name')?.invalid && profileForm.get('name')?.touched) {
                     <label class="label">
                       <span class="label-text-alt text-error italic">{{ 'auth.errors.fieldRequired' | transloco }}</span>
@@ -90,6 +95,11 @@
                   <input type="text" formControlName="last_name" class="input input-bordered w-full focus:input-primary transition-all"
                     [placeholder]="'profile.placeholders.lastName' | transloco"
                     [class.input-error]="profileForm.get('last_name')?.invalid && profileForm.get('last_name')?.touched">
+                  @if (validationErrors()['last_name']) {
+                    <label class="label">
+                      <span class="label-text-alt text-error italic">{{ validationErrors()['last_name'] }}</span>
+                    </label>
+                  }
                   @if (profileForm.get('last_name')?.invalid && profileForm.get('last_name')?.touched) {
                     <label class="label">
                       <span class="label-text-alt text-error italic">{{ 'auth.errors.fieldRequired' | transloco }}</span>
@@ -105,6 +115,11 @@
                   <input type="email" formControlName="email" class="input input-bordered w-full focus:input-primary transition-all"
                     [placeholder]="'profile.placeholders.email' | transloco"
                     [class.input-error]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+                  @if (validationErrors()['email']) {
+                    <label class="label">
+                      <span class="label-text-alt text-error italic">{{ validationErrors()['email'] }}</span>
+                    </label>
+                  }
                   @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
                     <label class="label">
                       <span class="label-text-alt text-error italic">{{ 'auth.errors.emailInvalid' | transloco }}</span>
@@ -120,6 +135,11 @@
                   <input type="text" formControlName="identification" class="input input-bordered w-full focus:input-primary transition-all"
                     [placeholder]="'profile.placeholders.identification' | transloco"
                     [class.input-error]="profileForm.get('identification')?.invalid && profileForm.get('identification')?.touched">
+                  @if (validationErrors()['identification']) {
+                    <label class="label">
+                      <span class="label-text-alt text-error italic">{{ validationErrors()['identification'] }}</span>
+                    </label>
+                  }
                   @if (profileForm.get('identification')?.invalid && profileForm.get('identification')?.touched) {
                     <label class="label">
                       <span class="label-text-alt text-error italic">{{ 'auth.errors.fieldRequired' | transloco }}</span>
@@ -147,7 +167,20 @@
                     <span class="label-text font-medium">{{ 'profile.fields.password' | transloco }}</span>
                   </label>
                   <input type="password" formControlName="password" class="input input-bordered w-full focus:input-primary transition-all"
-                    [placeholder]="'profile.placeholders.password' | transloco">
+                    [placeholder]="'profile.placeholders.password' | transloco"
+                    [class.input-error]="
+                      !!validationErrors()['password'] ||
+                      !!profileForm.get('password')?.errors?.['minlength']
+                    ">
+                  @if (validationErrors()['password']) {
+                    <label class="label">
+                      <span class="label-text-alt text-error italic">{{ validationErrors()['password'] }}</span>
+                    </label>
+                  } @else if (profileForm.get('password')?.errors?.['minlength']) {
+                    <label class="label">
+                      <span class="label-text-alt text-error italic">{{ 'profile.messages.passwordMinLength' | transloco }}</span>
+                    </label>
+                  }
                 </div>
 
                 <!-- Password Confirmation -->
@@ -157,13 +190,27 @@
                   </label>
                   <input type="password" formControlName="password_confirmation" class="input input-bordered w-full focus:input-primary transition-all"
                     [placeholder]="'profile.placeholders.passwordConfirmation' | transloco"
-                    [class.input-error]="profileForm.get('password_confirmation')?.hasError('mismatch')">
-                  @if (profileForm.get('password_confirmation')?.hasError('mismatch')) {
+                    [class.input-error]="
+                      !!validationErrors()['password_confirmation'] ||
+                      profileForm.get('password_confirmation')?.hasError('mismatch')
+                    ">
+                  @if (validationErrors()['password_confirmation']) {
+                    <label class="label">
+                      <span class="label-text-alt text-error italic">{{ validationErrors()['password_confirmation'] }}</span>
+                    </label>
+                  } @else if (profileForm.get('password_confirmation')?.hasError('mismatch')) {
                     <label class="label">
                       <span class="label-text-alt text-error italic">{{ 'profile.messages.passwordMismatch' | transloco }}</span>
                     </label>
                   }
                 </div>
+              </div>
+
+              <div class="mt-4 alert alert-info">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{{ 'profile.messages.passwordRequirements' | transloco }}</span>
               </div>
             </div>
 

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, computed, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -18,6 +18,7 @@ export class NotificationBellComponent implements OnInit {
     private _notificationService = inject(NotificationService);
     private _router = inject(Router);
     private _lastOpenRequestAt = 0;
+    @ViewChild('notificationBellTrigger') private _notificationBellTrigger?: ElementRef<HTMLElement>;
 
     public notifications = this._notificationService.notifications;
     public newCount = this._notificationService.newCount;
@@ -48,7 +49,6 @@ export class NotificationBellComponent implements OnInit {
         this._lastOpenRequestAt = now;
 
         this._notificationService.markAllAsOpened().subscribe();
-        this._notificationService.getUnreadCount().subscribe();
 
         // Always reload when opening, so relative timestamps stay fresh.
         this.currentPage.set(1);
@@ -62,6 +62,8 @@ export class NotificationBellComponent implements OnInit {
     }
 
     onNotificationClick(notification: AppNotification): void {
+        this._closeDropdown();
+
         const navigation = this._resolveNotificationNavigation(notification);
         const navigateToTarget = (): void => {
           if (!navigation) return;
@@ -108,9 +110,28 @@ export class NotificationBellComponent implements OnInit {
             queryParams: { digest: digestId },
           };
         },
+        'import-report': (item) => {
+          const importId = item.data?.id;
+          if (!importId) {
+            return {
+              commands: ['/historial-importaciones'],
+            };
+          }
+          return {
+            commands: ['/historial-importaciones'],
+            queryParams: { import: importId },
+          };
+        },
       };
 
       const resolver = notificationType ? routeResolvers[notificationType] : null;
       return resolver ? resolver(notification) : null;
+    }
+
+    private _closeDropdown(): void {
+      this._notificationBellTrigger?.nativeElement.blur();
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
     }
 }
