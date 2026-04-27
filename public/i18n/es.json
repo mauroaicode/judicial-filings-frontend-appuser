@@ -78,6 +78,15 @@
       "mustChangePassword": "Por seguridad, debes cambiar tu contraseña. Por favor, actualízala lo antes posible."
     }
   },
+  "sessionLock": {
+    "title": "Sesión bloqueada",
+    "description": "Por inactividad, la sesión fue bloqueada. Ingresa tu contraseña para continuar.",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Ingresa tu contraseña",
+    "unlockButton": "Desbloquear",
+    "unlocking": "Desbloqueando...",
+    "retryIn": "Puedes intentar de nuevo en"
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "gestionProcesos": "Gestión de Procesos",
@@ -90,6 +99,7 @@
     "search": "Buscar",
     "messages": "Mensajes",
     "notifications": "Notificaciones",
+    "lockSession": "Bloquear sesión",
     "userMenu": "Menú de usuario",
     "profile": "Perfil",
     "settings": "Configuración",

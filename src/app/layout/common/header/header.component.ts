@@ -14,6 +14,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AuthService } from '@app/core/auth/auth.service';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { NotificationBellComponent } from './notification-bell/notification-bell.component';
+import { SessionLockService } from '@app/core/services/session-lock/session-lock.service';
 
 @Component({
   selector: 'app-header',
@@ -28,6 +29,7 @@ export class HeaderComponent {
   private _authService = inject(AuthService);
   private _router = inject(Router);
   private _translocoService = inject(TranslocoService);
+  private _sessionLockService = inject(SessionLockService);
 
   // Inputs
   public pageTitle = input<string>('');
@@ -52,6 +54,13 @@ export class HeaderComponent {
    */
   onToggleSidebar(): void {
     this.toggleSidebar.emit();
+  }
+
+  /**
+   * Lock session manually from header action
+   */
+  lockSession(): void {
+    this._sessionLockService.lock();
   }
 
   /**

@@ -75,6 +75,15 @@
       "mustChangePassword": "For security, you must change your password. Please update it as soon as possible."
     }
   },
+  "sessionLock": {
+    "title": "Session locked",
+    "description": "Due to inactivity, your session was locked. Enter your password to continue.",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "unlockButton": "Unlock",
+    "unlocking": "Unlocking...",
+    "retryIn": "You can retry in"
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "gestionProcesos": "Process Management",
@@ -87,6 +96,7 @@
     "search": "Search",
     "messages": "Messages",
     "notifications": "Notifications",
+    "lockSession": "Lock session",
     "userMenu": "User menu",
     "profile": "Profile",
     "settings": "Settings",
