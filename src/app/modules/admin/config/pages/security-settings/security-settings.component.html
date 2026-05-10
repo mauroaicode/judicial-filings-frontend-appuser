@@ -1,0 +1,78 @@
+<div class="card bg-base-100 shadow-sm border border-base-content/10">
+  <div class="card-body">
+    <h2 class="card-title text-xl mb-4">{{ 'securitySettings.title' | transloco }}</h2>
+    
+    <form [formGroup]="securityForm" (ngSubmit)="saveSettings()" class="space-y-6">
+      
+      <!-- Session Lock Section -->
+      <div class="bg-base-200/50 rounded-xl p-5 border border-base-content/5">
+        <div class="flex items-start gap-4">
+          <div class="bg-primary/10 text-primary p-3 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          
+          <div class="flex-1">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="font-bold text-base-content">{{ 'securitySettings.automaticLock' | transloco }}</h3>
+                <p class="text-sm text-base-content/70 mt-1">{{ 'securitySettings.automaticLockDesc' | transloco }}</p>
+              </div>
+              <label class="cursor-pointer label p-0">
+                <input type="checkbox" formControlName="session_lock_enabled" class="toggle toggle-primary" />
+              </label>
+            </div>
+
+            <!-- Timeout input, only visible if enabled -->
+            @if (securityForm.get('session_lock_enabled')?.value) {
+              <div class="mt-4 pt-4 border-t border-base-content/10 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <label class="text-sm font-semibold text-base-content/80">{{ 'securitySettings.timeoutLabel' | transloco }}</label>
+                <input type="number" formControlName="session_lock_timeout" class="input input-sm input-bordered w-full sm:w-24 text-center" min="1" max="120" />
+              </div>
+              @if (securityForm.get('session_lock_timeout')?.invalid && securityForm.get('session_lock_timeout')?.touched) {
+                <div class="text-error text-xs font-medium mt-2">{{ 'securitySettings.timeoutError' | transloco }}</div>
+              }
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Manual Lock Tip -->
+      <div class="flex items-start gap-3 p-4 bg-info/10 text-info rounded-xl border border-info/20">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-sm leading-relaxed">
+          {{ 'securitySettings.manualLockTip' | transloco }}
+        </p>
+      </div>
+
+      <!-- Alerts -->
+      @if (successMessage()) {
+        <div class="alert alert-success mt-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span>{{ 'securitySettings.saveSuccess' | transloco }}</span>
+        </div>
+      }
+      @if (errorMessage()) {
+        <div class="alert alert-error mt-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span>{{ errorMessage() || ('securitySettings.saveError' | transloco) }}</span>
+        </div>
+      }
+
+      <div class="flex justify-end mt-6">
+        <button type="submit" class="btn btn-primary" [disabled]="securityForm.invalid || isSaving()">
+          @if (isSaving()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            {{ 'securitySettings.saving' | transloco }}
+          } @else {
+            {{ 'securitySettings.saveButton' | transloco }}
+          }
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

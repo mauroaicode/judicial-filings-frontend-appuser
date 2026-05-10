@@ -38,6 +38,11 @@ export default [
     loadChildren: () =>
       import('./profile/profile.routes').then((m) => m.default),
   },
+  {
+    path: 'config',
+    loadChildren: () =>
+      import('./config/config.routes').then((m) => m.default),
+  },
   // More admin routes will be added here as modules are created
   // Example structure for future modules with role guards:
   // {

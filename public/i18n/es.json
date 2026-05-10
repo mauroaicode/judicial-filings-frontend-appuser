@@ -85,14 +85,17 @@
     "passwordPlaceholder": "Ingresa tu contraseña",
     "unlockButton": "Desbloquear",
     "unlocking": "Desbloqueando...",
-    "retryIn": "Puedes intentar de nuevo en"
+    "retryIn": "Puedes intentar de nuevo en",
+    "configHint": "Puedes desactivar o configurar el tiempo de este bloqueo automático desde el menú Configuración > Seguridad."
   },
   "navigation": {
     "dashboard": "Dashboard",
     "gestionProcesos": "Gestión de Procesos",
     "importHistory": "Historial de Importaciones",
     "keywords": "Etapas Procesales",
-    "toggleSidebar": "Alternar menú lateral"
+    "toggleSidebar": "Alternar menú lateral",
+    "security": "Seguridad",
+    "config": "Configuración"
   },
   "header": {
     "searchPlaceholder": "Buscar...",
@@ -598,5 +601,17 @@
     "statusActive": "IA Judicial Activa",
     "selectChat": "Selecciona un chat",
     "emptySession": "Empieza una conversación..."
+  },
+  "securitySettings": {
+    "title": "Configuración de Seguridad",
+    "automaticLock": "Bloqueo automático por inactividad",
+    "automaticLockDesc": "Protege tu sesión bloqueando la pantalla cuando no estás activo.",
+    "timeoutLabel": "Tiempo de inactividad (minutos)",
+    "timeoutError": "Ingresa un valor válido entre 1 y 120.",
+    "manualLockTip": "Tip: También puedes bloquear tu sesión manualmente en cualquier momento haciendo clic en el icono del candado al lado de la campana de notificaciones en la barra superior.",
+    "saveSuccess": "Configuración guardada correctamente.",
+    "saveError": "Error al guardar la configuración.",
+    "saving": "Guardando...",
+    "saveButton": "Guardar cambios"
   }
 }

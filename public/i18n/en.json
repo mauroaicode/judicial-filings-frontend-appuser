@@ -82,14 +82,17 @@
     "passwordPlaceholder": "Enter your password",
     "unlockButton": "Unlock",
     "unlocking": "Unlocking...",
-    "retryIn": "You can retry in"
+    "retryIn": "You can retry in",
+    "configHint": "You can disable or configure the timeout for this automatic lock in the Settings > Security menu."
   },
   "navigation": {
     "dashboard": "Dashboard",
     "gestionProcesos": "Process Management",
     "importHistory": "Import History",
     "keywords": "Procedural Stages",
-    "toggleSidebar": "Toggle sidebar"
+    "toggleSidebar": "Toggle sidebar",
+    "security": "Security",
+    "config": "Settings"
   },
   "header": {
     "searchPlaceholder": "Search...",
@@ -541,5 +544,17 @@
   "process": {
     "import_finished_title": "Import Finished",
     "import_finished_description": "The process of importing filings has finished successfully."
+  },
+  "securitySettings": {
+    "title": "Security Settings",
+    "automaticLock": "Automatic inactivity lock",
+    "automaticLockDesc": "Protect your session by locking the screen when you are not active.",
+    "timeoutLabel": "Inactivity time (minutes)",
+    "timeoutError": "Enter a valid value between 1 and 120.",
+    "manualLockTip": "Tip: You can also manually lock your session at any time by clicking the padlock icon next to the notification bell in the top bar.",
+    "saveSuccess": "Settings saved successfully.",
+    "saveError": "Error saving settings.",
+    "saving": "Saving...",
+    "saveButton": "Save changes"
   }
 }

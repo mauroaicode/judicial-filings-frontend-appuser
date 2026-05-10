@@ -40,7 +40,15 @@ export class SessionLockService {
   initializeFromCurrentUser(): void {
     if (this._isInitialized()) return;
 
-    const timeoutMinutes = this._authService.currentUser?.session_lock_timeout;
+    const user = this._authService.currentUser;
+    const isEnabled = user?.session_lock_enabled !== false; // default to true if undefined
+    const timeoutMinutes = user?.session_lock_timeout;
+
+    if (!isEnabled) {
+      // If feature is disabled explicitly, just mark initialized but don't start timers
+      this._isInitialized.set(true);
+      return;
+    }
 
     if (typeof timeoutMinutes !== 'number' || !Number.isFinite(timeoutMinutes) || timeoutMinutes <= 0) {
       this.forceLogoutForMissingLockTimeout();
@@ -207,4 +215,31 @@ export class SessionLockService {
   private _isLockPersisted(): boolean {
     return localStorage.getItem(STORAGE.SESSION_LOCKED) === 'true';
   }
+  /**
+   * Update session lock settings from UI.
+   * Call this after changing the toggle or timeout.
+   */
+  public updateLockSettings(enabled: boolean, timeoutMinutes: number): void {
+    if (typeof timeoutMinutes !== 'number' || timeoutMinutes <= 0) {
+      console.warn('Invalid session lock timeout');
+      return;
+    }
+    this._lockTimeoutMs.set(timeoutMinutes * 60_000);
+    
+    if (!enabled) {
+      this.unlock();
+      this._clearIdleTimer();
+      // Remove activity listeners if we disable it
+      for (const eventName of this._activityEvents) {
+        this._document.removeEventListener(eventName, this._onActivityBound, { passive: true } as EventListenerOptions);
+      }
+    } else {
+      this._attachActivityListeners();
+      if (!this._isLocked()) {
+        this.resetInactivityTimer();
+      }
+    }
+  }
+
 }
+
