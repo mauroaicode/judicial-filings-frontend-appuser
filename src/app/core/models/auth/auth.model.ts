@@ -16,6 +16,7 @@ export interface User {
   roles: Role[];
   must_change_password: boolean;
   organization_id: string;
+  session_lock_enabled?: boolean;
   session_lock_timeout?: number | null;
 }
 

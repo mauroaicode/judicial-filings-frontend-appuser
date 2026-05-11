@@ -40,6 +40,11 @@ export const DEFAULT_NAVIGATION: NavigationItem[] = [
     icon: 'import-history',
     link: '/historial-importaciones',
   },
-  // More items will be added here as needed
+  {
+    id: 'config',
+    title: 'header.settings',
+    type: 'basic',
+    icon: 'settings',
+    link: '/config',
+  },
 ];
-
