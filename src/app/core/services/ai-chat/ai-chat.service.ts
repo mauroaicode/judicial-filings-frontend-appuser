@@ -38,10 +38,18 @@ export class AiChatService {
     return this._http.get<any[]>(`${this._baseUrl}/${chatId}/messages`);
   }
 
+  /** POST /ai-chats */
+  createChat(processId: string, title?: string): Observable<AiChatSession> {
+    return this._http.post<AiChatSession>(this._baseUrl, {
+      process_id: processId,
+      ...(title ? { title } : {}),
+    });
+  }
+
   // ── SSE Streaming ─────────────────────────────────────────────────
 
   /**
-   * POST /ai-chats/{chatId}/messages
+   * POST /ai-chats/{chatId}/stream
    *
    * Opens a native fetch() stream and calls the provided callbacks
    * as each SSE chunk arrives.
@@ -55,7 +63,7 @@ export class AiChatService {
     const controller = new AbortController();
     const token      = this._auth.accessToken;
 
-    const url = `${this._baseUrl}/${chatId}/messages`;
+    const url = `${this._baseUrl}/${chatId}/stream`;
 
     fetch(url, {
       method:  'POST',

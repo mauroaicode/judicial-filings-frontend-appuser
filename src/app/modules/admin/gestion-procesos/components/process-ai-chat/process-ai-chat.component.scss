@@ -104,6 +104,18 @@ $border-color:    #E5E7EB;
   &:hover { background: $brand-light; color: $brand-primary; }
   &--on   { background: rgba($brand-primary, 0.08); color: $brand-primary; }
   &--close:hover { background: #FEF2F2; color: #EF4444; }
+
+  // Voice assistant button — subtle glow on hover
+  &--voice:hover {
+    background: linear-gradient(135deg, rgba($brand-primary,.1), rgba($brand-secondary,.12));
+    color: $brand-primary;
+    box-shadow: 0 0 0 2px rgba($brand-primary, 0.12);
+  }
+  &--voice.hbtn--on {
+    background: linear-gradient(135deg, rgba($brand-primary,.12), rgba($brand-secondary,.16));
+    color: $brand-secondary;
+    box-shadow: 0 0 0 2px rgba($brand-secondary, 0.18);
+  }
 }
 
 // Brand
