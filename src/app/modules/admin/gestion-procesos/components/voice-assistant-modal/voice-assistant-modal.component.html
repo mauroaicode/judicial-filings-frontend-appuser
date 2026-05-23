@@ -1,0 +1,170 @@
+<!-- Voice Conversation Modal -->
+<div class="va-overlay" (click)="close()">
+  <div class="va-card" (click)="$event.stopPropagation()">
+
+    <!-- ── Header ─────────────────────────────────────────────── -->
+    <div class="va-card__header">
+      <div class="va-brand">
+        <div class="va-brand__dot"
+             [class.va-brand__dot--standby]="state() === 'standby'"
+             [class.va-brand__dot--listening]="state() === 'listening'"
+             [class.va-brand__dot--active]="state() === 'transcribing' || state() === 'thinking' || state() === 'speaking'"
+             [class.va-brand__dot--error]="state() === 'error'">
+        </div>
+        <span class="va-brand__name">LEXA</span>
+        <span class="va-brand__sub">Asistente de Voz</span>
+      </div>
+      <button class="va-close-btn" (click)="close()" title="Cerrar">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- ── Orb area ───────────────────────────────────────────── -->
+    <div class="va-orb-wrap">
+
+      <!-- Rings -->
+      <div class="va-ring va-ring--3"
+           [class.va-ring--standby]="state() === 'standby'"
+           [class.va-ring--listening]="state() === 'listening'"
+           [class.va-ring--speaking]="state() === 'speaking'"></div>
+      <div class="va-ring va-ring--2"
+           [class.va-ring--standby]="state() === 'standby'"
+           [class.va-ring--listening]="state() === 'listening'"
+           [class.va-ring--speaking]="state() === 'speaking'"></div>
+      <div class="va-ring va-ring--1"
+           [class.va-ring--standby]="state() === 'standby'"
+           [class.va-ring--listening]="state() === 'listening'"
+           [class.va-ring--speaking]="state() === 'speaking'"></div>
+
+      <!-- Orb button -->
+      <button
+        class="va-orb"
+        [class.va-orb--idle]="state() === 'idle'"
+        [class.va-orb--standby]="state() === 'standby'"
+        [class.va-orb--listening]="state() === 'listening'"
+        [class.va-orb--processing]="state() === 'transcribing' || state() === 'thinking'"
+        [class.va-orb--speaking]="state() === 'speaking'"
+        [class.va-orb--error]="state() === 'error'"
+        [disabled]="state() === 'transcribing' || state() === 'thinking' || state() === 'speaking'"
+        (click)="onOrbClick()">
+
+        <div class="va-orb__gloss"></div>
+
+        <!-- Idle: microphone — tap to activate -->
+        @if (state() === 'idle') {
+          <svg class="va-orb__icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.25 4.5a3.75 3.75 0 117.5 0v8.25a3.75 3.75 0 11-7.5 0V4.5z" />
+            <path d="M6 10.5a.75.75 0 01.75.75v1.5a5.25 5.25 0 1010.5 0v-1.5a.75.75 0 011.5 0v1.5a6.751 6.751 0 01-6 6.709v2.291h3a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5h3v-2.291a6.751 6.751 0 01-6-6.709v-1.5A.75.75 0 016 10.5z" />
+          </svg>
+        }
+
+        <!-- Standby: microphone — always listening, tap to deactivate -->
+        @if (state() === 'standby') {
+          <svg class="va-orb__icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.25 4.5a3.75 3.75 0 117.5 0v8.25a3.75 3.75 0 11-7.5 0V4.5z" />
+            <path d="M6 10.5a.75.75 0 01.75.75v1.5a5.25 5.25 0 1010.5 0v-1.5a.75.75 0 011.5 0v1.5a6.751 6.751 0 01-6 6.709v2.291h3a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5h3v-2.291a6.751 6.751 0 01-6-6.709v-1.5A.75.75 0 016 10.5z" />
+          </svg>
+        }
+
+        <!-- Listening: waveform — VAD detected speech -->
+        @if (state() === 'listening') {
+          <svg class="va-orb__icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.25 4.5a3.75 3.75 0 117.5 0v8.25a3.75 3.75 0 11-7.5 0V4.5z" />
+            <path d="M6 10.5a.75.75 0 01.75.75v1.5a5.25 5.25 0 1010.5 0v-1.5a.75.75 0 011.5 0v1.5a6.751 6.751 0 01-6 6.709v2.291h3a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5h3v-2.291a6.751 6.751 0 01-6-6.709v-1.5A.75.75 0 016 10.5z" />
+          </svg>
+        }
+
+        <!-- Transcribing / Thinking: spinner -->
+        @if (state() === 'transcribing' || state() === 'thinking') {
+          <svg class="va-orb__icon va-orb__icon--spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="50" stroke-linecap="round"/>
+          </svg>
+        }
+
+        <!-- Speaking: sound wave -->
+        @if (state() === 'speaking') {
+          <svg class="va-orb__icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06zM18.584 5.106a.75.75 0 011.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 11-1.06-1.06 8.25 8.25 0 000-11.668.75.75 0 010-1.06z" />
+            <path d="M15.932 7.757a.75.75 0 011.061 0 6 6 0 010 8.486.75.75 0 01-1.06-1.061 4.5 4.5 0 000-6.364.75.75 0 010-1.06z" />
+          </svg>
+        }
+
+        <!-- Error -->
+        @if (state() === 'error') {
+          <svg class="va-orb__icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+        }
+      </button>
+    </div>
+
+    <!-- ── Waveform ─────────────────────────────────────────── -->
+    <div class="va-waveform"
+         [class.va-waveform--standby]="state() === 'standby'"
+         [class.va-waveform--listening]="state() === 'listening'"
+         [class.va-waveform--speaking]="state() === 'speaking'">
+      @for (bar of waveformBars; track $index) {
+        <div class="va-bar" [style.animation-delay.ms]="$index * 60"></div>
+      }
+    </div>
+
+    <!-- ── Status ─────────────────────────────────────────────── -->
+    <p class="va-status-text">{{ statusText() }}</p>
+
+    @if (assistantPreview() && state() === 'thinking') {
+      <div class="va-utterance va-utterance--preview">
+        <p>{{ assistantPreview() }}</p>
+      </div>
+    }
+
+    <!-- ── What the user said ─────────────────────────────────── -->
+    @if (lastUserText() && (state() === 'thinking' || state() === 'speaking')) {
+      <div class="va-utterance">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+        </svg>
+        <p>{{ lastUserText() }}</p>
+      </div>
+    }
+
+    <!-- ── Duration badge ─────────────────────────────────────── -->
+    @if (lastDuration() && state() === 'standby') {
+      <div class="va-duration-badge">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Último turno: {{ lastDuration() }}
+      </div>
+    }
+
+    <!-- ── Error ──────────────────────────────────────────────── -->
+    @if (state() === 'error') {
+      <div class="va-error-box">
+        <p class="va-error-box__msg">{{ errorMessage() }}</p>
+        @if (!hasNoChatId()) {
+          <button class="va-retry-btn" (click)="retry()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            Reintentar
+          </button>
+        }
+      </div>
+    }
+
+    <!-- ── Hint ───────────────────────────────────────────────── -->
+    @if (state() === 'idle') {
+      <div class="va-hint">
+        Toca el orb para activar el micrófono · Lexa responde con voz
+      </div>
+    }
+    @if (state() === 'standby') {
+      <div class="va-hint va-hint--active">
+        Escucha automática activa · Toca para desactivar
+      </div>
+    }
+
+  </div>
+</div>

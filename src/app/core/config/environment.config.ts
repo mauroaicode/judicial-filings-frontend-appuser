@@ -15,5 +15,14 @@ export const environment = {
     port: import.meta.env.NG_APP_REVERB_PORT || 8080,
     scheme: import.meta.env.NG_APP_REVERB_SCHEME || 'http',
   },
+  omnivoice: {
+    transcribeUrl:
+      import.meta.env.NG_APP_OMNIVOICE_TRANSCRIBE_URL ||
+      'https://kdhe3t42xdtc42-3900.proxy.runpod.net/transcribe',
+    ttsWsUrl:
+      import.meta.env.NG_APP_OMNIVOICE_TTS_WS_URL ||
+      'wss://kdhe3t42xdtc42-3900.proxy.runpod.net/ws/tts',
+    ttsVoiceId: import.meta.env.NG_APP_OMNIVOICE_TTS_VOICE_ID || 'e70acddc',
+  },
 };
 

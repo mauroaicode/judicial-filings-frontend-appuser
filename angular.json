@@ -61,6 +61,9 @@
         },
         "serve": {
           "builder": "@ngx-env/builder:dev-server",
+          "options": {
+            "port": 3901
+          },
           "configurations": {
             "production": {
               "buildTarget": "judicial-filings-appuser:build:production"

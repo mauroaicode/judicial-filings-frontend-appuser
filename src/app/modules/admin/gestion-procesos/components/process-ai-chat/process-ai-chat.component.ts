@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { MarkdownComponent } from 'ngx-markdown';
 import { AiChatService } from 'src/app/core/services/ai-chat/ai-chat.service';
 import { AiChatSession as LocalAiChatSession } from 'src/app/core/models/ai-chat/ai-chat-session.model';
-import { finalize } from 'rxjs';
+import { VoiceAssistantModalComponent } from '../voice-assistant-modal/voice-assistant-modal.component';
 
 export type QueryMode = 'agil' | 'estrategico';
 
@@ -42,7 +42,7 @@ interface Suggestion {
 @Component({
   selector: 'app-process-ai-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, MarkdownComponent],
+  imports: [CommonModule, FormsModule, MarkdownComponent, VoiceAssistantModalComponent],
   templateUrl: './process-ai-chat.component.html',
   styleUrls: ['./process-ai-chat.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -96,9 +96,10 @@ export class ProcessAiChatComponent implements OnChanges, OnDestroy {
   }
 
   // ── UI state ──────────────────────────────────────────────────────
-  showSidebar  = signal(false);
-  isExpanded   = signal(false);
-  isPinned     = signal(false);
+  showSidebar      = signal(false);
+  isExpanded       = signal(false);
+  isPinned         = signal(false);
+  showVoiceModal   = signal(false);
   
   queryMode    = signal<QueryMode>('estrategico');
   messageText  = '';
@@ -195,6 +196,14 @@ export class ProcessAiChatComponent implements OnChanges, OnDestroy {
 
   setMode(mode: QueryMode): void { this.queryMode.set(mode); }
 
+  openVoiceModal(): void  { this.showVoiceModal.set(true); }
+  closeVoiceModal(): void { this.showVoiceModal.set(false); }
+
+  onVoiceTurnCompleted(): void {
+    const id = this.selectedSessionId();
+    if (id && !id.startsWith('new-')) this.loadMessages(id);
+  }
+
   // ── Sessions ──────────────────────────────────────────────────────
   selectSession(id: string): void {
     if (this.selectedSessionId() === id) return;
@@ -289,8 +298,10 @@ export class ProcessAiChatComponent implements OnChanges, OnDestroy {
     const apiSearchMode = this.queryMode() === 'agil' ? 'agile' : 'strategic';
 
     this._activeStream?.abort();
-    this._activeStream = this._aiService.sendMessage(currentId, content, apiSearchMode, {
-      onChunk: (chunk) => {
+    this.startLabelRotation();
+
+    const streamHandlers = {
+      onChunk: (chunk: string) => {
         if (this.isWaitingFirstChunk()) {
           this.isWaitingFirstChunk.set(false);
           this.clearLabelInterval();
@@ -300,9 +311,9 @@ export class ProcessAiChatComponent implements OnChanges, OnDestroy {
       },
       onDone: () => {
         const elapsed = Date.now() - this._startTime;
-        this.processFinalDone(aiId, currentId, elapsed);
+        this.processFinalDone(aiId, this.selectedSessionId()!, elapsed);
       },
-      onError: (err) => {
+      onError: () => {
         this.isTyping.set(false);
         this.isWaitingFirstChunk.set(false);
         this.stopTypewriter();
@@ -313,7 +324,28 @@ export class ProcessAiChatComponent implements OnChanges, OnDestroy {
         })));
         this._cdr.markForCheck();
       },
-    });
+    };
+
+    const startStream = (chatId: string) => {
+      this._activeStream = this._aiService.sendMessage(chatId, content, apiSearchMode, streamHandlers);
+    };
+
+    if (currentId.startsWith('new-')) {
+      const title = this.truncate(content, 38);
+      this._aiService.createChat(this.processId.toString(), title).subscribe({
+        next: (chat) => {
+          this.sessions.update(prev => prev.map(s =>
+            s.id === currentId ? { ...s, id: chat.id, title: chat.title || s.title } : s
+          ));
+          this.selectedSessionId.set(chat.id);
+          startStream(chat.id);
+          this._cdr.markForCheck();
+        },
+        error: () => streamHandlers.onError(),
+      });
+    } else {
+      startStream(currentId);
+    }
   }
 
   private startTypewriter(): void {
