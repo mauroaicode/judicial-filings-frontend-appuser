@@ -20,6 +20,10 @@
       <button type="button" class="btn btn-ghost btn-sm flex items-center justify-center p-0 w-10 h-10"
         [class.text-brand-neutral]="isOpen()" [class.hover:bg-brand-neutral/10]="isOpen()"
         [class.text-white]="!isOpen()" [class.hover:bg-white/10]="!isOpen()" (click)="toggleSidebar()"
+        (mouseenter)="onNavItemHover($event, 'navigation.toggleSidebar')"
+        (mouseleave)="hideNavTooltip()"
+        (focus)="onNavItemHover($event, 'navigation.toggleSidebar')"
+        (blur)="hideNavTooltip()"
         [attr.aria-label]="'navigation.toggleSidebar' | transloco">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           @if (isOpen()) {
@@ -45,7 +49,11 @@
         } @else if (item.type === 'collapsable' && item.children) {
         <li [class.mt-auto]="item.id === 'config'">
           <button type="button" class="w-full" [class.active]="activeIds().has(item.id)" [class.disabled]="item.disabled"
-            (click)="toggleItem(item)">
+            (click)="toggleItem(item)"
+            (mouseenter)="onNavItemHover($event, item.title)"
+            (mouseleave)="hideNavTooltip()"
+            (focus)="onNavItemHover($event, item.title)"
+            (blur)="hideNavTooltip()">
             <div class="sidebar-item flex items-center rounded-lg py-2 text-left transition-colors"
               [class.gap-3]="isOpen()" [class.px-3]="isOpen()" [class.justify-center]="!isOpen()"
               [class.px-2]="!isOpen()" [class.sidebar-item-active]="activeIds().has(item.id)">
@@ -98,7 +106,11 @@
             [class.disabled]="item.disabled"
             class="sidebar-item flex items-center rounded-lg py-2 text-left transition-colors" [class.gap-3]="isOpen()"
             [class.px-3]="isOpen()" [class.justify-center]="!isOpen()" [class.px-2]="!isOpen()"
-            (click)="onMenuItemClick(item)">
+            (click)="onMenuItemClick(item)"
+            (mouseenter)="onNavItemHover($event, item.title)"
+            (mouseleave)="hideNavTooltip()"
+            (focus)="onNavItemHover($event, item.title)"
+            (blur)="hideNavTooltip()">
             @if (item.icon && getIconPath(item)) {
             <span class="flex-shrink-0 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"

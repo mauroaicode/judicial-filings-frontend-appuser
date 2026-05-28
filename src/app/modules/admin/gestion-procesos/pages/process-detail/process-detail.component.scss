@@ -5,6 +5,11 @@
   width: 100%;
 }
 
+// Evita que el tooltip del semáforo se recorte en el header
+.detail-header-card {
+  overflow: visible;
+}
+
 // Custom Animations
 @keyframes slideUp {
   from {
