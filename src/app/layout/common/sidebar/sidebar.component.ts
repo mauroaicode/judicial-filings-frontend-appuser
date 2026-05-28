@@ -1,7 +1,9 @@
+import { DOCUMENT } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   effect,
   inject,
   signal,
@@ -9,7 +11,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { filter } from 'rxjs';
 import { NavigationService } from '@app/core/navigation/navigation.service';
 import { NavigationItem } from '@app/core/models/navigation/navigation-item.model';
@@ -30,10 +32,20 @@ export class SidebarComponent {
   private _navigationService = inject(NavigationService);
   private _router = inject(Router);
   private _iconService = inject(IconService);
+  private _transloco = inject(TranslocoService);
+  private _document = inject(DOCUMENT);
+  private _destroyRef = inject(DestroyRef);
+  private _bodyTooltipEl: HTMLElement | null = null;
 
   // Sidebar state - load from localStorage or default to true
   public isOpen = signal<boolean>(this._loadSidebarState());
   public isMobile = signal<boolean>(false);
+
+  /** Tooltip flotante al pasar por ítems con el menú colapsado (desktop) */
+  public collapsedNavTooltip = signal<{ label: string; top: number; left: number } | null>(null);
+
+  /** Muestra tooltips solo en escritorio con el menú cerrado */
+  public showCollapsedTooltips = computed(() => !this.isOpen() && !this.isMobile());
 
   // Navigation items
   public navigation = computed(() => this._navigationService.filteredNavigation());
@@ -119,6 +131,12 @@ export class SidebarComponent {
       }
     });
 
+    // Renderizar tooltip en body para que no quede detrás del contenido principal
+    effect(() => {
+      this._syncBodyTooltip(this.collapsedNavTooltip());
+    });
+
+    this._destroyRef.onDestroy(() => this._removeBodyTooltip());
   }
 
   /**
@@ -126,6 +144,49 @@ export class SidebarComponent {
    */
   toggleSidebar(): void {
     this.isOpen.update((value) => !value);
+    this.hideNavTooltip();
+  }
+
+  /**
+   * Muestra el tooltip flotante junto al ítem del menú colapsado
+   */
+  onNavItemHover(event: Event, titleKey: string): void {
+    if (!this.showCollapsedTooltips() || !titleKey) return;
+
+    const el = event.currentTarget as HTMLElement;
+    const rect = el.getBoundingClientRect();
+
+    this.collapsedNavTooltip.set({
+      label: this._transloco.translate(titleKey),
+      top: rect.top + rect.height / 2,
+      left: rect.right + 10,
+    });
+  }
+
+  /**
+   * Oculta el tooltip flotante del menú colapsado
+   */
+  hideNavTooltip(): void {
+    this.collapsedNavTooltip.set(null);
+  }
+
+  private _syncBodyTooltip(tip: { label: string; top: number; left: number } | null): void {
+    this._removeBodyTooltip();
+    if (!tip) return;
+
+    const el = this._document.createElement('div');
+    el.className = 'sidebar-floating-tooltip';
+    el.setAttribute('role', 'tooltip');
+    el.textContent = tip.label;
+    el.style.top = `${tip.top}px`;
+    el.style.left = `${tip.left}px`;
+    this._document.body.appendChild(el);
+    this._bodyTooltipEl = el;
+  }
+
+  private _removeBodyTooltip(): void {
+    this._bodyTooltipEl?.remove();
+    this._bodyTooltipEl = null;
   }
 
   /**
@@ -209,6 +270,7 @@ export class SidebarComponent {
   }
 
   onMenuItemClick(item: NavigationItem): void {
+    this.hideNavTooltip();
     this.selectedMenuId.set(item.id);
     if (this.isMobile()) this.closeSidebar();
   }
