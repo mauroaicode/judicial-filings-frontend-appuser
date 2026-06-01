@@ -410,6 +410,7 @@
     "subjects": {
       "title": "Process Subjects",
       "empty": "No process subjects available",
+      "others": "Other subjects",
       "table": {
         "subjectType": "Subject Type",
         "name": "Name or Business Name",

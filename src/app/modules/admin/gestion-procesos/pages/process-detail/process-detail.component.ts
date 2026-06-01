@@ -73,10 +73,18 @@ export class ProcessDetailComponent {
   public loadingInstances = signal<boolean>(false);
   public subjects = signal<Subject[]>([]);
   public plaintiffSubjects = computed(() =>
-    this.subjects().filter((s) => s.subject_type?.toLowerCase().includes('demandante'))
+    this.subjects().filter((s) => this.isPlaintiffSubject(s))
   );
   public defendantSubjects = computed(() =>
-    this.subjects().filter((s) => s.subject_type?.toLowerCase().includes('demandado'))
+    this.subjects().filter((s) => this.isDefendantSubject(s))
+  );
+  /** Sujetos cuyo tipo no es demandante ni demandado (p. ej. Opositor, Recurrente casación) */
+  public otherSubjects = computed(() =>
+    this.subjects().filter((s) => !this.isPlaintiffSubject(s) && !this.isDefendantSubject(s))
+  );
+  /** Layout de dos columnas solo cuando hay al menos un demandante o demandado */
+  public hasClassicSubjectLayout = computed(
+    () => this.plaintiffSubjects().length > 0 || this.defendantSubjects().length > 0
   );
   public actions = signal<Action[]>([]);
   public loading = signal<boolean>(false);
@@ -706,8 +714,24 @@ export class ProcessDetailComponent {
   public getRoleLabel(role: string | null | undefined): string {
     if (!role) return '';
     const r = role.toLowerCase();
-    if (r === 'plaintiff' || r.includes('demandante')) return 'DEMANDANTE';
-    if (r === 'defendant' || r.includes('demandado')) return 'DEMANDADO';
+    if (this.isPlaintiffType(r)) return 'DEMANDANTE';
+    if (this.isDefendantType(r)) return 'DEMANDADO';
     return role.toUpperCase();
+  }
+
+  public isPlaintiffSubject(subject: Subject): boolean {
+    return this.isPlaintiffType(subject.subject_type?.toLowerCase() ?? '');
+  }
+
+  public isDefendantSubject(subject: Subject): boolean {
+    return this.isDefendantType(subject.subject_type?.toLowerCase() ?? '');
+  }
+
+  private isPlaintiffType(type: string): boolean {
+    return type === 'plaintiff' || type.includes('demandante');
+  }
+
+  private isDefendantType(type: string): boolean {
+    return type === 'defendant' || type.includes('demandado');
   }
 }

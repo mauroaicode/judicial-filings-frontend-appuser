@@ -426,6 +426,7 @@
     "subjects": {
       "title": "Sujetos Procesales",
       "empty": "No hay sujetos procesales disponibles",
+      "others": "Otros sujetos",
       "table": {
         "subjectType": "Tipo de Sujeto",
         "name": "Nombre o Razón Social",
