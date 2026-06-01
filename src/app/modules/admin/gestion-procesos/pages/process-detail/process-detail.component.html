@@ -317,7 +317,7 @@
             <div class="text-center py-6 bg-base-200/20 rounded-xl border border-dashed border-base-300">
               <p class="text-base-content/40 font-medium text-xs">{{ 'processDetail.subjects.empty' | transloco }}</p>
             </div>
-            } @else {
+            } @else if (hasClassicSubjectLayout()) {
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-3">
               <div class="space-y-4">
                 <h4 class="text-[9px] uppercase font-bold text-base-content/40 tracking-wider">Demandante(s)</h4>
@@ -345,6 +345,40 @@
                   }
                 </div>
               </div>
+            </div>
+            @if (otherSubjects().length > 0) {
+            <div class="space-y-4 mt-6">
+              <h4 class="text-[9px] uppercase font-bold text-base-content/40 tracking-wider">{{ 'processDetail.subjects.others' | transloco }}</h4>
+              <div class="space-y-2">
+                @for (subject of otherSubjects(); track subject.id; let i = $index) {
+                <div
+                  class="flex items-center gap-3 p-3 bg-base-200/30 rounded-xl border border-transparent hover:border-base-300/50 transition-all">
+                  <span class="text-[10px] font-bold text-base-content/30">{{ i + 1 }}.</span>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-base-content leading-tight">{{ subject.name_or_business_name }}</p>
+                    @if (subject.subject_type) {
+                    <p class="text-[10px] font-medium text-base-content/45 mt-0.5">{{ subject.subject_type }}</p>
+                    }
+                  </div>
+                </div>
+                }
+              </div>
+            </div>
+            }
+            } @else {
+            <div class="space-y-2 mt-3">
+              @for (subject of subjects(); track subject.id; let i = $index) {
+              <div
+                class="flex items-center gap-3 p-3 bg-base-200/30 rounded-xl border border-transparent hover:border-base-300/50 transition-all">
+                <span class="text-[10px] font-bold text-base-content/30">{{ i + 1 }}.</span>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-semibold text-base-content leading-tight">{{ subject.name_or_business_name }}</p>
+                  @if (subject.subject_type) {
+                  <p class="text-[10px] font-medium text-base-content/45 mt-0.5">{{ subject.subject_type }}</p>
+                  }
+                </div>
+              </div>
+              }
             </div>
             }
           </div>
