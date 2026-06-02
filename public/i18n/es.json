@@ -245,6 +245,7 @@
       "status": "Estado",
       "plaintiff": "Demandante (S)",
       "defendant": "Demandado (S)",
+      "otherSubjects": "Otros sujetos",
       "multipleInstances": "Múltiples instancias",
       "processDate": "Fecha de registro",
       "lastActivityDate": "Fecha última actuación",

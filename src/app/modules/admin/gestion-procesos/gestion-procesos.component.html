@@ -419,6 +419,17 @@
                   }
                 </span>
               </div>
+              <div class="flex flex-col">
+                <span class="text-[10px] text-base-content/50 uppercase font-bold tracking-wider mb-1">{{
+                  'gestionProcesos.table.otherSubjects' | transloco }}:</span>
+                @let othersDisplayMobile = getPartyDisplay(getOthersList(process));
+                <span class="text-base-content/80 font-medium break-words leading-snug">
+                  {{ othersDisplayMobile.mainText || '–' }}
+                  @if (othersDisplayMobile.extraCount > 0) {
+                  <span class="text-primary font-bold">(+{{ othersDisplayMobile.extraCount }})</span>
+                  }
+                </span>
+              </div>
             </div>
           </div>
 
@@ -706,6 +717,31 @@
                 <span class="text-base-content/50">–</span>
                 }
               </td>
+              <td class="align-middle">
+                @let othersDisplay = getPartyDisplay(getOthersList(process));
+                @if (othersDisplay.mainText || othersDisplay.extraCount > 0) {
+                <span>
+                  {{ othersDisplay.mainText }}
+                  @if (othersDisplay.extraCount > 0) {
+                  <span class="tooltip tooltip-top tooltip-primary process-list-tooltip"
+                    (click)="$event.stopPropagation()">
+                    <div
+                      class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
+                      @for (name of othersDisplay.fullList; track name; let i = $index) {
+                      <div class="text-base-content">{{ i + 1 }}. {{ name }}</div>
+                      }
+                    </div>
+                    <span
+                      class="text-primary font-bold cursor-pointer whitespace-nowrap underline decoration-primary/50 decoration-dotted underline-offset-1">
+                      (+{{ othersDisplay.extraCount }})
+                    </span>
+                  </span>
+                  }
+                </span>
+                } @else {
+                <span class="text-base-content/50">–</span>
+                }
+              </td>
               <td class="text-center align-middle">
                 <span class="badge badge-sm font-bold" [class.badge-primary]="getInstanceCount(process) > 1"
                   [class.badge-ghost]="getInstanceCount(process) <= 1"
@@ -854,6 +890,31 @@
                     <span
                       class="text-primary font-bold cursor-pointer whitespace-nowrap underline decoration-primary/50 decoration-dotted underline-offset-1">
                       (+{{ instDef.extraCount }})
+                    </span>
+                  </span>
+                  }
+                </span>
+                } @else {
+                <span class="text-base-content/50">–</span>
+                }
+              </td>
+              <td class="align-middle">
+                @let instOthers = getPartyDisplay(getOthersList(instance));
+                @if (instOthers.mainText || instOthers.extraCount > 0) {
+                <span>
+                  {{ instOthers.mainText }}
+                  @if (instOthers.extraCount > 0) {
+                  <span class="tooltip tooltip-top tooltip-primary process-list-tooltip"
+                    (click)="$event.stopPropagation()">
+                    <div
+                      class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
+                      @for (name of instOthers.fullList; track name; let i = $index) {
+                      <div class="text-base-content">{{ i + 1 }}. {{ name }}</div>
+                      }
+                    </div>
+                    <span
+                      class="text-primary font-bold cursor-pointer whitespace-nowrap underline decoration-primary/50 decoration-dotted underline-offset-1">
+                      (+{{ instOthers.extraCount }})
                     </span>
                   </span>
                   }
