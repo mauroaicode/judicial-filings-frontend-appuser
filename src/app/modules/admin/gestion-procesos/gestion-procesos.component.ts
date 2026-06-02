@@ -180,6 +180,11 @@ export class GestionProcesosComponent {
       width: '200px',
     },
     {
+      key: 'other_subjects',
+      label: 'gestionProcesos.table.otherSubjects',
+      width: '200px',
+    },
+    {
       key: 'has_multiple_instances',
       label: 'gestionProcesos.table.multipleInstances',
       width: '150px',
@@ -505,6 +510,14 @@ export class GestionProcesosComponent {
     const extraCount = arr.length - 1;
     const tooltipText = arr.map((name, i) => `${i + 1}. ${name}`).join('\n');
     return { mainText, extraCount, tooltipText, fullList: arr };
+  }
+
+  getOthersList(row: { others?: string[]; other_subject?: string | null }): string[] {
+    if (row.others?.length) {
+      return row.others;
+    }
+    const single = row.other_subject?.trim();
+    return single ? [single.replace(/\s*\(\+\d+\)\s*$/i, '').trim()].filter(Boolean) : [];
   }
 
   /**

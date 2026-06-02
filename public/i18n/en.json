@@ -241,6 +241,7 @@
       "status": "Status",
       "plaintiff": "Plaintiff (S)",
       "defendant": "Defendant (S)",
+      "otherSubjects": "Other subjects",
       "multipleInstances": "Multiple instances",
       "processDate": "Registration date",
       "lastActivityDate": "Last activity date"
