@@ -14,6 +14,14 @@ declare interface Env {
   readonly NG_APP_REVERB_HOST: string;
   readonly NG_APP_REVERB_PORT: string;
   readonly NG_APP_REVERB_SCHEME: string;
+  readonly NG_APP_VOICE_STT_PROVIDER: string;
+  readonly NG_APP_VOICE_TTS_PROVIDER: string;
+  readonly NG_APP_DEEPINFRA_TRANSCRIPTIONS_URL: string;
+  readonly NG_APP_DEEPINFRA_STT_MODEL: string;
+  readonly NG_APP_DEEPINFRA_API_KEY: string;
+  readonly NG_APP_DEEPGRAM_TTS_URL: string;
+  readonly NG_APP_DEEPGRAM_TTS_MODEL: string;
+  readonly NG_APP_DEEPGRAM_API_KEY: string;
   readonly NG_APP_OMNIVOICE_TRANSCRIBE_URL: string;
   readonly NG_APP_OMNIVOICE_TTS_WS_URL: string;
   readonly NG_APP_OMNIVOICE_TTS_VOICE_ID: string;

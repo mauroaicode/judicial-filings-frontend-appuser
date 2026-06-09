@@ -1,4 +1,4 @@
-<div class="w-full space-y-6">
+<div class="w-full space-y-4">
   @if (loading()) {
   <div class="flex justify-center items-center min-h-[200px]">
     <span class="loading loading-spinner loading-lg text-primary"></span>
@@ -16,102 +16,118 @@
   }
 
   @if (!loading() && !error()) {
-  <div class="space-y-4">
-    <!-- 1. Tarjetas Críticas (Siempre visibles en 2 columnas en móvil) -->
-    @if (importantCards().length > 0) {
-    <div class="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4 sm:gap-5">
-      @for (card of importantCards(); track card.type) {
-      <ng-container *ngTemplateOutlet="cardTemplate; context: { $implicit: card }"></ng-container>
-      }
-    </div>
-    }
+  <!-- Row 1: Notificaciones + Alertas (2 cols, full-width, clickable) -->
+  @if (importantCards().length > 0) {
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    @for (card of importantCards(); track card.type) {
 
-    <!-- 2. Tarjetas Informativas (Carrusel en móvil, Grid en escritorio) -->
-    @if (regularCards().length > 0) {
     <div
-      class="flex overflow-x-auto pb-4 gap-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:overflow-x-visible sm:pb-0 sm:gap-5">
-      @for (card of regularCards(); track card.type) {
-      <div class="flex-none w-[240px] sm:w-auto snap-center h-full">
-        <ng-container *ngTemplateOutlet="cardTemplate; context: { $implicit: card }"></ng-container>
+      class="stats-card--important group relative overflow-hidden rounded-2xl sm:rounded-3xl border-0 cursor-pointer transition-all duration-200 hover:-translate-y-0.5"
+      [class]="card.type === 'actuacion' ? 'bg-sky-50 shadow-[0_8px_28px_-8px_rgba(3,105,161,0.18)]' : 'bg-amber-50 shadow-[0_8px_28px_-8px_rgba(245,158,11,0.22)]'"
+      [attr.role]="'button'"
+      [attr.tabindex]="0"
+      [attr.aria-label]="(card.labelKey | transloco) + ': ' + card.value"
+      (click)="onCardClick(card)"
+      (keydown.enter)="onCardClick(card)"
+      (keydown.space)="onCardClick(card); $event.preventDefault()"
+    >
+      <div class="p-5 sm:p-6 flex items-start justify-between gap-4">
+        <div class="flex flex-col gap-2 min-w-0">
+          <div class="flex items-center gap-2">
+            <!-- colored dot indicator -->
+            <span
+              class="h-2 w-2 rounded-full shrink-0"
+              [class]="card.type === 'actuacion' ? 'bg-sky-500' : 'bg-amber-500'"
+            ></span>
+            <p
+              class="text-xs font-semibold tracking-wide uppercase"
+              [class]="card.type === 'actuacion' ? 'text-sky-700' : 'text-amber-700'"
+            >
+              {{ card.labelKey | transloco }}
+            </p>
+          </div>
+          <p
+            class="text-4xl font-bold tabular-nums leading-none"
+            [class]="card.type === 'actuacion' ? 'text-sky-900' : 'text-amber-900'"
+          >
+            {{ card.value }}
+          </p>
+          <span
+            class="inline-flex items-center gap-1 self-start text-xs font-semibold px-3 py-1 rounded-xl border transition-colors"
+            [class]="card.type === 'actuacion'
+              ? 'bg-white/60 text-sky-700 border-sky-200 group-hover:bg-sky-600 group-hover:text-white group-hover:border-sky-600'
+              : 'bg-white/60 text-amber-700 border-amber-200 group-hover:bg-amber-500 group-hover:text-white group-hover:border-amber-500'"
+          >
+            {{ 'dashboard.stats.viewDetail' | transloco }}
+          </span>
+        </div>
+        <div
+          class="kpi-icon-box shrink-0"
+          [class]="card.type === 'actuacion' ? 'bg-sky-100 text-sky-600' : 'bg-amber-100 text-amber-600'"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
+            @if (card.type === 'actuacion') {
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            } @else {
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            }
+          </svg>
+        </div>
       </div>
-      }
     </div>
+
     }
   </div>
   }
 
-  <!-- Template reutilizable para la tarjeta -->
-  <ng-template #cardTemplate let-card>
-    <div
-      class="stats-card flex flex-col bg-base-100 border border-base-200 rounded-xl shadow-sm p-4 sm:p-6 min-h-[140px] sm:min-h-[160px] transition-all h-full"
-      [class.stats-card--clickable]="card.clickable" [class]="card.clickable ? 'card-' + card.type : ''"
-      [class.hover:shadow-md]="card.clickable" [class.hover:border-primary/30]="card.clickable"
-      [attr.role]="card.clickable ? 'button' : 'group'" [attr.tabindex]="card.clickable ? 0 : -1"
-      [attr.aria-label]="(card.labelKey | transloco) + ': ' + card.value" (click)="onCardClick(card)"
-      (keydown.enter)="card.clickable && onCardClick(card)"
-      (keydown.space)="card.clickable && onCardClick(card); $event.preventDefault()">
-      <!-- Icono arriba, centrado -->
-      <div class="flex justify-center mb-3">
-        <span
-          class="icon-container flex items-center justify-center w-11 h-11 rounded-xl bg-base-200 transitioning-colors"
-          [class]="card.valueClass">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-            class="w-6 h-6 stroke-[1.8]">
-            @switch (card.type) {
-            @case ('total_processes') {
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            }
-            @case ('active_processes') {
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            }
-            @case ('inactive_processes') {
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            }
-            @case ('processes_with_multiple_instances') {
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M17 20h5V4H2v16h5m10 0v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6m10 0H7" />
-            }
-            @case ('actuacion') {
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            }
-            @case ('actuacion_alerta') {
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            }
-            @default {
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            }
-            }
-          </svg>
-        </span>
+  <!-- Row 2: Métricas de procesos (4 cols) -->
+  @if (regularCards().length > 0) {
+  <div
+    class="flex overflow-x-auto pb-3 gap-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:overflow-x-visible sm:pb-0 sm:gap-4">
+    @for (card of regularCards(); track card.type) {
+    <div class="flex-none w-[200px] sm:w-auto snap-center">
+      <div
+        class="card border-0 bg-base-100 rounded-2xl h-full shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_-6px_rgba(15,23,42,0.07)]"
+      >
+        <div class="card-body gap-2 p-4 sm:p-5">
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="h-2 w-2 rounded-full shrink-0" [class]="card.dotClass"></span>
+              <p class="text-xs font-semibold tracking-wide uppercase text-base-content/65">
+                {{ card.labelKey | transloco }}
+              </p>
+            </div>
+            <div class="kpi-icon-box bg-base-200 shrink-0" [class]="card.valueClass" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
+                @switch (card.type) {
+                @case ('total_processes') {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                }
+                @case ('active_processes') {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                }
+                @case ('inactive_processes') {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                }
+                @case ('processes_with_multiple_instances') {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-6a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                }
+                @default {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                }
+                }
+              </svg>
+            </div>
+          </div>
+          <p class="text-3xl font-bold tabular-nums leading-none text-base-content" [class]="card.valueClass">
+            {{ card.value }}
+          </p>
+          <p class="text-xs text-base-content/55">{{ card.subtitleKey | transloco }}</p>
+        </div>
       </div>
-      <!-- Título -->
-      <p class="text-[13px] sm:text-sm font-medium text-base-content/70 text-center leading-tight">
-        {{ card.labelKey | transloco }}
-      </p>
-      <!-- Valor -->
-      <p class="stats-card__value text-xl sm:text-2xl font-bold tabular-nums text-center mt-1 flex-1"
-        [class]="card.valueClass">
-        {{ card.value }}
-      </p>
-      <!-- Acción solo en tarjetas clickeables -->
-      @if (card.clickable) {
-      <div class="stats-card__action mt-2 pt-2 border-t border-base-200 cursor-pointer">
-        <span class="text-[10px] sm:text-xs font-semibold link link-hover block text-center" [class]="card.valueClass">
-          {{ 'dashboard.stats.viewDetail' | transloco }}
-        </span>
-      </div>
-      }
     </div>
-  </ng-template>
-
-  @if (!loading() && !error() && regularCards().length === 0 && importantCards().length === 0) {
-  <div class="text-center py-8 text-base-content/70">
-    {{ 'dashboard.stats.empty' | transloco }}
+    }
   </div>
+  }
   }
 </div>

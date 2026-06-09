@@ -113,13 +113,19 @@
     "stats": {
       "title": "Estadísticas del dashboard",
       "totalProcesses": "Total de procesos",
+      "totalProcessesSubtitle": "Radicados registrados",
       "activeProcesses": "Procesos activos",
+      "activeProcessesSubtitle": "En seguimiento activo",
       "inactiveProcesses": "Procesos inactivos",
-      "multipleInstancesTotal": "Total Multiple instancia",
+      "inactiveProcessesSubtitle": "Sin actividad reciente",
+      "multipleInstancesTotal": "Doble instancia",
+      "multipleInstancesSubtitle": "Casos en tránsito de instancia",
       "notifications": {
         "actuacion": "Notificaciones por actuación",
+        "actuacionSubtitle": "Nuevas actuaciones registradas",
         "sujetoProcesal": "Notificaciones por sujeto procesal",
-        "actuacionAlerta": "Alertas de actuación"
+        "actuacionAlerta": "Alertas de actuación",
+        "actuacionAlertaSubtitle": "Riesgo legal inminente"
       },
       "viewDetail": "Ver detalle",
       "empty": "No hay estadísticas disponibles"

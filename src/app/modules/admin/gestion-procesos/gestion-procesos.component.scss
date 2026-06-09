@@ -100,7 +100,7 @@
     position: sticky !important;
     top: var(--table-sticky-top) !important;
     z-index: 10 !important; /* Header por encima del body sticky */
-    background-color: #24163E !important;
+    background-color: #4B2A7D !important;
     color: #ffffff !important;
     font-weight: 700 !important;
     font-size: 13px !important;
@@ -108,14 +108,14 @@
     white-space: nowrap !important;
     padding: 1rem !important;
     transform: none !important;
-    box-shadow: 0 0 0 0.5px #24163E !important;
+    box-shadow: 0 0 0 0.5px #4B2A7D !important;
   }
 
   thead th.sticky-col-idx {
     left: -1px !important;
     z-index: 11 !important;
     transform: none !important;
-    box-shadow: 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
+    box-shadow: 1px 0 0 0 #4B2A7D, 0 0 0 0.5px #4B2A7D !important;
     border: none !important;
   }
 
@@ -123,7 +123,7 @@
     left: 47px !important; 
     z-index: 11 !important;
     transform: none !important;
-    box-shadow: 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
+    box-shadow: 1px 0 0 0 #4B2A7D, 0 0 0 0.5px #4B2A7D !important;
     border: none !important;
   }
 
@@ -134,7 +134,7 @@
     max-width: 340px !important;
     width: 340px !important;
     transform: none !important;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1), 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1), 1px 0 0 0 #4B2A7D, 0 0 0 0.5px #4B2A7D !important;
     border: none !important;
   }
 

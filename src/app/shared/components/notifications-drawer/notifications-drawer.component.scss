@@ -10,7 +10,6 @@
   pointer-events: none;
 }
 
-// When open: drawer root receives clicks (overlay + panel). When closed: no clicks (so page is clickable).
 .notifications-drawer-root {
   position: fixed !important;
   inset: 0 !important;
@@ -24,12 +23,10 @@
   pointer-events: auto;
 }
 
-// Prevent scroll on content behind drawer
 body.notifications-drawer-body-open {
   overflow: hidden;
 }
 
-// Drawer side y panel a altura completa para que el scroll sea interno (header fijo)
 .notifications-drawer-root .drawer-side {
   height: 100%;
   max-height: 100vh;
@@ -40,66 +37,146 @@ body.notifications-drawer-body-open {
   max-height: 100vh;
 }
 
-// Header fijo: sombra sutil para separar del contenido que hace scroll por debajo
 .notifications-drawer-header {
-  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 0 hsl(var(--bc) / 0.05);
   z-index: 10;
 }
 
-// List-based layout (Clean, minimal rows)
-.notifications-drawer-item {
-  background-color: transparent !important;
-  border-left: none !important;
-  border-right: none !important;
-  border-top: none !important;
-  box-shadow: none !important;
-  transition: background-color 0.2s ease;
-  
-  &:last-child {
-    border-bottom: none !important;
-  }
-  
+.notifications-drawer-header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.875rem;
+  background-color: hsl(var(--p) / 0.1);
+  color: hsl(var(--p));
+}
+
+// ─── CARD ─────────────────────────────────────────────────────────
+.notifications-drawer-card {
+  background-color: hsl(var(--b1)) !important;
+  border: none !important;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 16px -4px rgba(15, 23, 42, 0.07) !important;
+  transition: box-shadow 0.15s ease, background-color 0.15s ease;
+
   &:hover {
-    background-color: hsl(var(--bc) / 0.02) !important;
-    transform: none !important;
-    box-shadow: none !important;
+    box-shadow:
+      0 2px 4px rgba(15, 23, 42, 0.05),
+      0 8px 24px -6px rgba(15, 23, 42, 0.1) !important;
+  }
+
+  &--selected {
+    background-color: #F3F0F9 !important;
+
+    .notifications-drawer-card-header {
+      background-color: hsl(var(--p) / 0.06) !important;
+    }
   }
 }
 
-// Keyword highlight refinement (Standardized for Drawer)
-.notifications-drawer-item {
+.notifications-drawer-card-header {
+  background-color: hsl(var(--b2) / 0.45);
+  border: none !important;
+}
+
+.notifications-drawer-radicado {
+  font-variant-numeric: tabular-nums;
+}
+
+.notifications-drawer-scroll {
+  scroll-behavior: smooth;
+  background-color: hsl(var(--b2) / 0.25);
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: hsl(var(--bc) / 0.1);
+    border-radius: 10px;
+
+    &:hover {
+      background: hsl(var(--bc) / 0.18);
+    }
+  }
+}
+
+// Mismo tooltip que gestión de procesos (semáforo / sujetos)
+.process-list-tooltip {
+  position: relative !important;
+  display: inline-flex !important;
+
+  .tooltip-content {
+    position: absolute !important;
+    bottom: 140% !important;
+    left: 50% !important;
+    transform: translateX(-50%) translateY(4px) !important;
+    white-space: normal !important;
+    width: max-content !important;
+    max-width: 280px !important;
+    z-index: 10050 !important;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.15s ease-out;
+    pointer-events: none;
+    background-color: #ffffff !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    padding: 1rem !important;
+    border-radius: 0.75rem !important;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #ffffff;
+      z-index: 101;
+    }
+  }
+
+  &:hover .tooltip-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0) !important;
+    pointer-events: auto;
+  }
+
+  &.tooltip-left-aligned {
+    .tooltip-content {
+      left: 0 !important;
+      transform: translateY(4px) !important;
+
+      &::after {
+        left: 0.75rem !important;
+        transform: none !important;
+      }
+    }
+
+    &:hover .tooltip-content {
+      transform: translateY(0) !important;
+    }
+  }
+}
+
+.notifications-drawer-card {
   ::ng-deep .alert-highlight {
-    background-color: #FFF9E6 !important; // Light gold/amber
-    color: #92400E !important; // Dark amber text
+    background-color: #FFF9E6 !important;
+    color: #92400E !important;
     font-weight: 700 !important;
-    padding: 1px 4px !important;
-    border-radius: 4px !important;
-    border: 1px solid rgba(245, 158, 11, 0.2) !important;
+    padding: 1px 5px !important;
+    border-radius: 5px !important;
+    border: 1px solid rgba(245, 158, 11, 0.25) !important;
     text-transform: none;
     font-size: 0.95em;
   }
 }
-
-// Background for annotation snippets
-.bg-base-50 {
-  background-color: hsl(var(--bc) / 0.02);
-}
-
-.bg-base-50\/30 {
-  background-color: hsl(var(--bc) / 0.012);
-}
-
-// Empty state improvements
-.notifications-drawer-scroll {
-  scroll-behavior: smooth;
-  
-  &::-webkit-scrollbar {
-    width: 5px;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: hsl(var(--bc) / 0.08);
-    border-radius: 10px;
-  }
-}
-
