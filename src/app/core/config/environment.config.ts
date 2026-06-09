@@ -1,16 +1,25 @@
 import type { VoiceSttProviderId, VoiceTtsProviderId } from './voice-providers.types';
 
-function voiceSttProvider(): VoiceSttProviderId {
-  const raw = (import.meta.env.NG_APP_VOICE_STT_PROVIDER || '').toLowerCase();
-  if (raw === 'omnivoice' || raw === 'deepinfra') return raw;
-  return 'deepinfra';
+function resolveVoiceProvider<T extends string>(
+  value: string | undefined,
+  allowed: readonly T[],
+  fallback: T,
+): T {
+  const raw = (value || '').toLowerCase();
+  return (allowed as readonly string[]).includes(raw) ? (raw as T) : fallback;
 }
 
-function voiceTtsProvider(): VoiceTtsProviderId {
-  const raw = (import.meta.env.NG_APP_VOICE_TTS_PROVIDER || '').toLowerCase();
-  if (raw === 'omnivoice' || raw === 'deepgram') return raw;
-  return 'deepgram';
-}
+const voiceSttProvider = resolveVoiceProvider<VoiceSttProviderId>(
+  import.meta.env.NG_APP_VOICE_STT_PROVIDER,
+  ['deepinfra', 'omnivoice'],
+  'deepinfra',
+);
+
+const voiceTtsProvider = resolveVoiceProvider<VoiceTtsProviderId>(
+  import.meta.env.NG_APP_VOICE_TTS_PROVIDER,
+  ['deepgram', 'omnivoice'],
+  'deepgram',
+);
 
 export const environment = {
   systemName: import.meta.env.NG_APP_SYSTEM_NAME || 'Tribunal de Ética Médica',
@@ -30,8 +39,8 @@ export const environment = {
     scheme: import.meta.env.NG_APP_REVERB_SCHEME || 'http',
   },
   voice: {
-    sttProvider: voiceSttProvider(),
-    ttsProvider: voiceTtsProvider(),
+    sttProvider: voiceSttProvider,
+    ttsProvider: voiceTtsProvider,
     deepinfra: {
       transcriptionsUrl:
         import.meta.env.NG_APP_DEEPINFRA_TRANSCRIPTIONS_URL ||
