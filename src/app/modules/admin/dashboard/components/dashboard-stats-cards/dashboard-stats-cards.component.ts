@@ -16,8 +16,12 @@ export interface DashboardStatsCardItem {
   type: DashboardStatsCardType;
   value: number;
   labelKey: string;
+  /** i18n key for the small subtitle below the value (regular cards only) */
+  subtitleKey: string;
   /** DaisyUI class for value and icon (e.g. text-primary, text-error) */
   valueClass: string;
+  /** Tailwind class for the colored dot indicator */
+  dotClass: string;
   /** Accessible and clickable (opens notifications drawer) */
   clickable: boolean;
 }
@@ -58,42 +62,54 @@ export class DashboardStatsCardsComponent {
         type: 'total_processes',
         value: s.total_processes,
         labelKey: 'dashboard.stats.totalProcesses',
+        subtitleKey: 'dashboard.stats.totalProcessesSubtitle',
         valueClass: 'text-warning',
+        dotClass: 'bg-warning',
         clickable: false,
       },
       {
         type: 'active_processes',
         value: s.active_processes,
         labelKey: 'dashboard.stats.activeProcesses',
+        subtitleKey: 'dashboard.stats.activeProcessesSubtitle',
         valueClass: 'text-success',
+        dotClass: 'bg-success',
         clickable: false,
       },
       {
         type: 'inactive_processes',
         value: s.inactive_processes,
         labelKey: 'dashboard.stats.inactiveProcesses',
+        subtitleKey: 'dashboard.stats.inactiveProcessesSubtitle',
         valueClass: 'text-error',
+        dotClass: 'bg-error',
         clickable: false,
       },
       {
         type: 'processes_with_multiple_instances',
         value: s.processes_with_multiple_instances ?? 0,
         labelKey: 'dashboard.stats.multipleInstancesTotal',
+        subtitleKey: 'dashboard.stats.multipleInstancesSubtitle',
         valueClass: 'text-secondary',
+        dotClass: 'bg-secondary',
         clickable: false,
       },
       {
         type: 'actuacion',
         value: byType.actuacion,
         labelKey: 'dashboard.stats.notifications.actuacion',
+        subtitleKey: 'dashboard.stats.notifications.actuacionSubtitle',
         valueClass: 'text-info',
+        dotClass: 'bg-sky-500',
         clickable: true,
       },
       {
         type: 'actuacion_alerta',
         value: byType.actuacion_alerta,
         labelKey: 'dashboard.stats.notifications.actuacionAlerta',
+        subtitleKey: 'dashboard.stats.notifications.actuacionAlertaSubtitle',
         valueClass: 'text-warning',
+        dotClass: 'bg-amber-500',
         clickable: true,
       },
     ];

@@ -22,17 +22,18 @@ import {
 } from '@app/core/models/notification/organization-notification.model';
 import { buildTextWithHighlights } from '@app/core/utils/alert-highlight.utils';
 import { SafeHtmlPipe } from '@app/shared/pipes/safe-html.pipe';
+import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
 import { ConfirmationDialogComponent } from '@app/shared/components/confirmation-dialog/confirmation-dialog.component';
 
 const PER_PAGE = 20;
 const SCROLL_LOAD_THRESHOLD = 200;
-const MAX_SUBJECTS_PREVIEW = 3;
+const MAX_OTROS_SUBJECTS_PREVIEW = 3;
 const TOAST_DURATION_MS = 4_000;
 
 @Component({
   selector: 'app-notifications-drawer',
   standalone: true,
-  imports: [CommonModule, TranslocoPipe, SafeHtmlPipe, ConfirmationDialogComponent],
+  imports: [CommonModule, TranslocoPipe, SafeHtmlPipe, ProcessNumberPipe, ConfirmationDialogComponent],
   templateUrl: './notifications-drawer.component.html',
   styleUrls: ['./notifications-drawer.component.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -82,6 +83,7 @@ export class NotificationsDrawerComponent implements OnDestroy {
   readonly markingInProgress = signal<boolean>(false);
   /** Success message after marking selected (e.g. "Se marcaron 2 como vistas") */
   readonly markedCountMessage = signal<string | null>(null);
+  readonly toastIsError = signal<boolean>(false);
 
   readonly selectedCount = computed(() => this.selectedIds().size);
 
@@ -95,6 +97,7 @@ export class NotificationsDrawerComponent implements OnDestroy {
         this.expandedSubjectRows.set(new Set());
         this.selectedIds.set(new Set());
         this.markedCountMessage.set(null);
+        this.toastIsError.set(false);
         this.loadNotifications(type, 1, false);
         document.body.classList.add('notifications-drawer-body-open');
       } else {
@@ -136,6 +139,70 @@ export class NotificationsDrawerComponent implements OnDestroy {
     this.rowClick.emit(row);
   }
 
+  onItemDblClick(row: OrganizationNotificationRow): void {
+    this.rowClick.emit(row);
+  }
+
+  getRemainingSubjectsTooltip(row: OrganizationNotificationRow): string {
+    return this._formatSubjectsTooltip(this.getOtrosSubjects(row).slice(MAX_OTROS_SUBJECTS_PREVIEW));
+  }
+
+  getMainSubjectGroups(row: OrganizationNotificationRow): {
+    label: string;
+    subjects: OrganizationNotificationSubject[];
+    showType: boolean;
+  }[] {
+    return this.getGroupedSubjects(row).filter(g => g.label !== 'Otros sujetos');
+  }
+
+  getOtrosSubjects(row: OrganizationNotificationRow): OrganizationNotificationSubject[] {
+    const list = row.subjects ?? [];
+    return list.filter(s =>
+      !s.type.toLowerCase().includes('demandante') &&
+      !s.type.toLowerCase().includes('demandado'),
+    );
+  }
+
+  getVisibleOtrosSubjects(row: OrganizationNotificationRow): OrganizationNotificationSubject[] {
+    return this.getOtrosSubjects(row).slice(0, MAX_OTROS_SUBJECTS_PREVIEW);
+  }
+
+  getRemainingOtrosSubjects(row: OrganizationNotificationRow): OrganizationNotificationSubject[] {
+    return this.getOtrosSubjects(row).slice(MAX_OTROS_SUBJECTS_PREVIEW);
+  }
+
+  getRemainingOtrosSubjectsCount(row: OrganizationNotificationRow): number {
+    const total = this.getOtrosSubjects(row).length;
+    return total > MAX_OTROS_SUBJECTS_PREVIEW ? total - MAX_OTROS_SUBJECTS_PREVIEW : 0;
+  }
+
+  getRemainingOtrosSubjectsTooltip(row: OrganizationNotificationRow): string {
+    return this._formatSubjectsTooltip(this.getOtrosSubjects(row).slice(MAX_OTROS_SUBJECTS_PREVIEW));
+  }
+
+  private _formatSubjectsTooltip(subjects: OrganizationNotificationSubject[]): string {
+    return subjects.map(s => `${s.name} · ${s.type}`).join('\n');
+  }
+
+  getGroupedSubjects(row: OrganizationNotificationRow): {
+    label: string;
+    subjects: OrganizationNotificationSubject[];
+    showType: boolean;
+  }[] {
+    const list = row.subjects ?? [];
+    const demandantes = list.filter(s => s.type.toLowerCase().includes('demandante'));
+    const demandados  = list.filter(s => s.type.toLowerCase().includes('demandado'));
+    const otros       = list.filter(s =>
+      !s.type.toLowerCase().includes('demandante') &&
+      !s.type.toLowerCase().includes('demandado'),
+    );
+    const groups: { label: string; subjects: OrganizationNotificationSubject[]; showType: boolean }[] = [];
+    if (demandantes.length > 0) groups.push({ label: 'Demandante(s)', subjects: demandantes, showType: false });
+    if (demandados.length  > 0) groups.push({ label: 'Demandado(s)',  subjects: demandados,  showType: false });
+    if (otros.length       > 0) groups.push({ label: 'Otros sujetos', subjects: otros,        showType: true  });
+    return groups;
+  }
+
   formatDate(value: string): string {
     return this._formatDate(value);
   }
@@ -174,13 +241,13 @@ export class NotificationsDrawerComponent implements OnDestroy {
     const list = row.subjects ?? [];
     if (list.length === 0) return [];
     const expanded = this.expandedSubjectRows().has(row.id);
-    return expanded ? list : list.slice(0, MAX_SUBJECTS_PREVIEW);
+    return expanded ? list : list.slice(0, MAX_OTROS_SUBJECTS_PREVIEW);
   }
 
   getRemainingSubjectsCount(row: OrganizationNotificationRow): number {
     const list = row.subjects ?? [];
-    if (list.length <= MAX_SUBJECTS_PREVIEW) return 0;
-    return list.length - MAX_SUBJECTS_PREVIEW;
+    if (list.length <= MAX_OTROS_SUBJECTS_PREVIEW) return 0;
+    return list.length - MAX_OTROS_SUBJECTS_PREVIEW;
   }
 
   isSelected(rowId: string): boolean {
@@ -231,6 +298,7 @@ export class NotificationsDrawerComponent implements OnDestroy {
 
   onConfirmMarkViewed(): void {
     const kind = this.confirmKind();
+    const selectedIdsToMark = kind === 'markSelected' ? Array.from(this.selectedIds()) : [];
     this.confirmOpen.set(false);
     this.confirmKind.set(null);
     if (!kind) return;
@@ -244,16 +312,24 @@ export class NotificationsDrawerComponent implements OnDestroy {
       this._notificationService.markAllViewed(type).subscribe({
         next: () => {
           this.markingInProgress.set(false);
+          this.selectedIds.set(new Set());
           this._dashboardService.loadStats();
           this.loadNotifications(type, 1, false);
         },
-        error: () => this.markingInProgress.set(false),
+        error: (err) => {
+          this.markingInProgress.set(false);
+          this._showToast(err?.message ?? 'Error al marcar notificaciones', true);
+        },
       });
       return;
     }
 
-    const ids = Array.from(this.selectedIds());
-    this._notificationService.markViewed(ids).subscribe({
+    if (selectedIdsToMark.length === 0) {
+      this.markingInProgress.set(false);
+      return;
+    }
+
+    this._notificationService.markViewed(selectedIdsToMark).subscribe({
       next: (res) => {
         this.markingInProgress.set(false);
         this.selectedIds.set(new Set());
@@ -261,11 +337,13 @@ export class NotificationsDrawerComponent implements OnDestroy {
         const message = this._transloco.translate('notificationsDrawer.markedCountSuccess', {
           count: res.marked,
         });
-        this.markedCountMessage.set(message);
-        this._scheduleToastDismiss();
+        this._showToast(message, false);
         this.loadNotifications(type, 1, false);
       },
-      error: () => this.markingInProgress.set(false),
+      error: (err) => {
+        this.markingInProgress.set(false);
+        this._showToast(err?.message ?? 'Error al marcar notificaciones', true);
+      },
     });
   }
 
@@ -276,6 +354,12 @@ export class NotificationsDrawerComponent implements OnDestroy {
     }
   }
 
+  private _showToast(message: string, isError: boolean): void {
+    this.toastIsError.set(isError);
+    this.markedCountMessage.set(message);
+    this._scheduleToastDismiss();
+  }
+
   private _scheduleToastDismiss(): void {
     if (this._toastTimeoutId != null) {
       clearTimeout(this._toastTimeoutId);
@@ -283,6 +367,7 @@ export class NotificationsDrawerComponent implements OnDestroy {
     this._toastTimeoutId = setTimeout(() => {
       this._toastTimeoutId = null;
       this.markedCountMessage.set(null);
+      this.toastIsError.set(false);
     }, TOAST_DURATION_MS);
   }
 
@@ -308,12 +393,13 @@ export class NotificationsDrawerComponent implements OnDestroy {
     if (!text) return;
     
     navigator.clipboard.writeText(text).then(() => {
-      // Reuse the toast mechanism for feedback
       const originalMessage = this.markedCountMessage();
-      this.markedCountMessage.set(this._transloco.translate('notificationsDrawer.copiedToClipboard'));
-      
+      const originalIsError = this.toastIsError();
+      this._showToast(this._transloco.translate('notificationsDrawer.copiedToClipboard'), false);
+
       setTimeout(() => {
         this.markedCountMessage.set(originalMessage);
+        this.toastIsError.set(originalIsError);
       }, 2000);
     }).catch(err => {
       console.error('Could not copy text: ', err);

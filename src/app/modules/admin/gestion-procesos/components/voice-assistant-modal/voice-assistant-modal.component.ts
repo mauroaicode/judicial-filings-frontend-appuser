@@ -6,12 +6,21 @@
  *   standby → (speech detected) → listening [MediaRecorder capturing]
  *   listening → (silence 1.5 s) → transcribing [POST /transcribe]
  *   transcribing → thinking [POST /ai-chats/{id}/voice SSE]
- *   thinking → speaking [TTS buffer único por frase; voz wait + answer]
+ *   thinking → waiting   [TTS del wait sonando; answer en prefetch paralelo]
+ *   waiting  → preparingAnswer [wait terminó; esperando prefetch del answer]
+ *   preparingAnswer → speaking [answer listo; reproduciendo]
  *   speaking → standby [auto-cycle] o cierre si conversation_end / 10s sin voz
  *
  * Tap while standby/listening → deactivate → idle.
  * conversation_end (SSE) → TTS despedida → cerrar modal.
  * 10 s en standby sin hablar → cerrar modal.
+ *
+ * Optimizaciones de latencia (inspiradas en NotiJudicial-iOS):
+ *   • Prefetch: el HTTP TTS del answer arranca en cuanto llega el SSE `done`,
+ *     mientras el wait todavía suena → cero silencio entre wait y answer.
+ *   • Sentence chunker: el answer se divide en frases (~160 chars) para
+ *     que la primera frase se reproduzca antes aunque la respuesta sea larga.
+ *   • Normalización de pico (0.85) para volumen consistente entre frases.
  *
  * VAD: RMS energy via AnalyserNode + requestAnimationFrame loop.
  * No external packages required.
@@ -22,12 +31,11 @@ import {
   ChangeDetectionStrategy, inject, ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { environment } from '@app/core/config/environment.config';
-import {
-  resolveOmnivoiceHttpUrl,
-  resolveOmnivoiceWsUrl,
-} from '@app/core/utils/omnivoice-url.util';
 import { AiVoiceChatService } from 'src/app/core/services/ai-voice-chat/ai-voice-chat.service';
+import { VoiceSttService } from '@app/core/services/voice/voice-stt.service';
+import { VoiceTtsService } from '@app/core/services/voice/voice-tts.service';
+import { splitIntoTtsSentences } from '@app/core/services/voice/tts-sentence-chunker';
+import type { VoiceTtsSynthesisSession } from '@app/core/services/voice/voice-tts.types';
 
 export type VoiceState =
   | 'idle'
@@ -35,8 +43,16 @@ export type VoiceState =
   | 'listening'
   | 'transcribing'
   | 'thinking'
+  | 'waiting'
+  | 'preparingAnswer'
   | 'speaking'
   | 'error';
+
+interface TtsQueueItem {
+  text:      string;
+  kind:      'wait' | 'answer';
+  prefetch?: Promise<ArrayBuffer | null>;
+}
 
 @Component({
   selector: 'app-voice-assistant-modal',
@@ -54,6 +70,8 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
 
   private _cdr          = inject(ChangeDetectorRef);
   private _voiceService = inject(AiVoiceChatService);
+  private _voiceStt     = inject(VoiceSttService);
+  private _voiceTts     = inject(VoiceTtsService);
 
   // ── UI signals ────────────────────────────────────────────────
   state        = signal<VoiceState>('idle');
@@ -88,20 +106,22 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
   private ttsSessionComplete:       (() => void) | null = null;
   private ttsGain:                  GainNode | null = null;
 
-  /** Debounce tras JSON "done" para PCM tardíos (el WS de RunPod casi nunca se cierra solo). */
-  private static readonly TTS_TAIL_FLUSH_MS       = 160;
-  private static readonly TTS_TAIL_MAX_ATTEMPTS   = 4;
-  private static readonly TTS_DURATION_FILL_RATIO = 0.97;
-  private static readonly TTS_PHRASE_GAP_SEC        = 0.35;
-  private static readonly TTS_POST_PHRASE_PAUSE_MS = 300;
+  /** Debounce tras "done" para PCM tardíos (WS OmniVoice; REST Deepgram ya tiene todo). */
+  private static readonly TTS_TAIL_FLUSH_MS        = 60;
+  private static readonly TTS_TAIL_MAX_ATTEMPTS    = 3;
+  private static readonly TTS_DURATION_FILL_RATIO  = 0.97;
+  /** Silencio programado (AudioContext) entre wait y answer. */
+  private static readonly TTS_PHRASE_GAP_SEC       = 0.30;
+  private static readonly TTS_POST_PHRASE_PAUSE_MS = 200;
   /** Progress en pantalla; voz solo en wait + answer (menos espera total). */
   private static readonly TTS_SPEAK_PROGRESS_AUDIO = false;
 
-  // ── TTS WebSocket + cola (wait_message → respuesta) ───────────
-  private wsTTS: WebSocket | null = null;
-  private ttsQueue: string[] = [];
-  private ttsBusy  = false;
-  private ttsOnQueueEmpty: (() => void) | null = null;
+  // ── TTS (Deepgram REST u OmniVoice WS) + cola ─────────────────
+  private ttsSession:       VoiceTtsSynthesisSession | null = null;
+  private ttsQueue:         TtsQueueItem[]                  = [];
+  private _ttsCurrentKind:  'wait' | 'answer'               = 'wait';
+  private ttsBusy           = false;
+  private ttsOnQueueEmpty:  (() => void) | null             = null;
 
   // ── SSE voz (Laravel) ─────────────────────────────────────────
   private voiceStreamAbort: AbortController | null = null;
@@ -130,14 +150,6 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
   /** ms en standby sin hablar antes de cerrar el asistente. */
   private readonly STANDBY_SILENCE_MS = 10_000;
 
-  private get sttHttpUrl(): string {
-    return resolveOmnivoiceHttpUrl(environment.omnivoice.transcribeUrl);
-  }
-
-  private get ttsWsUrl(): string {
-    return resolveOmnivoiceWsUrl(environment.omnivoice.ttsWsUrl);
-  }
-
   // ── Lifecycle ─────────────────────────────────────────────────
   ngOnInit(): void {
     if (!this.chatId) {
@@ -156,7 +168,7 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
     this.clearTtsPlayTimer();
     this.voiceStreamAbort?.abort();
     this.deactivateVad(false);
-    this.closeTtsWs();
+    this.cancelTtsSession();
     this.closeAudioCtx();
   }
 
@@ -339,22 +351,8 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
     const audioBlob = new Blob(this.recordedChunks, { type: mimeType });
     this.recordedChunks = [];
 
-    console.log(`[STT] POST ${this.sttHttpUrl} — ${audioBlob.size} bytes`);
-
-    const formData = new FormData();
-    formData.append('audio', audioBlob, 'utterance.webm');
-    formData.append('mode', 'fast');
-
-    fetch(this.sttHttpUrl, { method: 'POST', body: formData })
-      .then(async res => {
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error((err as Record<string, string>)['detail'] ?? `HTTP ${res.status}`);
-        }
-        return res.json() as Promise<{ text: string }>;
-      })
-      .then(data => {
-        const text = (data.text ?? '').trim();
+    this._voiceStt.transcribe(audioBlob, mimeType)
+      .then(text => {
         console.log('[STT] ✅ Transcripción:', text);
 
         if (!text) {
@@ -408,7 +406,7 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
         console.log('[Voice] wait_message:', wait, eta != null ? `(~${eta}s)` : '');
         this.statusText.set(eta != null ? `${wait} (~${eta}s)` : wait);
         this._cdr.markForCheck();
-        this.queueTts(wait);
+        this.queueTts(wait, 'wait');
       },
 
       onProgress: (message, event) => {
@@ -430,7 +428,7 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
         this.statusText.set(text);
         this._cdr.markForCheck();
         if (VoiceAssistantModalComponent.TTS_SPEAK_PROGRESS_AUDIO) {
-          this.queueTts(text);
+          this.queueTts(text, 'wait');
         }
       },
 
@@ -480,7 +478,7 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
         };
 
         if (answer) {
-          this.queueTts(answer, afterAnswer);
+          this.queueAnswerChunks(answer, afterAnswer);
         } else if (conversationEnd) {
           this.completeConversationEnd();
         } else if (!this.ttsBusy && this.ttsQueue.length === 0) {
@@ -499,15 +497,17 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // TTS — cola secuencial (wait → progress… → answer)
+  // TTS — cola secuencial wait → answer (con prefetch y chunker)
   // ═══════════════════════════════════════════════════════════════
-  private queueTts(text: string, onAfter?: () => void): void {
+  private queueTts(
+    text:      string,
+    kind:      'wait' | 'answer',
+    onAfter?:  () => void,
+    prefetch?: Promise<ArrayBuffer | null>,
+  ): void {
     const trimmed = text.trim();
-    if (!trimmed) {
-      onAfter?.();
-      return;
-    }
-    this.ttsQueue.push(trimmed);
+    if (!trimmed) { onAfter?.(); return; }
+    this.ttsQueue.push({ text: trimmed, kind, prefetch });
     if (onAfter) {
       const prev = this.ttsOnQueueEmpty;
       this.ttsOnQueueEmpty = () => { prev?.(); onAfter(); };
@@ -515,12 +515,38 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
     this.processTtsQueue();
   }
 
+  /**
+   * Divide la respuesta en frases cortas y encola cada una con su propio
+   * prefetch HTTP disparado en paralelo.  La primera frase suena en cuanto
+   * termina el wait (sin HTTP blocking), las siguientes ya están listas.
+   */
+  private queueAnswerChunks(answer: string, onAfter?: () => void): void {
+    const sentences = splitIntoTtsSentences(answer);
+    if (sentences.length === 0) { onAfter?.(); return; }
+
+    console.log(`[TTS] chunker → ${sentences.length} frase(s); prefetch en paralelo`);
+    const prefetches = sentences.map(s => this._voiceTts.prefetch(s));
+
+    sentences.forEach((sentence, i) => {
+      const isLast = i === sentences.length - 1;
+      this.queueTts(sentence, 'answer', isLast ? onAfter : undefined, prefetches[i]);
+    });
+  }
+
   private processTtsQueue(): void {
     if (this.ttsBusy || this.ttsQueue.length === 0) return;
     this.ttsBusy = true;
-    const text      = this.ttsQueue.shift()!;
+    const { text, kind, prefetch } = this.ttsQueue.shift()!;
+    this._ttsCurrentKind = kind;
     const gapBefore = this.ttsPhrasesPlayed > 0;
     this.ttsPhrasesPlayed++;
+
+    if (kind === 'answer') {
+      this.state.set('preparingAnswer');
+      this.statusText.set('Preparando respuesta...');
+      this._cdr.markForCheck();
+    }
+
     this.runTtsSession(text, () => {
       this.ttsBusy = false;
       if (this.ttsQueue.length > 0) {
@@ -529,7 +555,7 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
         this.ttsOnQueueEmpty?.();
         this.ttsOnQueueEmpty = null;
       }
-    }, gapBefore);
+    }, gapBefore, prefetch);
   }
 
   private ensureTtsGain(): GainNode {
@@ -541,14 +567,19 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
     return this.ttsGain;
   }
 
-  private runTtsSession(text: string, onComplete: () => void, gapBefore = false): void {
+  private runTtsSession(
+    text:      string,
+    onComplete: () => void,
+    gapBefore  = false,
+    prefetch?: Promise<ArrayBuffer | null>,
+  ): void {
     if (!this.audioCtx) {
       onComplete();
       return;
     }
-    if (this.wsTTS) {
-      console.warn('[TTS] Cerrando WS de sesión anterior (no debía seguir abierto)');
-      this.closeTtsWs();
+    if (this.ttsSession) {
+      console.warn('[TTS] Cancelando sesión anterior (no debía seguir activa)');
+      this.cancelTtsSession();
     }
 
     this.clearTtsPlayTimer();
@@ -563,48 +594,70 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
     this.lastTtsSource             = null;
     this.ttsSessionComplete        = onComplete;
 
-    console.log('[TTS] Conectando...', text.slice(0, 80));
+    if (prefetch) {
+      // Ruta rápida: buffer ya descargado en paralelo con el wait
+      prefetch.then(pcm => {
+        if (!this.ttsSessionComplete) return; // sesión cancelada entretanto
+        if (pcm && pcm.byteLength > 0) {
+          const durS = pcm.byteLength / 2 / this.ttsSampleRate;
+          this.ttsExpectedDurationS = durS;
+          this.lastDuration.set(`${durS.toFixed(1)}s`);
+          this.ttsPcmBuffers.push(pcm);
+          this.ttsWsDoneReceived = true;
+          this.ttsWsClosed       = true;
+          console.log(`[TTS] Prefetch listo — ${pcm.byteLength} bytes (${durS.toFixed(2)}s)`);
+          this.schedulePhrasePlayback();
+        } else {
+          console.warn('[TTS] Prefetch nulo — síntesis directa');
+          this._startLiveSynthesis(text);
+        }
+      }).catch(() => this._startLiveSynthesis(text));
+      return;
+    }
 
+    this._startLiveSynthesis(text);
+  }
+
+  private _startLiveSynthesis(text: string): void {
     let chunkCount = 0;
-    this.wsTTS = new WebSocket(this.ttsWsUrl);
-    this.wsTTS.binaryType = 'arraybuffer';
-
-    this.wsTTS.onopen = () => {
-      console.log('[TTS] ✅ Conectado, enviando texto');
-      this.wsTTS!.send(JSON.stringify({
-        text,
-        voice:     environment.omnivoice.ttsVoiceId,
-        language:  'Spanish',
-        emo_alpha: 1.0,
-      }));
-    };
-
-    this.wsTTS.onmessage = (ev) => {
-      if (typeof ev.data === 'string') {
-        try {
-          this.handleTtsJson(JSON.parse(ev.data));
-        } catch { /* ignore */ }
-      } else if (ev.data instanceof ArrayBuffer) {
+    this.ttsSession = this._voiceTts.startSynthesis(text, {
+      onStart: sampleRate => {
+        this.ttsSampleRate = sampleRate;
+        this.statusText.set(
+          this._ttsCurrentKind === 'wait'
+            ? 'Lexa está pensando...'
+            : 'Preparando respuesta...',
+        );
+        this._cdr.markForCheck();
+      },
+      onPcmChunk: data => {
         chunkCount++;
-        console.log(`[TTS] Chunk #${chunkCount} — ${ev.data.byteLength} bytes (buffered)`);
-        this.ttsPcmBuffers.push(ev.data.slice(0));
+        console.log(`[TTS] Chunk #${chunkCount} — ${data.byteLength} bytes (buffered)`);
+        this.ttsPcmBuffers.push(data);
         if (this.ttsWsDoneReceived && !this.ttsPhrasePlaybackStarted) {
           this.schedulePhrasePlayback();
         }
-      }
-    };
-
-    this.wsTTS.onerror = () => {
-      this.clearTtsPlayTimer();
-      this.ttsPcmBuffers = [];
-      this.ttsWsClosed   = true;
-      this.finishTtsSession();
-      this.setError('Error en el servicio de voz.');
-    };
-    this.wsTTS.onclose = () => {
-      console.log('[TTS] WS cerrado');
-      this.ttsWsClosed = true;
-    };
+      },
+      onDone: durS => {
+        if (durS) {
+          this.ttsExpectedDurationS = durS;
+          this.lastDuration.set(`${durS.toFixed(1)}s`);
+        }
+        console.log(
+          `[TTS] DONE — chunks: ${this.ttsPcmBuffers.length}, samples: ${this.ttsBufferedSamples()}, dur: ${durS}s`,
+        );
+        this.ttsWsDoneReceived = true;
+        this.ttsWsClosed       = true;
+        this.schedulePhrasePlayback();
+      },
+      onError: detail => {
+        this.clearTtsPlayTimer();
+        this.ttsPcmBuffers = [];
+        this.ttsWsClosed   = true;
+        this.finishTtsSession();
+        this.setError(`Error TTS: ${detail}`);
+      },
+    });
   }
 
   private ttsBufferedSamples(): number {
@@ -659,25 +712,22 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
 
     if (this.ttsPcmBuffers.length === 0) {
       console.warn('[TTS] Sin audio en buffer');
-      this.closeTtsWsIfOpen();
+      this.cancelTtsSessionIfActive();
       this.finishTtsSession();
       return;
     }
 
     this.ttsPhrasePlaybackStarted = true;
-    this.closeTtsWsIfOpen();
+    this.cancelTtsSessionIfActive();
     console.log(
       `[TTS] ▶ Play — ${(buffered / this.ttsSampleRate).toFixed(2)}s, ${this.ttsPcmBuffers.length} chunks`,
     );
     this.playBufferedPhrase();
   }
 
-  /** RunPod suele dejar el WS abierto; lo cerramos nosotros para no bloquear la cola. */
-  private closeTtsWsIfOpen(): void {
-    if (!this.wsTTS) return;
-    const open = this.wsTTS.readyState === WebSocket.OPEN
-      || this.wsTTS.readyState === WebSocket.CONNECTING;
-    if (open) this.closeTtsWs();
+  /** OmniVoice suele dejar el WS abierto; lo cancelamos para no bloquear la cola. */
+  private cancelTtsSessionIfActive(): void {
+    if (this.ttsSession) this.cancelTtsSession();
   }
 
   /** Un único buffer por frase — sin cortes entre chunks WS. */
@@ -699,9 +749,20 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
     }
     this.ttsPcmBuffers = [];
 
+    // Normalización de pico (target 0.85, boost máx 3×) — volumen uniforme entre frases
+    let peak = 0;
+    for (let i = 0; i < float32.length; i++) {
+      const abs = Math.abs(float32[i]);
+      if (abs > peak) peak = abs;
+    }
+    if (peak > 0.001 && peak < 0.85) {
+      const peakGain = Math.min(0.85 / peak, 3.0);
+      for (let i = 0; i < float32.length; i++) float32[i] *= peakGain;
+    }
+
     const fadeIn = Math.min(64, Math.max(1, Math.floor(float32.length * 0.004)));
     for (let i = 0; i < fadeIn; i++) float32[i] *= i / fadeIn;
-    // Sin fade-out al final: en frases cortas (wait_message) comía la última sílaba.
+    // Sin fade-out: en frases cortas (wait_message) comía la última sílaba.
 
     const audioBuffer = this.audioCtx.createBuffer(1, float32.length, this.ttsSampleRate);
     audioBuffer.getChannelData(0).set(float32);
@@ -714,8 +775,8 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
       this.ttsNextPlayTime = now + 0.05;
     }
 
-    this.state.set('speaking');
-    this.statusText.set('Lexa está hablando...');
+    this.state.set(this._ttsCurrentKind === 'wait' ? 'waiting' : 'speaking');
+    this.statusText.set(this._ttsCurrentKind === 'wait' ? 'Lexa está pensando...' : 'Lexa está hablando...');
     this._cdr.markForCheck();
 
     const gain = this.ensureTtsGain();
@@ -739,38 +800,8 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
     this.clearTtsPlayTimer();
     const done = this.ttsSessionComplete;
     this.ttsSessionComplete = null;
-    this.closeTtsWsIfOpen();
+    this.cancelTtsSessionIfActive();
     done?.();
-  }
-
-  private handleTtsJson(msg: Record<string, unknown>): void {
-    console.log('[TTS] JSON:', msg['type']);
-    switch (msg['type']) {
-      case 'start':
-        this.ttsSampleRate = (msg['sample_rate'] as number) || 24000;
-        this.statusText.set('Lexa está preparando la respuesta...');
-        this._cdr.markForCheck();
-        break;
-
-      case 'done': {
-        const durS = msg['duration_s'] as number | undefined;
-        if (durS) {
-          this.ttsExpectedDurationS = durS;
-          this.lastDuration.set(`${durS.toFixed(1)}s`);
-        }
-        console.log(`[TTS] DONE — chunks: ${this.ttsPcmBuffers.length}, samples: ${this.ttsBufferedSamples()}, dur: ${durS}s`);
-        this.ttsWsDoneReceived = true;
-        this.schedulePhrasePlayback();
-        break;
-      }
-
-      case 'error':
-        this.clearTtsPlayTimer();
-        this.ttsPcmBuffers = [];
-        this.finishTtsSession();
-        this.setError(`Error TTS: ${msg['detail'] || 'desconocido'}`);
-        break;
-    }
   }
 
   /** Despedida del cerebro: deja de escuchar y cierra el modal. */
@@ -827,18 +858,16 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
     this.clearTtsPlayTimer();
     this.ttsPcmBuffers     = [];
     this.deactivateVad(false);
-    this.closeTtsWs();
+    this.cancelTtsSession();
     this.state.set('error');
     this.statusText.set('Ocurrió un error');
     this.errorMessage.set(msg);
     this._cdr.markForCheck();
   }
 
-  private closeTtsWs(): void {
-    if (!this.wsTTS) return;
-    this.wsTTS.onopen = this.wsTTS.onmessage = this.wsTTS.onerror = this.wsTTS.onclose = null;
-    this.wsTTS.close();
-    this.wsTTS = null;
+  private cancelTtsSession(): void {
+    this.ttsSession?.cancel();
+    this.ttsSession = null;
   }
 
   private closeAudioCtx(): void {
@@ -868,7 +897,7 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
     this.voiceStreamAbort?.abort();
     this.voiceStreamAbort = null;
     this.deactivateVad(false);
-    this.closeTtsWs();
+    this.cancelTtsSession();
     this.closeAudioCtx();
     this.closed.emit();
   }

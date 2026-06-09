@@ -1,1 +1,8 @@
-// Host and modal use DaisyUI; no extra styles needed unless overrides desired
+// Host and modal use DaisyUI
+:host {
+  display: contents;
+}
+
+.modal {
+  z-index: 10050;
+}
