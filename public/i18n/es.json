@@ -128,7 +128,26 @@
         "actuacionAlertaSubtitle": "Riesgo legal inminente"
       },
       "viewDetail": "Ver detalle",
-      "empty": "No hay estadísticas disponibles"
+      "empty": "No hay estadísticas disponibles",
+      "semaphores": {
+        "title": "Semáforos de procesos",
+        "hint": "Haz clic en un color para filtrar la tabla",
+        "total": "Con semáforo",
+        "filter": "Filtrar tabla",
+        "filterActive": "Filtro activo",
+        "red": {
+          "title": "Crítico",
+          "subtitle": "Inactividad +90 días o hitos determinantes"
+        },
+        "yellow": {
+          "title": "Alerta temprana",
+          "subtitle": "Seguimiento preventivo o trámites en curso"
+        },
+        "green": {
+          "title": "Saludable",
+          "subtitle": "Actividad reciente o inactividad favorable"
+        }
+      }
     }
   },
   "notificationsDrawer": {
@@ -143,6 +162,9 @@
       "actuacion_alerta": "Listado de alertas prioritarias de actuaciones (consulta, apelación, doble instancia)."
     },
     "close": "Cerrar",
+    "sections": {
+      "dates": "Fechas"
+    },
     "loading": "Cargando notificaciones...",
     "scrollForMore": "Desplaza hacia abajo para cargar más",
     "emptyWatermark": "Sin datos",

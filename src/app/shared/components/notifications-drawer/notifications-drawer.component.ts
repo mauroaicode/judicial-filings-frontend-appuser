@@ -167,6 +167,28 @@ export class NotificationsDrawerComponent implements OnDestroy {
     return this.getOtrosSubjects(row).slice(0, MAX_OTROS_SUBJECTS_PREVIEW);
   }
 
+  getSubjectDisplayName(name: string | undefined | null): string {
+    return (name ?? '')
+      .replace(/<+$/g, '')
+      .replace(/^<+/g, '')
+      .trim();
+  }
+
+  shouldShowSubjectType(type: string | undefined | null): boolean {
+    const label = this.getSubjectTypeLabel(type);
+    return label.length > 0;
+  }
+
+  getSubjectTypeLabel(type: string | undefined | null): string {
+    const cleaned = (type ?? '')
+      .replace(/^<+\s*/g, '')
+      .replace(/<+$/g, '')
+      .trim();
+    if (!cleaned || cleaned === '-') return '';
+    if (/^sin\s+tipo/i.test(cleaned)) return '';
+    return cleaned;
+  }
+
   getRemainingOtrosSubjects(row: OrganizationNotificationRow): OrganizationNotificationSubject[] {
     return this.getOtrosSubjects(row).slice(MAX_OTROS_SUBJECTS_PREVIEW);
   }
@@ -181,7 +203,13 @@ export class NotificationsDrawerComponent implements OnDestroy {
   }
 
   private _formatSubjectsTooltip(subjects: OrganizationNotificationSubject[]): string {
-    return subjects.map(s => `${s.name} · ${s.type}`).join('\n');
+    return subjects
+      .map(s => {
+        const name = this.getSubjectDisplayName(s.name);
+        const type = this.getSubjectTypeLabel(s.type);
+        return type ? `${name} · ${type}` : name;
+      })
+      .join('\n');
   }
 
   getGroupedSubjects(row: OrganizationNotificationRow): {

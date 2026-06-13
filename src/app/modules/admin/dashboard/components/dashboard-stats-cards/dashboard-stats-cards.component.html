@@ -16,14 +16,113 @@
   }
 
   @if (!loading() && !error()) {
-  <!-- Row 1: Notificaciones + Alertas (2 cols, full-width, clickable) -->
+
+  <!-- Gestion Procesos: Semáforos (prioridad visual) -->
+  @if (isGestionProcesos() && semaphoreItems().length > 0) {
+  <div
+    class="semaphore-panel rounded-2xl sm:rounded-3xl border border-base-200 bg-base-100 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_32px_-8px_rgba(15,23,42,0.08)] overflow-hidden"
+    role="group"
+    [attr.aria-label]="'dashboard.stats.semaphores.title' | transloco"
+  >
+    <div class="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h3 class="text-sm font-bold text-base-content tracking-tight">
+          {{ 'dashboard.stats.semaphores.title' | transloco }}
+        </h3>
+        <p class="text-xs text-base-content/55 mt-0.5">
+          {{ 'dashboard.stats.semaphores.hint' | transloco }}
+        </p>
+      </div>
+      <div class="text-right">
+        <p class="text-[10px] font-semibold uppercase tracking-wider text-base-content/45">
+          {{ 'dashboard.stats.semaphores.total' | transloco }}
+        </p>
+        <p class="text-2xl font-bold tabular-nums text-base-content leading-none">
+          {{ semaphoreTotal() }}
+        </p>
+      </div>
+    </div>
+
+    @if (semaphoreTotal() > 0) {
+    <div class="semaphore-distribution mx-5 sm:mx-6 mb-4 flex h-1.5 rounded-full overflow-hidden bg-base-200" aria-hidden="true">
+      @for (item of semaphoreItems(); track item.color) {
+      @if (getSemaphoreBarWidth(item.color) > 0) {
+      <div
+        class="semaphore-distribution__segment h-full transition-all duration-300"
+        [class]="'semaphore-distribution__segment--' + item.color"
+        [style.width.%]="getSemaphoreBarWidth(item.color)"
+      ></div>
+      }
+      }
+    </div>
+    }
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 px-4 sm:px-5 pb-4 sm:pb-5">
+      @for (item of semaphoreItems(); track item.color) {
+      <button
+        type="button"
+        class="semaphore-segment group cursor-pointer text-left rounded-2xl border-2 p-4 sm:p-5 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        [class]="'semaphore-segment--' + item.color"
+        [class.semaphore-segment--active]="isSemaphoreActive(item.color)"
+        [attr.aria-pressed]="isSemaphoreActive(item.color)"
+        [attr.aria-label]="(item.labelKey | transloco) + ': ' + item.value"
+        (click)="onSemaphoreClick(item.color)"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex flex-col gap-2 min-w-0">
+            <div class="flex items-center gap-2.5">
+              <span
+                class="alert-dot shrink-0"
+                [ngClass]="{
+                  'alert-red alert-pulse': item.color === 'red',
+                  'alert-yellow': item.color === 'yellow',
+                  'alert-green': item.color === 'green'
+                }"
+              ></span>
+              <p class="text-xs font-bold uppercase tracking-wide semaphore-segment__label">
+                {{ item.labelKey | transloco }}
+              </p>
+            </div>
+            <p class="text-3xl sm:text-4xl font-bold tabular-nums leading-none semaphore-segment__value">
+              {{ item.value }}
+            </p>
+            <p class="text-[11px] leading-snug semaphore-segment__subtitle">
+              {{ item.subtitleKey | transloco }}
+            </p>
+          </div>
+        </div>
+        <span class="semaphore-segment__action mt-3 inline-flex items-center gap-1 text-[11px] font-semibold">
+          @if (isSemaphoreActive(item.color)) {
+            {{ 'dashboard.stats.semaphores.filterActive' | transloco }}
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+          } @else {
+            {{ 'dashboard.stats.semaphores.filter' | transloco }}
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 opacity-60 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+          }
+        </span>
+      </button>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- Row: Notificaciones + Alertas -->
   @if (importantCards().length > 0) {
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <div
+    class="grid grid-cols-1 gap-3 sm:gap-4"
+    [class.sm:grid-cols-2]="!isGestionProcesos()"
+    [class.lg:grid-cols-2]="isGestionProcesos()"
+  >
     @for (card of importantCards(); track card.type) {
 
     <div
-      class="stats-card--important group relative overflow-hidden rounded-2xl sm:rounded-3xl border-0 cursor-pointer transition-all duration-200 hover:-translate-y-0.5"
+      class="stats-card--important group relative overflow-hidden rounded-2xl border-0 cursor-pointer transition-all duration-200 hover:-translate-y-0.5"
       [class]="card.type === 'actuacion' ? 'bg-sky-50 shadow-[0_8px_28px_-8px_rgba(3,105,161,0.18)]' : 'bg-amber-50 shadow-[0_8px_28px_-8px_rgba(245,158,11,0.22)]'"
+      [class.stats-card--compact]="isGestionProcesos()"
       [attr.role]="'button'"
       [attr.tabindex]="0"
       [attr.aria-label]="(card.labelKey | transloco) + ': ' + card.value"
@@ -31,10 +130,9 @@
       (keydown.enter)="onCardClick(card)"
       (keydown.space)="onCardClick(card); $event.preventDefault()"
     >
-      <div class="p-5 sm:p-6 flex items-start justify-between gap-4">
+      <div class="flex items-start justify-between gap-4" [class]="isGestionProcesos() ? 'p-4' : 'p-5 sm:p-6'">
         <div class="flex flex-col gap-2 min-w-0">
           <div class="flex items-center gap-2">
-            <!-- colored dot indicator -->
             <span
               class="h-2 w-2 rounded-full shrink-0"
               [class]="card.type === 'actuacion' ? 'bg-sky-500' : 'bg-amber-500'"
@@ -47,11 +145,14 @@
             </p>
           </div>
           <p
-            class="text-4xl font-bold tabular-nums leading-none"
-            [class]="card.type === 'actuacion' ? 'text-sky-900' : 'text-amber-900'"
+            class="font-bold tabular-nums leading-none"
+            [class]="isGestionProcesos() ? 'text-3xl' : 'text-4xl'"
+            [class.text-sky-900]="card.type === 'actuacion'"
+            [class.text-amber-900]="card.type !== 'actuacion'"
           >
             {{ card.value }}
           </p>
+          @if (!isGestionProcesos()) {
           <span
             class="inline-flex items-center gap-1 self-start text-xs font-semibold px-3 py-1 rounded-xl border transition-colors"
             [class]="card.type === 'actuacion'
@@ -60,10 +161,22 @@
           >
             {{ 'dashboard.stats.viewDetail' | transloco }}
           </span>
+          } @else {
+          <span
+            class="inline-flex items-center gap-1 self-start text-[11px] font-semibold transition-colors"
+            [class]="card.type === 'actuacion' ? 'text-sky-600' : 'text-amber-600'"
+          >
+            {{ 'dashboard.stats.viewDetail' | transloco }}
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </span>
+          }
         </div>
         <div
           class="kpi-icon-box shrink-0"
           [class]="card.type === 'actuacion' ? 'bg-sky-100 text-sky-600' : 'bg-amber-100 text-amber-600'"
+          [class.kpi-icon-box--compact]="isGestionProcesos()"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
             @if (card.type === 'actuacion') {
@@ -80,7 +193,7 @@
   </div>
   }
 
-  <!-- Row 2: Métricas de procesos (4 cols) -->
+  <!-- Row: Métricas de procesos (4 cols) -->
   @if (regularCards().length > 0) {
   <div
     class="flex overflow-x-auto pb-3 gap-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:overflow-x-visible sm:pb-0 sm:gap-4">
