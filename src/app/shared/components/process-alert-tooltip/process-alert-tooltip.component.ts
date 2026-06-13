@@ -27,26 +27,51 @@ export class ProcessAlertTooltipComponent {
   /** Desactivar el cursor de ayuda */
   public disableTrigger = input<boolean>(false);
 
+  /** Contexto del mensaje: inactividad (por rol) o keywords (independiente del rol) */
+  public messageContext = input<'inactivity' | 'keyword'>('inactivity');
+
   /**
    * Obtiene la llave de traducción para el mensaje del tooltip del semáforo
    */
   public getAlertTooltipMessage(): string {
     const level = this.alertLevel();
     const role = this.normalizeRole(this.lawyerRole());
-    
+
     if (!level) return '';
-    
-    let tooltipKey = '';
-    
-    if (level === 'red') {
-      tooltipKey = role === 'plaintiff' ? 'redDemandante' : 'redGeneral';
-    } else if (level === 'yellow') {
-      tooltipKey = role === 'plaintiff' ? 'yellowDemandante' : 'yellowGeneral';
-    } else {
-      tooltipKey = role === 'defendant' ? 'greenDemandado' : (role === 'plaintiff' ? 'greenDemandante' : 'greenGeneral');
+
+    if (this.messageContext() === 'keyword') {
+      const keywordKeys: Record<'red' | 'yellow' | 'green', string> = {
+        red: 'redGeneral',
+        yellow: 'yellowGeneral',
+        green: 'greenGeneral',
+      };
+      return `alertSemafor.alerts.${keywordKeys[level]}`;
     }
-    
-    return `alertSemafor.alerts.${tooltipKey}`;
+
+    if (role === 'plaintiff') {
+      const plaintiffKeys: Record<'red' | 'yellow' | 'green', string> = {
+        red: 'redDemandante',
+        yellow: 'yellowDemandante',
+        green: 'greenDemandante',
+      };
+      return `alertSemafor.alerts.${plaintiffKeys[level]}`;
+    }
+
+    if (role === 'defendant') {
+      const defendantKeys: Record<'red' | 'yellow' | 'green', string> = {
+        red: 'redDemandado',
+        yellow: 'yellowDemandado',
+        green: 'greenDemandado',
+      };
+      return `alertSemafor.alerts.${defendantKeys[level]}`;
+    }
+
+    const generalKeys: Record<'red' | 'yellow' | 'green', string> = {
+      red: 'redGeneral',
+      yellow: 'yellowGeneral',
+      green: 'greenGeneral',
+    };
+    return `alertSemafor.alerts.${generalKeys[level]}`;
   }
 
   /**

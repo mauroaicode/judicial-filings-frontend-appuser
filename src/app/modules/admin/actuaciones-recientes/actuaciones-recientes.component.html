@@ -458,6 +458,7 @@
                         <app-process-alert-tooltip
                           [alertLevel]="action.alert_level"
                           [lawyerRole]="action.lawyer_role"
+                          messageContext="keyword"
                           [position]="'left'"
                           [leftAligned]="true"
                           (click)="openLegendModal($event)">
@@ -614,6 +615,7 @@
                             <app-process-alert-tooltip 
                               [alertLevel]="action.alert_level" 
                               [lawyerRole]="action.lawyer_role"
+                              messageContext="keyword"
                               [position]="i < 3 ? 'bottom' : 'top'"
                               [leftAligned]="true"
                               (click)="openLegendModal($event)">
