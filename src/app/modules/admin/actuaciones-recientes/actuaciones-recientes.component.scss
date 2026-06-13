@@ -84,7 +84,7 @@
     white-space: normal !important;
     width: max-content !important;
     max-width: 280px !important;
-    z-index: 100 !important;
+    z-index: 200 !important;
     opacity: 0;
     visibility: hidden;
     transition: all 0.15s ease-out;
@@ -152,6 +152,11 @@
 
 .process-list-table {
   --table-sticky-top: 0px;
+  --sticky-idx-width: 48px;
+  --sticky-alert-width: 80px;
+  --sticky-idx-left: 0px;
+  --sticky-alert-left: calc(var(--sticky-idx-left) + var(--sticky-idx-width) - 1px);
+  --sticky-radicado-left: calc(var(--sticky-idx-left) + var(--sticky-idx-width) + var(--sticky-alert-width) - 2px);
   overflow-x: auto !important;
   overflow-y: visible !important;
   position: relative;
@@ -172,54 +177,211 @@
     font-size: 13px !important;
     border: none !important;
     white-space: nowrap !important;
-    padding: 1rem !important;
-    transform: translateZ(0) !important;
-    box-shadow: 0 0 0 0.5px #24163E !important;
+    padding: 0.75rem 0.5rem !important;
+    transform: none !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
   }
 
   thead th.sticky-col-idx {
-    left: -1px !important;
-    z-index: 110 !important;
+    left: var(--sticky-idx-left) !important;
+    z-index: 112 !important;
+    width: var(--sticky-idx-width) !important;
+    min-width: var(--sticky-idx-width) !important;
+    max-width: var(--sticky-idx-width) !important;
+    padding-inline: 0.25rem !important;
+    box-shadow: none !important;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: -1px;
+      width: 2px;
+      height: 100%;
+      background: #24163E;
+      pointer-events: none;
+    }
   }
 
   thead th.sticky-col-alert {
-    left: 47px !important; 
-    z-index: 110 !important;
+    left: var(--sticky-alert-left) !important;
+    z-index: 113 !important;
+    width: var(--sticky-alert-width) !important;
+    min-width: var(--sticky-alert-width) !important;
+    max-width: var(--sticky-alert-width) !important;
+    padding-inline: 0.25rem !important;
+    box-shadow: none !important;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -1px;
+      width: 2px;
+      height: 100%;
+      background: #24163E;
+      pointer-events: none;
+    }
   }
 
   thead th.sticky-col-radicado {
-    left: 127px !important;
-    z-index: 110 !important;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1), 1px 0 0 0 #24163E, 0 0 0 0.5px #24163E !important;
+    left: var(--sticky-radicado-left) !important;
+    z-index: 114 !important;
+    width: auto !important;
+    min-width: max-content !important;
+    max-width: none !important;
+    white-space: nowrap !important;
+    padding-inline: 0.5rem !important;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1), 1px 0 0 0 #24163E !important;
+  }
+
+  tbody td.sticky-col-idx,
+  tbody td.sticky-col-alert,
+  tbody td.sticky-col-radicado {
+    position: sticky !important;
+    box-sizing: border-box !important;
+    border: none !important;
+    overflow: visible !important;
+    transform: none !important;
   }
 
   tbody td.sticky-col-idx {
-    position: sticky !important;
-    left: -1px !important;
-    z-index: 10 !important;
+    left: var(--sticky-idx-left) !important;
+    z-index: 6 !important;
+    width: var(--sticky-idx-width) !important;
+    min-width: var(--sticky-idx-width) !important;
+    max-width: var(--sticky-idx-width) !important;
+    padding-inline: 0.25rem !important;
     background-color: #ffffff !important;
+    box-shadow: none !important;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: -1px;
+      width: 1px;
+      height: 100%;
+      background: inherit;
+      pointer-events: none;
+    }
   }
 
   tbody td.sticky-col-alert {
-    position: sticky !important;
-    left: 47px !important;
-    z-index: 10 !important;
+    left: var(--sticky-alert-left) !important;
+    z-index: 7 !important;
+    width: var(--sticky-alert-width) !important;
+    min-width: var(--sticky-alert-width) !important;
+    max-width: var(--sticky-alert-width) !important;
+    padding-inline: 0.25rem !important;
     background-color: #ffffff !important;
     box-shadow: none !important;
-    border-right: 0 !important;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -1px;
+      width: 2px;
+      height: 100%;
+      background: inherit;
+      pointer-events: none;
+    }
+
+    & .sticky-cell-bg {
+      position: absolute !important;
+      inset: 0 !important;
+      background: inherit !important;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    & .sticky-cell-txt {
+      position: relative !important;
+      z-index: 1;
+    }
   }
 
   tbody td.sticky-col-radicado {
-    position: sticky !important;
-    left: 127px !important;
-    z-index: 10 !important;
+    left: var(--sticky-radicado-left) !important;
+    z-index: 8 !important;
+    width: auto !important;
+    min-width: max-content !important;
+    max-width: none !important;
+    white-space: nowrap !important;
+    padding-inline: 0.5rem !important;
     background-color: #ffffff !important;
-    box-shadow: none !important;
-    border-left: 0 !important;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1), 1px 0 0 0 #ffffff !important;
+
+    .sticky-cell-txt {
+      width: auto;
+      max-width: none;
+      overflow: visible;
+    }
+
+    .radicado-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.125rem;
+      white-space: nowrap;
+    }
+
+    .radicado-number {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    .radicado-copy {
+      flex: 0 0 auto;
+      line-height: 0;
+    }
+
+    & .sticky-cell-bg {
+      position: absolute !important;
+      inset: 0 !important;
+      background: inherit !important;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    & .sticky-cell-txt {
+      position: relative !important;
+      z-index: 1;
+    }
   }
 
-  tbody tr:hover td {
+  tbody tr:nth-child(2n) td.sticky-col-radicado,
+  tbody tr:nth-child(2n) td.sticky-col-alert,
+  tbody tr:nth-child(2n) td.sticky-col-idx {
+    background-color: #f9fafb !important;
+  }
+
+  tbody tr:nth-child(2n) td.sticky-col-radicado {
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1), 1px 0 0 0 #f9fafb !important;
+  }
+
+  tbody tr:hover td,
+  tbody tr.process-row-hovered td,
+  tbody tr:hover td.sticky-col-radicado,
+  tbody tr:hover td.sticky-col-alert,
+  tbody tr:hover td.sticky-col-idx,
+  tbody tr.process-row-hovered td.sticky-col-radicado,
+  tbody tr.process-row-hovered td.sticky-col-alert,
+  tbody tr.process-row-hovered td.sticky-col-idx {
     background-color: #F3F0F9 !important;
+  }
+
+  tbody tr:hover td.sticky-col-alert .sticky-cell-bg,
+  tbody tr:hover td.sticky-col-radicado .sticky-cell-bg,
+  tbody tr.process-row-hovered td.sticky-col-alert .sticky-cell-bg,
+  tbody tr.process-row-hovered td.sticky-col-radicado .sticky-cell-bg {
+    background: #F3F0F9 !important;
+  }
+
+  tbody tr:hover td.sticky-col-radicado,
+  tbody tr.process-row-hovered td.sticky-col-radicado {
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1), 1px 0 0 0 #F3F0F9 !important;
   }
 }
 
@@ -227,8 +389,40 @@
 .digest-detail-table-scroll {
   overflow-x: scroll !important;
   overflow-y: auto !important;
-  scrollbar-gutter: stable both-edges;
+  scrollbar-gutter: stable;
   padding-bottom: 2px; // evita que el thumb se recorte visualmente
+
+  .digest-detail-table {
+    thead th.digest-th-compact {
+      text-align: center !important;
+      font-size: 0.6875rem !important;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+      padding: 0.7rem 0.4rem !important;
+    }
+
+    thead th.digest-th-left {
+      text-align: left !important;
+      font-size: 0.75rem !important;
+      letter-spacing: 0.02em;
+      line-height: 1.3;
+      padding: 0.7rem 0.6rem !important;
+    }
+
+    tbody td.digest-col-court {
+      min-width: 320px;
+      width: 320px;
+      max-width: 320px;
+      white-space: normal;
+    }
+
+    tbody td.digest-col-action {
+      min-width: 280px;
+      width: 280px;
+      max-width: 280px;
+      white-space: normal;
+    }
+  }
 
   &::-webkit-scrollbar {
     height: 10px;
@@ -252,28 +446,59 @@
   }
 }
 
-/*
- * Fix de capas para tooltip dentro de columnas sticky.
- * Evita que el popup se recorte o quede detrás de celdas vecinas.
- */
-.process-list-table tbody tr:hover td,
-.process-list-table tbody tr.process-row-hovered td {
-  z-index: 5 !important;
+.process-list-table tbody td.party-col-cell {
+  overflow: visible !important;
 }
 
+/* Tooltip de partes: se abre a la derecha para no chocar con columnas sticky al hacer scroll */
+.party-col-tooltip {
+  position: relative;
+  z-index: 1;
+
+  .tooltip-content {
+    left: calc(100% + 0.5rem) !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) translateX(4px) !important;
+
+    &::after {
+      top: 50% !important;
+      left: -6px !important;
+      right: auto !important;
+      bottom: auto !important;
+      transform: translateY(-50%) !important;
+      border: 6px solid transparent !important;
+      border-right-color: #ffffff !important;
+      border-top-color: transparent !important;
+      border-bottom-color: transparent !important;
+    }
+  }
+
+  &:hover {
+    z-index: 200;
+  }
+
+  &:hover .tooltip-content {
+    transform: translateY(-50%) translateX(0) !important;
+  }
+}
+
+/*
+ * Capas al hover: tooltips de semáforo sobre radicado; sin elevar celdas scrollables (evita glitches al scroll).
+ */
 .process-list-table tbody tr:hover td.sticky-col-alert,
 .process-list-table tbody tr.process-row-hovered td.sticky-col-alert {
-  z-index: 50 !important;
+  z-index: 10 !important;
 }
 
 .process-list-table tbody tr:hover td.sticky-col-radicado,
 .process-list-table tbody tr.process-row-hovered td.sticky-col-radicado {
-  z-index: 30 !important;
+  z-index: 9 !important;
 }
 
 .process-list-table tbody tr:hover td.sticky-col-idx,
 .process-list-table tbody tr.process-row-hovered td.sticky-col-idx {
-  z-index: 25 !important;
+  z-index: 8 !important;
 }
 
 // Paginación del modal de consolidado (misma estructura que gestión de procesos / data-table)
@@ -343,16 +568,28 @@
   }
 }
 
+.digest-detail-dialog {
+  padding: 1vh 1vw !important;
+
+  .modal-box.digest-detail-modal {
+    width: 98vw !important;
+    max-width: 98vw !important;
+    height: 98vh !important;
+    max-height: 98vh !important;
+    margin: 0 !important;
+  }
+}
+
 @media (max-width: 640px) {
   .digest-detail-dialog {
     align-items: flex-end !important;
     padding: 0 !important;
 
     .modal-box.digest-detail-modal {
-      width: 100vw !important;
-      max-width: 100vw !important;
-      height: min(92dvh, 92vh) !important;
-      max-height: min(92dvh, 92vh) !important;
+      width: 98vw !important;
+      max-width: 98vw !important;
+      height: 98vh !important;
+      max-height: 98vh !important;
       margin: 0 !important;
       border-radius: 1.15rem 1.15rem 0 0 !important;
       box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.2) !important;

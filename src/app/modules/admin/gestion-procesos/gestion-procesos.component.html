@@ -345,7 +345,7 @@
           <!-- Body -->
           <div class="p-3 sm:p-4 space-y-4 text-sm">
             @if (!process.lawyer_role) {
-              <div class="bg-primary/5 rounded-xl p-3 border border-primary/10 flex items-center justify-between group" (click)="onRowDblClick(process)">
+              <div class="bg-primary/5 rounded-xl p-3 border border-primary/10 flex items-center justify-between group cursor-pointer" (click)="openRoleModal(process, $event)">
                 <div class="flex items-center gap-3">
                   <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -609,14 +609,17 @@
                               Para activar el semáforo de actividad, debe vincular su rol (Demandante o Demandado) desde las <b>acciones del proceso</b> o de forma <b>masiva</b>.
                             </p>
                           </div>
-                          <div class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
+                          <button
+                            type="button"
+                            class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+                            (click)="openRoleModal(process, $event)">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             <span class="text-[8px] uppercase font-black tracking-widest text-base-content/60 text-center leading-none">
                               {{ 'alertSemafor.linkRole' | transloco }}
                             </span>
-                          </div>
+                          </button>
                         </span>
                       } @else {
                         <!-- Estado de Escucha para Fila Principal -->
@@ -803,12 +806,15 @@
                               Para activar el semáforo de actividad, debe vincular su rol (Demandante o Demandado) desde las <b>acciones del proceso</b> o de forma <b>masiva</b>.
                             </p>
                           </div>
-                          <div class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
+                          <button
+                            type="button"
+                            class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+                            (click)="openRoleModal(instance, $event)">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             <span class="text-[8px] uppercase font-black tracking-widest text-base-content/60 text-center leading-none">Vincular rol</span>
-                          </div>
+                          </button>
                         </span>
                       } @else {
                         <!-- Estado de Escucha (Rol vinculado pero sin alerta aún) -->
@@ -1369,6 +1375,22 @@
       </div>
     </div>
   }
+
+  <!-- Modal de asignación de rol individual (desde tabla) -->
+  <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="isRoleModalOpen()">
+    @if (isRoleModalOpen() && roleModalProcessId()) {
+      <div class="modal-box p-0 bg-transparent shadow-none border-none max-w-lg">
+        <app-role-selection-modal
+          [processId]="roleModalProcessId()!"
+          (closed)="closeRoleModal()"
+          (saved)="onRoleSaved($event)">
+        </app-role-selection-modal>
+      </div>
+    }
+    <form method="dialog" class="modal-backdrop" (click)="closeRoleModal()">
+      <button type="button">close</button>
+    </form>
+  </dialog>
 
   <!-- Modales de Acciones Masivas -->
   <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="isBulkRoleModalOpen()">

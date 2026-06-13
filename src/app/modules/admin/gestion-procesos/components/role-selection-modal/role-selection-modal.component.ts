@@ -95,7 +95,7 @@ export class RoleSelectionModalComponent implements OnInit {
       .pipe(finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: (response) => {
-          this.saved.emit(response);
+          this.saved.emit(this.isBulk() ? response : { ...response, role: selectedRole });
         },
         error: (err) => {
           console.error('Error updating role:', err);

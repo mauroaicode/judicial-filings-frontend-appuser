@@ -264,7 +264,7 @@
 
   <!-- Detail Modal -->
   <dialog class="modal digest-detail-dialog" [class.modal-open]="isModalOpen()">
-    <div class="modal-box digest-detail-modal w-[min(98vw,1720px)] max-w-none h-[90vh] max-h-screen p-0 flex flex-col bg-base-100 rounded-2xl overflow-hidden shadow-2xl relative">
+    <div class="modal-box digest-detail-modal w-[98vw] max-w-[98vw] h-[98vh] max-h-[98vh] p-0 flex flex-col bg-base-100 rounded-2xl overflow-hidden shadow-2xl relative">
       @if (selectedDigest()) {
         <div class="flex flex-col flex-1 min-h-0 overflow-hidden">
         <!-- Modal Sticky Header -->
@@ -278,7 +278,7 @@
               }
             </div>
 
-            <button type="button" class="hidden sm:inline-flex btn btn-sm btn-circle btn-ghost bg-base-200/50 hover:bg-base-200" (click)="closeDigestModal()">
+            <button type="button" class="inline-flex btn btn-sm btn-circle btn-ghost bg-base-200/50 hover:bg-base-200" (click)="closeDigestModal()">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -468,8 +468,10 @@
                   </div>
 
                   <div class="p-3 space-y-3 text-sm">
-                    @if (!action.alert_level || !action.lawyer_role) {
-                      <div class="bg-primary/5 rounded-xl p-3 border border-primary/10 flex items-center justify-between group">
+                    @if (!action.lawyer_role) {
+                      <div
+                        class="bg-primary/5 rounded-xl p-3 border border-primary/10 flex items-center justify-between group cursor-pointer"
+                        (click)="openRoleModal(action, $event)">
                         <div class="flex items-center gap-3 min-w-0">
                           <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -585,30 +587,35 @@
               </div>
 
               <div class="overflow-x-scroll overflow-y-auto w-full h-full min-h-0 process-list-table digest-detail-table-scroll border border-base-200 rounded-xl bg-white shadow-sm">
-              <table class="table table-zebra" style="min-width: 1500px;">
+              <table class="table table-zebra digest-detail-table" style="min-width: 1480px;">
                 <thead style="background-color: #24163E; color: #ffffff;">
                   <tr>
-                    <th style="width: 48px;" class="text-center sticky-col-idx">{{ 'processDetail.actions.table.index' | transloco }}</th>
-                    <th style="width: 80px;" class="text-center sticky-col-alert">{{ 'alertSemafor.alertLevel' | transloco }}</th>
-                    <th style="width: 280px;" class="text-left sticky-col-radicado">{{ 'gestionProcesos.table.processNumber' | transloco }}</th>
-                    <th style="width: 260px;" class="text-left">{{ 'gestionProcesos.table.court' | transloco }}</th>
-                    <th style="width: 180px;" class="text-left">{{ 'gestionProcesos.table.plaintiff' | transloco }}</th>
-                    <th style="width: 180px;" class="text-left">{{ 'gestionProcesos.table.defendant' | transloco }}</th>
-                    <th style="width: 130px;" class="text-center">{{ 'processDetail.actions.table.registrationDate' | transloco }}</th>
-                    <th style="width: 130px;" class="text-center">{{ 'processDetail.actions.table.termStartDate' | transloco }}</th>
-                    <th style="width: 130px;" class="text-center">{{ 'processDetail.actions.table.termEndDate' | transloco }}</th>
-                    <th class="text-left min-w-[300px]">{{ 'processDetail.actions.table.action' | transloco }}</th>
+                    <th style="width: 48px;" class="text-center sticky-col-idx digest-th-compact">{{ 'processDetail.actions.table.index' | transloco }}</th>
+                    <th style="width: 80px;" class="text-center sticky-col-alert digest-th-compact">{{ 'alertSemafor.alertLevel' | transloco }}</th>
+                    <th class="text-left sticky-col-radicado digest-th-left">{{ 'gestionProcesos.table.processNumber' | transloco }}</th>
+                    <th style="width: 320px;" class="text-left digest-th-left">{{ 'gestionProcesos.table.court' | transloco }}</th>
+                    <th style="width: 180px;" class="text-left digest-th-left">{{ 'gestionProcesos.table.plaintiff' | transloco }}</th>
+                    <th style="width: 180px;" class="text-left digest-th-left">{{ 'gestionProcesos.table.defendant' | transloco }}</th>
+                    <th style="width: 120px;" class="text-center digest-th-compact">{{ 'processDetail.actions.table.registrationDate' | transloco }}</th>
+                    <th style="width: 120px;" class="text-center digest-th-compact">{{ 'processDetail.actions.table.termStartDate' | transloco }}</th>
+                    <th style="width: 120px;" class="text-center digest-th-compact">{{ 'processDetail.actions.table.termEndDate' | transloco }}</th>
+                    <th style="width: 280px;" class="text-left digest-th-left">{{ 'processDetail.actions.table.action' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
                   @for (action of selectedDigestDetails(); track digestRowTrack(action, i); let i = $index) {
-                    <tr class="hover:bg-primary/5 transition-colors cursor-default border-b border-base-200/60">
+                    @let rowTrackId = digestRowTrack(action, i);
+                    <tr
+                      class="transition-colors cursor-default border-b border-base-200/60"
+                      [class.process-row-hovered]="hoveredRowId() === rowTrackId"
+                      (mouseenter)="hoveredRowId.set(rowTrackId)"
+                      (mouseleave)="hoveredRowId.set(null)">
                       
                       <td class="text-center align-middle sticky-col-idx font-bold text-[11px] text-base-content/40">
                         {{ digestRowIndex(i) }}
                       </td>
                       
-                      <td class="text-center align-middle sticky-col-alert bg-base-100">
+                      <td class="text-center align-middle sticky-col-alert">
                         <span class="sticky-cell-bg" aria-hidden="true"></span>
                         <div class="sticky-cell-txt flex justify-center w-full">
                           @if (action.alert_level && action.lawyer_role) {
@@ -634,14 +641,17 @@
                                     Para activar el semáforo de actividad, debe vincular su rol (Demandante o Demandado) desde las <b>acciones del proceso</b> o de forma <b>masiva</b>.
                                   </p>
                                 </div>
-                                <div class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
+                                <button
+                                  type="button"
+                                  class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+                                  (click)="openRoleModal(action, $event)">
                                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                   </svg>
                                   <span class="text-[8px] uppercase font-black tracking-widest text-base-content/60 text-center leading-none">
                                     {{ 'alertSemafor.linkRole' | transloco }}
                                   </span>
-                                </div>
+                                </button>
                               </span>
                             } @else {
                               <div class="flex flex-col items-center gap-1.5 opacity-40">
@@ -656,24 +666,24 @@
                       </td>
 
                       <!-- Número de radicado (mismo patrón que gestión desktop) -->
-                      <td class="whitespace-nowrap align-middle sticky-col-radicado">
+                      <td class="align-middle sticky-col-radicado">
                         <span class="sticky-cell-bg" aria-hidden="true"></span>
                         <div class="sticky-cell-txt">
-                          <div class="flex items-center gap-2">
+                          <div class="radicado-row">
                             @let processNavigationIdDesktop = getProcessNavigationId(action);
                             @if (processNavigationIdDesktop) {
                               <button
                                 type="button"
-                                class="font-bold text-primary cursor-pointer hover:underline underline-offset-2 decoration-primary/40 transition-colors"
+                                class="radicado-number font-bold text-primary cursor-pointer hover:underline underline-offset-2 decoration-primary/40 transition-colors text-left"
                                 (click)="goToProcessDetail(processNavigationIdDesktop, $event)">
                                 {{ action.process_number | processNumber }}
                               </button>
                             } @else {
-                              <span class="font-bold text-primary/80">{{ action.process_number | processNumber }}</span>
+                              <span class="radicado-number font-bold text-primary/80">{{ action.process_number | processNumber }}</span>
                             }
-                            <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                            <span class="radicado-copy tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
                               <button type="button"
-                                class="btn btn-ghost btn-xs btn-circle text-primary/40 hover:bg-primary/10 hover:text-primary transition-colors"
+                                class="btn btn-ghost btn-xs btn-circle h-6 w-6 min-h-6 min-w-6 text-primary/40 hover:bg-primary/10 hover:text-primary transition-colors"
                                 (click)="copyToClipboard(action.process_number, $event)">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
@@ -689,17 +699,17 @@
                         </div>
                       </td>
 
-                      <td class="align-middle text-sm font-medium text-base-content/90 max-w-[260px]">
+                      <td class="align-middle text-sm font-medium text-base-content/90 digest-col-court leading-snug">
                         {{ action.court || '–' }}
                       </td>
 
-                      <td class="align-middle text-sm text-base-content/80 max-w-[180px]">
+                      <td class="align-middle text-sm text-base-content/80 max-w-[180px] party-col-cell">
                         @let plaintiffDisplay = getPartyDisplay(action.plaintiffs ?? (action.plaintiff ? [action.plaintiff] : []));
                         @if (plaintiffDisplay.mainText || plaintiffDisplay.extraCount > 0) {
                         <span>
                           <span class="truncate block max-w-full" [title]="plaintiffDisplay.mainText">{{ plaintiffDisplay.mainText }}</span>
                           @if (plaintiffDisplay.extraCount > 0) {
-                          <span class="tooltip tooltip-top tooltip-primary process-list-tooltip" (click)="$event.stopPropagation()">
+                          <span class="process-list-tooltip party-col-tooltip" (click)="$event.stopPropagation()">
                             <div class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
                               @for (name of plaintiffDisplay.fullList; track name; let j = $index) {
                               <div class="text-base-content">{{ j + 1 }}. {{ name }}</div>
@@ -716,13 +726,13 @@
                         }
                       </td>
 
-                      <td class="align-middle text-sm text-base-content/80 max-w-[180px]">
+                      <td class="align-middle text-sm text-base-content/80 max-w-[180px] party-col-cell">
                         @let defendantDisplay = getPartyDisplay(action.defendants ?? (action.defendant ? [action.defendant] : []));
                         @if (defendantDisplay.mainText || defendantDisplay.extraCount > 0) {
                         <span>
                           <span class="truncate block max-w-full" [title]="defendantDisplay.mainText">{{ defendantDisplay.mainText }}</span>
                           @if (defendantDisplay.extraCount > 0) {
-                          <span class="tooltip tooltip-top tooltip-primary process-list-tooltip" (click)="$event.stopPropagation()">
+                          <span class="process-list-tooltip party-col-tooltip" (click)="$event.stopPropagation()">
                             <div class="tooltip-content text-left text-sm max-w-xs rounded-lg shadow-lg bg-base-100 border border-base-300 p-3 space-y-1">
                               @for (name of defendantDisplay.fullList; track name; let j = $index) {
                               <div class="text-base-content">{{ j + 1 }}. {{ name }}</div>
@@ -752,7 +762,7 @@
                       </td>
 
                       <!-- Actuación: fijación + auto (is_merged en API o emparejado en cliente) -->
-                      <td class="align-middle text-sm text-base-content leading-snug min-w-[300px] max-w-[520px]">
+                      <td class="align-middle text-sm text-base-content leading-snug digest-col-action">
                         <button
                           type="button"
                           class="w-full text-left rounded-lg p-1.5 -m-1.5 hover:bg-primary/5 transition-colors cursor-pointer"
@@ -789,7 +799,7 @@
                             <span class="font-medium">{{ digestActionLineText(action) }}</span>
                           }
                           </div>
-                          <div class="self-end inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary/70 hover:text-primary transition-colors">
+                          <div class="self-start inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary/70 hover:text-primary transition-colors">
                             <span>{{ 'actuacionesRecientes.actionDetail.viewMore' | transloco }}</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5l7 7-7 7" />
@@ -862,14 +872,6 @@
           </div>
         }
 
-        <div class="shrink-0 border-t border-base-300 bg-base-100 px-4 py-3 flex justify-center">
-          <button
-            type="button"
-            class="btn btn-outline btn-primary min-w-[180px]"
-            (click)="closeDigestModal()">
-            {{ 'actuacionesRecientes.actionDetail.close' | transloco }}
-          </button>
-        </div>
         </div>
       }
     </div>
@@ -975,6 +977,22 @@
         <button type="button">close</button>
       </form>
     }
+  </dialog>
+
+  <!-- Modal asignación de rol (desde tabla consolidado) -->
+  <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="isRoleModalOpen()">
+    @if (isRoleModalOpen() && roleModalProcessId()) {
+      <div class="modal-box p-0 bg-transparent shadow-none border-none max-w-lg">
+        <app-role-selection-modal
+          [processId]="roleModalProcessId()!"
+          (closed)="closeRoleModal()"
+          (saved)="onRoleSaved($event)">
+        </app-role-selection-modal>
+      </div>
+    }
+    <form method="dialog" class="modal-backdrop" (click)="closeRoleModal()">
+      <button type="button">close</button>
+    </form>
   </dialog>
 
   <!-- Legend Modal for Semaphore (Re-used pattern from Gestión) -->

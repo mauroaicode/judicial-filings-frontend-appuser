@@ -413,6 +413,10 @@
   },
   "processDetail": {
     "title": "Process Detail",
+    "headerCompact": {
+      "lastActivity": "Last proceeding",
+      "lastUpdate": "Last update"
+    },
     "activateProcess": "Activate Tracking",
     "deactivateProcess": "Deactivate Tracking",
     "back": "Back",

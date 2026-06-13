@@ -6,6 +6,7 @@ import {
   signal,
   ViewEncapsulation,
   computed,
+  afterNextRender,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
@@ -27,6 +28,7 @@ import { NotificationService } from '@app/core/services/notification/notificatio
 import type { OrganizationNotificationRow } from '@app/core/models/notification/organization-notification.model';
 
 import { RoleSelectionModalComponent } from './components/role-selection-modal/role-selection-modal.component';
+import { AuthenticatedLayoutComponent } from '@app/layout/layouts/authenticated/authenticated.component';
 
 @Component({
   selector: 'app-gestion-procesos',
@@ -57,6 +59,7 @@ export class GestionProcesosComponent {
   private _destroyRef = inject(DestroyRef);
   protected readonly Array = Array;
   private _transloco = inject(TranslocoService);
+  private _layout = inject(AuthenticatedLayoutComponent, { optional: true });
 
   readonly stats = this._dashboardService.stats;
   readonly statsLoading = this._dashboardService.isLoading;
@@ -95,6 +98,10 @@ export class GestionProcesosComponent {
   public isBulkRoleModalOpen = signal(false);
   public bulkUpdateResult = signal<import('@app/core/models/process/process.model').BulkRoleUpdateResponse | null>(null);
   public isBulkResultModalOpen = signal(false);
+
+  // Single-process role modal (from table "Vincular rol")
+  public isRoleModalOpen = signal(false);
+  public roleModalProcessId = signal<string | null>(null);
 
   // Roles for selection
   public readonly roles = [
@@ -207,6 +214,9 @@ export class GestionProcesosComponent {
   ];
 
   constructor() {
+    this._layout?.syncPageTitleFromRouter();
+    afterNextRender(() => this._layout?.syncPageTitleFromRouter());
+
     this._loadFiltersFromQueryParams();
     this.loadProcesses();
 
@@ -802,6 +812,69 @@ export class GestionProcesosComponent {
    */
   public clearSelection(): void {
     this.selectedProcessIds.set(new Set());
+  }
+
+  /**
+   * Abrir modal de asignación de rol para un proceso de la tabla
+   */
+  public openRoleModal(row: Process | ProcessInstance, event?: Event): void {
+    event?.stopPropagation();
+    event?.preventDefault();
+    this.roleModalProcessId.set(row.id);
+    this.isRoleModalOpen.set(true);
+  }
+
+  /**
+   * Cerrar modal de asignación de rol individual
+   */
+  public closeRoleModal(): void {
+    this.isRoleModalOpen.set(false);
+    this.roleModalProcessId.set(null);
+  }
+
+  /**
+   * Tras guardar el rol desde la tabla, actualiza la fila sin recargar la lista
+   */
+  public onRoleSaved(result: { role?: string; message?: string }): void {
+    const processId = this.roleModalProcessId();
+    const role = result?.role;
+    this.closeRoleModal();
+    if (!processId || !role) return;
+
+    this._processService.getProcessDetail(processId).subscribe({
+      next: (detail) => {
+        const { lawyer_role, alert_level } = detail.process;
+        this._patchProcessRoleInList(processId, lawyer_role ?? role, alert_level ?? null);
+      },
+      error: () => {
+        this._patchProcessRoleInList(processId, role, null);
+      },
+    });
+  }
+
+  private _patchProcessRoleInList(
+    processId: string,
+    lawyerRole: string,
+    alertLevel: Process['alert_level'],
+  ): void {
+    this.processes.update((list) =>
+      list.map((p) => {
+        if (p.id === processId) {
+          return { ...p, lawyer_role: lawyerRole, alert_level: alertLevel };
+        }
+        if (p.instances?.some((inst) => inst.id === processId)) {
+          return {
+            ...p,
+            instances: p.instances.map((inst) =>
+              inst.id === processId
+                ? { ...inst, lawyer_role: lawyerRole, alert_level: alertLevel }
+                : inst,
+            ),
+          };
+        }
+        return p;
+      }),
+    );
   }
 
   /**
