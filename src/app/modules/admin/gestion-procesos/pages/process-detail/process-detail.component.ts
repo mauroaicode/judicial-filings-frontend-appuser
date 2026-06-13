@@ -34,6 +34,9 @@ import { ProcessAlertTooltipComponent } from '@app/shared/components/process-ale
 import { RoleSelectionModalComponent } from '../../components/role-selection-modal/role-selection-modal.component';
 import { ProcessAiChatComponent } from '../../components/process-ai-chat/process-ai-chat.component';
 import { AiCoreService } from '@app/core/services/ai-chat/ai-core.service';
+import { PageHeaderContextService } from '@app/core/services/layout/page-header-context.service';
+
+const DETAIL_HEADER_SCROLL_THRESHOLD = 80;
 
 @Component({
   selector: 'app-process-detail',
@@ -63,6 +66,7 @@ export class ProcessDetailComponent {
   private _destroyRef = inject(DestroyRef);
   private _layout = inject(AuthenticatedLayoutComponent, { optional: true });
   private _aiCoreService = inject(AiCoreService);
+  private _headerContext = inject(PageHeaderContextService);
 
   // AI Permission State
   public isAiEnabled = this._aiCoreService.isAiEnabled;
@@ -241,8 +245,12 @@ export class ProcessDetailComponent {
     this._route.paramMap
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((params) => {
+        this._headerContext.setCompactVisible(false);
         const id = params.get('id');
         this.loadProcessDetail(id);
+        queueMicrotask(() => {
+          document.querySelector<HTMLElement>('.process-detail-scroll')?.scrollTo(0, 0);
+        });
       });
 
     // Validar estado de IA para la organización
@@ -257,6 +265,49 @@ export class ProcessDetailComponent {
         this.loadActions();
       }
     });
+
+    effect(() => {
+      const process = this.process();
+      const instance = this.selectedInstance();
+
+      if (!process) {
+        this._headerContext.setProcessDetailContext(null);
+        return;
+      }
+
+      const statusLabel = this.initialStatusLabel() || process.status_label;
+      const lastActivitySource =
+        process.has_multiple_instances && instance
+          ? instance.last_activity_date
+          : process.last_activity_date;
+      const lawyerRole = instance?.lawyer_role ?? process.lawyer_role;
+
+      this._headerContext.setProcessDetailContext({
+        processNumber: process.process_number,
+        statusLabel,
+        statusBadgeClass: this.getStatusClass(statusLabel),
+        alertLevel: process.alert_level ?? null,
+        lawyerRole: lawyerRole ?? null,
+        lawyerRoleLabel: lawyerRole ? this.getRoleLabel(lawyerRole) : null,
+        instanceName: process.has_multiple_instances ? (instance?.court ?? null) : null,
+        lastActivityDate: this.formatDateSafe(lastActivitySource, 'shortDate'),
+      });
+    });
+
+    this._destroyRef.onDestroy(() => {
+      this._headerContext.clearProcessDetail();
+    });
+  }
+
+  /**
+   * Sync compact header visibility from detail scroll (desktop only)
+   */
+  onDetailScroll(event: Event): void {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      return;
+    }
+    const target = event.target as HTMLElement;
+    this._headerContext.setCompactVisible(target.scrollTop > DETAIL_HEADER_SCROLL_THRESHOLD);
   }
 
   /**

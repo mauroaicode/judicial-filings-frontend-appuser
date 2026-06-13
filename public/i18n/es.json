@@ -430,6 +430,10 @@
   },
   "processDetail": {
     "title": "Detalle del Proceso",
+    "headerCompact": {
+      "lastActivity": "Última actuación",
+      "lastUpdate": "Última actualización"
+    },
     "activateProcess": "Activar Seguimiento",
     "deactivateProcess": "Desactivar Seguimiento",
     "back": "Volver",

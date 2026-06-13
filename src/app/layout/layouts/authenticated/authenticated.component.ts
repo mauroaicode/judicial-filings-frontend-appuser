@@ -7,9 +7,10 @@ import {
   ViewChild,
   ViewEncapsulation,
   OnInit,
-  ChangeDetectorRef,
+  DestroyRef,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule, Location, PlatformLocation } from '@angular/common';
 import { Router, RouterOutlet, NavigationEnd, ActivatedRouteSnapshot } from '@angular/router';
 import { filter, tap } from 'rxjs';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -20,6 +21,7 @@ import { AuthService } from '@app/core/auth/auth.service';
 import { AlertComponent } from '@app/shared/components/alert/alert.component';
 import { SessionLockService } from '@app/core/services/session-lock/session-lock.service';
 import { SessionLockModalComponent } from '@app/shared/components/session-lock-modal/session-lock-modal.component';
+import { PageHeaderContextService } from '@app/core/services/layout/page-header-context.service';
 
 @Component({
   selector: 'app-authenticated-layout',
@@ -42,7 +44,10 @@ export class AuthenticatedLayoutComponent implements OnInit {
   private _router = inject(Router);
   private _authService = inject(AuthService);
   private _sessionLockService = inject(SessionLockService);
-  private _cdr = inject(ChangeDetectorRef);
+  private _location = inject(Location);
+  private _platformLocation = inject(PlatformLocation);
+  private _destroyRef = inject(DestroyRef);
+  private _headerContext = inject(PageHeaderContextService);
 
   @ViewChild(SidebarComponent) sidebar!: SidebarComponent;
 
@@ -50,31 +55,35 @@ export class AuthenticatedLayoutComponent implements OnInit {
   public mustChangePassword = computed(() => this._authService.user()?.must_change_password ?? false);
 
   // State signals
-  private _currentUrl = signal<string>(this._router.url);
+  private _routeRevision = signal(0);
   public sidebarOpen = signal<boolean>(true);
   public pageScrolled = signal<boolean>(false);
   public sessionLocked = this._sessionLockService.isLocked;
 
-  // Computed page title - Always in sync with URL and Router State
+  // Computed page title — derived from live Router URL (zoneless-safe)
   public pageTitle = computed(() => {
-    const url = this._currentUrl();
-
-    // 1. title en data de la ruta hoja o de un ancestro (lazy + path '' suelen dejar el título en el padre)
-    const dataTitle = this._titleFromSnapshot(this._router.routerState.snapshot.root);
-    if (dataTitle) {
-      return dataTitle;
-    }
-
-    // 2. Fallback si falta data en rutas
-    if (url.includes('/gestion-procesos/')) return 'processDetail.title';
-    if (url.includes('/gestion-procesos')) return 'navigation.gestionProcesos';
-    if (url.includes('/palabras-clave')) return 'navigation.keywords';
-    if (url.includes('/tareas')) return 'tasks.title';
-    if (url.includes('/perfil')) return 'header.profile';
-    if (url.includes('/dashboard')) return 'navigation.dashboard';
-
-    return '';
+    this._routeRevision();
+    const path = this._router.url.split('?')[0].split('#')[0];
+    return this._titleFromUrl(path) ?? this._titleFromSnapshot(this._router.routerState.snapshot.root) ?? '';
   });
+
+  private _titleFromUrl(path: string): string | undefined {
+    const normalized = path.replace(/\/$/, '') || '/';
+
+    if (/^\/gestion-procesos\/[^/]+$/.test(normalized)) {
+      return 'processDetail.title';
+    }
+    if (normalized === '/gestion-procesos') {
+      return 'navigation.gestionProcesos';
+    }
+    if (path.includes('/actuaciones-recientes')) return 'actuacionesRecientes.title';
+    if (path.includes('/palabras-clave')) return 'navigation.keywords';
+    if (path.includes('/tareas')) return 'tasks.title';
+    if (path.includes('/perfil')) return 'header.profile';
+    if (path.includes('/historial-importaciones')) return 'historialImportaciones.title';
+    if (path.includes('/dashboard')) return 'navigation.dashboard';
+    return undefined;
+  }
 
   private _titleFromSnapshot(root: ActivatedRouteSnapshot): string | undefined {
     let deepest = root;
@@ -91,16 +100,32 @@ export class AuthenticatedLayoutComponent implements OnInit {
     }
     return undefined;
   }
+  /** Re-sync header title from the current router URL (e.g. after browser back). */
+  public syncPageTitleFromRouter(): void {
+    this._routeRevision.update((v) => v + 1);
+  }
+
+  private _scheduleTitleSync(delayed = false): void {
+    const sync = () => this.syncPageTitleFromRouter();
+    if (delayed) {
+      setTimeout(sync, 0);
+    } else {
+      sync();
+    }
+  }
   
   constructor() {
-    // Explicitly force change detection on every navigation end
     this._router.events
       .pipe(
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-        tap((event) => {
-          this._currentUrl.set(event.urlAfterRedirects || event.url);
-          this._cdr.detectChanges();
-        })
+        tap(() => {
+          this._scheduleTitleSync();
+          const path = this._router.url.split('?')[0].split('#')[0];
+          if (!/^\/gestion-procesos\/[^/]+$/.test(path.replace(/\/$/, '') || '/')) {
+            this._headerContext.clearProcessDetail();
+          }
+        }),
+        takeUntilDestroyed()
       )
       .subscribe();
   }
@@ -108,11 +133,21 @@ export class AuthenticatedLayoutComponent implements OnInit {
   ngOnInit(): void {
     this._sessionLockService.initializeFromCurrentUser();
 
-    // Initial sync
-    setTimeout(() => {
-      this._currentUrl.set(this._router.url);
-      this._cdr.detectChanges();
-    }, 100);
+    // Browser back/forward: router.url may update after popstate
+    this._platformLocation.onPopState(() => this._scheduleTitleSync(true));
+
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        this._scheduleTitleSync(true);
+      }
+    };
+    window.addEventListener('pageshow', onPageShow);
+    this._destroyRef.onDestroy(() => window.removeEventListener('pageshow', onPageShow));
+
+    const removeUrlChange = this._location.onUrlChange(() => this._scheduleTitleSync(true));
+    this._destroyRef.onDestroy(() => removeUrlChange());
+
+    this.syncPageTitleFromRouter();
 
     // Initial scroll reset
     this._router.events
@@ -120,6 +155,7 @@ export class AuthenticatedLayoutComponent implements OnInit {
       .subscribe(() => {
         // Reset scroll state
         this.pageScrolled.set(false);
+        this._headerContext.setCompactVisible(false);
 
         // Reset scroll position
         const mainEl = document.querySelector('main');

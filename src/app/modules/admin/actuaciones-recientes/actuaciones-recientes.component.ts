@@ -25,11 +25,13 @@ import { finalize } from 'rxjs';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
 import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
 import { ProcessAlertTooltipComponent } from '@app/shared/components/process-alert-tooltip/process-alert-tooltip.component';
+import { RoleSelectionModalComponent } from '@app/modules/admin/gestion-procesos/components/role-selection-modal/role-selection-modal.component';
+import { ProcessService } from '@app/core/services/process/process.service';
 
 @Component({
   selector: 'app-actuaciones-recientes',
   standalone: true,
-  imports: [CommonModule, TranslocoModule, ReactiveFormsModule, DateRangePickerComponent, ProcessNumberPipe, ProcessAlertTooltipComponent],
+  imports: [CommonModule, TranslocoModule, ReactiveFormsModule, DateRangePickerComponent, ProcessNumberPipe, ProcessAlertTooltipComponent, RoleSelectionModalComponent],
   templateUrl: './actuaciones-recientes.component.html',
   styleUrls: ['./actuaciones-recientes.component.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -37,6 +39,7 @@ import { ProcessAlertTooltipComponent } from '@app/shared/components/process-ale
 })
 export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
   private _historyService = inject(NotificationDigestHistoryService);
+  private _processService = inject(ProcessService);
   private _fb = inject(FormBuilder);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
@@ -67,6 +70,9 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
   public selectedActionDetail = signal<NotificationDigestDisplayRow | null>(null);
   public copiedMessage = signal<string | null>(null);
   public mobileDigestSummaryExpanded = signal<boolean>(false);
+  public hoveredRowId = signal<string | null>(null);
+  public isRoleModalOpen = signal(false);
+  public roleModalProcessId = signal<string | null>(null);
 
   @ViewChild('loadingTrigger') loadingTrigger!: ElementRef;
   private _observer!: IntersectionObserver;
@@ -288,6 +294,8 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     this.showActionDetailModal.set(false);
     this.selectedActionDetail.set(null);
     this.mobileDigestSummaryExpanded.set(false);
+    this.hoveredRowId.set(null);
+    this.closeRoleModal();
     this.digestDetailPagination.set(null);
     setTimeout(() => {
       this.selectedDigest.set(null);
@@ -443,6 +451,50 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     return siblingId || null;
   }
 
+  public openRoleModal(action: NotificationDigestDisplayRow, event?: Event): void {
+    event?.stopPropagation();
+    event?.preventDefault();
+    const processId = this.getProcessNavigationId(action);
+    if (!processId) return;
+    this.roleModalProcessId.set(processId);
+    this.isRoleModalOpen.set(true);
+  }
+
+  public closeRoleModal(): void {
+    this.isRoleModalOpen.set(false);
+    this.roleModalProcessId.set(null);
+  }
+
+  public onRoleSaved(result: { role?: string; message?: string }): void {
+    const processId = this.roleModalProcessId();
+    const role = result?.role;
+    this.closeRoleModal();
+    if (!processId || !role) return;
+
+    this._processService.getProcessDetail(processId).subscribe({
+      next: (detail) => {
+        const { lawyer_role, alert_level } = detail.process;
+        this._patchDigestRowRole(processId, lawyer_role ?? role, alert_level ?? null);
+      },
+      error: () => {
+        this._patchDigestRowRole(processId, role, null);
+      },
+    });
+  }
+
+  private _patchDigestRowRole(
+    processId: string,
+    lawyerRole: string,
+    alertLevel: 'red' | 'yellow' | 'green' | null,
+  ): void {
+    this.selectedDigestDetails.update((list) =>
+      list.map((row) => {
+        if (this.getProcessNavigationId(row) !== processId) return row;
+        return { ...row, lawyer_role: lawyerRole, alert_level: alertLevel };
+      }),
+    );
+  }
+
   public openLegendModal(event?: MouseEvent): void {
     if (event) {
       event.preventDefault();
@@ -471,10 +523,14 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
 
   @HostListener('document:keydown.escape', ['$event'])
   public handleEscapeKey(event: Event): void {
-    if (!this.isModalOpen() && !this.showActionDetailModal() && !this.showLegendModal()) {
+    if (!this.isModalOpen() && !this.showActionDetailModal() && !this.showLegendModal() && !this.isRoleModalOpen()) {
       return;
     }
     event.preventDefault();
+    if (this.isRoleModalOpen()) {
+      this.closeRoleModal();
+      return;
+    }
     if (this.showActionDetailModal()) {
       this.closeActionDetailModal();
       return;
