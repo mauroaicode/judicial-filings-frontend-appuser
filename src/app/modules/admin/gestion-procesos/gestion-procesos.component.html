@@ -59,7 +59,14 @@
     <h2 id="gestion-stats-heading" class="sr-only">
       {{ 'dashboard.stats.title' | transloco }}
     </h2>
-    <app-dashboard-stats-cards [stats]="stats()" [loading]="statsLoading()" [error]="statsError()" />
+    <app-dashboard-stats-cards
+      [stats]="stats()"
+      [loading]="statsLoading()"
+      [error]="statsError()"
+      variant="gestion-procesos"
+      [activeSeverityColor]="filterForm.get('severity_color')?.value || null"
+      (semaphoreClick)="onSemaphoreFilter($event)"
+    />
   </section>
 
   <!-- Notifications drawer -->

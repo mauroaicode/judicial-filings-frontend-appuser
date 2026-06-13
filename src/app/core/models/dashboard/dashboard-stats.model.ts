@@ -7,6 +7,15 @@ export interface DashboardStatsNotificationsByType {
 }
 
 /**
+ * Semaphore counts from dashboard stats API
+ */
+export interface DashboardStatsSemaphores {
+  red: number;
+  yellow: number;
+  green: number;
+}
+
+/**
  * Dashboard stats response from GET dashboard/stats
  */
 export interface DashboardStats {
@@ -14,10 +23,13 @@ export interface DashboardStats {
   active_processes: number;
   inactive_processes: number;
   processes_with_multiple_instances: number;
+  semaphores?: DashboardStatsSemaphores;
   notifications: {
     by_type: DashboardStatsNotificationsByType;
   };
 }
+
+export type SemaphoreColor = 'red' | 'yellow' | 'green';
 
 /**
  * Card type for dashboard stats (used for click navigation)

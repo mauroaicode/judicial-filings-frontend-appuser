@@ -21,6 +21,7 @@ import { DateRangePickerComponent, DateRange } from '@app/shared/components/date
 import { DashboardService } from '@app/core/services/dashboard/dashboard.service';
 import { DashboardStatsCardsComponent } from '../dashboard/components/dashboard-stats-cards/dashboard-stats-cards.component';
 import { NotificationsDrawerComponent } from '@app/shared/components/notifications-drawer/notifications-drawer.component';
+import type { SemaphoreColor } from '@app/core/models/dashboard/dashboard-stats.model';
 import { NotificationsDrawerStateService } from '@app/core/services/notification/notifications-drawer-state.service';
 import { NotificationService } from '@app/core/services/notification/notification.service';
 import type { OrganizationNotificationRow } from '@app/core/models/notification/organization-notification.model';
@@ -426,6 +427,16 @@ export class GestionProcesosComponent {
    */
   onSearch(): void {
     this.loadProcesses(1, this.pagination()?.per_page || 20);
+  }
+
+  /**
+   * Apply or toggle semaphore filter from stats panel
+   */
+  onSemaphoreFilter(color: SemaphoreColor): void {
+    const current = this.filterForm.get('severity_color')?.value;
+    const next = current === color ? '' : color;
+    this.filterForm.patchValue({ severity_color: next });
+    this.onSearch();
   }
 
   /**

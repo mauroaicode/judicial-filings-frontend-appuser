@@ -125,7 +125,7 @@
           }
 
           @if (rows().length > 0) {
-            <div class="flex flex-col gap-3 px-4 pb-4 pt-1">
+            <div class="flex flex-col gap-4 px-4 pb-5 pt-2">
               @for (row of rows(); track row.id) {
 
                 <div
@@ -134,11 +134,11 @@
                   (dblclick)="onItemDblClick(row)"
                 >
                   <!-- Card header -->
-                  <div class="notifications-drawer-card-header px-3.5 py-3 flex justify-between items-start gap-3">
-                    <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                  <div class="notifications-drawer-card-header px-4 py-3.5 flex justify-between items-start gap-4">
+                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
                       <input
                         type="checkbox"
-                        class="checkbox checkbox-primary checkbox-sm mt-0.5 shrink-0"
+                        class="checkbox checkbox-primary checkbox-sm shrink-0"
                         [checked]="isSelected(row.id)"
                         (change)="toggleSelection(row.id, $event)"
                         (click)="$event.stopPropagation()"
@@ -146,13 +146,13 @@
                       />
                       <div class="min-w-0 flex-1 group/copy">
                         <span class="text-[9px] text-base-content/40 uppercase font-bold tracking-widest block mb-0.5">Radicado</span>
-                        <div class="flex items-start gap-1.5">
+                        <div class="flex items-center gap-1.5 min-w-0">
                           <span class="notifications-drawer-radicado font-bold text-primary text-sm break-all leading-snug select-all">
                             {{ row.process_number | processNumber }}
                           </span>
                           <button
                             type="button"
-                            class="btn btn-ghost btn-xs btn-circle shrink-0 pt-0.5 text-base-content/30 hover:bg-primary/5 hover:text-primary"
+                            class="btn btn-ghost btn-xs btn-circle shrink-0 text-base-content/30 hover:bg-primary/5 hover:text-primary"
                             [attr.aria-label]="'notificationsDrawer.copy' | transloco"
                             (click)="copyToClipboard(row.process_number, $event)"
                           >
@@ -195,71 +195,84 @@
                   </div>
 
                   <!-- Card body -->
-                  <div class="px-3.5 pb-3.5 pt-2.5 space-y-3 text-xs">
+                  <div class="notifications-drawer-card-body text-xs">
                     @if (isActuacionOrAlerta()) {
 
-                      <button
-                        type="button"
-                        class="text-left w-full focus:outline-none group/title"
-                        (click)="onItemClick(row)"
-                      >
-                        <h4 class="text-sm font-bold text-base-content leading-snug group-hover/title:text-primary transition-colors">
-                          <span [innerHTML]="getActionHtml(row) | safeHtml"></span>
-                        </h4>
-                      </button>
+                      <div class="notifications-drawer-card-section">
+                        <button
+                          type="button"
+                          class="text-left w-full focus:outline-none group/title"
+                          (click)="onItemClick(row)"
+                        >
+                          <h4 class="text-sm font-bold text-base-content leading-snug group-hover/title:text-primary transition-colors">
+                            <span [innerHTML]="getActionHtml(row) | safeHtml"></span>
+                          </h4>
+                        </button>
+                      </div>
 
                       @if (row.annotation && row.annotation !== '-') {
-                        <div class="rounded-xl bg-base-200/40 px-3 py-2.5">
-                          <span class="text-[10px] text-base-content/45 uppercase font-bold tracking-wider mb-1 block">
-                            {{ 'notificationsDrawer.table.annotation' | transloco }}
-                          </span>
-                          <p class="text-xs text-base-content/70 leading-relaxed">
-                            <span [innerHTML]="getAnnotationHtml(row) | safeHtml"></span>
-                          </p>
+                        <div class="notifications-drawer-card-section">
+                          <div class="rounded-xl bg-base-200/35 px-3.5 py-3">
+                            <span class="notifications-drawer-section-label">
+                              {{ 'notificationsDrawer.table.annotation' | transloco }}
+                            </span>
+                            <p class="text-xs text-base-content/70 leading-relaxed mt-1.5">
+                              <span [innerHTML]="getAnnotationHtml(row) | safeHtml"></span>
+                            </p>
+                          </div>
                         </div>
                       }
 
                       @if (row.subjects && row.subjects.length > 0) {
-                        <div (click)="$event.stopPropagation()" (dblclick)="$event.stopPropagation()">
-                          <span class="text-[10px] text-base-content/40 uppercase font-bold tracking-wider block mb-2">Sujetos procesales</span>
+                        <div class="notifications-drawer-card-section notifications-drawer-card-section--subjects" (click)="$event.stopPropagation()" (dblclick)="$event.stopPropagation()">
 
-                          <!-- Fila 1: Demandante(s) + Demandado(s) -->
                           @if (getMainSubjectGroups(row).length > 0) {
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                              @for (group of getMainSubjectGroups(row); track group.label) {
-                                <div class="flex flex-col min-w-0">
-                                  <span class="text-[10px] text-base-content/45 uppercase font-bold tracking-wider mb-1">{{ group.label }}</span>
-                                  <div class="space-y-1">
-                                    @for (subject of group.subjects; track subject.name + subject.type) {
-                                      <div class="flex items-start gap-2">
-                                        <div class="w-5 h-5 rounded-full bg-primary/15 text-primary text-[9px] font-bold flex items-center justify-center shrink-0 uppercase">
-                                          {{ subject.name.charAt(0) }}
-                                        </div>
-                                        <div class="min-w-0 pt-px">
-                                          <span class="text-base-content/85 text-xs font-medium break-words leading-snug">{{ subject.name }}</span>
-                                        </div>
+                            <div class="notifications-drawer-subjects-block">
+                              <span class="notifications-drawer-section-title">Sujetos procesales</span>
+
+                              <div class="notifications-drawer-subjects-main">
+                                @for (group of getMainSubjectGroups(row); track group.label) {
+                                  <div class="notifications-drawer-subjects-main-col">
+                                    <span class="notifications-drawer-section-label notifications-drawer-section-label--group">{{ group.label }}</span>
+                                    <div class="notifications-drawer-subjects-main-col-body">
+                                      <div class="notifications-drawer-subjects-list">
+                                        @for (subject of group.subjects; track subject.name + subject.type) {
+                                          <div class="flex items-start gap-2">
+                                            <div class="w-5 h-5 rounded-full bg-primary/15 text-primary text-[9px] font-bold flex items-center justify-center shrink-0 uppercase">
+                                              {{ getSubjectDisplayName(subject.name).charAt(0) }}
+                                            </div>
+                                            <div class="min-w-0 pt-px">
+                                              <span class="text-base-content/85 text-xs font-medium break-words leading-snug">{{ getSubjectDisplayName(subject.name) }}</span>
+                                              @if (group.showType && shouldShowSubjectType(subject.type)) {
+                                                <span class="block text-[10px] text-base-content/40 font-normal mt-0.5">{{ getSubjectTypeLabel(subject.type) }}</span>
+                                              }
+                                            </div>
+                                          </div>
+                                        }
                                       </div>
-                                    }
+                                    </div>
                                   </div>
-                                </div>
-                              }
+                                }
+                              </div>
                             </div>
+                          } @else {
+                            <span class="notifications-drawer-section-title">Sujetos procesales</span>
                           }
 
                           <!-- Fila 2: Otros sujetos (máx. 3 + tooltip) -->
                           @if (getOtrosSubjects(row).length > 0) {
-                            <div class="mt-3 pt-3 border-t border-base-200/40">
-                              <span class="text-[10px] text-base-content/45 uppercase font-bold tracking-wider mb-1.5 block">Otros sujetos</span>
-                              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                            <div class="notifications-drawer-subjects-otros">
+                              <span class="notifications-drawer-section-label notifications-drawer-section-label--group notifications-drawer-section-label--otros">Otros sujetos</span>
+                              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                 @for (subject of getVisibleOtrosSubjects(row); track subject.name + subject.type) {
                                   <div class="flex items-start gap-2 min-w-0">
                                     <div class="w-5 h-5 rounded-full bg-primary/15 text-primary text-[9px] font-bold flex items-center justify-center shrink-0 uppercase">
-                                      {{ subject.name.charAt(0) }}
+                                      {{ getSubjectDisplayName(subject.name).charAt(0) }}
                                     </div>
                                     <div class="min-w-0 pt-px">
-                                      <span class="text-base-content/85 text-xs font-medium break-words leading-snug">{{ subject.name }}</span>
-                                      @if (subject.type) {
-                                        <span class="block text-[10px] text-base-content/40 font-normal mt-px">{{ subject.type }}</span>
+                                      <span class="text-base-content/85 text-xs font-medium break-words leading-snug">{{ getSubjectDisplayName(subject.name) }}</span>
+                                      @if (shouldShowSubjectType(subject.type)) {
+                                        <span class="block text-[10px] text-base-content/40 font-normal mt-0.5">{{ getSubjectTypeLabel(subject.type) }}</span>
                                       }
                                     </div>
                                   </div>
@@ -273,9 +286,9 @@
                                       <div class="tooltip-content text-left text-xs max-w-xs rounded-xl shadow-2xl bg-white border border-base-200 p-3 space-y-2 z-[1000]">
                                         @for (subject of getRemainingOtrosSubjects(row); track subject.name + subject.type) {
                                           <div>
-                                            <div class="text-base-content font-medium leading-snug">{{ subject.name }}</div>
-                                            @if (subject.type) {
-                                              <div class="text-[10px] text-base-content/45 mt-0.5">{{ subject.type }}</div>
+                                            <div class="text-base-content font-medium leading-snug">{{ getSubjectDisplayName(subject.name) }}</div>
+                                            @if (shouldShowSubjectType(subject.type)) {
+                                              <div class="text-[10px] text-base-content/45 mt-0.5">{{ getSubjectTypeLabel(subject.type) }}</div>
                                             }
                                           </div>
                                         }
@@ -292,8 +305,12 @@
                         </div>
                       }
 
-                      <div class="border-t border-base-200/40 mt-1 pt-3 overflow-x-auto">
-                        <div class="grid grid-cols-4 gap-2 sm:gap-3 min-w-[32rem]">
+                      <div class="notifications-drawer-card-footer">
+                        <div class="notifications-drawer-card-section notifications-drawer-card-section--dates overflow-x-auto">
+                          <span class="notifications-drawer-section-label notifications-drawer-section-label--footer">
+                            {{ 'notificationsDrawer.sections.dates' | transloco }}
+                          </span>
+                          <div class="grid grid-cols-4 gap-3 sm:gap-4 min-w-[32rem] mt-3">
                         @if (row.action_date) {
                           <div class="flex items-start gap-1.5 min-w-0">
                             <div class="shrink-0 w-6 h-6 rounded-md bg-base-200/80 flex items-center justify-center">
@@ -346,6 +363,7 @@
                             </div>
                           </div>
                         }
+                        </div>
                         </div>
                       </div>
 
