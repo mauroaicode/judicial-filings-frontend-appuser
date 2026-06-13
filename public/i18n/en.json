@@ -362,10 +362,12 @@
       "redDemandante": "Critical Alert: Risk of withdrawal or serious paralysis (+90 days of inactivity).",
       "yellowDemandante": "Early Alert: Follow-up needed to avoid default (+45 days of inactivity).",
       "greenDemandante": "Process with recent and healthy activity.",
+      "redDemandado": "Critical Alert: The case against is advancing; stay alert (recent activity, < 45 days).",
+      "yellowDemandado": "Early Alert: Moderate activity; follow-up recommended (45–89 days without action).",
+      "greenDemandado": "Favorable Informational: The case against is not advancing (+90 days of inactivity).",
       "redGeneral": "Critical Alert: Judgment, order or termination detected.",
       "yellowGeneral": "Process Alert: Transfer, memorial or notice detected.",
-      "greenGeneral": "Informational: Record or file detected.",
-      "greenDemandado": "Favorable Informational: The case against is not advancing (+90 days of inactivity)."
+      "greenGeneral": "Informational: Record or file detected."
     },
     "legend": {
       "title": "Status Legend",

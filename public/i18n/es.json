@@ -383,10 +383,12 @@
       "redDemandante": "Alerta Crítica: Riesgo de desistimiento o parálisis grave (+90 días de inactividad).",
       "yellowDemandante": "Alerta Temprana: Seguimiento necesario para evitar mora (+45 días de inactividad).",
       "greenDemandante": "Proceso con actividad reciente y saludable.",
+      "redDemandado": "Alerta Crítica: El proceso en contra avanza; debe estar pendiente (actividad reciente, < 45 días).",
+      "yellowDemandado": "Alerta Temprana: Actividad moderada; seguimiento recomendado (45–89 días sin actuación).",
+      "greenDemandado": "Informativo Favorable: El proceso en contra no avanza (+90 días de inactividad).",
       "redGeneral": "Alerta Crítica: Sentencia, mandamiento o terminación detectada.",
       "yellowGeneral": "Alerta de Trámite: Traslado, memorial u oficio detectado.",
-      "greenGeneral": "Informativo: Constancia o archivo detectado.",
-      "greenDemandado": "Informativo Favorable: El proceso en contra no avanza (+90 días de inactividad)."
+      "greenGeneral": "Informativo: Constancia o archivo detectado."
     },
     "legend": {
       "title": "Leyenda de Estados",
