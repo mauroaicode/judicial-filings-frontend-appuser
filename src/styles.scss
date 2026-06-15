@@ -74,8 +74,11 @@ body {
 }
 
 
-/* Flatpickr Date Range Picker Styles */
+.modal-box {
+  position: relative;
+}
 app-date-range-picker .flatpickr-calendar,
+app-date-picker .flatpickr-calendar,
 .flatpickr-calendar {
   border: 1px solid hsl(var(--b3)) !important;
   border-radius: 0.5rem !important;
@@ -182,8 +185,11 @@ app-date-range-picker .flatpickr-day,
   }
 
   &.today {
-    border-color: #4B2A7D !important;
+    border: none !important;
+    background: transparent !important;
+    color: hsl(var(--bc)) !important;
     font-weight: 600 !important;
+    box-shadow: none !important;
   }
 }
 
@@ -277,6 +283,48 @@ app-gestion-procesos .process-list-table tbody tr.process-row-hovered td {
 .input::placeholder {
   font-weight: 500 !important;
   opacity: 0.35 !important;
+}
+
+.textarea-standard {
+  min-height: 7.5rem !important;
+  height: auto !important;
+  border-radius: 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: hsl(var(--bc) / 0.2) !important;
+  background-color: var(--color-base-100, #ffffff) !important;
+  width: 100% !important;
+  padding: 0.75rem 1rem !important;
+  line-height: 1.5 !important;
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  resize: vertical !important;
+  transition: all 0.2s ease-in-out !important;
+  box-shadow: none !important;
+}
+
+.textarea-standard:focus {
+  border-color: var(--color-primary) !important;
+  outline: 2px solid rgba(75, 42, 125, 0.3) !important;
+  outline-offset: 1px !important;
+}
+
+.textarea-standard::placeholder {
+  font-weight: 500 !important;
+  opacity: 0.35 !important;
+}
+
+.task-form .input-standard,
+.task-form .textarea-standard {
+  font-weight: 400 !important;
+}
+
+.task-form .input-standard.process-selected {
+  font-weight: 900 !important;
+  color: var(--color-primary) !important;
 }
 
 .btn-standard-search {

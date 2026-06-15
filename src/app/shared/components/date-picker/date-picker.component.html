@@ -1,0 +1,31 @@
+<div class="form-control w-full">
+  @if (label()) {
+    <label class="label pt-0 pb-1">
+      <span class="label-standard">{{ label() }}</span>
+    </label>
+  }
+
+  <div class="relative">
+    <input #dateInput type="text"
+      class="input-standard input input-bordered w-full date-picker-input"
+      [placeholder]="placeholder()"
+      [disabled]="disabled() || isDisabled()"
+      name="task-due-date"
+      autocomplete="off"
+      (click)="openPicker()"
+      (blur)="onBlur()"
+      readonly />
+    <button type="button"
+      class="date-picker-icon absolute right-3 top-1/2 -translate-y-1/2 text-base-content/30"
+      [disabled]="disabled() || isDisabled()"
+      (click)="openPicker()"
+      tabindex="-1"
+      aria-label="Abrir calendario">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    </button>
+  </div>
+</div>

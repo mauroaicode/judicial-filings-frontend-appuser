@@ -2,43 +2,138 @@
     <div class="modal-box p-0 flex flex-col bg-base-100 shadow-2xl lg:max-w-2xl w-full lg:rounded-2xl rounded-t-3xl rounded-b-none pb-8 lg:pb-0 max-h-[95vh] sm:max-h-[90vh]">
         
         <!-- Header -->
-        <div class="p-6 sm:p-8 border-b border-base-200 flex-none">
-            <h3 class="font-bold text-2xl text-base-content">{{ (task() ? 'tasks.edit' : 'tasks.add') | transloco }}</h3>
+        <div class="px-6 sm:px-8 pt-6 sm:pt-8 pb-4 border-b border-base-200 flex-none">
+            <h3 class="font-bold text-2xl text-base-content">
+                @if (isStatusOnlyMode()) {
+                    {{ 'tasks.changeStatus' | transloco }}
+                } @else {
+                    {{ (task() ? 'tasks.edit' : 'tasks.add') | transloco }}
+                }
+            </h3>
             <p class="text-sm text-base-content/60 mt-1">
-                {{ (task() ? 'Actualice la información de la tarea para su gestión' : 'Cree una nueva tarea para llevar el seguimiento de sus procesos') }}
+                @if (isStatusOnlyMode()) {
+                    {{ 'tasks.form.statusOnlyHint' | transloco }}
+                } @else {
+                    {{ (task() ? 'Actualice la información de la tarea para su gestión' : 'Cree una nueva tarea para llevar el seguimiento de sus procesos') }}
+                }
             </p>
         </div>
 
-        <div class="p-6 sm:p-8 overflow-y-auto flex-1">
-            <form [formGroup]="taskForm" (ngSubmit)="onSave()" class="space-y-6">
+        <div class="px-6 sm:px-8 pt-4 pb-6 sm:pb-8 overflow-y-auto flex-1">
+            <form [formGroup]="taskForm" (ngSubmit)="onSave()" class="space-y-6 task-form" autocomplete="off">
+                @if (isStatusOnlyMode()) {
+                    <div class="rounded-xl border border-base-200 bg-base-200/30 px-4 py-3 text-sm text-base-content/70">
+                        {{ 'tasks.archivedReadOnly' | transloco }}
+                    </div>
+                }
+
                 <!-- Title -->
                 <div class="form-control">
-                    <label class="label pb-1">
-                        <span class="label-standard uppercase tracking-widest text-[10px] font-black text-base-content/40">{{ 'tasks.form.title' | transloco }}</span>
+                    <label class="label pt-0 pb-1">
+                        <span class="label-standard">{{ 'tasks.form.title' | transloco }}</span>
                     </label>
                     <input type="text" formControlName="title"
                         [placeholder]="'tasks.form.titlePlaceholder' | transloco"
                         class="input-standard input w-full"
+                        autocomplete="off" name="task-title"
                         [class.input-error]="(taskForm.get('title')?.touched && taskForm.get('title')?.invalid) || getBackendError('title')">
+                    @if (getBackendError('title')) {
+                        <label class="label pt-1.5">
+                            <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ getBackendError('title') }}</span>
+                        </label>
+                    } @else if (taskForm.get('title')?.touched && taskForm.get('title')?.invalid) {
+                        <label class="label pt-1.5">
+                            <span class="text-[10px] font-bold text-error uppercase tracking-wider">Campo obligatorio</span>
+                        </label>
+                    }
                 </div>
 
                 <!-- Description -->
                 <div class="form-control">
-                    <label class="label pb-1">
-                        <span class="label-standard uppercase tracking-widest text-[10px] font-black text-base-content/40">{{ 'tasks.form.description' | transloco }}</span>
+                    <label class="label pt-0 pb-1">
+                        <span class="label-standard">{{ 'tasks.form.description' | transloco }}</span>
                     </label>
-                    <textarea formControlName="description"
+                    <textarea formControlName="description" rows="4"
                         [placeholder]="'tasks.form.descriptionPlaceholder' | transloco"
-                        class="input-standard input w-full min-h-[120px] py-3 leading-relaxed focus:border-primary transition-all"
-                        [class.input-error]="(taskForm.get('description')?.touched && taskForm.get('description')?.invalid) || getBackendError('description')"></textarea>
+                        class="textarea-standard textarea textarea-bordered w-full"
+                        autocomplete="off" name="task-description"
+                        [class.textarea-error]="(taskForm.get('description')?.touched && taskForm.get('description')?.invalid) || getBackendError('description')"></textarea>
+                    @if (getBackendError('description')) {
+                        <label class="label pt-1.5">
+                            <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ getBackendError('description') }}</span>
+                        </label>
+                    } @else if (taskForm.get('description')?.touched && taskForm.get('description')?.invalid) {
+                        <label class="label pt-1.5">
+                            <span class="text-[10px] font-bold text-error uppercase tracking-wider">Campo obligatorio</span>
+                        </label>
+                    }
                 </div>
 
-                <!-- Process Associated Search (Cleaner approach) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Due Date -->
+                    <div class="form-control">
+                        <app-date-picker
+                            [label]="'tasks.form.dueDate' | transloco"
+                            [placeholder]="'tasks.form.dueDatePlaceholder' | transloco"
+                            formControlName="due_date"
+                            [size]="'sm'">
+                        </app-date-picker>
+                        @if (getBackendError('due_date')) {
+                            <label class="label pt-1.5">
+                                <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ getBackendError('due_date') }}</span>
+                            </label>
+                        }
+                    </div>
+
+                    <!-- Reminder Days -->
+                    <div class="form-control">
+                        <label class="label pt-0 pb-1">
+                            <span class="label-standard">{{ 'tasks.form.reminderDays' | transloco }}</span>
+                        </label>
+                        <input type="number" formControlName="reminder_days" min="0" max="365"
+                            [placeholder]="'tasks.form.reminderDaysPlaceholder' | transloco"
+                            class="input-standard input input-bordered w-full"
+                            autocomplete="off" name="task-reminder-days" inputmode="numeric"
+                            [class.input-error]="(taskForm.get('reminder_days')?.touched && taskForm.get('reminder_days')?.invalid) || getBackendError('reminder_days')">
+                        @if (getBackendError('reminder_days')) {
+                            <label class="label pt-1.5">
+                                <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ getBackendError('reminder_days') }}</span>
+                            </label>
+                        } @else if (taskForm.get('reminder_days')?.touched && taskForm.get('reminder_days')?.invalid) {
+                            <label class="label pt-1.5">
+                                <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ 'tasks.form.reminderDaysInvalid' | transloco }}</span>
+                            </label>
+                        }
+                    </div>
+                </div>
+
+                <!-- Status -->
                 <div class="form-control">
-                    <label class="label pb-1">
-                        <span class="label-standard uppercase tracking-widest text-[10px] font-black text-base-content/40">{{ 'tasks.form.process' | transloco }}</span>
+                    <label class="label pt-0 pb-1">
+                        <span class="label-standard">{{ 'tasks.form.status' | transloco }}</span>
                     </label>
-                    <div class="relative group w-full">
+                    <select formControlName="status" class="select-standard select select-bordered w-full"
+                        [class.select-error]="getBackendError('status')">
+                        @for (status of taskStatuses(); track status.value) {
+                            <option [value]="status.value">{{ status.label }}</option>
+                        }
+                    </select>
+                    <label class="label pt-1">
+                        <span class="text-[10px] font-medium text-base-content/40">{{ 'tasks.form.statusHint' | transloco }}</span>
+                    </label>
+                    @if (getBackendError('status')) {
+                        <label class="label pt-0">
+                            <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ getBackendError('status') }}</span>
+                        </label>
+                    }
+                </div>
+
+                <!-- Process Associated Search -->
+                <div class="form-control">
+                    <label class="label pt-0 pb-1">
+                        <span class="label-standard">{{ 'tasks.form.process' | transloco }}</span>
+                    </label>
+                    <div #processSearchContainer class="relative group w-full">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-base-content/30 z-10">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -48,6 +143,14 @@
                         <input type="text" formControlName="process_search"
                             [placeholder]="'tasks.form.processPlaceholder' | transloco"
                             class="input-standard input w-full pl-10 pr-10 cursor-pointer focus:cursor-text"
+                            name="task-process-search"
+                            autocomplete="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                            role="combobox"
+                            aria-autocomplete="list"
+                            [attr.aria-expanded]="showProcessDropdown()"
+                            [class.process-selected]="taskForm.get('process_id')?.value"
                             (focus)="onProcessSearchFocus()"
                             [class.input-error]="getBackendError('process_id')">
 
@@ -132,10 +235,12 @@
                         {{ 'common.cancel' | transloco }}
                     </button>
                     <button type="submit" class="btn btn-primary btn-sm sm:btn-md h-11 px-10 rounded-xl font-bold normal-case"
-                        [disabled]="taskForm.invalid || isSaving()">
+                        [disabled]="!canSubmit()">
                         @if (isSaving()) {
                             <span class="loading loading-spinner loading-xs"></span>
                             {{ 'common.saving' | transloco }}
+                        } @else if (isStatusOnlyMode()) {
+                            {{ 'tasks.changeStatus' | transloco }}
                         } @else {
                             {{ (task() ? 'common.save' : 'tasks.add') | transloco }}
                         }
@@ -152,8 +257,8 @@
 <!-- Confirmation Dialog BEFORE actual saving (Matches Desactivar Proceso flow) -->
 <app-confirmation-dialog
     [open]="showConfirmDialog()"
-    [title]="(task() ? 'Actualizar Tarea' : 'Crear Tarea')"
-    [message]="(task() ? '¿Está seguro de actualizar la información de esta tarea?' : '¿Desea crear esta nueva tarea para iniciar el seguimiento?') "
+    [title]="(isStatusOnlyMode() ? ('tasks.changeStatus' | transloco) : (task() ? 'Actualizar Tarea' : 'Crear Tarea'))"
+    [message]="(isStatusOnlyMode() ? ('tasks.messages.confirmStatusChange' | transloco) : (task() ? '¿Está seguro de actualizar la información de esta tarea?' : '¿Desea crear esta nueva tarea para iniciar el seguimiento?'))"
     [confirmLabel]="'Confirmar'"
     [cancelLabel]="'Cancelar'"
     confirmClass="btn-primary text-white h-11 px-8 rounded-xl font-bold normal-case"
