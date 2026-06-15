@@ -4,7 +4,8 @@
     "loading": "Loading...",
     "save": "Save",
     "saving": "Saving...",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "close": "Close"
   },
   "generics": {
     "email": "Email",
@@ -83,6 +84,7 @@
     "unlockButton": "Unlock",
     "unlocking": "Unlocking...",
     "retryIn": "You can retry in",
+    "signOut": "Sign out",
     "configHint": "You can disable or configure the timeout for this automatic lock in the Settings > Security menu."
   },
   "navigation": {
@@ -590,5 +592,114 @@
     "saveError": "Error saving settings.",
     "saving": "Saving...",
     "saveButton": "Save changes"
+  },
+  "tasks": {
+    "title": "Judicial Agenda",
+    "description": "Manage your tasks, deadlines and commitments related to judicial processes.",
+    "add": "Add Task",
+    "edit": "Edit",
+    "delete": "Delete",
+    "moveToTrash": "Move to trash",
+    "markComplete": "Mark complete",
+    "changeStatus": "Change status",
+    "archivedReadOnly": "Archived task — read only",
+    "empty": "No tasks registered",
+    "emptyPending": "You have no pending tasks",
+    "emptyPendingHint": "Create a new task to track deadlines, hearings and actions in your cases.",
+    "emptyDraft": "You have no drafts",
+    "emptyCompleted": "You have no completed tasks",
+    "emptyTrash": "Trash is empty",
+    "loading": "Loading tasks...",
+    "loadMore": "Load more",
+    "days": "days",
+    "createdAt": "Created",
+    "dueDate": "Due",
+    "reminderIn": "Reminder in {{days}} days",
+    "relatedProcess": "Related process",
+    "copyRadicado": "Copy case number",
+    "detail": {
+      "subtitle": "Full task details",
+      "viewDetail": "View details",
+      "noProcess": "No associated process"
+    },
+    "tabs": {
+      "pending": "Pending",
+      "draft": "Drafts",
+      "completed": "Completed",
+      "trash": "Trash"
+    },
+    "trash": {
+      "description": "Deleted tasks you can restore or permanently remove.",
+      "hint": "Tasks in trash do not appear in normal lists. You can restore them to their original status or delete them permanently.",
+      "emptyHint": "Tasks you move to trash will appear here.",
+      "badge": "In trash",
+      "deletedAt": "Deleted on",
+      "restore": "Restore",
+      "forceDelete": "Delete permanently",
+      "detailSubtitle": "Task in trash — read only",
+      "confirmForceDeleteTitle": "Delete permanently",
+      "confirmForceDelete": "This action is irreversible. The task will be permanently removed from the database and cannot be recovered."
+    },
+    "urgency": {
+      "title": "Urgency indicator",
+      "hint": "Color shows how many days the task has been open since creation.",
+      "normal": "Normal (< 10 days)",
+      "alert1": "Alert (10 days)",
+      "alert2": "High alert (15 days)",
+      "critical": "Critical (30+ days)"
+    },
+    "complete": {
+      "title": "Mark task as complete",
+      "message": "The task will be archived and removed from pending. You will no longer receive reminders.",
+      "confirm": "Confirm complete"
+    },
+    "alert": {
+      "success": "Success!",
+      "error": "Error!"
+    },
+    "form": {
+      "title": "Task Title",
+      "titlePlaceholder": "E.g.: Review process terms",
+      "description": "Description",
+      "descriptionPlaceholder": "Additional task details...",
+      "dueDate": "Due Date",
+      "dueDatePlaceholder": "Select date",
+      "reminderDays": "Reminder Days",
+      "reminderDaysPlaceholder": "E.g.: 3",
+      "reminderDaysInvalid": "Enter a value between 0 and 365",
+      "status": "Task Status",
+      "statusHint": "Pending: active with reminders. Draft: saved but inactive. Completed: archived without reminders.",
+      "statusOnlyHint": "Completed tasks cannot be edited. You can only change the status to reactivate them.",
+      "isAdmin": "Visible to Admin",
+      "process": "Associated Process (Optional)",
+      "processPlaceholder": "Search by case number or court",
+      "noProcessesFound": "No active processes found",
+      "searching": "Searching processes..."
+    },
+    "messages": {
+      "created": "Task created successfully",
+      "updated": "Task updated successfully",
+      "deleted": "Task deleted successfully",
+      "movedToTrash": "Task moved to trash",
+      "moveToTrashError": "Could not move the task to trash.",
+      "restored": "Task restored successfully",
+      "restoreError": "Could not restore the task.",
+      "forceDeleted": "Task permanently deleted",
+      "forceDeleteError": "Could not permanently delete the task.",
+      "completed": "Task marked as complete and archived",
+      "statusUpdated": "Task status updated successfully",
+      "copied": "Case number copied to clipboard",
+      "loadError": "An error occurred while loading tasks",
+      "taskNotFound": "The requested task could not be found",
+      "deleteError": "Could not delete the task. Please try again.",
+      "completeError": "Could not mark the task as complete.",
+      "copyError": "Could not copy the number.",
+      "error": "An error occurred while processing the request",
+      "confirmDelete": "Are you sure you want to delete this task? This action cannot be undone.",
+      "confirmDeleteTitle": "Delete Task",
+      "confirmMoveToTrash": "The task will be moved to trash. You can restore it or delete it permanently later.",
+      "confirmMoveToTrashTitle": "Move to trash",
+      "confirmStatusChange": "Do you want to change the status of this archived task?"
+    }
   }
 }

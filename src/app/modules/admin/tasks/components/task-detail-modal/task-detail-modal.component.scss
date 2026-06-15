@@ -1,0 +1,107 @@
+:host {
+  display: contents;
+}
+
+.modal {
+  z-index: 10050;
+}
+
+.task-section-label {
+  display: block;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: hsl(var(--bc) / 0.38);
+  margin-bottom: 0.25rem;
+}
+
+.task-urgency--normal { --task-urgency-accent: #16a34a; }
+.task-urgency--alert-1 { --task-urgency-accent: #d97706; }
+.task-urgency--alert-2 { --task-urgency-accent: #ea580c; }
+.task-urgency--critical { --task-urgency-accent: #dc2626; }
+
+.task-urgency-panel {
+  border: 1px solid transparent;
+
+  &__label {
+    margin-bottom: 0.35rem;
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #fff;
+    background-color: var(--task-urgency-accent);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+  }
+
+  &__dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.92);
+    flex-shrink: 0;
+  }
+
+  &.task-urgency--normal {
+    background: rgba(22, 163, 74, 0.08);
+    border-color: rgba(22, 163, 74, 0.22);
+
+    .task-urgency-panel__label {
+      color: rgba(22, 101, 52, 0.75);
+    }
+  }
+
+  &.task-urgency--alert-1 {
+    background: rgba(217, 119, 6, 0.1);
+    border-color: rgba(217, 119, 6, 0.24);
+
+    .task-urgency-panel__label {
+      color: rgba(146, 64, 14, 0.8);
+    }
+  }
+
+  &.task-urgency--alert-2 {
+    background: rgba(234, 88, 12, 0.1);
+    border-color: rgba(234, 88, 12, 0.24);
+
+    .task-urgency-panel__label {
+      color: rgba(154, 52, 18, 0.8);
+    }
+  }
+
+  &.task-urgency--critical {
+    background: rgba(220, 38, 38, 0.1);
+    border-color: rgba(220, 38, 38, 0.24);
+
+    .task-urgency-panel__label {
+      color: rgba(153, 27, 27, 0.8);
+    }
+  }
+}
+
+.task-urgency-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: hsl(var(--bc) / 0.45);
+
+  &__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background-color: var(--task-urgency-accent);
+    flex-shrink: 0;
+  }
+}

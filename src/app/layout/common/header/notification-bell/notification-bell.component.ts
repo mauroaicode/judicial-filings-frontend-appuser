@@ -122,10 +122,34 @@ export class NotificationBellComponent implements OnInit {
             queryParams: { import: importId },
           };
         },
+        'task-reminder': (item) => this._resolveTaskNavigation(item),
+        'task_reminder': (item) => this._resolveTaskNavigation(item),
+        'task-urgency': (item) => this._resolveTaskNavigation(item),
+        'task': (item) => this._resolveTaskNavigation(item),
       };
 
       const resolver = notificationType ? routeResolvers[notificationType] : null;
-      return resolver ? resolver(notification) : null;
+      if (resolver) {
+        return resolver(notification);
+      }
+
+      if (notification.data?.task_id) {
+        return this._resolveTaskNavigation(notification);
+      }
+
+      return null;
+    }
+
+    private _resolveTaskNavigation(
+      notification: AppNotification
+    ): { commands: string[]; queryParams?: Record<string, string> } | null {
+      const taskId = notification.data?.task_id;
+      if (!taskId) return null;
+
+      return {
+        commands: ['/tareas'],
+        queryParams: { task: taskId },
+      };
     }
 
     private _closeDropdown(): void {

@@ -4,8 +4,15 @@
 export interface NotificationData {
     title: string;
     description: string;
-    type: string; // e.g., 'import-report'
-    id?: string;   // Resource related ID (like batch import UUID)
+    type: string; // e.g., 'import-report', 'task-urgency'
+    id?: string;
+    task_id?: string;
+    task_title?: string;
+    process_id?: string;
+    process_number?: string;
+    days_elapsed?: number;
+    urgency_level?: string;
+    urgency_label?: string;
     digest_id?: string;
     status?: string;
 }

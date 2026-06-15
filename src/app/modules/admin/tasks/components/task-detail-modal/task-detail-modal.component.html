@@ -1,0 +1,155 @@
+<dialog class="modal modal-bottom lg:modal-middle" [class.modal-open]="true">
+    <div class="modal-box p-0 flex flex-col bg-base-100 shadow-2xl lg:max-w-2xl w-full lg:rounded-2xl rounded-t-3xl rounded-b-none max-h-[95vh] sm:max-h-[90vh]">
+        <!-- Header -->
+        <div class="px-6 sm:px-8 pt-6 sm:pt-8 pb-4 border-b border-base-200 flex-none">
+            <div class="flex items-start justify-between gap-4">
+                <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                        <span class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none"
+                            [class.badge-primary]="task().status === 'pending'"
+                            [class.badge-ghost]="task().status === 'draft'"
+                            [class.badge-success]="task().status === 'completed'">
+                            {{ task().status_label }}
+                        </span>
+                        @if (isTrash()) {
+                            <span class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none badge-error badge-outline">
+                                {{ 'tasks.trash.badge' | transloco }}
+                            </span>
+                        }
+                        @if (urgencyInfo(); as urgency) {
+                            <span class="task-urgency-indicator" [class]="urgencyClass()">
+                                <span class="task-urgency-indicator__dot"></span>
+                                {{ urgency.days }} {{ 'tasks.days' | transloco }}
+                            </span>
+                        }
+                    </div>
+                    <h3 class="font-bold text-2xl text-base-content leading-tight">{{ task().title }}</h3>
+                    <p class="text-sm text-base-content/60 mt-1">
+                        {{ (isTrash() ? 'tasks.trash.detailSubtitle' : 'tasks.detail.subtitle') | transloco }}
+                    </p>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm btn-circle shrink-0" (click)="onClose()" [attr.aria-label]="'common.close' | transloco">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="px-6 sm:px-8 py-5 sm:py-6 overflow-y-auto flex-1 space-y-5">
+            @if (isTrash() && task().deleted_at) {
+                <div class="rounded-xl border border-error/20 bg-error/5 px-4 py-3 text-sm text-error/80">
+                    {{ 'tasks.trash.deletedAt' | transloco }}: {{ task().deleted_at | date:'dd MMM yyyy HH:mm' }}
+                </div>
+            }
+
+            <!-- Description -->
+            <section>
+                <span class="task-section-label">{{ 'tasks.form.description' | transloco }}</span>
+                <div class="mt-2 rounded-xl bg-base-200/35 border border-base-200/60 px-4 py-4">
+                    <p class="text-sm text-base-content/80 leading-relaxed whitespace-pre-wrap break-words">
+                        {{ task().description }}
+                    </p>
+                </div>
+            </section>
+
+            <!-- Meta grid -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="rounded-xl bg-base-200/25 border border-base-200/50 px-4 py-3">
+                    <span class="task-section-label">{{ 'tasks.createdAt' | transloco }}</span>
+                    <p class="text-sm font-semibold text-base-content mt-1">{{ task().created_at | date:'dd MMM yyyy' }}</p>
+                </div>
+                <div class="rounded-xl bg-base-200/25 border border-base-200/50 px-4 py-3">
+                    <span class="task-section-label">{{ 'tasks.form.dueDate' | transloco }}</span>
+                    <p class="text-sm font-semibold text-base-content mt-1">
+                        {{ task().due_date ? (task().due_date | date:'dd MMM yyyy') : '—' }}
+                    </p>
+                </div>
+                <div class="rounded-xl bg-base-200/25 border border-base-200/50 px-4 py-3">
+                    <span class="task-section-label">{{ 'tasks.form.reminderDays' | transloco }}</span>
+                    <p class="text-sm font-semibold text-base-content mt-1">
+                        @if (task().reminder_days !== null && task().reminder_days !== undefined) {
+                            {{ 'tasks.reminderIn' | transloco:{ days: task().reminder_days } }}
+                        } @else {
+                            —
+                        }
+                    </p>
+                </div>
+                @if (urgencyInfo(); as urgency) {
+                    <div class="task-urgency-panel rounded-xl px-4 py-3" [class]="urgencyClass()">
+                        <span class="task-section-label task-urgency-panel__label">{{ 'tasks.urgency.title' | transloco }}</span>
+                        <span class="task-urgency-panel__badge">
+                            <span class="task-urgency-panel__dot" aria-hidden="true"></span>
+                            {{ urgency.labelKey | transloco }}
+                        </span>
+                    </div>
+                }
+            </section>
+
+            <!-- Process -->
+            <section>
+                <span class="task-section-label">{{ 'tasks.relatedProcess' | transloco }}</span>
+                @if (task().process_id) {
+                    <div class="mt-2 rounded-xl bg-base-200/35 border border-base-200/60 px-4 py-3 flex items-center justify-between gap-3">
+                        <span class="font-bold text-primary text-sm break-all">
+                            {{ task().process_number ? (task().process_number | processNumber) : ('ID: ' + task().process_id) }}
+                        </span>
+                        @if (task().process_number) {
+                            <button type="button" class="btn btn-ghost btn-xs btn-circle shrink-0 text-base-content/30 hover:text-primary"
+                                (click)="onCopyRadicado($event)"
+                                [attr.aria-label]="'tasks.copyRadicado' | transloco">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIconPath('copy')" />
+                                </svg>
+                            </button>
+                        }
+                    </div>
+                } @else {
+                    <p class="text-sm text-base-content/50 mt-2">{{ 'tasks.detail.noProcess' | transloco }}</p>
+                }
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-6 sm:px-8 py-4 border-t border-base-200 flex flex-wrap items-center justify-end gap-2 flex-none">
+            <button type="button" class="btn btn-ghost btn-sm sm:btn-md h-11 px-6 rounded-xl font-bold normal-case"
+                (click)="onClose()">
+                {{ 'common.close' | transloco }}
+            </button>
+            @if (canModify()) {
+                <button type="button" class="btn btn-ghost btn-sm sm:btn-md h-11 px-6 rounded-xl font-bold normal-case text-primary hover:bg-primary/10"
+                    (click)="onEdit()">
+                    {{ 'tasks.edit' | transloco }}
+                </button>
+            }
+            @if (canChangeStatus()) {
+                <button type="button" class="btn btn-ghost btn-sm sm:btn-md h-11 px-6 rounded-xl font-bold normal-case text-primary hover:bg-primary/10"
+                    (click)="onEdit()">
+                    {{ 'tasks.changeStatus' | transloco }}
+                </button>
+            }
+            @if (canComplete()) {
+                <button type="button" class="btn btn-success btn-sm sm:btn-md h-11 px-6 rounded-xl font-bold normal-case text-white"
+                    (click)="onComplete()">
+                    {{ 'tasks.markComplete' | transloco }}
+                </button>
+            }
+            @if (canRestore()) {
+                <button type="button" class="btn btn-primary btn-sm sm:btn-md h-11 px-6 rounded-xl font-bold normal-case text-white"
+                    (click)="onRestore()">
+                    {{ 'tasks.trash.restore' | transloco }}
+                </button>
+            }
+            @if (canForceDelete()) {
+                <button type="button" class="btn btn-error btn-sm sm:btn-md h-11 px-6 rounded-xl font-bold normal-case text-white"
+                    (click)="onForceDelete()">
+                    {{ 'tasks.trash.forceDelete' | transloco }}
+                </button>
+            }
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop" (click)="onClose()">
+        <button type="button">close</button>
+    </form>
+</dialog>

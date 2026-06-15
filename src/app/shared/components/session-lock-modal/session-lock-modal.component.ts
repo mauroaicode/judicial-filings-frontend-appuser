@@ -26,8 +26,18 @@ export class SessionLockModalComponent {
   public readonly rateLimitUntil = signal<number | null>(null);
   public readonly rateLimitSeconds = signal(0);
   public readonly isLocked = this._sessionLockService.isLocked;
+  public readonly showPassword = signal(false);
 
   public readonly isRateLimited = computed(() => this.rateLimitSeconds() > 0);
+
+  togglePasswordVisibility(): void {
+    this.showPassword.update((value) => !value);
+  }
+
+  async signOut(): Promise<void> {
+    await this._sessionLockService.logoutAndRedirectToSignIn();
+  }
+
   async unlockSession(): Promise<void> {
     if (this.unlockForm.invalid) {
       this.unlockForm.markAllAsTouched();

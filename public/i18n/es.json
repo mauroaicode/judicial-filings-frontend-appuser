@@ -4,7 +4,8 @@
     "loading": "Cargando...",
     "save": "Guardar",
     "saving": "Guardando...",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "close": "Cerrar"
   },
   "generics": {
     "spanish": "Español",
@@ -86,6 +87,7 @@
     "unlockButton": "Desbloquear",
     "unlocking": "Desbloqueando...",
     "retryIn": "Puedes intentar de nuevo en",
+    "signOut": "Cerrar sesión",
     "configHint": "Puedes desactivar o configurar el tiempo de este bloqueo automático desde el menú Configuración > Seguridad."
   },
   "navigation": {
@@ -598,19 +600,82 @@
     "import_finished_description": "El proceso de importación de radicados ha terminado satisfactoriamente."
   },
   "tasks": {
-    "title": "Tareas",
-    "description": "Gestiona tus tareas y compromisos relacionados con los procesos judiciales",
+    "title": "Agenda Judicial",
+    "description": "Gestiona tus tareas, términos y compromisos relacionados con los procesos judiciales.",
     "add": "Agregar Tarea",
-    "edit": "Editar Tarea",
-    "delete": "Eliminar Tarea",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "moveToTrash": "Mover a basurero",
+    "markComplete": "Marcar cumplida",
+    "changeStatus": "Cambiar estado",
+    "archivedReadOnly": "Tarea archivada — solo lectura",
     "empty": "No hay tareas registradas",
+    "emptyPending": "No tienes tareas pendientes",
+    "emptyPendingHint": "Crea una nueva tarea para llevar el control de términos, audiencias y actuaciones de tus procesos.",
+    "emptyDraft": "No tienes borradores",
+    "emptyCompleted": "No tienes tareas completadas",
+    "emptyTrash": "El basurero está vacío",
     "loading": "Cargando tareas...",
     "loadMore": "Cargar más",
+    "days": "días",
+    "createdAt": "Creada",
+    "dueDate": "Vence",
+    "reminderIn": "Recordatorio en {{days}} días",
+    "relatedProcess": "Proceso relacionado",
+    "copyRadicado": "Copiar radicado",
+    "detail": {
+      "subtitle": "Detalle completo de la tarea",
+      "viewDetail": "Ver detalle",
+      "noProcess": "Sin proceso asociado"
+    },
+    "tabs": {
+      "pending": "Pendientes",
+      "draft": "Borradores",
+      "completed": "Completadas",
+      "trash": "Basurero"
+    },
+    "trash": {
+      "description": "Tareas eliminadas que puedes restaurar o borrar definitivamente.",
+      "hint": "Las tareas en el basurero no aparecen en las listas normales. Puedes restaurarlas a su estado original o eliminarlas permanentemente.",
+      "emptyHint": "Las tareas que muevas al basurero aparecerán aquí.",
+      "badge": "En basurero",
+      "deletedAt": "Eliminada el",
+      "restore": "Restaurar",
+      "forceDelete": "Eliminar permanentemente",
+      "detailSubtitle": "Tarea en el basurero — solo lectura",
+      "confirmForceDeleteTitle": "Eliminar permanentemente",
+      "confirmForceDelete": "Esta acción es irreversible. La tarea se borrará definitivamente de la base de datos y no podrá recuperarse."
+    },
+    "urgency": {
+      "title": "Semáforo de urgencia",
+      "hint": "El color indica cuántos días lleva la tarea sin cumplirse desde su creación.",
+      "normal": "Normal (< 10 días)",
+      "alert1": "Alerta (10 días)",
+      "alert2": "Alerta alta (15 días)",
+      "critical": "Crítico (30+ días)"
+    },
+    "complete": {
+      "title": "Marcar tarea como cumplida",
+      "message": "La tarea se archivará y dejará de aparecer en pendientes. Ya no recibirás recordatorios sobre ella.",
+      "confirm": "Confirmar cumplida"
+    },
+    "alert": {
+      "success": "¡Éxito!",
+      "error": "¡Error!"
+    },
     "form": {
       "title": "Título de la Tarea",
       "titlePlaceholder": "Ej: Revisar términos del proceso",
       "description": "Descripción",
       "descriptionPlaceholder": "Detalles adicionales de la tarea...",
+      "dueDate": "Fecha de Vencimiento",
+      "dueDatePlaceholder": "Seleccionar fecha",
+      "reminderDays": "Días de Recordatorio",
+      "reminderDaysPlaceholder": "Ej: 3",
+      "reminderDaysInvalid": "Ingrese un valor entre 0 y 365",
+      "status": "Estado de la Tarea",
+      "statusHint": "Pendiente: activa con recordatorios. Borrador: guardada sin activar. Cumplida: archivada sin recordatorios.",
+      "statusOnlyHint": "Las tareas completadas no permiten editar campos. Solo puedes cambiar el estado para reactivarlas.",
       "isAdmin": "Visible para Admin",
       "process": "Proceso Asociado (Opcional)",
       "processPlaceholder": "Buscar por número de radicado o despacho",
@@ -621,9 +686,26 @@
       "created": "Tarea creada satisfactoriamente",
       "updated": "Tarea actualizada satisfactoriamente",
       "deleted": "Tarea eliminada satisfactoriamente",
+      "movedToTrash": "Tarea movida al basurero",
+      "moveToTrashError": "No se pudo mover la tarea al basurero.",
+      "restored": "Tarea restaurada correctamente",
+      "restoreError": "No se pudo restaurar la tarea.",
+      "forceDeleted": "Tarea eliminada permanentemente",
+      "forceDeleteError": "No se pudo eliminar la tarea permanentemente.",
+      "completed": "Tarea marcada como cumplida y archivada",
+      "statusUpdated": "Estado de la tarea actualizado correctamente",
+      "copied": "Número de radicado copiado al portapapeles",
+      "loadError": "Ocurrió un error al cargar las tareas",
+      "taskNotFound": "No se pudo encontrar la tarea solicitada",
+      "deleteError": "No se pudo eliminar la tarea. Inténtalo de nuevo.",
+      "completeError": "No se pudo marcar la tarea como cumplida.",
+      "copyError": "No se pudo copiar el número.",
       "error": "Ha ocurrido un error al procesar la solicitud",
-      "confirmDelete": "¿Estás seguro de que deseas eliminar esta tarea?",
-      "confirmDeleteTitle": "Eliminar Tarea"
+      "confirmDelete": "¿Está seguro de eliminar esta tarea? Esta acción no se puede deshacer.",
+      "confirmDeleteTitle": "Eliminar Tarea",
+      "confirmMoveToTrash": "La tarea se moverá al basurero. Podrás restaurarla o eliminarla permanentemente más adelante.",
+      "confirmMoveToTrashTitle": "Mover al basurero",
+      "confirmStatusChange": "¿Desea cambiar el estado de esta tarea archivada?"
     }
   },
   "aiChat": {

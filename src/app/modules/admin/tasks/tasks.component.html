@@ -1,16 +1,17 @@
 <div class="w-full space-y-6 animate-fade-in relative">
     <!-- Page Header -->
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
             <h1 class="text-2xl font-bold text-base-content md:text-3xl">
                 {{ 'tasks.title' | transloco }}
             </h1>
-            <p class="mt-1 text-sm text-base-content/70">
-                {{ 'tasks.description' | transloco }}
+            <p class="mt-1 text-sm text-base-content/70 max-w-2xl">
+                {{ (isTrashView() ? 'tasks.trash.description' : 'tasks.description') | transloco }}
             </p>
         </div>
-        <div class="flex gap-2">
-            <button type="button" class="btn btn-primary btn-sm sm:btn-md h-11 px-8 rounded-xl font-bold normal-case shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95"
+        @if (!isTrashView()) {
+            <button type="button"
+                class="btn btn-primary btn-sm sm:btn-md h-11 px-8 rounded-xl font-bold normal-case shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 shrink-0"
                 (click)="openCreateModal()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2.5">
@@ -18,150 +19,266 @@
                 </svg>
                 {{ 'tasks.add' | transloco }}
             </button>
-        </div>
+        }
     </div>
 
-    <!-- Toast Notifications (Matching Platform Standard) -->
-    @if (alert()) {
-        <div class="toast toast-end toast-bottom sm:toast-top sm:mt-20 z-[10000] pointer-events-none p-4">
-            <div [class]="'alert shadow-2xl border-none animate-in fade-in slide-in-from-right duration-300 min-w-[320px] rounded-2xl ' + (alert()!.type === 'success' ? 'bg-success text-success-content' : 'bg-error text-error-content')">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div class="flex flex-col">
-                    <span class="font-bold text-sm">{{ (alert()!.type === 'success' ? '¡Éxito!' : '¡Error!') }}</span>
-                    <span class="text-xs opacity-90">{{ alert()!.message | transloco }}</span>
+    <!-- Status Tabs -->
+    <div class="flex flex-wrap items-center gap-2">
+        @for (tab of tabs; track tab.view) {
+            <button type="button"
+                class="task-tab btn btn-sm h-10 px-4 rounded-xl font-bold normal-case"
+                [class.task-tab--active]="activeView() === tab.view"
+                [class.btn-ghost]="activeView() !== tab.view"
+                (click)="setActiveView(tab.view)">
+                @if (tab.view === 'trash') {
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIconPath('trash')" />
+                    </svg>
+                }
+                {{ tab.labelKey | transloco }}
+                @if (activeView() === tab.view) {
+                    <span class="badge badge-sm ml-1"
+                        [class.badge-primary]="tab.view !== 'trash'"
+                        [class.badge-ghost]="tab.view === 'trash'">{{ totalTasks() }}</span>
+                }
+            </button>
+        }
+    </div>
+
+    <!-- Urgency Legend (pending only) -->
+    @if (showUrgencyLegend()) {
+        <div class="task-legend-panel rounded-2xl bg-base-100 p-4 sm:px-5 sm:py-4">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <p class="text-xs font-semibold text-base-content/50">{{ 'tasks.urgency.hint' | transloco }}</p>
+                <div class="flex flex-wrap gap-x-4 gap-y-2">
+                    <span class="task-legend-item"><span class="task-legend-item__dot bg-green-500"></span>{{ 'tasks.urgency.normal' | transloco }}</span>
+                    <span class="task-legend-item"><span class="task-legend-item__dot bg-amber-500"></span>{{ 'tasks.urgency.alert1' | transloco }}</span>
+                    <span class="task-legend-item"><span class="task-legend-item__dot bg-orange-500"></span>{{ 'tasks.urgency.alert2' | transloco }}</span>
+                    <span class="task-legend-item"><span class="task-legend-item__dot bg-red-500"></span>{{ 'tasks.urgency.critical' | transloco }}</span>
                 </div>
             </div>
         </div>
     }
 
-    <!-- Tasls List Body -->
+    <!-- Trash hint -->
+    @if (isTrashView()) {
+        <div class="task-legend-panel rounded-2xl bg-base-100 p-4 sm:px-5 sm:py-4">
+            <p class="text-xs font-semibold text-base-content/50">{{ 'tasks.trash.hint' | transloco }}</p>
+        </div>
+    }
+
+    <!-- Tasks List -->
     <div class="relative min-h-[400px]">
-        @if (isLoading() && tasks().length === 0) {
+        @if (!isViewReady()) {
             <div class="flex items-center justify-center py-20">
                 <div class="flex flex-col items-center gap-3">
                     <span class="loading loading-spinner loading-lg text-primary"></span>
-                    <p class="text-[10px] font-black uppercase text-base-content/30 tracking-widest">Cargando tus tareas...</p>
+                    <p class="text-[10px] font-black uppercase text-base-content/30 tracking-widest">{{ 'tasks.loading' | transloco }}</p>
                 </div>
             </div>
         } @else if (tasks().length === 0) {
-            <div class="flex flex-col items-center justify-center py-32 text-center opacity-20 pointer-events-none select-none">
-                <div class="relative mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-32 w-32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" [attr.d]="getIconPath('tasks')" />
+            <div class="flex flex-col items-center justify-center py-24 text-center">
+                <div class="relative mb-6 opacity-20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-28 w-28" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" [attr.d]="getIconPath(isTrashView() ? 'trash' : 'tasks')" />
                     </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <div class="w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
-                    </div>
                 </div>
-                <h2 class="text-4xl font-black uppercase tracking-tighter">{{ 'tasks.empty' | transloco }}</h2>
-                <p class="text-lg font-bold mt-2">{{ 'tasks.description' | transloco }}</p>
+                <h2 class="text-2xl font-black text-base-content">{{ getActiveTabEmptyKey() | transloco }}</h2>
+                @if (activeView() === 'pending') {
+                    <p class="text-sm text-base-content/50 mt-2 max-w-md">{{ 'tasks.emptyPendingHint' | transloco }}</p>
+                    <button type="button" class="btn btn-primary btn-sm mt-6 rounded-xl font-bold normal-case" (click)="openCreateModal()">
+                        {{ 'tasks.add' | transloco }}
+                    </button>
+                } @else if (isTrashView()) {
+                    <p class="text-sm text-base-content/50 mt-2 max-w-md">{{ 'tasks.trash.emptyHint' | transloco }}</p>
+                }
             </div>
         } @else {
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 @for (task of tasks(); track task.id) {
-                    <div class="card bg-base-100 shadow-sm border border-base-200 hover:border-primary/20 transition-all group overflow-hidden hover:shadow-xl hover:shadow-primary/5 rounded-2xl">
-                        <div class="card-body p-6">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="flex flex-col">
-                                    <span class="text-[9px] font-black uppercase text-base-content/30 tracking-wider">Creado el</span>
-                                    <span class="text-[10px] font-bold text-base-content/60">{{ task.created_at | date:'dd MMM yyyy' }}</span>
-                                </div>
-                                <div class="flex gap-1 group-hover:translate-x-0 transition-all">
-                                    <!-- Desktop Actions (Hover) -->
-                                    <div class="hidden sm:flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button class="btn btn-ghost btn-sm btn-circle text-primary hover:bg-primary/10" (click)="openEditModal(task)" title="Editar">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getIconPath('pencil')" />
-                                            </svg>
-                                        </button>
-                                        <button class="btn btn-ghost btn-sm btn-circle text-error hover:bg-error/10" (click)="confirmDelete(task)" title="Eliminar">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getIconPath('trash')" />
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    <!-- Mobile Actions (Dropdown) -->
-                                    <div class="dropdown dropdown-end sm:hidden">
-                                        <button tabindex="0" class="btn btn-ghost btn-xs btn-circle text-base-content/40 hover:text-primary active:scale-90 transition-all">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getIconPath('ellipsis-vertical')" />
-                                            </svg>
-                                        </button>
-                                        <ul tabindex="0" class="dropdown-content z-[20] menu p-2 shadow-2xl bg-base-100 rounded-xl w-44 border border-base-200 mt-2 animate-in fade-in zoom-in duration-200">
-                                            <li>
-                                                <button (click)="openEditModal(task)" class="flex items-center gap-3 py-3 active:bg-primary/10">
-                                                    <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getIconPath('pencil')" />
-                                                        </svg>
-                                                    </div>
-                                                    <span class="font-bold text-sm">Editar</span>
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <button (click)="confirmDelete(task)" class="flex items-center gap-3 py-3 text-error active:bg-error/10">
-                                                    <div class="w-8 h-8 rounded-lg bg-error/10 flex items-center justify-center text-error">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getIconPath('trash')" />
-                                                        </svg>
-                                                    </div>
-                                                    <span class="font-bold text-sm">Eliminar</span>
-                                                </button>
-                                            </li>
-                                        </ul>
-                                    </div>
+                    @if (isTrashView()) {
+                        <article class="task-card task-card--trash group rounded-2xl bg-base-100 overflow-hidden">
+                            <div class="task-card__header">
+                                <div class="flex flex-wrap items-center gap-2 min-w-0">
+                                    <span class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none badge-ghost">
+                                        {{ task.status_label }}
+                                    </span>
+                                    <span class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none badge-error badge-outline">
+                                        {{ 'tasks.trash.badge' | transloco }}
+                                    </span>
                                 </div>
                             </div>
 
-                            <h3 class="card-title text-lg font-black text-base-content group-hover:text-primary transition-colors leading-tight mb-3">
-                                {{ task.title }}
-                            </h3>
-                            
-                            <p class="text-sm text-base-content/60 line-clamp-3 mb-6 min-h-[4rem] leading-relaxed">
-                                {{ task.description }}
-                            </p>
+                            <div class="task-card__body cursor-pointer" (click)="openDetailModal(task)" role="button" tabindex="0"
+                                (keydown.enter)="openDetailModal(task)" (keydown.space)="openDetailModal(task); $event.preventDefault()">
+                                <h3 class="font-bold text-base text-base-content leading-snug group-hover:text-primary transition-colors">
+                                    {{ task.title }}
+                                </h3>
+                                <p class="text-sm text-base-content/60 line-clamp-3 leading-relaxed mt-2">
+                                    {{ task.description }}
+                                </p>
+                                <span class="inline-block mt-2 text-xs font-semibold text-primary/70 group-hover:text-primary transition-colors">
+                                    {{ 'tasks.detail.viewDetail' | transloco }}
+                                </span>
+                            </div>
 
-                            @if (task.process_id) {
-                                <div class="mt-auto pt-5 border-t border-base-200/60 flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm transition-transform group-hover:scale-110">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIconPath('gestion-procesos')" />
+                            <div class="task-card__meta">
+                                @if (task.deleted_at) {
+                                    <span class="task-card__meta-item text-error/70">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIconPath('trash')" />
                                         </svg>
-                                    </div>
-                                    <div class="flex flex-col min-w-0 flex-1">
-                                        <span class="text-[9px] uppercase font-black text-secondary/50 tracking-widest">Proceso Relacionado</span>
-                                        <div class="flex items-center gap-2 group/copy">
-                                            <span class="text-xs font-black truncate text-base-content group-hover/copy:text-primary transition-colors">
-                                                {{ task.process_number ? (task.process_number | processNumber) : ('ID: ' + task.process_id) }}
-                                            </span>
-                                            @if (task.process_number) {
-                                                <div class="tooltip tooltip-right" data-tip="Copiar número">
-                                                    <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary active:scale-90 transition-all opacity-0 group-hover:opacity-100"
-                                                        (click)="copyToClipboard(task.process_number, $event)">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getIconPath('copy')" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            }
-                                        </div>
-                                    </div>
+                                        {{ 'tasks.trash.deletedAt' | transloco }}: {{ task.deleted_at | date:'dd MMM yyyy HH:mm' }}
+                                    </span>
+                                }
+                                <span class="task-card__meta-item">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    {{ 'tasks.createdAt' | transloco }}: {{ task.created_at | date:'dd MMM yyyy' }}
+                                </span>
+                            </div>
+
+                            <div class="task-card__footer flex flex-wrap items-center justify-end gap-2">
+                                <button type="button"
+                                    class="btn btn-outline btn-primary btn-sm h-9 px-4 rounded-xl font-semibold normal-case"
+                                    [disabled]="isRestoring()"
+                                    (click)="confirmRestore(task); $event.stopPropagation()">
+                                    {{ 'tasks.trash.restore' | transloco }}
+                                </button>
+                                <button type="button"
+                                    class="btn btn-outline btn-error btn-sm h-9 px-4 rounded-xl font-semibold normal-case border-error/30 text-error hover:bg-error hover:text-white hover:border-error"
+                                    (click)="confirmForceDelete(task); $event.stopPropagation()">
+                                    {{ 'tasks.trash.forceDelete' | transloco }}
+                                </button>
+                            </div>
+                        </article>
+                    } @else {
+                        <article
+                            class="task-card group rounded-2xl bg-base-100 overflow-hidden"
+                            [class]="getUrgencyClass(task)"
+                            [class.task-card--completed]="task.status === 'completed'">
+
+                            <!-- Header -->
+                            <div class="task-card__header">
+                                <div class="flex flex-wrap items-center gap-2 min-w-0">
+                                    <span class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none"
+                                        [class.badge-primary]="task.status === 'pending'"
+                                        [class.badge-ghost]="task.status === 'draft'"
+                                        [class.badge-success]="task.status === 'completed'">
+                                        {{ task.status_label }}
+                                    </span>
+                                    @if (getUrgencyInfo(task); as urgency) {
+                                        <span class="task-urgency-indicator" [class]="getUrgencyClass(task)">
+                                            <span class="task-urgency-indicator__dot"></span>
+                                            {{ urgency.days }} {{ 'tasks.days' | transloco }}
+                                        </span>
+                                    }
                                 </div>
-                            } @else {
-                                <div class="mt-auto pt-5 border-t border-base-200/60 flex items-center gap-4 opacity-30">
-                                    <div class="w-10 h-10 rounded-xl bg-base-200 flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIconPath('no-symbol')" />
-                                        </svg>
+
+                                @if (canModifyTask(task)) {
+                                    <div class="flex gap-0.5 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                        <button type="button" class="btn btn-ghost btn-xs btn-square text-primary hover:bg-primary/10"
+                                            (click)="openEditModal(task)" [title]="'tasks.edit' | transloco">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIconPath('pencil')" />
+                                            </svg>
+                                        </button>
+                                        <button type="button" class="btn btn-ghost btn-xs btn-square text-error hover:bg-error/10"
+                                            (click)="confirmDelete(task)" [title]="'tasks.moveToTrash' | transloco">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIconPath('trash')" />
+                                            </svg>
+                                        </button>
                                     </div>
-                                    <span class="text-[9px] uppercase font-black tracking-widest">Sin proceso asociado</span>
+                                }
+                            </div>
+
+                            <!-- Body -->
+                            <div class="task-card__body cursor-pointer" (click)="openDetailModal(task)" role="button" tabindex="0"
+                                (keydown.enter)="openDetailModal(task)" (keydown.space)="openDetailModal(task); $event.preventDefault()">
+                                <h3 class="font-bold text-base text-base-content leading-snug group-hover:text-primary transition-colors">
+                                    {{ task.title }}
+                                </h3>
+                                <p class="text-sm text-base-content/60 line-clamp-3 leading-relaxed mt-2">
+                                    {{ task.description }}
+                                </p>
+                                <span class="inline-block mt-2 text-xs font-semibold text-primary/70 group-hover:text-primary transition-colors">
+                                    {{ 'tasks.detail.viewDetail' | transloco }}
+                                </span>
+                            </div>
+
+                            <!-- Meta -->
+                            <div class="task-card__meta">
+                                <span class="task-card__meta-item">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    {{ task.created_at | date:'dd MMM yyyy' }}
+                                </span>
+                                @if (task.due_date) {
+                                    <span class="task-card__meta-item">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        {{ 'tasks.dueDate' | transloco }}: {{ task.due_date | date:'dd MMM yyyy' }}
+                                    </span>
+                                }
+                                @if (task.reminder_days !== null && task.reminder_days !== undefined) {
+                                    <span class="task-card__meta-item">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                        </svg>
+                                        {{ 'tasks.reminderIn' | transloco:{ days: task.reminder_days } }}
+                                    </span>
+                                }
+                            </div>
+
+                            <!-- Process -->
+                            @if (task.process_id) {
+                                <div class="task-card__process">
+                                    <span class="task-section-label">{{ 'tasks.relatedProcess' | transloco }}</span>
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="font-bold text-primary text-sm truncate">
+                                            {{ task.process_number ? (task.process_number | processNumber) : ('ID: ' + task.process_id) }}
+                                        </span>
+                                        @if (task.process_number) {
+                                            <button type="button" class="btn btn-ghost btn-xs btn-circle shrink-0 text-base-content/30 hover:text-primary"
+                                                (click)="copyToClipboard(task.process_number, $event)"
+                                                [attr.aria-label]="'tasks.copyRadicado' | transloco">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIconPath('copy')" />
+                                                </svg>
+                                            </button>
+                                        }
+                                    </div>
                                 </div>
                             }
-                        </div>
-                    </div>
+
+                            <!-- Footer -->
+                            @if (canMarkComplete(task)) {
+                                <div class="task-card__footer">
+                                    <button type="button"
+                                        class="btn btn-outline btn-success btn-sm h-9 px-4 rounded-xl font-semibold normal-case border-success/30 text-success hover:bg-success hover:text-white hover:border-success w-full sm:w-auto"
+                                        (click)="confirmComplete(task)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        {{ 'tasks.markComplete' | transloco }}
+                                    </button>
+                                </div>
+                            } @else if (task.status === 'completed') {
+                                <div class="task-card__footer flex flex-wrap items-center justify-between gap-2">
+                                    <span class="text-xs font-semibold text-base-content/40">{{ 'tasks.archivedReadOnly' | transloco }}</span>
+                                    <button type="button"
+                                        class="btn btn-ghost btn-xs h-8 px-3 rounded-lg font-semibold normal-case text-primary hover:bg-primary/10"
+                                        (click)="openStatusModal(task); $event.stopPropagation()">
+                                        {{ 'tasks.changeStatus' | transloco }}
+                                    </button>
+                                </div>
+                            }
+                        </article>
+                    }
                 }
             </div>
 
@@ -174,21 +291,65 @@
     </div>
 </div>
 
-<!-- Modal Formulario -->
 @if (showFormModal()) {
     <app-task-form-modal
         [task]="selectedTask()"
-        (closed)="showFormModal.set(false)"
+        (closed)="showFormModal.set(false); selectedTask.set(null)"
         (saved)="onTaskSaved()" />
 }
 
-<!-- Dialogo de confirmación eliminación (Matching Desactivar Proceso style) -->
+@if (showDetailModal() && detailTask(); as task) {
+    <app-task-detail-modal
+        [task]="task"
+        [isTrash]="isTrashTask(task)"
+        (closed)="closeDetailModal()"
+        (edit)="onDetailEdit($event)"
+        (complete)="onDetailComplete($event)"
+        (restore)="onDetailRestore($event)"
+        (forceDelete)="onDetailForceDelete($event)"
+        (copyRadicado)="copyToClipboard($event)" />
+}
+
 <app-confirmation-dialog
     [open]="showDeleteConfirm()"
-    [title]="'Eliminar Tarea'"
-    [message]="'¿Está seguro de eliminar esta tarea? Esta acción no se puede deshacer y la información se perderá permanentemente.'"
-    [confirmLabel]="'Eliminar'"
-    [cancelLabel]="'Cancelar'"
+    [title]="'tasks.messages.confirmMoveToTrashTitle' | transloco"
+    [message]="'tasks.messages.confirmMoveToTrash' | transloco"
+    [confirmLabel]="'tasks.moveToTrash' | transloco"
+    [cancelLabel]="'common.cancel' | transloco"
     confirmClass="btn-error text-white h-11 px-8 rounded-xl font-bold normal-case"
     (confirm)="onDeleteConfirm()"
     (cancel)="showDeleteConfirm.set(false)" />
+
+<app-confirmation-dialog
+    [open]="showForceDeleteConfirm()"
+    [title]="'tasks.trash.confirmForceDeleteTitle' | transloco"
+    [message]="'tasks.trash.confirmForceDelete' | transloco"
+    [confirmLabel]="'tasks.trash.forceDelete' | transloco"
+    [cancelLabel]="'common.cancel' | transloco"
+    confirmClass="btn-error text-white h-11 px-8 rounded-xl font-bold normal-case"
+    (confirm)="onForceDeleteConfirm()"
+    (cancel)="showForceDeleteConfirm.set(false)" />
+
+<app-confirmation-dialog
+    [open]="showCompleteConfirm()"
+    [title]="'tasks.complete.title' | transloco"
+    [message]="'tasks.complete.message' | transloco"
+    [confirmLabel]="'tasks.complete.confirm' | transloco"
+    [cancelLabel]="'common.cancel' | transloco"
+    confirmClass="btn-success text-white h-11 px-8 rounded-xl font-bold normal-case"
+    (confirm)="onCompleteConfirm()"
+    (cancel)="showCompleteConfirm.set(false)" />
+
+@if (alert()) {
+    <div class="toast toast-end toast-bottom z-[10060] pointer-events-none p-4">
+        <div [class]="'alert shadow-2xl border-none animate-in fade-in slide-in-from-right duration-300 min-w-[320px] rounded-2xl ' + (alert()!.type === 'success' ? 'bg-success text-success-content' : 'bg-error text-error-content')">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div class="flex flex-col">
+                <span class="font-bold text-sm">{{ (alert()!.type === 'success' ? 'tasks.alert.success' : 'tasks.alert.error') | transloco }}</span>
+                <span class="text-xs opacity-90">{{ alert()!.message | transloco }}</span>
+            </div>
+        </div>
+    </div>
+}
