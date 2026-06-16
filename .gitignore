@@ -42,3 +42,6 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 .env
+
+# Silero VAD assets (copiados desde node_modules en postinstall)
+/public/vad

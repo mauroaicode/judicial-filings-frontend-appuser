@@ -4,9 +4,13 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "prestart": "node scripts/copy-vad-assets.mjs",
     "build": "ng build",
+    "prebuild": "node scripts/copy-vad-assets.mjs",
+    "vad:assets": "node scripts/copy-vad-assets.mjs",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "postinstall": "node scripts/copy-vad-assets.mjs"
   },
   "prettier": {
     "printWidth": 100,
@@ -29,10 +33,12 @@
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
     "@jsverse/transloco": "^8.2.0",
+    "@ricky0123/vad-web": "^0.0.30",
     "flatpickr": "^4.6.13",
     "laravel-echo": "^2.3.0",
     "marked": "^18.0.2",
     "ngx-markdown": "^20.1.0",
+    "onnxruntime-web": "^1.26.0",
     "pusher-js": "^8.4.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
