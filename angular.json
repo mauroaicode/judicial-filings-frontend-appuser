@@ -32,7 +32,9 @@
             ],
             "allowedCommonJsDependencies": [
               "pusher-js",
-              "flatpickr/dist/l10n/es"
+              "flatpickr/dist/l10n/es",
+              "onnxruntime-web",
+              "@ricky0123/vad-web"
             ]
           },
           "configurations": {

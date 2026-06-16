@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '@app/core/config/environment.config';
+import { cleanSttHallucinations } from '@app/core/utils/stt-transcript.util';
+import { trimTrailingSilence } from '@app/core/utils/trim-trailing-silence.util';
 import {
   resolveOmnivoiceHttpUrl,
 } from '@app/core/utils/omnivoice-url.util';
@@ -8,12 +10,22 @@ import {
 export class VoiceSttService {
   async transcribe(audioBlob: Blob, mimeType: string): Promise<string> {
     const provider = environment.voice.sttProvider;
-    console.log(`[STT] provider=${provider} — ${audioBlob.size} bytes`);
+    const trimmed = await trimTrailingSilence(audioBlob, mimeType);
+    console.log(
+      `[STT] provider=${provider} — ${trimmed.blob.size} bytes`
+      + (trimmed.blob.size !== audioBlob.size ? ` (orig ${audioBlob.size})` : ''),
+    );
 
-    if (provider === 'deepinfra') {
-      return this.transcribeDeepInfra(audioBlob, mimeType);
+    const raw = provider === 'deepinfra'
+      ? await this.transcribeDeepInfra(trimmed.blob, trimmed.mimeType)
+      : await this.transcribeOmnivoice(trimmed.blob, trimmed.mimeType);
+
+    const cleaned = cleanSttHallucinations(raw);
+    if (cleaned !== raw) {
+      console.log('[STT] Limpieza alucinaciones:', { raw, cleaned });
     }
-    return this.transcribeOmnivoice(audioBlob, mimeType);
+
+    return cleaned;
   }
 
   private async transcribeDeepInfra(audioBlob: Blob, mimeType: string): Promise<string> {
@@ -26,6 +38,8 @@ export class VoiceSttService {
     const formData = new FormData();
     formData.append('file', audioBlob, `utterance.${ext}`);
     formData.append('model', model);
+    formData.append('language', 'es');
+    formData.append('temperature', '0');
 
     const res = await fetch(transcriptionsUrl, {
       method: 'POST',
@@ -53,6 +67,7 @@ export class VoiceSttService {
     const formData = new FormData();
     formData.append('audio', audioBlob, `utterance.${ext}`);
     formData.append('mode', 'fast');
+    formData.append('language', 'es');
 
     const res = await fetch(url, { method: 'POST', body: formData });
     if (!res.ok) {

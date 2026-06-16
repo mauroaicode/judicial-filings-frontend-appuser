@@ -22,8 +22,7 @@
  *     que la primera frase se reproduzca antes aunque la respuesta sea larga.
  *   • Normalización de pico (0.85) para volumen consistente entre frases.
  *
- * VAD: RMS energy via AnalyserNode + requestAnimationFrame loop.
- * No external packages required.
+ * VAD: Silero via @ricky0123/vad-web (MicVAD + ONNX Runtime WASM).
  */
 import {
   Component, Input, Output, EventEmitter,
@@ -31,9 +30,11 @@ import {
   ChangeDetectionStrategy, inject, ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { utils as vadUtils } from '@ricky0123/vad-web';
 import { AiVoiceChatService } from 'src/app/core/services/ai-voice-chat/ai-voice-chat.service';
 import { VoiceSttService } from '@app/core/services/voice/voice-stt.service';
 import { VoiceTtsService } from '@app/core/services/voice/voice-tts.service';
+import { VoiceVadService } from '@app/core/services/voice/voice-vad.service';
 import { splitIntoTtsSentences } from '@app/core/services/voice/tts-sentence-chunker';
 import type { VoiceTtsSynthesisSession } from '@app/core/services/voice/voice-tts.types';
 
@@ -72,6 +73,7 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
   private _voiceService = inject(AiVoiceChatService);
   private _voiceStt     = inject(VoiceSttService);
   private _voiceTts     = inject(VoiceTtsService);
+  private _voiceVad     = inject(VoiceVadService);
 
   // ── UI signals ────────────────────────────────────────────────
   state        = signal<VoiceState>('idle');
@@ -130,25 +132,16 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
   /** Cerrar modal tras reproducir la respuesta final (despedida del cerebro). */
   private pendingConversationEnd = false;
 
-  // ── Microphone & VAD ─────────────────────────────────────────
-  private mediaStream:    MediaStream | null   = null;
-  private mediaRecorder:  MediaRecorder | null = null;
-  private recordedChunks: Blob[]               = [];
-
+  // ── Microphone & VAD (Silero) ─────────────────────────────────
   private isVadActive  = false;
   private vadSpeaking  = false;
-  private silenceTimer:  ReturnType<typeof setTimeout> | null = null;
   private standbyTimer:  ReturnType<typeof setTimeout> | null = null;
-  private vadAnalyser:   AnalyserNode | null  = null;
-  private vadRafData:    Float32Array<ArrayBuffer> | null  = null;
-  private vadRafId:      number | null        = null;
 
-  /** RMS threshold to consider "speech". Tune if too sensitive / not sensitive enough. */
-  private readonly VAD_THRESHOLD       = 0.012;
-  /** ms of continuous silence before auto-stopping the recording. */
-  private readonly SILENCE_DURATION_MS = 1500;
+  /** ms de silencio antes de cerrar el segmento de voz. */
+  private readonly SILENCE_DURATION_MS = 1000;
   /** ms en standby sin hablar antes de cerrar el asistente. */
   private readonly STANDBY_SILENCE_MS = 10_000;
+  private static readonly VAD_SAMPLE_RATE = 16000;
 
   // ── Lifecycle ─────────────────────────────────────────────────
   ngOnInit(): void {
@@ -203,29 +196,32 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
     this.errorMessage.set('');
     this._cdr.markForCheck();
 
-    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-      .then(stream => {
-        this.mediaStream = stream;
-
-        // Connect stream to analyser (shares the same AudioContext as TTS)
-        const src = this.audioCtx!.createMediaStreamSource(stream);
-        this.vadAnalyser         = this.audioCtx!.createAnalyser();
-        this.vadAnalyser.fftSize = 512;
-        src.connect(this.vadAnalyser);
-        this.vadRafData = new Float32Array(this.vadAnalyser.fftSize);
-
+    this._voiceVad.start({
+      onSpeechStart: () => this.onVadSpeechStart(),
+      onSpeechEnd:   audio => this.onVadSpeechEnd(audio),
+      onVADMisfire:  () => this.onVadMisfire(),
+    }, {
+      audioContext: this.audioCtx,
+      silenceMs: this.SILENCE_DURATION_MS,
+    })
+      .then(() => {
         this.isVadActive = true;
         this.vadSpeaking = false;
-        this.startVadLoop();
         this.startStandbyTimer();
 
-        console.log('[VAD] ✅ Micrófono abierto — VAD activo');
+        console.log('[VAD] ✅ Micrófono abierto — Silero VAD activo');
         this.statusText.set('Te escucho... habla cuando quieras');
         this._cdr.markForCheck();
       })
       .catch(err => {
-        console.error('[VAD] getUserMedia error:', err);
-        this.setError('No se pudo acceder al micrófono. Revisa los permisos del navegador.');
+        console.error('[VAD] Error iniciando Silero VAD:', err);
+        const detail = err instanceof Error ? err.message : String(err);
+        const isMicDenied = detail.includes('Permission') || detail.includes('NotAllowed');
+        this.setError(
+          isMicDenied
+            ? 'No se pudo acceder al micrófono. Revisa los permisos del navegador.'
+            : `No se pudo iniciar el detector de voz: ${detail}`,
+        );
       });
   }
 
@@ -233,20 +229,9 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
     this.isVadActive = false;
     this.vadSpeaking = false;
 
-    if (this.silenceTimer !== null) { clearTimeout(this.silenceTimer); this.silenceTimer = null; }
     if (this.standbyTimer !== null) { clearTimeout(this.standbyTimer); this.standbyTimer = null; }
-    if (this.vadRafId !== null) {
-      cancelAnimationFrame(this.vadRafId);
-      this.vadRafId = null;
-    }
 
-    this.mediaRecorder?.stop();
-    this.mediaRecorder = null;
-    this.mediaStream?.getTracks().forEach(t => t.stop());
-    this.mediaStream    = null;
-    this.recordedChunks = [];
-    this.vadAnalyser    = null;
-    this.vadRafData     = null;
+    void this._voiceVad.destroy();
 
     if (goToIdle) {
       this.state.set('idle');
@@ -255,70 +240,10 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // VAD LOOP — requestAnimationFrame RMS analysis
-  // ═══════════════════════════════════════════════════════════════
-  private startVadLoop(): void {
-    const loop = () => {
-      if (!this.isVadActive) return;
-
-      this.vadAnalyser!.getFloatTimeDomainData(this.vadRafData!);
-
-      let sum = 0;
-      for (let i = 0; i < this.vadRafData!.length; i++) {
-        sum += this.vadRafData![i] * this.vadRafData![i];
-      }
-      const rms = Math.sqrt(sum / this.vadRafData!.length);
-
-      // Ignore VAD triggers while processing the current turn
-      const busy = this.state() === 'transcribing'
-        || this.state() === 'thinking'
-        || this.state() === 'speaking';
-
-      if (!busy) {
-        if (rms > this.VAD_THRESHOLD) {
-          if (!this.vadSpeaking) this.onVadSpeechStart();
-          // Reset silence timer on any new speech energy
-          if (this.silenceTimer !== null) {
-            clearTimeout(this.silenceTimer);
-            this.silenceTimer = null;
-          }
-        } else if (this.vadSpeaking && this.silenceTimer === null) {
-          // Start silence countdown
-          this.silenceTimer = setTimeout(() => {
-            this.silenceTimer = null;
-            if (this.vadSpeaking) this.onVadSpeechEnd();
-          }, this.SILENCE_DURATION_MS);
-        }
-      }
-
-      this.vadRafId = requestAnimationFrame(loop);
-    };
-
-    this.vadRafId = requestAnimationFrame(loop);
-  }
-
   private onVadSpeechStart(): void {
-    if (this.state() !== 'standby' || !this.mediaStream) return;
-    // User spoke — reset the inactivity timer
+    if (this.state() !== 'standby') return;
     if (this.standbyTimer !== null) { clearTimeout(this.standbyTimer); this.standbyTimer = null; }
-    this.vadSpeaking    = true;
-    this.recordedChunks = [];
-
-    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-      ? 'audio/webm;codecs=opus'
-      : 'audio/webm';
-
-    this.mediaRecorder = new MediaRecorder(this.mediaStream, { mimeType });
-    this.mediaRecorder.ondataavailable = (e) => {
-      if (e.data.size > 0) this.recordedChunks.push(e.data);
-    };
-    this.mediaRecorder.onstop  = () => this.transcribeRecording();
-    this.mediaRecorder.onerror = (e) => {
-      console.error('[MediaRecorder] Error:', e);
-      this.setError('Error en el micrófono.');
-    };
-    this.mediaRecorder.start(250);
+    this.vadSpeaking = true;
 
     console.log('[VAD] 🎙️ Habla detectada — grabando');
     this.state.set('listening');
@@ -326,30 +251,44 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
     this._cdr.markForCheck();
   }
 
-  private onVadSpeechEnd(): void {
+  private onVadSpeechEnd(audio: Float32Array): void {
     this.vadSpeaking = false;
-    console.log('[VAD] 🔇 Silencio detectado — deteniendo grabación');
-    this.mediaRecorder?.stop();
-    this.mediaRecorder = null;
+    console.log('[VAD] 🔇 Silencio detectado — segmento listo para STT');
+
+    void this._voiceVad.pause();
 
     this.state.set('transcribing');
     this.statusText.set('Transcribiendo...');
     this._cdr.markForCheck();
+
+    this.transcribeVadAudio(audio);
+  }
+
+  private onVadMisfire(): void {
+    console.log('[VAD] Misfire — ruido breve descartado');
+    this.vadSpeaking = false;
+    if (this.state() === 'listening') {
+      this.resumeStandby();
+    }
   }
 
   // ═══════════════════════════════════════════════════════════════
   // STT — HTTP POST /transcribe
   // ═══════════════════════════════════════════════════════════════
-  private transcribeRecording(): void {
-    if (this.recordedChunks.length === 0) {
-      console.warn('[STT] No hay audio grabado');
+  private transcribeVadAudio(audio: Float32Array): void {
+    if (audio.length === 0) {
+      console.warn('[STT] Segmento de voz vacío');
       this.resumeStandby();
       return;
     }
 
-    const mimeType  = this.recordedChunks[0].type || 'audio/webm';
-    const audioBlob = new Blob(this.recordedChunks, { type: mimeType });
-    this.recordedChunks = [];
+    const wavBuffer = vadUtils.encodeWAV(
+      audio,
+      1,
+      VoiceAssistantModalComponent.VAD_SAMPLE_RATE,
+    );
+    const audioBlob = new Blob([wavBuffer], { type: 'audio/wav' });
+    const mimeType = 'audio/wav';
 
     this._voiceStt.transcribe(audioBlob, mimeType)
       .then(text => {
@@ -826,6 +765,7 @@ export class VoiceAssistantModalComponent implements OnInit, OnDestroy {
       this.vadSpeaking = false;
       this.state.set('standby');
       this.statusText.set('Te escucho... habla cuando quieras');
+      void this._voiceVad.resume();
       this.startStandbyTimer();
     }
     this._cdr.markForCheck();
