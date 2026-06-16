@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { MicVAD } from '@ricky0123/vad-web';
 
+/** Misma versión que onnxruntime-web en package.json. */
+const ONNX_RUNTIME_WASM_CDN =
+  'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.26.0/dist/';
+
 export interface VoiceVadCallbacks {
   onSpeechStart: () => void;
   onSpeechEnd: (audio: Float32Array) => void;
@@ -26,7 +30,8 @@ export class VoiceVadService {
       startOnLoad: false,
       audioContext: options.audioContext,
       baseAssetPath: '/vad/',
-      onnxWASMBasePath: '/vad/',
+      // CDN: nginx en prod suele servir .mjs como octet-stream → falla dynamic import.
+      onnxWASMBasePath: ONNX_RUNTIME_WASM_CDN,
       model: 'legacy',
       redemptionMs: silenceMs,
       minSpeechMs: 250,

@@ -1,0 +1,6 @@
+# Incluir en el server de nginx si prefieres servir ONNX local (/vad/) en lugar del CDN.
+# Sin esto, .mjs se sirve como application/octet-stream y el VAD falla en el navegador.
+
+types {
+    application/javascript mjs;
+}
