@@ -53,7 +53,7 @@ export class TaskService {
     }
 
     completeTask(id: string): Observable<Task> {
-        return this._httpClient.put<Task>(`${this._baseUrl}/${id}/complete`, {});
+        return this._httpClient.patch<Task>(`${this._baseUrl}/${id}/complete`, {});
     }
 
     deleteTask(id: string): Observable<void> {
