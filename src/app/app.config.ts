@@ -40,7 +40,7 @@ export const appConfig: ApplicationConfig = {
       // Initialize theme
       THEME_CONFIG.setTheme(THEME_CONFIG.defaultTheme);
       
-      return firstValueFrom(translocoService.load(defaultLang));
+      return firstValueFrom(translocoService.load(defaultLang)).catch(() => undefined);
     }),
 
     provideMarkdown(),

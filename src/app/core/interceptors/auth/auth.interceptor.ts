@@ -40,14 +40,15 @@ export const authInterceptor = (
   // Response
   return next(newReq).pipe(
     catchError((error) => {
-      const isVerifyPasswordRequest = req.url.includes('/verify-password');
+      const isPublicAuthRequest =
+        req.url.includes('/login') ||
+        req.url.includes('/forgot-password') ||
+        req.url.includes('/reset-password') ||
+        req.url.includes('/verify-password');
 
-      // Catch "401 Unauthorized" responses
-      if (error instanceof HttpErrorResponse && error.status === 401 && !isVerifyPasswordRequest) {
-        // Sign out
+      // Catch "401 Unauthorized" responses on authenticated requests only
+      if (error instanceof HttpErrorResponse && error.status === 401 && !isPublicAuthRequest) {
         authService.signOut();
-
-        // Reload the app
         location.reload();
       }
 

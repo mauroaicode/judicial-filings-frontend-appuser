@@ -4,6 +4,11 @@ import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '@app/core/auth/auth.service';
 import { STORAGE } from '@app/core/constants/storage.constant';
+import {
+  safeGetLocalStorageItem,
+  safeRemoveLocalStorageItem,
+  safeSetLocalStorageItem,
+} from '@app/core/utils/local-storage.util';
 
 @Injectable({
   providedIn: 'root',
@@ -37,6 +42,8 @@ export class SessionLockService {
   private readonly _onBlockedInteractionBound = this._onBlockedInteraction.bind(this);
   private readonly _onBlockedKeydownBound = this._onBlockedKeydown.bind(this);
 
+  private readonly _defaultLockTimeoutMinutes = 5;
+
   initializeFromCurrentUser(): void {
     if (this._isInitialized()) return;
 
@@ -50,12 +57,12 @@ export class SessionLockService {
       return;
     }
 
-    if (typeof timeoutMinutes !== 'number' || !Number.isFinite(timeoutMinutes) || timeoutMinutes <= 0) {
-      this.forceLogoutForMissingLockTimeout();
-      return;
-    }
+    const resolvedTimeoutMinutes =
+      typeof timeoutMinutes === 'number' && Number.isFinite(timeoutMinutes) && timeoutMinutes > 0
+        ? timeoutMinutes
+        : this._defaultLockTimeoutMinutes;
 
-    this._lockTimeoutMs.set(timeoutMinutes * 60_000);
+    this._lockTimeoutMs.set(resolvedTimeoutMinutes * 60_000);
     this._isInitialized.set(true);
     this._attachActivityListeners();
 
@@ -206,14 +213,14 @@ export class SessionLockService {
 
   private _persistLockState(locked: boolean): void {
     if (locked) {
-      localStorage.setItem(STORAGE.SESSION_LOCKED, 'true');
+      safeSetLocalStorageItem(STORAGE.SESSION_LOCKED, 'true');
       return;
     }
-    localStorage.removeItem(STORAGE.SESSION_LOCKED);
+    safeRemoveLocalStorageItem(STORAGE.SESSION_LOCKED);
   }
 
   private _isLockPersisted(): boolean {
-    return localStorage.getItem(STORAGE.SESSION_LOCKED) === 'true';
+    return safeGetLocalStorageItem(STORAGE.SESSION_LOCKED) === 'true';
   }
   /**
    * Update session lock settings from UI.
