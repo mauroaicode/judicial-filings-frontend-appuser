@@ -29,7 +29,7 @@ export const guestGuard: CanActivateFn = async (route, state) => {
       }
     }
 
-    await router.navigate([ROUTES_ADMIN.DASHBOARD]);
+    await router.navigate([ROUTES_ADMIN.GESTION_PROCESOS]);
     return false;
   }
 

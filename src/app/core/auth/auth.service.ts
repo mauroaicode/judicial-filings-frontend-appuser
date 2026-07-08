@@ -13,6 +13,11 @@ import {
 } from '@app/core/models/auth/auth.model';
 import {SessionStorageService} from '@app/core/services/storage/session-storage.service';
 import {STORAGE} from '@app/core/constants/storage.constant';
+import {
+  safeGetLocalStorageItem,
+  safeRemoveLocalStorageItem,
+  safeSetLocalStorageItem,
+} from '@app/core/utils/local-storage.util';
 
 @Injectable({
   providedIn: 'root',
@@ -51,12 +56,12 @@ export class AuthService {
     if (token) {
       this._token.set(token);
       this._sessionStorageService.saveJwt(token);
-      localStorage.setItem(STORAGE.JWT, token);
+      safeSetLocalStorageItem(STORAGE.JWT, token);
       return;
     }
     this._token.set(null);
     this._sessionStorageService.removeJwt();
-    localStorage.removeItem(STORAGE.JWT);
+    safeRemoveLocalStorageItem(STORAGE.JWT);
   }
 
   /**
@@ -79,12 +84,12 @@ export class AuthService {
   set currentUser(user: User | null) {
     this._user.set(user);
     if (user) {
-      localStorage.setItem(STORAGE.USER, JSON.stringify(user));
+      safeSetLocalStorageItem(STORAGE.USER, JSON.stringify(user));
       this.isAuthenticated.set(true);
 
       return;
     }
-    localStorage.removeItem(STORAGE.USER);
+    safeRemoveLocalStorageItem(STORAGE.USER);
     this.isAuthenticated.set(false);
   }
 
@@ -142,6 +147,7 @@ export class AuthService {
   signOut(): Observable<boolean> {
     this.accessToken = null;
     this.currentUser = null;
+    safeRemoveLocalStorageItem(STORAGE.SESSION_LOCKED);
 
     return of(true);
   }
@@ -154,8 +160,8 @@ export class AuthService {
    * Load user and token from storage
    */
   private _loadFromStorage(): void {
-    const token = this._sessionStorageService.getJwt() || localStorage.getItem(STORAGE.JWT);
-    const userStr = localStorage.getItem(STORAGE.USER);
+    const token = this._sessionStorageService.getJwt() || safeGetLocalStorageItem(STORAGE.JWT);
+    const userStr = safeGetLocalStorageItem(STORAGE.USER);
 
     if (token) {
       this._token.set(token);
@@ -168,7 +174,10 @@ export class AuthService {
         this.isAuthenticated.set(true);
       } catch (error) {
         console.error('Error parsing user from storage:', error);
-        localStorage.removeItem(STORAGE.USER);
+        safeRemoveLocalStorageItem(STORAGE.USER);
+        safeRemoveLocalStorageItem(STORAGE.JWT);
+        this._token.set(null);
+        this._sessionStorageService.removeJwt();
       }
     }
   }

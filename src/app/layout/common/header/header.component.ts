@@ -9,7 +9,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthService } from '@app/core/auth/auth.service';
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -30,7 +30,6 @@ import { ProcessAlertTooltipComponent } from '@app/shared/components/process-ale
 })
 export class HeaderComponent {
   private _authService = inject(AuthService);
-  private _router = inject(Router);
   private _sessionLockService = inject(SessionLockService);
   private _headerContext = inject(PageHeaderContextService);
 
@@ -86,8 +85,7 @@ export class HeaderComponent {
    */
   async signOut(): Promise<void> {
     try {
-      await this._authService.signOut();
-      await this._router.navigate(['/sign-in']);
+      await this._sessionLockService.logoutAndRedirectToSignIn();
     } catch (error) {
       console.error('Error signing out:', error);
     }
