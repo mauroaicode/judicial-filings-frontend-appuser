@@ -1,0 +1,124 @@
+<div class="form-control w-full time-picker">
+  @if (label()) {
+    <label class="label pt-0 pb-1">
+      <span class="label-standard">{{ label() }}</span>
+    </label>
+  }
+
+  <div class="relative">
+    <button type="button"
+      class="input-standard input input-bordered w-full time-picker-trigger text-left"
+      [class.time-picker-trigger--open]="isOpen()"
+      [disabled]="disabled() || isDisabled()"
+      (click)="toggleOpen($event)">
+      <span [class.text-base-content/40]="!displayValue()">
+        {{ displayValue() || placeholder() }}
+      </span>
+    </button>
+
+    @if (displayValue() && !(disabled() || isDisabled())) {
+      <button type="button"
+        class="time-picker-clear absolute right-10 top-1/2 -translate-y-1/2 text-error/40 hover:text-error"
+        (click)="clearTime($event)"
+        tabindex="-1"
+        aria-label="Limpiar hora">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    }
+
+    <span class="time-picker-icon absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+      aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </span>
+  </div>
+
+  @if (isOpen()) {
+    <div class="time-picker-panel" role="dialog" [attr.aria-label]="'tasks.form.dueTime' | transloco">
+      <div class="time-picker-period">
+        <button type="button"
+          class="time-picker-period__btn"
+          [class.time-picker-period__btn--active]="draftPeriod() === 'am'"
+          [class.time-picker-period__btn--disabled]="isPeriodDisabled('am')"
+          [disabled]="isPeriodDisabled('am')"
+          (click)="selectPeriod('am')">
+          {{ 'tasks.form.dueTimeMorning' | transloco }}
+        </button>
+        <button type="button"
+          class="time-picker-period__btn"
+          [class.time-picker-period__btn--active]="draftPeriod() === 'pm'"
+          [class.time-picker-period__btn--disabled]="isPeriodDisabled('pm')"
+          [disabled]="isPeriodDisabled('pm')"
+          (click)="selectPeriod('pm')">
+          {{ 'tasks.form.dueTimeAfternoon' | transloco }}
+        </button>
+      </div>
+
+      <div class="time-picker-wheels">
+        <div class="time-picker-wheel">
+          <span class="time-picker-wheel__label">{{ 'tasks.form.dueTimeHour' | transloco }}</span>
+          <div class="time-picker-wheel__list">
+            @for (hour of hours; track hour) {
+              <button type="button"
+                class="time-picker-wheel__item"
+                [class.time-picker-wheel__item--active]="draftHour() === hour"
+                [class.time-picker-wheel__item--disabled]="isHourDisabled(hour)"
+                [disabled]="isHourDisabled(hour)"
+                (click)="selectHour(hour)">
+                {{ hour }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="time-picker-wheel">
+          <span class="time-picker-wheel__label">{{ 'tasks.form.dueTimeMinute' | transloco }}</span>
+          <div class="time-picker-wheel__list">
+            @for (minute of minutes; track minute) {
+              <button type="button"
+                class="time-picker-wheel__item"
+                [class.time-picker-wheel__item--active]="draftMinute() === minute"
+                [class.time-picker-wheel__item--disabled]="isMinuteDisabled(minute)"
+                [disabled]="isMinuteDisabled(minute)"
+                (click)="selectMinute(minute)">
+                {{ padMinute(minute) }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (!draftIsValid()) {
+        <p class="time-picker-error">{{ 'tasks.form.dueTimePast' | transloco }}</p>
+      }
+
+      <div class="time-picker-preview">
+        {{ draftHour() }}:{{ padMinute(draftMinute()) }}
+        {{ draftPeriod() === 'am' ? ('tasks.form.dueTimeMorning' | transloco) : ('tasks.form.dueTimeAfternoon' | transloco) }}
+      </div>
+
+      <div class="time-picker-actions">
+        <button type="button" class="btn btn-ghost btn-sm h-10 px-4 rounded-xl font-bold normal-case"
+          (click)="closePanel()">
+          {{ 'common.cancel' | transloco }}
+        </button>
+        <button type="button" class="btn btn-primary btn-sm h-10 px-5 rounded-xl font-bold normal-case text-white"
+          [disabled]="!draftIsValid()"
+          (click)="confirm()">
+          {{ 'common.confirm' | transloco }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (hint() && !isOpen()) {
+    <label class="label pt-1">
+      <span class="text-[10px] font-medium text-base-content/40">{{ hint() }}</span>
+    </label>
+  }
+</div>

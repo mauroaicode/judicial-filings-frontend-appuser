@@ -1,0 +1,267 @@
+<div
+  class="drawer drawer-end process-tasks-drawer-root"
+  [class.process-tasks-drawer-visible]="isOpen()"
+>
+  <input
+    id="process-tasks-drawer-toggle"
+    type="checkbox"
+    class="drawer-toggle"
+    [checked]="isOpen()"
+    (change)="onToggleChange($event)"
+  />
+  <div class="drawer-content min-w-0 w-0 overflow-visible"></div>
+  <div class="drawer-side">
+    <label
+      for="process-tasks-drawer-toggle"
+      aria-label="close sidebar"
+      class="drawer-overlay"
+    ></label>
+    <div
+      class="process-tasks-drawer-panel bg-base-100 h-full w-full max-w-lg md:max-w-xl lg:max-w-2xl flex flex-col shadow-2xl overflow-hidden"
+      role="dialog"
+      [attr.aria-label]="'processDetail.tasks.drawerTitle' | transloco"
+    >
+      <header class="process-tasks-drawer-header flex flex-col gap-3 border-b border-base-200/60 px-5 py-4 shrink-0 bg-base-100">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex items-start gap-3 min-w-0">
+            <div class="process-tasks-drawer-header-icon shrink-0" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <h2 class="text-lg font-bold text-base-content leading-tight">
+                {{ 'processDetail.tasks.drawerTitle' | transloco }}
+              </h2>
+              <p class="text-xs text-base-content/55 mt-1 leading-relaxed">
+                {{ 'processDetail.tasks.drawerDescription' | transloco }}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="btn btn-ghost btn-square btn-sm shrink-0 hover:bg-base-200"
+            [attr.aria-label]="'processDetail.tasks.close' | transloco"
+            (click)="close()"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          @for (tab of tabs; track tab.status) {
+            <button
+              type="button"
+              class="task-tab btn btn-sm h-9 px-3 rounded-xl font-bold normal-case"
+              [class.task-tab--active]="activeStatus() === tab.status"
+              [class.btn-ghost]="activeStatus() !== tab.status"
+              (click)="setActiveStatus(tab.status)"
+            >
+              {{ tab.labelKey | transloco }}
+              @if (activeStatus() === tab.status) {
+                <span class="badge badge-primary badge-sm ml-1">{{ totalForTab() }}</span>
+              }
+            </button>
+          }
+        </div>
+      </header>
+
+      <div
+        class="process-tasks-drawer-scroll flex-1 min-h-0 overflow-auto py-4"
+        (scroll)="onScroll($event)"
+      >
+        @if (error()) {
+          <div class="px-4 py-3">
+            <div class="alert alert-error shadow rounded-xl">
+              <span>{{ error() }}</span>
+            </div>
+          </div>
+        }
+
+        @if (!error()) {
+          @if (loading() && tasks().length === 0) {
+            <div class="flex flex-col items-center justify-center py-24">
+              <span class="loading loading-spinner loading-lg text-primary"></span>
+              <p class="mt-4 text-sm text-base-content/60">{{ 'tasks.loading' | transloco }}</p>
+            </div>
+          }
+
+          @if (!loading() && tasks().length === 0) {
+            <div class="flex flex-col items-center justify-center py-24 text-center px-8">
+              <div class="w-16 h-16 rounded-2xl bg-base-200 flex items-center justify-center mb-5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-base-content/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+              </div>
+              <p class="text-base font-semibold text-base-content/70">
+                {{ 'processDetail.tasks.emptyTitle' | transloco }}
+              </p>
+              <p class="mt-1.5 text-sm text-base-content/50 max-w-xs leading-relaxed">
+                {{ 'processDetail.tasks.emptyDescription' | transloco }}
+              </p>
+            </div>
+          }
+
+          @if (tasks().length > 0) {
+            <div class="flex flex-col gap-4 px-4 pb-5 pt-2">
+              @for (task of tasks(); track task.id) {
+                <article
+                  class="task-card group rounded-2xl bg-base-100 overflow-hidden"
+                  [class]="getUrgencyClass(task)"
+                  [class.task-card--completed]="task.status === 'completed'"
+                >
+                  <div class="task-card__header">
+                    <div class="flex flex-wrap items-center gap-2 min-w-0">
+                      <span
+                        class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none"
+                        [class.badge-primary]="task.status === 'pending'"
+                        [class.badge-ghost]="task.status === 'draft'"
+                        [class.badge-success]="task.status === 'completed'"
+                      >
+                        {{ task.status_label }}
+                      </span>
+                      @if (task.type_label || task.type) {
+                        @if (task.type === 'suspension') {
+                          <span class="relative group/susp inline-flex">
+                            <span class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none badge-outline badge-warning inline-flex items-center gap-1 cursor-help">
+                              {{ task.type_label || ('tasks.form.typeOptions.suspension' | transloco) }}
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </span>
+                            <span class="absolute left-0 top-full mt-2 w-64 p-3 rounded-xl bg-base-100 border border-base-200 shadow-xl text-[11px] font-semibold text-base-content/80 leading-relaxed normal-case tracking-normal opacity-0 invisible group-hover/susp:opacity-100 group-hover/susp:visible transition-all z-[40] pointer-events-none">
+                              {{ 'tasks.suspensionGuide.badgeTip' | transloco }}
+                            </span>
+                          </span>
+                        } @else {
+                          <span class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none badge-outline">
+                            {{ task.type_label || ('tasks.form.typeOptions.' + task.type | transloco) }}
+                          </span>
+                        }
+                      }
+                      @if (getUrgencyInfo(task); as urgency) {
+                        <span class="task-urgency-indicator" [class]="getUrgencyClass(task)">
+                          <span class="task-urgency-indicator__dot"></span>
+                          {{ urgency.days }} {{ 'tasks.days' | transloco }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+
+                  <div
+                    class="task-card__body cursor-pointer"
+                    (click)="openDetail(task)"
+                    role="button"
+                    tabindex="0"
+                    (keydown.enter)="openDetail(task)"
+                    (keydown.space)="openDetail(task); $event.preventDefault()"
+                  >
+                    <h3 class="font-bold text-base text-base-content leading-snug group-hover:text-primary transition-colors">
+                      {{ task.title }}
+                    </h3>
+                    <p class="text-sm text-base-content/60 line-clamp-3 leading-relaxed mt-2">
+                      {{ task.description }}
+                    </p>
+                    <span class="inline-block mt-2 text-xs font-semibold text-primary/70 group-hover:text-primary transition-colors">
+                      {{ 'tasks.detail.viewDetail' | transloco }}
+                    </span>
+                  </div>
+
+                  <div class="task-card__meta">
+                    <span class="task-card__meta-item">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      {{ task.created_at | date:'dd MMM yyyy' }}
+                    </span>
+                    @if (task.due_date) {
+                      <span class="task-card__meta-item task-card__meta-item--due">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>{{ 'tasks.dueDate' | transloco }}: {{ task.due_date }}</span>
+                      </span>
+                    }
+                    @if (task.reminder_days !== null && task.reminder_days !== undefined) {
+                      <span class="task-card__meta-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        {{ 'tasks.reminderIn' | transloco:{ days: task.reminder_days } }}
+                      </span>
+                    }
+                  </div>
+
+                  @if (canMarkComplete(task)) {
+                    <div class="task-card__footer">
+                      <button
+                        type="button"
+                        class="btn btn-outline btn-success btn-sm h-9 px-4 rounded-xl font-semibold normal-case border-success/30 text-success hover:bg-success hover:text-white hover:border-success w-full sm:w-auto"
+                        [disabled]="actionInProgress()"
+                        (click)="confirmComplete(task)"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                        </svg>
+                        {{ 'tasks.markComplete' | transloco }}
+                      </button>
+                    </div>
+                  }
+                </article>
+              }
+            </div>
+
+            @if (loadingMore()) {
+              <div class="flex justify-center py-6">
+                <span class="loading loading-spinner loading-md text-primary"></span>
+              </div>
+            }
+            @if (hasMore() && !loadingMore()) {
+              <p class="text-center text-xs text-base-content/40 py-4">
+                {{ 'notificationsDrawer.scrollForMore' | transloco }}
+              </p>
+            }
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (selectedTask(); as task) {
+  <app-task-detail-modal
+    [task]="task"
+    (closed)="closeDetail()"
+    (edit)="onDetailEdit($event)"
+    (complete)="onDetailComplete($event)"
+  />
+}
+
+@if (showFormModal()) {
+  <app-task-form-modal
+    [task]="editingTask()"
+    (closed)="closeFormModal()"
+    (saved)="onTaskSaved()"
+  />
+}
+
+<app-confirmation-dialog
+  [open]="confirmCompleteOpen()"
+  [title]="'tasks.complete.title' | transloco"
+  [message]="getCompleteConfirmMessageKey() | transloco"
+  [confirmLabel]="'tasks.complete.confirm' | transloco"
+  [cancelLabel]="'common.cancel' | transloco"
+  confirmClass="btn-success"
+  (confirm)="onConfirmComplete()"
+  (cancel)="onCancelComplete()"
+/>
+
+@if (toastMessage()) {
+  <div class="toast toast-end toast-bottom z-[10060] pointer-events-none">
+    <div class="alert alert-success shadow-lg rounded-xl">
+      <span>{{ toastMessage() }}</span>
+    </div>
+  </div>
+}

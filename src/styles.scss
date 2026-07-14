@@ -391,6 +391,18 @@ app-gestion-procesos .process-list-table tbody tr.process-row-hovered td {
     box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
   }
 
+  &.alert-paused {
+    background-color: #94a3b8; /* Slate-400 */
+    box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.35);
+    background-image: linear-gradient(
+      135deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.55) 40%,
+      rgba(255, 255, 255, 0.55) 60%,
+      transparent 60%
+    );
+  }
+
   &.alert-pulse {
     animation: pulse-red 2s infinite;
   }

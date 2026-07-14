@@ -16,6 +16,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractContro
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ProcessAlertTooltipComponent } from '@app/shared/components/process-alert-tooltip/process-alert-tooltip.component';
 import { ProcessService } from '@app/core/services/process/process.service';
+import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
 import { Process, ProcessInstance, ProcessFilter, ProcessResponseMeta, CreateProcessResponse } from '@app/core/models/process/process.model';
 import { DataTableColumn } from '@app/shared/components/data-table/data-table.component';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
@@ -29,6 +30,8 @@ import type { OrganizationNotificationRow } from '@app/core/models/notification/
 
 import { RoleSelectionModalComponent } from './components/role-selection-modal/role-selection-modal.component';
 import { AuthenticatedLayoutComponent } from '@app/layout/layouts/authenticated/authenticated.component';
+import { isSemaphorePaused, getSemaphorePauseMessage } from '@app/core/utils/process-semaphore.util';
+import type { ProcessSemaphore } from '@app/core/models/process/process.model';
 
 @Component({
   selector: 'app-gestion-procesos',
@@ -51,6 +54,7 @@ import { AuthenticatedLayoutComponent } from '@app/layout/layouts/authenticated/
 })
 export class GestionProcesosComponent {
   private _processService = inject(ProcessService);
+  private _processRefresh = inject(ProcessRefreshService);
   private _dashboardService = inject(DashboardService);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
@@ -227,6 +231,55 @@ export class GestionProcesosComponent {
         console.log('Refreshing process list because of a notification...');
         this.loadProcesses(this.pagination()?.current_page || 1, this.pagination()?.per_page || 20);
       });
+
+    // Suspension completed (or other views) → soft-update matching row status
+    this._processRefresh.refreshed$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((processId) => {
+        this._refreshProcessRowStatus(processId);
+      });
+  }
+
+  private _refreshProcessRowStatus(processId: string): void {
+    this._processService.getProcessDetail(processId).subscribe({
+      next: (response) => {
+        const updated = response.process;
+        this.processes.update((list) =>
+          list.map((process) => {
+            if (process.id === processId) {
+              return {
+                ...process,
+                status: updated.status,
+                status_label: updated.status_label,
+                alert_level: updated.alert_level,
+                semaphore: updated.semaphore ?? null,
+              };
+            }
+            if (process.instances?.some((inst) => inst.id === processId)) {
+              return {
+                ...process,
+                instances: process.instances!.map((inst) =>
+                  inst.id === processId
+                    ? {
+                        ...inst,
+                        status: updated.status,
+                        status_label: updated.status_label,
+                        alert_level: updated.alert_level,
+                        semaphore: updated.semaphore ?? null,
+                      }
+                    : inst
+                ),
+              };
+            }
+            return process;
+          })
+        );
+        this._dashboardService.loadStats();
+      },
+      error: () => {
+        // Ignore — list can be refreshed manually
+      },
+    });
   }
 
   /**
@@ -902,5 +955,45 @@ export class GestionProcesosComponent {
   public closeBulkResultModal(): void {
     this.isBulkResultModalOpen.set(false);
     this.bulkUpdateResult.set(null);
+  }
+
+  /**
+   * CSS class for process/instance status badges
+   */
+  public getStatusBadgeClass(status: string | null | undefined): string {
+    const statusLower = (status ?? '').toLowerCase();
+
+    if (statusLower.includes('suspend')) {
+      return 'badge-info';
+    }
+    if (statusLower.includes('inactivo') || statusLower.includes('inactive')) {
+      return 'badge-error';
+    }
+    if (statusLower.includes('activo') || statusLower.includes('active')) {
+      return 'badge-success';
+    }
+    if (statusLower.includes('pendiente') || statusLower.includes('pending')) {
+      return 'badge-warning';
+    }
+    if (statusLower.includes('cerrado') || statusLower.includes('closed')) {
+      return 'badge-neutral';
+    }
+
+    return '';
+  }
+
+  public isSemaphorePaused(
+    semaphore: ProcessSemaphore | null | undefined
+  ): boolean {
+    return isSemaphorePaused(semaphore);
+  }
+
+  public getSemaphorePauseMessage(
+    semaphore: ProcessSemaphore | null | undefined
+  ): string {
+    return getSemaphorePauseMessage(
+      semaphore,
+      this._transloco.translate('alertSemafor.paused.message')
+    );
   }
 }

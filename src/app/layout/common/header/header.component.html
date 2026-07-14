@@ -56,7 +56,16 @@
             </svg>
           </button>
         </div>
-        @if (ctx.alertLevel) {
+        @if (ctx.semaphorePaused) {
+        <app-process-alert-tooltip
+          class="header-semaphore-tooltip shrink-0"
+          [paused]="true"
+          [pausedMessage]="ctx.semaphoreMessage"
+          [lawyerRole]="ctx.lawyerRole"
+          position="bottom"
+          [leftAligned]="true"
+        />
+        } @else if (ctx.alertLevel) {
         <app-process-alert-tooltip
           class="header-semaphore-tooltip shrink-0"
           [alertLevel]="ctx.alertLevel"

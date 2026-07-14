@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslocoPipe } from '@jsverse/transloco';
 
@@ -13,8 +13,8 @@ import { TranslocoPipe } from '@jsverse/transloco';
 })
 export class ProcessAlertTooltipComponent {
   /** Nivel de alerta: red, yellow, green */
-  public alertLevel = input.required<'red' | 'yellow' | 'green' | null | undefined>();
-  
+  public alertLevel = input<'red' | 'yellow' | 'green' | null | undefined>(undefined);
+
   /** Rol del abogado: Demandante, Demandado */
   public lawyerRole = input<string | null | undefined>();
 
@@ -30,10 +30,22 @@ export class ProcessAlertTooltipComponent {
   /** Contexto del mensaje: inactividad (por rol) o keywords (independiente del rol) */
   public messageContext = input<'inactivity' | 'keyword'>('inactivity');
 
+  /** Semáforo en pausa (p. ej. por tarea de suspensión en Agenda). */
+  public paused = input(false);
+
+  /** Mensaje del backend cuando el semáforo está en pausa. */
+  public pausedMessage = input<string | null | undefined>(null);
+
+  readonly isPaused = computed(() => this.paused());
+
   /**
    * Obtiene la llave de traducción para el mensaje del tooltip del semáforo
    */
   public getAlertTooltipMessage(): string {
+    if (this.isPaused()) {
+      return '';
+    }
+
     const level = this.alertLevel();
     const role = this.normalizeRole(this.lawyerRole());
 

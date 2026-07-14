@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { TranslocoModule } from '@jsverse/transloco';
 import { Task } from '@app/core/models/tasks/task.model';
 import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
@@ -16,6 +17,7 @@ import { getTaskUrgencyClass, getTaskUrgencyInfo } from '@app/core/utils/task-ur
 })
 export class TaskDetailModalComponent {
     private _iconService = inject(IconService);
+    private _router = inject(Router);
 
     public task = input.required<Task>();
     public isTrash = input(false);
@@ -37,10 +39,10 @@ export class TaskDetailModalComponent {
     });
 
     public urgencyInfo = computed(() => {
-        if (this.isTrash() || this.task().status === 'completed') {
+        if (this.isTrash()) {
             return null;
         }
-        return getTaskUrgencyInfo(this.task().created_at);
+        return getTaskUrgencyInfo(this.task());
     });
 
     public urgencyClass = computed(() => {
@@ -78,5 +80,19 @@ export class TaskDetailModalComponent {
         if (number) {
             this.copyRadicado.emit(number);
         }
+    }
+
+    public onOpenProcess(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const processId = this.task().process_id;
+        if (!processId) {
+            return;
+        }
+
+        const urlTree = this._router.createUrlTree(['/gestion-procesos', processId]);
+        const url = this._router.serializeUrl(urlTree);
+        window.open(url, '_blank', 'noopener,noreferrer');
     }
 }

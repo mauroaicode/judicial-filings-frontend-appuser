@@ -5,7 +5,8 @@
     "save": "Guardar",
     "saving": "Guardando...",
     "cancel": "Cancelar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "confirm": "Confirmar"
   },
   "generics": {
     "spanish": "Español",
@@ -400,9 +401,14 @@
     }
   },
   "alertSemafor": {
-    "alertLevel": "Estado",
+    "alertLevel": "Semáforo",
     "linkRole": "Vincular rol",
     "linkRoleDesc": "Vincule su rol para activar alertas procesales inteligentes",
+    "paused": {
+      "title": "Semáforo en pausa",
+      "label": "En pausa",
+      "message": "Semáforo de inactividad en pausa. Debe completar o eliminar la tarea de suspensión en la Agenda para reactivarlo."
+    },
     "alerts": {
       "redDemandante": "Alerta Crítica: Riesgo de desistimiento o parálisis grave (+90 días de inactividad).",
       "yellowDemandante": "Alerta Temprana: Seguimiento necesario para evitar mora (+45 días de inactividad).",
@@ -427,6 +433,10 @@
       "red": {
         "title": "Alerta Crítica",
         "desc": "Inactividad prolongada (+90 días) o hitos procesales determinantes."
+      },
+      "paused": {
+        "title": "Semáforo en pausa",
+        "desc": "Proceso suspendido por una tarea de suspensión en la Agenda. No se calculan alertas de inactividad hasta que complete o elimine esa tarea."
       }
     }
   },
@@ -458,6 +468,16 @@
     "updatedAt": "Fecha de Actualización",
     "lawyerRole": "Rol del Abogado",
     "alertStatus": "Semáforo de Alerta",
+    "semaphorePausedBanner": "Semáforo de inactividad en pausa por una tarea de suspensión en la Agenda.",
+    "semaphorePausedCta": "Ver tareas",
+    "suspendedHelp": {
+      "title": "Proceso suspendido",
+      "badgeTip": "Hay una tarea de suspensión activa en la Agenda. El seguimiento de inactividad está en pausa.",
+      "item1": "El semáforo de inactividad no muestra colores ni genera alertas mientras esté suspendido.",
+      "item2": "El proceso sigue sincronizando con Rama.",
+      "item3": "No se puede cambiar Activo/Inactivo desde aquí.",
+      "item4": "Para reactivar: complete o elimine la tarea de suspensión en Agenda (botón Ver tareas)."
+    },
     "yes": "Sí",
     "no": "No",
     "subjects": {
@@ -508,6 +528,14 @@
       "selected": "Seleccionada",
       "lastUpdate": "Última actualización",
       "actionsCount": "actuaciones"
+    },
+    "tasks": {
+      "label": "Tareas",
+      "drawerTitle": "Tareas del proceso",
+      "drawerDescription": "Pendientes, borradores y cumplidas asociadas a este radicado.",
+      "close": "Cerrar",
+      "emptyTitle": "No hay tareas en esta vista",
+      "emptyDescription": "Cambia de pestaña o crea una tarea desde la Agenda Judicial."
     }
   },
   "table": {
@@ -648,15 +676,42 @@
     },
     "urgency": {
       "title": "Semáforo de urgencia",
-      "hint": "El color indica cuántos días lleva la tarea sin cumplirse desde su creación.",
-      "normal": "Normal (< 10 días)",
-      "alert1": "Alerta (10 días)",
-      "alert2": "Alerta alta (15 días)",
-      "critical": "Crítico (30+ días)"
+      "hint": "El color indica cuántos días lleva la tarea sin cumplirse desde su fecha de vencimiento.",
+      "normal": "Normal (< 10 días vencida)",
+      "alert1": "Alerta (10 días vencida)",
+      "alert2": "Alerta alta (15 días vencida)",
+      "critical": "Crítico (30+ días vencida)"
+    },
+    "suspensionGuide": {
+      "title": "Guía de suspensión",
+      "subtitle": "Cómo afecta una tarea de suspensión al proceso y al semáforo",
+      "openLabel": "Ayuda sobre suspensión",
+      "bannerTitle": "Suspensiones activas",
+      "bannerText": "Hay tareas de suspensión en esta lista. Esos procesos quedan Suspendidos y el semáforo de inactividad en pausa hasta que completes o elimines la tarea.",
+      "bannerCta": "Cómo funciona",
+      "badgeTip": "Esta tarea suspende el proceso. Completarla o enviarla al basurero lo reactiva. Pulsa para ver la guía.",
+      "whatTitle": "¿Qué hace una suspensión?",
+      "whatDesc": "Al crear o actualizar una tarea tipo Suspensión (pendiente o borrador), el proceso pasa a estado Suspendido y el semáforo de inactividad se pone en pausa. Las tareas General no cambian el estado del proceso.",
+      "createTitle": "Al crear o editar",
+      "create1": "El proceso asociado es obligatorio.",
+      "create2": "Solo puede haber una suspensión activa (pendiente o borrador) por proceso.",
+      "create3": "El proceso queda Suspendido y sigue sincronizando con Rama.",
+      "reactivateTitle": "Cómo reactivar el proceso",
+      "reactivate1": "Marque la suspensión como Cumplida.",
+      "reactivate2": "O envíe la tarea al basurero.",
+      "reactivate3": "No hay estado «cancelado»: solo completar o basurero reactivan.",
+      "semaphoreTitle": "Semáforos",
+      "semaphoreProcess": "Proceso: mientras esté suspendido, el semáforo de inactividad queda en pausa (sin verde/amarillo/rojo) y no genera alertas de inactividad.",
+      "semaphoreTask": "Tarea: el semáforo de la Agenda sigue midiendo el vencimiento (10 / 15 / 30 días), también en suspensiones.",
+      "processTitle": "Proceso suspendido",
+      "process1": "Sigue sincronizando actuaciones (seguimiento activo).",
+      "process2": "No se puede cambiar Activo/Inactivo desde el menú: debe resolver la suspensión en Agenda.",
+      "process3": "Estados posibles del proceso: Activo, Inactivo o Suspendido."
     },
     "complete": {
       "title": "Marcar tarea como cumplida",
       "message": "La tarea se archivará y dejará de aparecer en pendientes. Ya no recibirás recordatorios sobre ella.",
+      "messageSuspension": "Al marcar esta suspensión como cumplida, el proceso asociado volverá a estado activo.",
       "confirm": "Confirmar cumplida"
     },
     "alert": {
@@ -668,8 +723,36 @@
       "titlePlaceholder": "Ej: Revisar términos del proceso",
       "description": "Descripción",
       "descriptionPlaceholder": "Detalles adicionales de la tarea...",
+      "type": "Tipo de Tarea",
+      "typeHint": "General: tarea habitual. Suspensión: suspende el proceso y pausa su semáforo de inactividad.",
+      "typeInfoTitle": "Tipo suspensión",
+      "typeInfo1": "Requiere un proceso de su organización.",
+      "typeInfo2": "Solo una suspensión activa (pendiente o borrador) por proceso.",
+      "typeInfo3": "Al guardar, el proceso pasa a Suspendido.",
+      "typeInfo4": "Para reactivar: cumplir la tarea o enviarla al basurero.",
+      "suspensionUniqueHint": "Solo puede haber una tarea de suspensión activa (pendiente o borrador) por proceso. Si ya existe una, complétela o elimínela antes de crear otra.",
+      "suspensionCalloutTitle": "Efecto en el proceso",
+      "suspensionCallout1": "El proceso quedará Suspendido y el semáforo de inactividad en pausa.",
+      "suspensionCallout2": "Sigue sincronizando con Rama; no podrá alternar Activo/Inactivo hasta reactivar.",
+      "suspensionCallout3": "Reactivación: marcar cumplida o mover a basurero.",
+      "suspensionProcessRequired": "Las tareas de suspensión requieren un proceso asociado.",
+      "processSuspensionHint": "Obligatorio en suspensión. El proceso debe ser de su organización y no tener otra suspensión activa.",
+      "typeOptions": {
+        "general": "General",
+        "suspension": "Suspensión"
+      },
       "dueDate": "Fecha de Vencimiento",
       "dueDatePlaceholder": "Seleccionar fecha",
+      "dueDatePast": "No puede seleccionar una fecha anterior a hoy.",
+      "dueTime": "Hora",
+      "dueTimePlaceholder": "Seleccionar hora",
+      "dueTimeHint": "Elija hora y si es de mañana o tarde.",
+      "dueTimeHintToday": "Si la fecha es hoy, solo puede elegir una hora futura.",
+      "dueTimePast": "La hora seleccionada ya pasó. Elija una hora posterior.",
+      "dueTimeMorning": "Mañana",
+      "dueTimeAfternoon": "Tarde",
+      "dueTimeHour": "Hora",
+      "dueTimeMinute": "Minutos",
       "reminderDays": "Días de Recordatorio",
       "reminderDaysPlaceholder": "Ej: 3",
       "reminderDaysInvalid": "Ingrese un valor entre 0 y 365",
@@ -678,6 +761,7 @@
       "statusOnlyHint": "Las tareas completadas no permiten editar campos. Solo puedes cambiar el estado para reactivarlas.",
       "isAdmin": "Visible para Admin",
       "process": "Proceso Asociado (Opcional)",
+      "processRequired": "Proceso Asociado (Obligatorio)",
       "processPlaceholder": "Buscar por número de radicado o despacho",
       "noProcessesFound": "No se encontraron procesos activos",
       "searching": "Buscando procesos..."
@@ -693,6 +777,7 @@
       "forceDeleted": "Tarea eliminada permanentemente",
       "forceDeleteError": "No se pudo eliminar la tarea permanentemente.",
       "completed": "Tarea marcada como cumplida y archivada",
+      "completedSuspensionReactivated": "Tarea cumplida. El proceso volvió a estado activo.",
       "statusUpdated": "Estado de la tarea actualizado correctamente",
       "copied": "Número de radicado copiado al portapapeles",
       "loadError": "Ocurrió un error al cargar las tareas",
@@ -701,6 +786,7 @@
       "completeError": "No se pudo marcar la tarea como cumplida.",
       "copyError": "No se pudo copiar el número.",
       "error": "Ha ocurrido un error al procesar la solicitud",
+      "validationError": "No se pudo guardar. Revise los datos del formulario.",
       "confirmDelete": "¿Está seguro de eliminar esta tarea? Esta acción no se puede deshacer.",
       "confirmDeleteTitle": "Eliminar Tarea",
       "confirmMoveToTrash": "La tarea se moverá al basurero. Podrás restaurarla o eliminarla permanentemente más adelante.",

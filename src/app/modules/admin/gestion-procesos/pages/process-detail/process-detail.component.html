@@ -1,7 +1,7 @@
 <div class="w-full">
   <!-- Toast: éxito al copiar al portapapeles (IDÉNTICO A ACTUACIONES RECIENTES) -->
   @if (copiedMessage()) {
-    <div class="toast toast-end toast-bottom z-[10000] pointer-events-none">
+    <div class="toast toast-end toast-bottom z-[10060] pointer-events-none">
       <div class="alert alert-success shadow-lg border-none bg-success text-success-content rounded-2xl animate-fade-in-up">
         <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -11,9 +11,9 @@
     </div>
   }
 
-  <!-- Toast notification (for other success/error messages) -->
+  <!-- Toast notification (for other success/error messages) — above process-tasks-drawer (z-9999) -->
   @if (toastVisible()) {
-  <div class="toast toast-end z-[110]">
+  <div class="toast toast-end toast-bottom z-[10060] pointer-events-none">
     <div
       [class]="'alert shadow-lg border-none animate-in fade-in slide-in-from-right duration-300 ' + (toastType() === 'success' ? 'alert-success' : 'alert-error')">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -71,7 +71,16 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-2 mt-2">
-            @if (process()!.alert_level) {
+            @if (isSemaphorePaused()) {
+              <app-process-alert-tooltip
+                [paused]="true"
+                [pausedMessage]="getSemaphorePauseMessage()"
+                [lawyerRole]="process()!.lawyer_role"
+                position="bottom"
+                [leftAligned]="true"
+                class="ml-1">
+              </app-process-alert-tooltip>
+            } @else if (process()!.alert_level) {
               <app-process-alert-tooltip 
                 [alertLevel]="process()!.alert_level" 
                 [lawyerRole]="process()!.lawyer_role"
@@ -85,6 +94,21 @@
               [class]="'badge badge-sm font-bold uppercase ' + getStatusClass(initialStatusLabel() || process()!.status_label)">
               {{ initialStatusLabel() || process()!.status_label }}
             </span>
+
+            <button
+              type="button"
+              class="inline-flex items-center gap-1.5 h-6 pl-1.5 pr-1.5 rounded-lg border border-primary/25 bg-primary/10 text-primary text-[10px] font-extrabold uppercase tracking-wider cursor-pointer transition-colors hover:bg-primary/20 hover:border-primary/40 active:scale-[0.97]"
+              (click)="openProcessTasksDrawer()"
+              [attr.aria-label]="'processDetail.tasks.label' | transloco"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              <span class="pointer-events-none">{{ 'processDetail.tasks.label' | transloco }}</span>
+              <span class="inline-flex items-center justify-center min-w-[1.15rem] h-[1.15rem] px-1 rounded-full bg-primary text-primary-content text-[10px] font-extrabold leading-none pointer-events-none">
+                {{ process()!.tasks_count ?? 0 }}
+              </span>
+            </button>
 
             @if (process()!.lawyer_role) {
               <span class="badge badge-primary badge-outline font-extrabold text-[9px] uppercase tracking-widest px-2 h-5">
@@ -161,6 +185,36 @@
       }
     </div>
   </div>
+
+  @if (process() && isSemaphorePaused()) {
+    <div class="mb-6 rounded-2xl border border-base-200 bg-base-100 px-4 py-4 sm:px-5 shadow-sm">
+      <div class="flex items-start gap-3">
+        <span class="alert-dot alert-paused mt-1.5 shrink-0" aria-hidden="true"></span>
+        <div class="min-w-0 flex-1 space-y-3">
+          <div>
+            <p class="text-[10px] font-extrabold uppercase tracking-wider text-base-content/45 mb-1">
+              {{ 'processDetail.suspendedHelp.title' | transloco }}
+            </p>
+            <p class="text-sm font-semibold text-base-content/80 leading-relaxed break-words">
+              {{ getSemaphorePauseMessage() }}
+            </p>
+          </div>
+          <ul class="space-y-1.5 text-[12px] font-medium text-base-content/65 leading-relaxed list-disc pl-4 break-words">
+            <li>{{ 'processDetail.suspendedHelp.item1' | transloco }}</li>
+            <li>{{ 'processDetail.suspendedHelp.item2' | transloco }}</li>
+            <li>{{ 'processDetail.suspendedHelp.item3' | transloco }}</li>
+            <li>{{ 'processDetail.suspendedHelp.item4' | transloco }}</li>
+          </ul>
+          <button
+            type="button"
+            class="btn btn-sm btn-primary h-9 px-4 rounded-xl font-bold normal-case"
+            (click)="openProcessTasksDrawer()">
+            {{ 'processDetail.semaphorePausedCta' | transloco }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 
   <!-- Content -->
   <div class="space-y-6 pb-8">
@@ -622,16 +676,21 @@
         </li>
         <li>
           <button (click)="toggleProcessStatus()"
-            [class.text-error]="!isProcessInactive()"
+            [class.text-error]="!isProcessInactive() && !isProcessSuspended()"
             [class.text-success]="isProcessInactive()"
+            [class.text-warning]="isProcessSuspended()"
             class="flex items-center gap-3 py-3 px-4 hover:bg-base-200/50 transition-all group w-full text-left">
-            <div [class]="isProcessInactive() ? 'bg-success/10 text-success' : 'bg-error/10 text-error'"
+            <div [class]="isProcessInactive()
+                ? 'bg-success/10 text-success'
+                : (isProcessSuspended() ? 'bg-warning/15 text-warning' : 'bg-error/10 text-error')"
               class="w-8 h-8 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="isProcessInactive() ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636'" />
               </svg>
             </div>
-            <span class="font-bold text-sm tracking-tight">{{ isProcessInactive() ? 'Activar Seguimiento' : 'Desactivar Seguimiento' }}</span>
+            <span class="font-bold text-sm tracking-tight">
+              {{ isProcessInactive() ? 'Activar Seguimiento' : (isProcessSuspended() ? ('alertSemafor.paused.title' | transloco) : 'Desactivar Seguimiento') }}
+            </span>
           </button>
         </li>
       </ul>
@@ -843,6 +902,16 @@
       (pinnedChanged)="onChatPinnedChanged($event)"
       (closed)="toggleAiChat()">
     </app-process-ai-chat>
+  }
+
+  @if (process(); as detailProcess) {
+    <app-process-tasks-drawer
+      [isOpen]="showProcessTasksDrawer()"
+      [processId]="detailProcess.id"
+      (closed)="closeProcessTasksDrawer()"
+      (tasksCountChange)="onProcessTasksCountChange($event)"
+      (processReactivated)="onProcessReactivatedFromTasks()">
+    </app-process-tasks-drawer>
   }
 
 </div><!-- /.flex layout -->

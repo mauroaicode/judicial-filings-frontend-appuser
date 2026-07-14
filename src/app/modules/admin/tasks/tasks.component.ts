@@ -11,6 +11,7 @@ import { TaskFormModalComponent } from './components/task-form-modal/task-form-m
 import { TaskDetailModalComponent } from './components/task-detail-modal/task-detail-modal.component';
 import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
 import { getTaskUrgencyClass, getTaskUrgencyInfo, TaskUrgencyInfo } from '@app/core/utils/task-urgency.util';
+import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
 
 type TaskTab = {
     view: TaskView;
@@ -38,6 +39,7 @@ export class TasksComponent implements OnInit, OnDestroy {
     private _iconService = inject(IconService);
     private _router = inject(Router);
     private _activatedRoute = inject(ActivatedRoute);
+    private _processRefresh = inject(ProcessRefreshService);
     private _destroy$ = new Subject<void>();
     private _queryParamsSubscription?: { unsubscribe: () => void };
     private _openingTaskId: string | null = null;
@@ -67,6 +69,7 @@ export class TasksComponent implements OnInit, OnDestroy {
 
     public showFormModal = signal(false);
     public showDetailModal = signal(false);
+    public showSuspensionGuide = signal(false);
     public selectedTask = signal<Task | null>(null);
     public detailTask = signal<Task | null>(null);
     public showDeleteConfirm = signal(false);
@@ -222,6 +225,14 @@ export class TasksComponent implements OnInit, OnDestroy {
         this.showCompleteConfirm.set(true);
     }
 
+    public getCompleteConfirmMessageKey(): string {
+        const task = this.taskToComplete();
+        if (task?.type === 'suspension' && task.process_id) {
+            return 'tasks.complete.messageSuspension';
+        }
+        return 'tasks.complete.message';
+    }
+
     public onDeleteConfirm(): void {
         const task = this.taskToDelete();
         if (!task) return;
@@ -291,10 +302,20 @@ export class TasksComponent implements OnInit, OnDestroy {
                 })
             )
             .subscribe({
-                next: () => {
+                next: (completed) => {
                     this.tasks.update(current => current.filter(t => t.id !== task.id));
                     this.totalTasks.update(total => Math.max(0, total - 1));
-                    this.showAlert('success', 'tasks.messages.completed');
+
+                    const isSuspension =
+                        (completed?.type ?? task.type) === 'suspension'
+                        && !!(completed?.process_id ?? task.process_id);
+
+                    if (isSuspension) {
+                        this._processRefresh.requestRefresh(completed?.process_id ?? task.process_id);
+                        this.showAlert('success', 'tasks.messages.completedSuspensionReactivated');
+                    } else {
+                        this.showAlert('success', 'tasks.messages.completed');
+                    }
                 },
                 error: (error) => {
                     console.error('Error completing task:', error);
@@ -309,7 +330,12 @@ export class TasksComponent implements OnInit, OnDestroy {
         this.showFormModal.set(false);
         this.selectedTask.set(null);
         this.loadTasks(1);
-        this.showAlert('success', wasStatusOnly ? 'tasks.messages.statusUpdated' : (editedTask ? 'tasks.messages.updated' : 'tasks.messages.created'));
+        this.showAlert(
+            'success',
+            wasStatusOnly
+                ? 'tasks.messages.statusUpdated'
+                : (editedTask ? 'tasks.messages.updated' : 'tasks.messages.created')
+        );
     }
 
     public showAlert(type: 'success' | 'error', message: string): void {
@@ -322,10 +348,10 @@ export class TasksComponent implements OnInit, OnDestroy {
     }
 
     public getUrgencyInfo(task: Task): TaskUrgencyInfo | null {
-        if (task.status === 'completed' || this.isTrashTask(task)) {
+        if (this.isTrashTask(task)) {
             return null;
         }
-        return getTaskUrgencyInfo(task.created_at);
+        return getTaskUrgencyInfo(task);
     }
 
     public getUrgencyClass(task: Task): string {
@@ -377,6 +403,21 @@ export class TasksComponent implements OnInit, OnDestroy {
             console.error('Could not copy text: ', err);
             this.showAlert('error', 'tasks.messages.copyError');
         });
+    }
+
+    public goToProcessDetail(processId: string | null | undefined, event?: Event): void {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        if (!processId) {
+            return;
+        }
+
+        const urlTree = this._router.createUrlTree(['/gestion-procesos', processId]);
+        const url = this._router.serializeUrl(urlTree);
+        window.open(url, '_blank', 'noopener,noreferrer');
     }
 
     @HostListener('window:scroll', [])
