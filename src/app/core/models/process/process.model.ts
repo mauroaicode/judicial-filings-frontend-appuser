@@ -96,10 +96,10 @@ export interface ProcessFilter {
   process_class?: string;
   plaintiff?: string;
   defendant?: string;
-  status?: string; // 'active' | 'inactive'
+  status?: string; // 'active' | 'inactive' | 'suspended'
   has_multiple_instances?: boolean;
   lawyer_role?: string; // 'plaintiff' | 'defendant'
-  severity_color?: string; // 'red' | 'yellow' | 'green'
+  severity_color?: string; // 'red' | 'yellow' | 'green' | 'none' | 'suspended'
   process_date_from?: string;
   process_date_to?: string;
   created_at_from?: string;
