@@ -21,6 +21,15 @@
 
         <div class="px-6 sm:px-8 pt-4 pb-6 sm:pb-8 overflow-y-auto flex-1">
             <form [formGroup]="taskForm" (ngSubmit)="onSave()" class="space-y-6 task-form" autocomplete="off">
+                @if (formError()) {
+                    <div class="alert alert-error shadow-sm rounded-xl text-sm py-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="font-medium leading-snug">{{ formError() }}</span>
+                    </div>
+                }
+
                 @if (isStatusOnlyMode()) {
                     <div class="rounded-xl border border-base-200 bg-base-200/30 px-4 py-3 text-sm text-base-content/70">
                         {{ 'tasks.archivedReadOnly' | transloco }}
@@ -69,42 +78,103 @@
                     }
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <!-- Due Date -->
-                    <div class="form-control">
-                        <app-date-picker
-                            [label]="'tasks.form.dueDate' | transloco"
-                            [placeholder]="'tasks.form.dueDatePlaceholder' | transloco"
-                            formControlName="due_date"
-                            [size]="'sm'">
-                        </app-date-picker>
-                        @if (getBackendError('due_date')) {
-                            <label class="label pt-1.5">
-                                <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ getBackendError('due_date') }}</span>
-                            </label>
+                <!-- Type -->
+                <div class="form-control">
+                    <label class="label pt-0 pb-1">
+                        <span class="label-standard">{{ 'tasks.form.type' | transloco }}</span>
+                    </label>
+                    <select formControlName="type" class="select-standard select select-bordered w-full"
+                        [class.select-error]="getBackendError('type')">
+                        @for (type of taskTypes; track type.value) {
+                            <option [value]="type.value">{{ type.labelKey | transloco }}</option>
                         }
-                    </div>
-
-                    <!-- Reminder Days -->
-                    <div class="form-control">
-                        <label class="label pt-0 pb-1">
-                            <span class="label-standard">{{ 'tasks.form.reminderDays' | transloco }}</span>
+                    </select>
+                    <label class="label pt-1">
+                        <span class="text-[10px] font-medium text-base-content/40">{{ 'tasks.form.typeHint' | transloco }}</span>
+                    </label>
+                    @if (isSuspensionType()) {
+                        <div class="mt-1.5 rounded-xl border border-base-200 bg-base-200/40 px-3.5 py-3 space-y-2">
+                            <div class="flex items-center justify-between gap-2">
+                                <p class="text-[10px] font-extrabold uppercase tracking-wider text-base-content/45">{{ 'tasks.form.suspensionCalloutTitle' | transloco }}</p>
+                                <button
+                                    type="button"
+                                    class="text-[11px] font-bold text-primary hover:underline shrink-0"
+                                    (click)="openSuspensionGuide.emit()">
+                                    {{ 'tasks.suspensionGuide.bannerCta' | transloco }}
+                                </button>
+                            </div>
+                            <ul class="space-y-1 text-[11px] font-semibold text-base-content/70 leading-snug list-disc pl-3.5">
+                                <li>{{ 'tasks.form.suspensionCallout1' | transloco }}</li>
+                                <li>{{ 'tasks.form.suspensionCallout2' | transloco }}</li>
+                                <li>{{ 'tasks.form.suspensionCallout3' | transloco }}</li>
+                            </ul>
+                            <p class="text-[11px] font-medium text-base-content/50 leading-snug pt-1 border-t border-base-200">
+                                {{ 'tasks.form.suspensionUniqueHint' | transloco }}
+                            </p>
+                        </div>
+                    }
+                    @if (getBackendError('type')) {
+                        <label class="label pt-0">
+                            <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ getBackendError('type') }}</span>
                         </label>
-                        <input type="number" formControlName="reminder_days" min="0" max="365"
-                            [placeholder]="'tasks.form.reminderDaysPlaceholder' | transloco"
-                            class="input-standard input input-bordered w-full"
-                            autocomplete="off" name="task-reminder-days" inputmode="numeric"
-                            [class.input-error]="(taskForm.get('reminder_days')?.touched && taskForm.get('reminder_days')?.invalid) || getBackendError('reminder_days')">
-                        @if (getBackendError('reminder_days')) {
-                            <label class="label pt-1.5">
-                                <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ getBackendError('reminder_days') }}</span>
-                            </label>
-                        } @else if (taskForm.get('reminder_days')?.touched && taskForm.get('reminder_days')?.invalid) {
-                            <label class="label pt-1.5">
-                                <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ 'tasks.form.reminderDaysInvalid' | transloco }}</span>
-                            </label>
-                        }
-                    </div>
+                    }
+                </div>
+
+                <!-- Due Date -->
+                <div class="form-control">
+                    <app-date-picker
+                        [label]="'tasks.form.dueDate' | transloco"
+                        [placeholder]="'tasks.form.dueDatePlaceholder' | transloco"
+                        formControlName="due_date"
+                        [minDate]="minDueDate"
+                        [size]="'sm'">
+                    </app-date-picker>
+                    @if (getBackendError('due_date')) {
+                        <label class="label pt-1.5">
+                            <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ getBackendError('due_date') }}</span>
+                        </label>
+                    } @else if (taskForm.get('due_date')?.touched && taskForm.get('due_date')?.hasError('dueDatePast')) {
+                        <label class="label pt-1.5">
+                            <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ 'tasks.form.dueDatePast' | transloco }}</span>
+                        </label>
+                    }
+                </div>
+
+                <!-- Due Time -->
+                <div class="form-control">
+                    <app-time-picker
+                        [label]="'tasks.form.dueTime' | transloco"
+                        [placeholder]="'tasks.form.dueTimePlaceholder' | transloco"
+                        [hint]="(minDueTime() ? 'tasks.form.dueTimeHintToday' : 'tasks.form.dueTimeHint') | transloco"
+                        [minTime]="minDueTime()"
+                        formControlName="due_time">
+                    </app-time-picker>
+                    @if (taskForm.get('due_time')?.touched && taskForm.get('due_time')?.hasError('dueTimePast')) {
+                        <label class="label pt-1.5">
+                            <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ 'tasks.form.dueTimePast' | transloco }}</span>
+                        </label>
+                    }
+                </div>
+
+                <!-- Reminder Days -->
+                <div class="form-control">
+                    <label class="label pt-0 pb-1">
+                        <span class="label-standard">{{ 'tasks.form.reminderDays' | transloco }}</span>
+                    </label>
+                    <input type="number" formControlName="reminder_days" min="0" max="365"
+                        [placeholder]="'tasks.form.reminderDaysPlaceholder' | transloco"
+                        class="input-standard input input-bordered w-full"
+                        autocomplete="off" name="task-reminder-days" inputmode="numeric"
+                        [class.input-error]="(taskForm.get('reminder_days')?.touched && taskForm.get('reminder_days')?.invalid) || getBackendError('reminder_days')">
+                    @if (getBackendError('reminder_days')) {
+                        <label class="label pt-1.5">
+                            <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ getBackendError('reminder_days') }}</span>
+                        </label>
+                    } @else if (taskForm.get('reminder_days')?.touched && taskForm.get('reminder_days')?.invalid) {
+                        <label class="label pt-1.5">
+                            <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ 'tasks.form.reminderDaysInvalid' | transloco }}</span>
+                        </label>
+                    }
                 </div>
 
                 <!-- Status -->
@@ -131,7 +201,22 @@
                 <!-- Process Associated Search -->
                 <div class="form-control">
                     <label class="label pt-0 pb-1">
-                        <span class="label-standard">{{ 'tasks.form.process' | transloco }}</span>
+                        <span class="label-standard inline-flex items-center gap-1.5">
+                            {{ (isSuspensionType() ? 'tasks.form.processRequired' : 'tasks.form.process') | transloco }}
+                            @if (isSuspensionType()) {
+                                <span class="text-error" aria-hidden="true">*</span>
+                                <span class="relative group/procinfo inline-flex cursor-help" tabindex="0">
+                                    <span class="w-4 h-4 rounded-full bg-warning/15 flex items-center justify-center text-warning group-hover/procinfo:bg-warning/25 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </span>
+                                    <span class="absolute left-0 top-full mt-2 w-72 p-3.5 rounded-2xl bg-base-100 border border-base-200 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] text-left opacity-0 invisible group-hover/procinfo:opacity-100 group-hover/procinfo:visible group-focus-within/procinfo:opacity-100 group-focus-within/procinfo:visible transition-all z-[1200] pointer-events-none">
+                                        <p class="text-[11px] font-semibold text-base-content/80 leading-relaxed">{{ 'tasks.form.processSuspensionHint' | transloco }}</p>
+                                    </span>
+                                </span>
+                            }
+                        </span>
                     </label>
                     <div #processSearchContainer class="relative group w-full">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-base-content/30 z-10">
@@ -152,7 +237,7 @@
                             [attr.aria-expanded]="showProcessDropdown()"
                             [class.process-selected]="taskForm.get('process_id')?.value"
                             (focus)="onProcessSearchFocus()"
-                            [class.input-error]="getBackendError('process_id')">
+                            [class.input-error]="!!getBackendError('process_id') || (isSuspensionType() && taskForm.get('process_id')?.touched && !taskForm.get('process_id')?.value)">
 
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-base-content/20 z-10 pointer-events-none">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200" 
@@ -223,7 +308,11 @@
 
                     @if (getBackendError('process_id')) {
                         <label class="label pt-1.5">
-                            <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ getBackendError('process_id') }}</span>
+                            <span class="text-[11px] font-semibold text-error leading-snug">{{ getBackendError('process_id') }}</span>
+                        </label>
+                    } @else if (isSuspensionType() && taskForm.get('process_id')?.touched && !taskForm.get('process_id')?.value) {
+                        <label class="label pt-1.5">
+                            <span class="text-[10px] font-bold text-error uppercase tracking-wider">{{ 'tasks.form.suspensionProcessRequired' | transloco }}</span>
                         </label>
                     }
                 </div>

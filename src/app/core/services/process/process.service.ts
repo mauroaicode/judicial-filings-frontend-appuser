@@ -15,6 +15,7 @@ import {
   AlertKeywordStatsResponse,
   ProcessDetailInstance,
 } from '@app/core/models/process/process.model';
+import { TaskPagination, TaskStatus, TaskType } from '@app/core/models/tasks/task.model';
 
 @Injectable({
   providedIn: 'root',
@@ -129,6 +130,30 @@ export class ProcessService {
   getProcessDetail(id: string): Observable<ProcessDetailResponse> {
     const url = `${environment.apiBaseUrl}/processes/${id}`;
     return this._http.get<ProcessDetailResponse>(url);
+  }
+
+  /**
+   * List tasks linked to a process (GET /processes/:id/tasks)
+   */
+  getProcessTasks(
+    processId: string,
+    page: number = 1,
+    perPage: number = 20,
+    filters: { status?: TaskStatus; type?: TaskType } = {}
+  ): Observable<TaskPagination> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('per_page', perPage.toString());
+
+    if (filters.status) {
+      params = params.set('status', filters.status);
+    }
+    if (filters.type) {
+      params = params.set('type', filters.type);
+    }
+
+    const url = `${environment.apiBaseUrl}/processes/${processId}/tasks`;
+    return this._http.get<TaskPagination>(url, { params });
   }
 
   /**

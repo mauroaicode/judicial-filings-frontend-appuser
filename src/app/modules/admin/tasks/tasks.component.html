@@ -45,7 +45,7 @@
         }
     </div>
 
-    <!-- Urgency Legend (pending only) -->
+    <!-- Urgency Legend (pending only) — task due-date semaphore only -->
     @if (showUrgencyLegend()) {
         <div class="task-legend-panel rounded-2xl bg-base-100 p-4 sm:px-5 sm:py-4">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -103,6 +103,25 @@
                                     <span class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none badge-ghost">
                                         {{ task.status_label }}
                                     </span>
+                                    @if (task.type_label || task.type) {
+                                        @if (task.type === 'suspension') {
+                                            <button
+                                                type="button"
+                                                class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none badge-outline badge-warning inline-flex items-center gap-1 cursor-pointer hover:bg-warning/15 transition-colors"
+                                                (click)="showSuspensionGuide.set(true); $event.stopPropagation()"
+                                                [attr.title]="'tasks.suspensionGuide.badgeTip' | transloco"
+                                                [attr.aria-label]="'tasks.suspensionGuide.openLabel' | transloco">
+                                                {{ task.type_label || ('tasks.form.typeOptions.suspension' | transloco) }}
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </button>
+                                        } @else {
+                                            <span class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none badge-outline">
+                                                {{ task.type_label || ('tasks.form.typeOptions.' + task.type | transloco) }}
+                                            </span>
+                                        }
+                                    }
                                     <span class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none badge-error badge-outline">
                                         {{ 'tasks.trash.badge' | transloco }}
                                     </span>
@@ -168,6 +187,25 @@
                                         [class.badge-success]="task.status === 'completed'">
                                         {{ task.status_label }}
                                     </span>
+                                    @if (task.type_label || task.type) {
+                                        @if (task.type === 'suspension') {
+                                            <button
+                                                type="button"
+                                                class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none badge-outline badge-warning inline-flex items-center gap-1 cursor-pointer hover:bg-warning/15 transition-colors"
+                                                (click)="showSuspensionGuide.set(true); $event.stopPropagation()"
+                                                [attr.title]="'tasks.suspensionGuide.badgeTip' | transloco"
+                                                [attr.aria-label]="'tasks.suspensionGuide.openLabel' | transloco">
+                                                {{ task.type_label || ('tasks.form.typeOptions.suspension' | transloco) }}
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </button>
+                                        } @else {
+                                            <span class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none badge-outline">
+                                                {{ task.type_label || ('tasks.form.typeOptions.' + task.type | transloco) }}
+                                            </span>
+                                        }
+                                    }
                                     @if (getUrgencyInfo(task); as urgency) {
                                         <span class="task-urgency-indicator" [class]="getUrgencyClass(task)">
                                             <span class="task-urgency-indicator__dot"></span>
@@ -217,11 +255,11 @@
                                     {{ task.created_at | date:'dd MMM yyyy' }}
                                 </span>
                                 @if (task.due_date) {
-                                    <span class="task-card__meta-item">
+                                    <span class="task-card__meta-item task-card__meta-item--due">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        {{ 'tasks.dueDate' | transloco }}: {{ task.due_date | date:'dd MMM yyyy' }}
+                                        <span>{{ 'tasks.dueDate' | transloco }}: {{ task.due_date }}</span>
                                     </span>
                                 }
                                 @if (task.reminder_days !== null && task.reminder_days !== undefined) {
@@ -239,9 +277,13 @@
                                 <div class="task-card__process">
                                     <span class="task-section-label">{{ 'tasks.relatedProcess' | transloco }}</span>
                                     <div class="flex items-center gap-2 min-w-0">
-                                        <span class="font-bold text-primary text-sm truncate">
+                                        <a class="font-bold text-primary text-sm truncate hover:underline cursor-pointer"
+                                            [href]="'/gestion-procesos/' + task.process_id"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            (click)="goToProcessDetail(task.process_id, $event)">
                                             {{ task.process_number ? (task.process_number | processNumber) : ('ID: ' + task.process_id) }}
-                                        </span>
+                                        </a>
                                         @if (task.process_number) {
                                             <button type="button" class="btn btn-ghost btn-xs btn-circle shrink-0 text-base-content/30 hover:text-primary"
                                                 (click)="copyToClipboard(task.process_number, $event)"
@@ -295,7 +337,8 @@
     <app-task-form-modal
         [task]="selectedTask()"
         (closed)="showFormModal.set(false); selectedTask.set(null)"
-        (saved)="onTaskSaved()" />
+        (saved)="onTaskSaved()"
+        (openSuspensionGuide)="showSuspensionGuide.set(true)" />
 }
 
 @if (showDetailModal() && detailTask(); as task) {
@@ -333,7 +376,7 @@
 <app-confirmation-dialog
     [open]="showCompleteConfirm()"
     [title]="'tasks.complete.title' | transloco"
-    [message]="'tasks.complete.message' | transloco"
+    [message]="getCompleteConfirmMessageKey() | transloco"
     [confirmLabel]="'tasks.complete.confirm' | transloco"
     [cancelLabel]="'common.cancel' | transloco"
     confirmClass="btn-success text-white h-11 px-8 rounded-xl font-bold normal-case"
@@ -353,3 +396,68 @@
         </div>
     </div>
 }
+
+<!-- Suspension guide (info modal) -->
+<dialog class="modal modal-bottom sm:modal-middle z-[110]" [class.modal-open]="showSuspensionGuide()">
+    <div class="modal-box p-0 bg-base-100 flex flex-col max-w-lg w-full max-h-[90dvh] sm:max-h-[85vh] overflow-hidden rounded-t-3xl sm:rounded-2xl">
+        <div class="shrink-0 px-6 pt-6 pb-4 border-b border-base-200">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-warning/15 flex items-center justify-center text-warning shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="font-bold text-lg text-base-content">{{ 'tasks.suspensionGuide.title' | transloco }}</h3>
+                    <p class="text-xs text-base-content/50 mt-1 leading-snug break-words">{{ 'tasks.suspensionGuide.subtitle' | transloco }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-6 py-5 space-y-4">
+            <div class="rounded-2xl border border-base-200 bg-base-200/30 p-4">
+                <h4 class="font-bold text-sm text-base-content mb-1.5">{{ 'tasks.suspensionGuide.whatTitle' | transloco }}</h4>
+                <p class="text-xs text-base-content/70 leading-relaxed break-words">{{ 'tasks.suspensionGuide.whatDesc' | transloco }}</p>
+            </div>
+            <div class="rounded-2xl border border-warning/20 bg-warning/5 p-4 space-y-2">
+                <h4 class="font-bold text-sm text-warning">{{ 'tasks.suspensionGuide.createTitle' | transloco }}</h4>
+                <ul class="space-y-1.5 text-xs text-base-content/70 leading-relaxed list-disc pl-4 break-words">
+                    <li>{{ 'tasks.suspensionGuide.create1' | transloco }}</li>
+                    <li>{{ 'tasks.suspensionGuide.create2' | transloco }}</li>
+                    <li>{{ 'tasks.suspensionGuide.create3' | transloco }}</li>
+                </ul>
+            </div>
+            <div class="rounded-2xl border border-success/20 bg-success/5 p-4 space-y-2">
+                <h4 class="font-bold text-sm text-success">{{ 'tasks.suspensionGuide.reactivateTitle' | transloco }}</h4>
+                <ul class="space-y-1.5 text-xs text-base-content/70 leading-relaxed list-disc pl-4 break-words">
+                    <li>{{ 'tasks.suspensionGuide.reactivate1' | transloco }}</li>
+                    <li>{{ 'tasks.suspensionGuide.reactivate2' | transloco }}</li>
+                    <li>{{ 'tasks.suspensionGuide.reactivate3' | transloco }}</li>
+                </ul>
+            </div>
+            <div class="rounded-2xl border border-base-200 p-4 space-y-2">
+                <h4 class="font-bold text-sm text-base-content">{{ 'tasks.suspensionGuide.semaphoreTitle' | transloco }}</h4>
+                <p class="text-xs text-base-content/70 leading-relaxed break-words">{{ 'tasks.suspensionGuide.semaphoreProcess' | transloco }}</p>
+                <p class="text-xs text-base-content/70 leading-relaxed break-words">{{ 'tasks.suspensionGuide.semaphoreTask' | transloco }}</p>
+            </div>
+            <div class="rounded-2xl border border-primary/15 bg-primary/5 p-4 space-y-2">
+                <h4 class="font-bold text-sm text-primary">{{ 'tasks.suspensionGuide.processTitle' | transloco }}</h4>
+                <ul class="space-y-1.5 text-xs text-base-content/70 leading-relaxed list-disc pl-4 break-words">
+                    <li>{{ 'tasks.suspensionGuide.process1' | transloco }}</li>
+                    <li>{{ 'tasks.suspensionGuide.process2' | transloco }}</li>
+                    <li>{{ 'tasks.suspensionGuide.process3' | transloco }}</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="shrink-0 px-6 py-4 border-t border-base-200 bg-base-100">
+            <button type="button" class="btn btn-primary w-full rounded-xl font-bold" (click)="showSuspensionGuide.set(false)">
+                {{ 'common.close' | transloco }}
+            </button>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop" (click)="showSuspensionGuide.set(false)">
+        <button type="button">close</button>
+    </form>
+</dialog>
+

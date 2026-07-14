@@ -304,6 +304,16 @@
                      (click)="$event.stopPropagation()" />
               
               @if (process.lawyer_role) {
+                @if (isSemaphorePaused(process.semaphore)) {
+                  <app-process-alert-tooltip
+                    [paused]="true"
+                    [pausedMessage]="getSemaphorePauseMessage(process.semaphore)"
+                    [lawyerRole]="process.lawyer_role"
+                    position="bottom"
+                    [leftAligned]="true"
+                    (click)="$event.stopPropagation()">
+                  </app-process-alert-tooltip>
+                } @else {
                 <button
                   type="button"
                   (click)="openLegendModal($event)"
@@ -316,6 +326,7 @@
                     'bg-base-300 ring-2 ring-base-200': !process.alert_level
                   }"></span>
                 </button>
+                }
               }
               <div class="flex items-center gap-2">
                 <span class="font-bold text-primary">{{ process.process_number | processNumber }}</span>
@@ -331,12 +342,7 @@
             </div>
             <!-- status badge -->
             <div class="flex flex-col items-end gap-1">
-              <span class="badge badge-sm font-semibold" [ngClass]="{
-                        'badge-success': process.status_label === 'Activo',
-                        'badge-warning': process.status_label === 'Pendiente',
-                        'badge-neutral': process.status_label === 'Cerrado',
-                        'badge-error': process.status_label === 'Inactivo'
-                      }">
+              <span class="badge badge-sm font-semibold" [ngClass]="getStatusBadgeClass(process.status_label)">
                 {{ process.status_label }}
               </span>
             </div>
@@ -486,12 +492,7 @@
                     </span>
                   </div>
                 </div>
-                <span class="badge badge-sm font-semibold whitespace-nowrap" [ngClass]="{
-                            'badge-success': instance.status_label === 'Activo',
-                            'badge-warning': instance.status_label === 'Pendiente',
-                            'badge-neutral': instance.status_label === 'Cerrado',
-                            'badge-error': instance.status_label === 'Inactivo'
-                          }">
+                <span class="badge badge-sm font-semibold whitespace-nowrap" [ngClass]="getStatusBadgeClass(instance.status_label)">
                   {{ instance.status_label }}
                 </span>
               </div>
@@ -584,7 +585,17 @@
               <td class="text-center align-middle sticky-col-alert">
                 <span class="sticky-cell-bg" aria-hidden="true"></span>
                 <div class="sticky-cell-txt flex justify-center">
-                  @if (process.alert_level && process.lawyer_role) {
+                  @if (isSemaphorePaused(process.semaphore)) {
+                  <div class="flex justify-center items-center h-full w-full">
+                    <app-process-alert-tooltip
+                      [paused]="true"
+                      [pausedMessage]="getSemaphorePauseMessage(process.semaphore)"
+                      [lawyerRole]="process.lawyer_role"
+                      [position]="i < 2 ? 'bottom' : 'top'"
+                      [leftAligned]="true">
+                    </app-process-alert-tooltip>
+                  </div>
+                  } @else if (process.alert_level && process.lawyer_role) {
                   <div class="flex justify-center items-center h-full w-full">
                     <app-process-alert-tooltip 
                       [alertLevel]="process.alert_level" 
@@ -666,12 +677,7 @@
               <td class="align-middle">{{ process.court }}</td>
               <td class="align-middle">{{ process.process_class }}</td>
               <td class="text-center align-middle">
-                <span class="badge whitespace-nowrap" [ngClass]="{
-                        'badge-success': process.status_label === 'Activo',
-                        'badge-warning': process.status_label === 'Pendiente',
-                        'badge-neutral': process.status_label === 'Cerrado',
-                        'badge-error': process.status_label === 'Inactivo'
-                      }">
+                <span class="badge whitespace-nowrap" [ngClass]="getStatusBadgeClass(process.status_label)">
                   {{ process.status_label }}
                 </span>
               </td>
@@ -781,7 +787,17 @@
               <td class="text-center align-middle sticky-col-alert">
                 <span class="sticky-cell-bg" aria-hidden="true"></span>
                 <div class="sticky-cell-txt flex justify-center">
-                  @if (instance.alert_level) {
+                  @if (isSemaphorePaused(instance.semaphore)) {
+                  <div class="flex justify-center items-center h-full w-full">
+                    <app-process-alert-tooltip
+                      [paused]="true"
+                      [pausedMessage]="getSemaphorePauseMessage(instance.semaphore)"
+                      [lawyerRole]="instance.lawyer_role"
+                      [position]="i < 2 ? 'bottom' : 'top'"
+                      [leftAligned]="true">
+                    </app-process-alert-tooltip>
+                  </div>
+                  } @else if (instance.alert_level) {
                   <div class="flex justify-center items-center h-full w-full">
                     <app-process-alert-tooltip 
                       [alertLevel]="instance.alert_level" 
@@ -851,12 +867,7 @@
               <td class="align-middle text-base-content/80">{{ instance.court }}</td>
               <td class="align-middle text-base-content/80">{{ instance.process_class }}</td>
               <td class="text-center align-middle">
-                <span class="badge badge-sm whitespace-nowrap" [ngClass]="{
-                            'badge-success': instance.status_label === 'Activo',
-                            'badge-warning': instance.status_label === 'Pendiente',
-                            'badge-neutral': instance.status_label === 'Cerrado',
-                            'badge-error': instance.status_label === 'Inactivo'
-                          }">
+                <span class="badge badge-sm whitespace-nowrap" [ngClass]="getStatusBadgeClass(instance.status_label)">
                   {{ instance.status_label }}
                 </span>
               </td>
@@ -1349,6 +1360,13 @@
             <div>
               <h4 class="font-bold text-error text-sm">{{ 'alertSemafor.legend.red.title' | transloco }}</h4>
               <p class="text-xs text-base-content/70 mt-1 leading-relaxed">{{ 'alertSemafor.legend.red.desc' | transloco }}</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 p-4 rounded-2xl bg-base-200/60 border border-base-300/60">
+            <div class="w-3 h-3 rounded-full alert-dot alert-paused mt-1.5 shrink-0"></div>
+            <div>
+              <h4 class="font-bold text-base-content/70 text-sm">{{ 'alertSemafor.legend.paused.title' | transloco }}</h4>
+              <p class="text-xs text-base-content/70 mt-1 leading-relaxed">{{ 'alertSemafor.legend.paused.desc' | transloco }}</p>
             </div>
           </div>
         </div>

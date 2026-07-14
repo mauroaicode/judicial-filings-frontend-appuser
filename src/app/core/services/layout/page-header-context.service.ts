@@ -6,6 +6,10 @@ export interface ProcessDetailHeaderContext {
   statusBadgeClass: string;
   /** Semaphore color from process alert level */
   alertLevel: 'red' | 'yellow' | 'green' | null;
+  /** Inactivity semaphore paused (e.g. suspension task). */
+  semaphorePaused?: boolean;
+  /** Backend message when semaphore is paused. */
+  semaphoreMessage?: string | null;
   /** Raw lawyer role for semaphore tooltip */
   lawyerRole: string | null;
   /** Lawyer role label (Demandante / Demandado) */

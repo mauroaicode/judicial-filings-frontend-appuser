@@ -12,6 +12,7 @@ export interface ProcessInstance {
   last_activity_date: string | null;
   is_private: boolean;
   has_multiple_instances: boolean;
+  status?: ProcessStatusCode;
   status_label: string;
   created_at: string;
   term_start_date?: string | null;
@@ -27,6 +28,23 @@ export interface ProcessInstance {
   speaker?: string | null;
   alert_level?: 'red' | 'yellow' | 'green' | null;
   lawyer_role?: string | null;
+  /** Inactivity semaphore state (paused while a suspension task is active). */
+  semaphore?: ProcessSemaphore | null;
+}
+
+/**
+ * Machine status codes from the API.
+ */
+export type ProcessStatusCode = 'active' | 'inactive' | 'suspended' | string;
+
+/**
+ * Inactivity semaphore metadata. When `paused` is true, tracking colors are frozen
+ * (typically due to an Agenda suspension task).
+ */
+export interface ProcessSemaphore {
+  paused: boolean;
+  reason?: string | null;
+  message?: string | null;
 }
 
 /**
@@ -43,6 +61,7 @@ export interface Process {
   last_activity_date: string | null;
   is_private: boolean;
   has_multiple_instances: boolean;
+  status?: ProcessStatusCode;
   status_label: string;
   created_at: string;
   plaintiff: string | null;
@@ -62,6 +81,8 @@ export interface Process {
   speaker?: string | null;
   alert_level?: 'red' | 'yellow' | 'green' | null;
   lawyer_role?: string | null;
+  /** Inactivity semaphore state (paused while a suspension task is active). */
+  semaphore?: ProcessSemaphore | null;
   /** UI State: si la fila está seleccionada */
   selected?: boolean;
 }
@@ -163,11 +184,16 @@ export interface ProcessDetail {
   is_private: boolean;
   has_multiple_instances: boolean;
   last_api_update: string;
+  status?: ProcessStatusCode;
   status_label: string;
   created_at: string;
   updated_at: string;
   alert_level?: 'red' | 'yellow' | 'green' | null;
   lawyer_role?: string | null;
+  /** Related judicial agenda tasks for this process. */
+  tasks_count?: number;
+  /** Inactivity semaphore state (paused while a suspension task is active). */
+  semaphore?: ProcessSemaphore | null;
 }
 
 /**

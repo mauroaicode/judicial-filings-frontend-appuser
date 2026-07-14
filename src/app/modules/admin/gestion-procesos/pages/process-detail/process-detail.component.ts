@@ -33,8 +33,11 @@ import { ConfirmationDialogComponent } from '@app/shared/components/confirmation
 import { ProcessAlertTooltipComponent } from '@app/shared/components/process-alert-tooltip/process-alert-tooltip.component';
 import { RoleSelectionModalComponent } from '../../components/role-selection-modal/role-selection-modal.component';
 import { ProcessAiChatComponent } from '../../components/process-ai-chat/process-ai-chat.component';
+import { ProcessTasksDrawerComponent } from '../../components/process-tasks-drawer/process-tasks-drawer.component';
 import { AiCoreService } from '@app/core/services/ai-chat/ai-core.service';
 import { PageHeaderContextService } from '@app/core/services/layout/page-header-context.service';
+import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
+import { getSemaphorePauseMessage, isSemaphorePaused } from '@app/core/utils/process-semaphore.util';
 
 const DETAIL_HEADER_SCROLL_THRESHOLD = 80;
 
@@ -52,6 +55,7 @@ const DETAIL_HEADER_SCROLL_THRESHOLD = 80;
     ProcessAlertTooltipComponent,
     RoleSelectionModalComponent,
     ProcessAiChatComponent,
+    ProcessTasksDrawerComponent,
   ],
   templateUrl: './process-detail.component.html',
   styleUrls: ['./process-detail.component.scss'],
@@ -67,12 +71,14 @@ export class ProcessDetailComponent {
   private _layout = inject(AuthenticatedLayoutComponent, { optional: true });
   private _aiCoreService = inject(AiCoreService);
   private _headerContext = inject(PageHeaderContextService);
+  private _processRefresh = inject(ProcessRefreshService);
 
   // AI Permission State
   public isAiEnabled = this._aiCoreService.isAiEnabled;
 
   // State
   public process = signal<ProcessDetail | null>(null);
+  public showProcessTasksDrawer = signal(false);
   public processInstances = signal<ProcessDetailInstance[]>([]);
   public loadingInstances = signal<boolean>(false);
   public subjects = signal<Subject[]>([]);
@@ -253,6 +259,14 @@ export class ProcessDetailComponent {
         });
       });
 
+    this._processRefresh.refreshed$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((processId) => {
+        if (this.process()?.id === processId) {
+          this.refreshProcessStatus(processId);
+        }
+      });
+
     // Validar estado de IA para la organización
     this._aiCoreService.checkAiStatus().subscribe();
 
@@ -287,6 +301,8 @@ export class ProcessDetailComponent {
         statusLabel,
         statusBadgeClass: this.getStatusClass(statusLabel),
         alertLevel: process.alert_level ?? null,
+        semaphorePaused: isSemaphorePaused(process.semaphore),
+        semaphoreMessage: getSemaphorePauseMessage(process.semaphore),
         lawyerRole: lawyerRole ?? null,
         lawyerRoleLabel: lawyerRole ? this.getRoleLabel(lawyerRole) : null,
         instanceName: process.has_multiple_instances ? (instance?.court ?? null) : null,
@@ -480,6 +496,44 @@ export class ProcessDetailComponent {
     if (!newState) this.isChatPinned.set(false);
   }
 
+  public openProcessTasksDrawer(): void {
+    this.showProcessTasksDrawer.set(true);
+  }
+
+  public closeProcessTasksDrawer(): void {
+    this.showProcessTasksDrawer.set(false);
+  }
+
+  public onProcessTasksCountChange(count: number): void {
+    const current = this.process();
+    if (!current) return;
+    this.process.set({ ...current, tasks_count: count });
+  }
+
+  public onProcessReactivatedFromTasks(): void {
+    const id = this.process()?.id;
+    if (id) {
+      this.refreshProcessStatus(id);
+    }
+  }
+
+  /**
+   * Soft-refresh process header/status without wiping the rest of the detail view.
+   */
+  public refreshProcessStatus(id: string): void {
+    this._processService.getProcessDetail(id).subscribe({
+      next: (response) => {
+        this.process.update((current) =>
+          current ? { ...current, ...response.process } : response.process
+        );
+        this.initialStatusLabel.set(response.process.status_label);
+      },
+      error: (error) => {
+        console.error('Error refreshing process detail:', error);
+      },
+    });
+  }
+
   public onChatPinnedChanged(pinned: boolean): void {
     this.isChatPinned.set(pinned);
   }
@@ -596,11 +650,53 @@ export class ProcessDetailComponent {
   }
 
   /**
+   * Check if process is inactive
+   */
+  isProcessInactive(): boolean {
+    const status = this.initialStatusLabel() || this.process()?.status_label;
+    const statusCode = this.process()?.status;
+    if (statusCode === 'inactive') return true;
+    if (statusCode === 'suspended' || statusCode === 'active') return false;
+    if (!status) return false;
+    const statusLower = status.toLowerCase();
+    return statusLower.includes('inactivo') || statusLower.includes('inactive');
+  }
+
+  isProcessSuspended(): boolean {
+    const process = this.process();
+    if (!process) return false;
+    if (process.status === 'suspended') return true;
+    if (isSemaphorePaused(process.semaphore)) return true;
+    const status = (this.initialStatusLabel() || process.status_label || '').toLowerCase();
+    return status.includes('suspend');
+  }
+
+  isSemaphorePaused(): boolean {
+    return isSemaphorePaused(this.process()?.semaphore);
+  }
+
+  getSemaphorePauseMessage(): string {
+    return getSemaphorePauseMessage(
+      this.process()?.semaphore,
+      'Semáforo de inactividad en pausa. Debe completar o eliminar la tarea de suspensión en la Agenda para reactivarlo.'
+    );
+  }
+
+  /**
    * Toggle process status (activate/deactivate)
    */
   toggleProcessStatus(): void {
     const process = this.process();
     if (!process) return;
+
+    if (this.isProcessSuspended()) {
+      this.showToast(
+        'error',
+        this.getSemaphorePauseMessage()
+      );
+      this.openProcessTasksDrawer();
+      return;
+    }
 
     const currentStatus = this.initialStatusLabel() || process.status_label;
     const statusLower = currentStatus.toLowerCase();
@@ -636,7 +732,9 @@ export class ProcessDetailComponent {
         this.initialStatusLabel.set(newStatus);
         this.process.set({
           ...process,
-          status_label: newStatus
+          status: isActivate ? 'active' : 'inactive',
+          status_label: newStatus,
+          semaphore: isActivate ? (process.semaphore ?? null) : process.semaphore,
         });
         this.confirmModalOpen.set(false);
 
@@ -678,20 +776,14 @@ export class ProcessDetailComponent {
   }
 
   /**
-   * Check if process is inactive
-   */
-  isProcessInactive(): boolean {
-    const status = this.initialStatusLabel() || this.process()?.status_label;
-    if (!status) return false;
-    const statusLower = status.toLowerCase();
-    return statusLower.includes('inactivo') || statusLower.includes('inactive');
-  }
-
-  /**
    * Get status badge class - usa el estado inicial del proceso
    */
   getStatusClass(status: string): string {
     const statusLower = status.toLowerCase();
+
+    if (statusLower.includes('suspend')) {
+      return 'badge badge-info';
+    }
 
     if (statusLower.includes('inactivo') || statusLower.includes('inactive')) {
       return 'badge badge-error';
@@ -699,6 +791,14 @@ export class ProcessDetailComponent {
 
     if (statusLower.includes('activo') || statusLower.includes('active')) {
       return 'badge badge-success';
+    }
+
+    if (statusLower.includes('pendiente') || statusLower.includes('pending')) {
+      return 'badge badge-warning';
+    }
+
+    if (statusLower.includes('cerrado') || statusLower.includes('closed')) {
+      return 'badge badge-neutral';
     }
 
     return 'badge';

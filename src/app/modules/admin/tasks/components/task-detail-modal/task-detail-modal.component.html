@@ -11,6 +11,12 @@
                             [class.badge-success]="task().status === 'completed'">
                             {{ task().status_label }}
                         </span>
+                        @if (task().type_label || task().type) {
+                            <span class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none badge-outline"
+                                [class.badge-warning]="task().type === 'suspension'">
+                                {{ task().type_label || ('tasks.form.typeOptions.' + task().type | transloco) }}
+                            </span>
+                        }
                         @if (isTrash()) {
                             <span class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none badge-error badge-outline">
                                 {{ 'tasks.trash.badge' | transloco }}
@@ -62,8 +68,8 @@
                 </div>
                 <div class="rounded-xl bg-base-200/25 border border-base-200/50 px-4 py-3">
                     <span class="task-section-label">{{ 'tasks.form.dueDate' | transloco }}</span>
-                    <p class="text-sm font-semibold text-base-content mt-1">
-                        {{ task().due_date ? (task().due_date | date:'dd MMM yyyy') : '—' }}
+                    <p class="text-sm font-semibold text-base-content mt-1 break-words">
+                        {{ task().due_date || '—' }}
                     </p>
                 </div>
                 <div class="rounded-xl bg-base-200/25 border border-base-200/50 px-4 py-3">
@@ -81,7 +87,7 @@
                         <span class="task-section-label task-urgency-panel__label">{{ 'tasks.urgency.title' | transloco }}</span>
                         <span class="task-urgency-panel__badge">
                             <span class="task-urgency-panel__dot" aria-hidden="true"></span>
-                            {{ urgency.labelKey | transloco }}
+                            {{ urgency.label }}
                         </span>
                     </div>
                 }
@@ -92,9 +98,13 @@
                 <span class="task-section-label">{{ 'tasks.relatedProcess' | transloco }}</span>
                 @if (task().process_id) {
                     <div class="mt-2 rounded-xl bg-base-200/35 border border-base-200/60 px-4 py-3 flex items-center justify-between gap-3">
-                        <span class="font-bold text-primary text-sm break-all">
+                        <a class="font-bold text-primary text-sm break-all hover:underline cursor-pointer"
+                            [href]="'/gestion-procesos/' + task().process_id"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            (click)="onOpenProcess($event)">
                             {{ task().process_number ? (task().process_number | processNumber) : ('ID: ' + task().process_id) }}
-                        </span>
+                        </a>
                         @if (task().process_number) {
                             <button type="button" class="btn btn-ghost btn-xs btn-circle shrink-0 text-base-content/30 hover:text-primary"
                                 (click)="onCopyRadicado($event)"

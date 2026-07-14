@@ -4,6 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  effect,
   forwardRef,
   inject,
   input,
@@ -40,6 +41,8 @@ export class DatePickerComponent implements ControlValueAccessor, AfterViewInit,
   public placeholder = input<string>('Seleccionar fecha');
   public size = input<'xs' | 'sm' | 'md' | 'lg'>('sm');
   public disabled = input<boolean>(false);
+  /** Earliest selectable date (`Y-m-d` or Date). Past days are disabled in the calendar. */
+  public minDate = input<string | Date | null>(null);
 
   public isDisabled = signal<boolean>(false);
   public inputElement = viewChild<ElementRef<HTMLInputElement>>('dateInput');
@@ -49,6 +52,16 @@ export class DatePickerComponent implements ControlValueAccessor, AfterViewInit,
 
   private _onChange: (value: string | null) => void = () => {};
   private _onTouched: () => void = () => {};
+
+  constructor() {
+    effect(() => {
+      const min = this.minDate();
+      if (!this.flatpickrInstance) {
+        return;
+      }
+      this.flatpickrInstance.set('minDate', min ?? undefined);
+    });
+  }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
@@ -115,6 +128,7 @@ export class DatePickerComponent implements ControlValueAccessor, AfterViewInit,
     }
 
     const appendTarget = this._resolveAppendTarget(inputElement);
+    const minDate = this.minDate();
 
     this.flatpickrInstance = flatpickr(inputElement, {
       mode: 'single',
@@ -125,6 +139,7 @@ export class DatePickerComponent implements ControlValueAccessor, AfterViewInit,
       disableMobile: true,
       appendTo: appendTarget,
       position: 'below',
+      minDate: minDate ?? undefined,
       onReady: (_selectedDates, _dateStr, instance) => {
         instance.calendarContainer.classList.add('app-date-picker-calendar');
         instance.calendarContainer.style.zIndex = '10050';
