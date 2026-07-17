@@ -157,7 +157,7 @@
         </div>
         } @else {
         <!-- Grid of Keywords -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             @for (keyword of keywords(); track keyword.id) {
             <app-keyword-card [keyword]="keyword" (onEdit)="openEditModal($event)" (onDelete)="deleteKeyword($event)"
                 class="animate-fade-in-up" [style.animation-delay]="($index * 40) + 'ms'">
@@ -235,14 +235,14 @@
                 <div class="flex gap-8 mt-2">
                     <label class="flex items-center gap-3 cursor-pointer group">
                         <input type="radio" value="active" formControlName="status"
-                            class="radio radio-accent radio-sm" />
+                            class="keyword-status-radio keyword-status-radio--active radio radio-success radio-sm" />
                         <span
-                            class="text-sm font-bold text-base-content/70 group-hover:text-accent transition-colors">{{
+                            class="text-sm font-bold text-base-content/70 group-hover:text-success transition-colors">{{
                             'keywords.status.active' | transloco }}</span>
                     </label>
                     <label class="flex items-center gap-3 cursor-pointer group">
                         <input type="radio" value="inactive" formControlName="status"
-                            class="radio radio-accent radio-sm" />
+                            class="keyword-status-radio keyword-status-radio--inactive radio radio-error radio-sm" />
                         <span class="text-sm font-bold text-base-content/70 group-hover:text-error transition-colors">{{
                             'keywords.status.inactive' | transloco }}</span>
                     </label>

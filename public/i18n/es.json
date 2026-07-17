@@ -109,7 +109,9 @@
     "userMenu": "Menú de usuario",
     "profile": "Perfil",
     "settings": "Configuración",
-    "signOut": "Cerrar Sesión"
+    "signOut": "Cerrar Sesión",
+    "switchToDark": "Cambiar a modo oscuro",
+    "switchToLight": "Cambiar a modo claro"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -491,6 +493,91 @@
         "name": "Nombre o Razón Social",
         "identification": "Identificación",
         "isCited": "Citado"
+      }
+    },
+    "timeline": {
+      "title": "Línea de tiempo",
+      "subtitle": "Cambios relevantes del sistema, tareas y seguimiento. Las actuaciones oficiales se muestran en su propia sección.",
+      "today": "Hoy",
+      "yesterday": "Ayer",
+      "empty": "Aún no hay eventos registrados para este proceso.",
+      "error": "No fue posible cargar la línea de tiempo.",
+      "retry": "Reintentar",
+      "loadMore": "Ver eventos anteriores",
+      "loadingMore": "Cargando eventos anteriores",
+      "end": "No hay eventos anteriores.",
+      "backfilled": "Evento reconstruido",
+      "estimated": "Fecha aproximada",
+      "historicalHelp": "Este evento fue reconstruido con la información histórica disponible.",
+      "notAvailable": "Sin información",
+      "reminderDays": "{{ count }} días antes",
+      "titles": {
+        "private": "El proceso pasó a privado",
+        "sourceChanged": "Fuente judicial actualizada",
+        "taskCreated": "Se creó una tarea",
+        "taskUpdated": "Se actualizó una tarea",
+        "taskStatusChanged": "Cambió el estado de una tarea",
+        "taskDeleted": "Se eliminó una tarea",
+        "taskRestored": "Se restauró una tarea",
+        "suspended": "Proceso suspendido",
+        "resumed": "Proceso reanudado",
+        "trackingActivated": "Seguimiento activado",
+        "trackingDeactivated": "Seguimiento desactivado",
+        "semaphoreChanged": "Cambió el semáforo",
+        "speakerChanged": "Cambió el ponente",
+        "unknown": "Nuevo evento del proceso"
+      },
+      "descriptions": {
+        "private": "El proceso pasó de público a privado en Rama Judicial.",
+        "sourceChanged": "La fuente de consulta cambió de {{ from }} a {{ to }}.",
+        "taskCreated": "Se agregó una tarea relacionada con este proceso.",
+        "taskUpdated": "Se modificó la información de la tarea.",
+        "taskStatusChanged": "El estado cambió de {{ from }} a {{ to }}.",
+        "taskDeleted": "La tarea relacionada con el proceso fue eliminada.",
+        "taskRestored": "La tarea relacionada con el proceso fue restaurada.",
+        "dueDateChanged": "Se extendió el vencimiento del {{ from }} al {{ to }}.",
+        "fieldsChanged": "Se actualizaron estos campos: {{ fields }}.",
+        "suspended": "El proceso quedó suspendido.",
+        "suspendedPaused": "El seguimiento y el semáforo quedaron pausados.",
+        "resumed": "El seguimiento volvió a estar activo.",
+        "trackingActivated": "Se activó el seguimiento automático del proceso.",
+        "trackingDeactivated": "Se desactivó el seguimiento automático del proceso.",
+        "semaphoreChanged": "El semáforo cambió de {{ from }} a {{ to }}.",
+        "semaphoreRed": "El proceso pasó a nivel rojo por inactividad.",
+        "semaphorePaused": "El semáforo quedó pausado por una tarea de suspensión.",
+        "speakerChanged": "El ponente cambió de {{ from }} a {{ to }}.",
+        "unknown": "Se registró un nuevo evento relevante para este proceso."
+      },
+      "fields": {
+        "corporation": "Corporación",
+        "type": "Tipo",
+        "status": "Estado",
+        "dueDate": "Vence",
+        "reminder": "Recordatorio",
+        "transition": "Cambio de estado",
+        "reason": "Motivo",
+        "role": "Rol",
+        "lastActivity": "Última actuación",
+        "persistedLevel": "Nivel persistido",
+        "relatedTask": "Tarea relacionada"
+      },
+      "actors": {
+        "app_user": "Usuario",
+        "admin": "Administrador",
+        "job": "Actualización automática",
+        "system": "Sistema",
+        "unknown": "Actor del sistema"
+      },
+      "sources": {
+        "judicial_branch": "Rama Judicial",
+        "samai": "SAMAI"
+      },
+      "semaphore": {
+        "red": "Rojo",
+        "yellow": "Amarillo",
+        "green": "Verde",
+        "none": "Sin nivel persistido",
+        "transition": "Transición del semáforo"
       }
     },
     "actions": {

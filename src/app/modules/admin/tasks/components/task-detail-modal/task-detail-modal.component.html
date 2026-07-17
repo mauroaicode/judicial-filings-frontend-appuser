@@ -98,7 +98,7 @@
                 <span class="task-section-label">{{ 'tasks.relatedProcess' | transloco }}</span>
                 @if (task().process_id) {
                     <div class="mt-2 rounded-xl bg-base-200/35 border border-base-200/60 px-4 py-3 flex items-center justify-between gap-3">
-                        <a class="font-bold text-primary text-sm break-all hover:underline cursor-pointer"
+                        <a class="font-bold text-base-content/90 text-sm break-all hover:text-base-content hover:underline cursor-pointer"
                             [href]="'/gestion-procesos/' + task().process_id"
                             target="_blank"
                             rel="noopener noreferrer"
@@ -106,7 +106,7 @@
                             {{ task().process_number ? (task().process_number | processNumber) : ('ID: ' + task().process_id) }}
                         </a>
                         @if (task().process_number) {
-                            <button type="button" class="btn btn-ghost btn-xs btn-circle shrink-0 text-base-content/30 hover:text-primary"
+                            <button type="button" class="btn btn-ghost btn-xs btn-circle shrink-0 text-base-content/35 hover:text-base-content"
                                 (click)="onCopyRadicado($event)"
                                 [attr.aria-label]="'tasks.copyRadicado' | transloco">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

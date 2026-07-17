@@ -106,7 +106,9 @@
     "userMenu": "User menu",
     "profile": "Profile",
     "settings": "Settings",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "switchToDark": "Switch to dark mode",
+    "switchToLight": "Switch to light mode"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -474,6 +476,91 @@
         "name": "Name or Business Name",
         "identification": "Identification",
         "isCited": "Is Cited"
+      }
+    },
+    "timeline": {
+      "title": "Timeline",
+      "subtitle": "Relevant system, task, and tracking changes. Official proceedings remain in their own section.",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "empty": "No events have been recorded for this process yet.",
+      "error": "The timeline could not be loaded.",
+      "retry": "Retry",
+      "loadMore": "View earlier events",
+      "loadingMore": "Loading earlier events",
+      "end": "There are no earlier events.",
+      "backfilled": "Reconstructed event",
+      "estimated": "Approximate date",
+      "historicalHelp": "This event was reconstructed from the historical information available.",
+      "notAvailable": "No information",
+      "reminderDays": "{{ count }} days before",
+      "titles": {
+        "private": "The process became private",
+        "sourceChanged": "Judicial source updated",
+        "taskCreated": "A task was created",
+        "taskUpdated": "A task was updated",
+        "taskStatusChanged": "A task status changed",
+        "taskDeleted": "A task was deleted",
+        "taskRestored": "A task was restored",
+        "suspended": "Process suspended",
+        "resumed": "Process resumed",
+        "trackingActivated": "Tracking activated",
+        "trackingDeactivated": "Tracking deactivated",
+        "semaphoreChanged": "Semaphore changed",
+        "speakerChanged": "Speaker changed",
+        "unknown": "New process event"
+      },
+      "descriptions": {
+        "private": "The process changed from public to private in Rama Judicial.",
+        "sourceChanged": "The consultation source changed from {{ from }} to {{ to }}.",
+        "taskCreated": "A task related to this process was added.",
+        "taskUpdated": "The task information was modified.",
+        "taskStatusChanged": "The status changed from {{ from }} to {{ to }}.",
+        "taskDeleted": "The task related to the process was deleted.",
+        "taskRestored": "The task related to the process was restored.",
+        "dueDateChanged": "The due date was extended from {{ from }} to {{ to }}.",
+        "fieldsChanged": "These fields were updated: {{ fields }}.",
+        "suspended": "The process was suspended.",
+        "suspendedPaused": "Tracking and the semaphore were paused.",
+        "resumed": "Tracking became active again.",
+        "trackingActivated": "Automatic process tracking was activated.",
+        "trackingDeactivated": "Automatic process tracking was deactivated.",
+        "semaphoreChanged": "The semaphore changed from {{ from }} to {{ to }}.",
+        "semaphoreRed": "The process reached red level due to inactivity.",
+        "semaphorePaused": "The semaphore was paused by a suspension task.",
+        "speakerChanged": "The speaker changed from {{ from }} to {{ to }}.",
+        "unknown": "A new relevant event was recorded for this process."
+      },
+      "fields": {
+        "corporation": "Corporation",
+        "type": "Type",
+        "status": "Status",
+        "dueDate": "Due",
+        "reminder": "Reminder",
+        "transition": "Status change",
+        "reason": "Reason",
+        "role": "Role",
+        "lastActivity": "Last proceeding",
+        "persistedLevel": "Persisted level",
+        "relatedTask": "Related task"
+      },
+      "actors": {
+        "app_user": "User",
+        "admin": "Administrator",
+        "job": "Automatic update",
+        "system": "System",
+        "unknown": "System actor"
+      },
+      "sources": {
+        "judicial_branch": "Rama Judicial",
+        "samai": "SAMAI"
+      },
+      "semaphore": {
+        "red": "Red",
+        "yellow": "Yellow",
+        "green": "Green",
+        "none": "No persisted level",
+        "transition": "Semaphore transition"
       }
     },
     "actions": {

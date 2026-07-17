@@ -130,7 +130,7 @@
 
                             <div class="task-card__body cursor-pointer" (click)="openDetailModal(task)" role="button" tabindex="0"
                                 (keydown.enter)="openDetailModal(task)" (keydown.space)="openDetailModal(task); $event.preventDefault()">
-                                <h3 class="font-bold text-base text-base-content leading-snug group-hover:text-primary transition-colors">
+                                <h3 class="font-bold text-base text-base-content leading-snug">
                                     {{ task.title }}
                                 </h3>
                                 <p class="text-sm text-base-content/60 line-clamp-3 leading-relaxed mt-2">
@@ -235,7 +235,7 @@
                             <!-- Body -->
                             <div class="task-card__body cursor-pointer" (click)="openDetailModal(task)" role="button" tabindex="0"
                                 (keydown.enter)="openDetailModal(task)" (keydown.space)="openDetailModal(task); $event.preventDefault()">
-                                <h3 class="font-bold text-base text-base-content leading-snug group-hover:text-primary transition-colors">
+                                <h3 class="font-bold text-base text-base-content leading-snug">
                                     {{ task.title }}
                                 </h3>
                                 <p class="text-sm text-base-content/60 line-clamp-3 leading-relaxed mt-2">
@@ -277,7 +277,7 @@
                                 <div class="task-card__process">
                                     <span class="task-section-label">{{ 'tasks.relatedProcess' | transloco }}</span>
                                     <div class="flex items-center gap-2 min-w-0">
-                                        <a class="font-bold text-primary text-sm truncate hover:underline cursor-pointer"
+                                        <a class="font-bold text-base-content/90 text-sm truncate hover:text-base-content hover:underline cursor-pointer"
                                             [href]="'/gestion-procesos/' + task.process_id"
                                             target="_blank"
                                             rel="noopener noreferrer"
@@ -285,7 +285,7 @@
                                             {{ task.process_number ? (task.process_number | processNumber) : ('ID: ' + task.process_id) }}
                                         </a>
                                         @if (task.process_number) {
-                                            <button type="button" class="btn btn-ghost btn-xs btn-circle shrink-0 text-base-content/30 hover:text-primary"
+                                            <button type="button" class="btn btn-ghost btn-xs btn-circle shrink-0 text-base-content/35 hover:text-base-content"
                                                 (click)="copyToClipboard(task.process_number, $event)"
                                                 [attr.aria-label]="'tasks.copyRadicado' | transloco">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

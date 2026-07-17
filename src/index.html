@@ -3,6 +3,17 @@
 
 <head>
   <meta charset="utf-8">
+  <!-- Theme detection runs BEFORE styles to eliminate flash of wrong theme -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('notijudicial-theme');
+        var sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var isDark = saved !== null ? saved === 'dark' : sysDark;
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      } catch (e) { /* noop – storage may be unavailable */ }
+    })();
+  </script>
   <title>Procesos Judiciales</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,6 +36,16 @@
     border-top-color: #4B2A7D;
     border-radius: 9999px;
     animation: app-boot-spin 0.8s linear infinite;
+  }
+
+  /* Dark mode boot screen */
+  [data-theme="dark"] #app-boot {
+    background: #1A1625;
+  }
+
+  [data-theme="dark"] #app-boot__spinner {
+    border-color: #2E2444;
+    border-top-color: #7C52B8;
   }
 
   @keyframes app-boot-spin {

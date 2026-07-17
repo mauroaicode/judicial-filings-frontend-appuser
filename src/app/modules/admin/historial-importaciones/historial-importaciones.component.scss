@@ -21,17 +21,17 @@
 }
 
 .import-history-table tbody tr.import-history-row.import-history-row-highlight > td {
-  background-color: color-mix(in srgb, var(--color-primary) 14%, white) !important;
+  background-color: color-mix(in srgb, var(--color-primary) 14%, var(--color-base-100)) !important;
   animation: import-row-fade-highlight 9s ease-out forwards;
 }
 
 .import-history-table tbody tr.import-history-row:hover > td,
 .import-history-table tbody tr.import-history-row.import-history-row-hover > td {
-  background-color: #f3f0f9 !important;
+  background-color: color-mix(in srgb, var(--color-primary) 14%, var(--color-base-100)) !important;
 }
 
 .pagination-results-info {
-  color: rgb(var(--bc) / 0.7);
+  color: color-mix(in srgb, var(--color-base-content) 70%, transparent);
   font-size: 0.875rem;
 }
 
@@ -40,12 +40,35 @@
   display: inline-flex;
 }
 
+.import-pagination-page {
+  color: color-mix(in srgb, var(--color-base-content) 72%, transparent);
+
+  &:hover:not(.import-pagination-page--current) {
+    background-color: color-mix(in srgb, var(--color-primary) 12%, var(--color-base-100));
+    color: var(--color-primary);
+  }
+
+  &--current,
+  &--current:hover,
+  &--current:focus-visible {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary-content) !important;
+    font-weight: 800;
+    box-shadow:
+      0 0 0 2px var(--color-base-100),
+      0 0 0 4px color-mix(in srgb, var(--color-primary) 45%, transparent);
+    position: relative;
+    z-index: 1;
+  }
+}
+
 @keyframes import-row-fade-highlight {
   0% {
-    background-color: color-mix(in srgb, var(--color-primary) 20%, white);
+    background-color: color-mix(in srgb, var(--color-primary) 20%, var(--color-base-100));
   }
   70% {
-    background-color: color-mix(in srgb, var(--color-primary) 8%, white);
+    background-color: color-mix(in srgb, var(--color-primary) 8%, var(--color-base-100));
   }
   100% {
     background-color: transparent;

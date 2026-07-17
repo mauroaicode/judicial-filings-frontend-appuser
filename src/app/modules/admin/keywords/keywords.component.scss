@@ -38,20 +38,42 @@
     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
 }
 
-/* Force accent focus color for inputs and radio */
+/* Theme-aware focus colors (DaisyUI v5 variables). */
 .input:focus,
-.input-bordered:focus,
-.radio:focus,
-.radio:active {
-    outline: 2px solid var(--a) !important;
+.input-bordered:focus {
+    outline: 2px solid color-mix(in srgb, var(--color-primary) 35%, transparent) !important;
     outline-offset: 1px;
-    border-color: var(--a) !important;
+    border-color: var(--color-primary) !important;
 }
 
-/* Specific fix for purple radio selected state if primary/secondary leak */
-.radio-accent:checked {
-    background-color: var(--a) !important;
-    border-color: var(--a) !important;
+.keyword-status-radio {
+    background-color: transparent !important;
+
+    &--active {
+        &:checked {
+            background-color: var(--color-success) !important;
+            border-color: var(--color-success) !important;
+            color: var(--color-success-content) !important;
+        }
+
+        &:focus-visible {
+            outline: 2px solid color-mix(in srgb, var(--color-success) 45%, transparent) !important;
+            outline-offset: 2px;
+        }
+    }
+
+    &--inactive {
+        &:checked {
+            background-color: var(--color-error) !important;
+            border-color: var(--color-error) !important;
+            color: var(--color-error-content) !important;
+        }
+
+        &:focus-visible {
+            outline: 2px solid color-mix(in srgb, var(--color-error) 45%, transparent) !important;
+            outline-offset: 2px;
+        }
+    }
 }
 
 .divider {

@@ -18,9 +18,9 @@
     visibility: hidden;
     transition: all 0.15s ease-out;
     pointer-events: none;
-    background-color: #ffffff !important;
+    background-color: var(--color-base-100) !important;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid color-mix(in srgb, var(--color-base-content) 14%, transparent) !important;
     padding: 1rem !important;
     border-radius: 0.75rem !important;
 
@@ -32,7 +32,7 @@
       left: 50%;
       transform: translateX(-50%);
       border: 6px solid transparent;
-      border-top-color: #ffffff;
+      border-top-color: var(--color-base-100);
       z-index: 101;
     }
   }
@@ -58,7 +58,7 @@
 // Hover accent en todas las filas (principales e instancias) — color sólido para que se vea
 .process-list-table tbody tr.process-row-hovered,
 .process-list-table tbody tr.process-row-hovered td {
-  background-color: #F3F0F9 !important;
+  background-color: color-mix(in srgb, var(--color-primary) 14%, var(--color-base-100)) !important;
 }
 
 /* Hover específico para la celda sticky */
@@ -69,8 +69,8 @@
 .process-list-table tbody tr.process-row-hovered td.sticky-col-alert::before,
 .process-list-table tbody tr.process-row-hovered td.sticky-col-radicado .sticky-cell-bg,
 .process-list-table tbody tr.process-row-hovered td.sticky-col-alert .sticky-cell-bg {
-  background-color: #F3F0F9 !important;
-  background: #F3F0F9 !important;
+  background-color: color-mix(in srgb, var(--color-primary) 14%, var(--color-base-100)) !important;
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--color-base-100)) !important;
 }
 
 /* IMPORTANTE: evitar que ancestros con overflow rompan el sticky del header */
@@ -82,6 +82,9 @@
 // Columna Número de Radicación sticky en scroll horizontal
 .process-list-table {
   --table-sticky-top: 0px;
+  --process-table-bg: var(--color-base-100);
+  --process-table-zebra: color-mix(in srgb, var(--color-base-200) 65%, var(--color-base-100));
+  --process-table-accent: color-mix(in srgb, var(--color-primary) 14%, var(--color-base-100));
   overflow-x: auto !important;
   overflow-y: auto !important;
   max-height: calc(100vh - 280px);
@@ -138,15 +141,29 @@
     border: none !important;
   }
 
+  /* DaisyUI zebra colors are theme-aware, but explicit cell backgrounds keep
+     sticky and non-sticky columns visually consistent while scrolling. */
+  tbody td {
+    background-color: var(--process-table-bg) !important;
+  }
+
+  tbody tr:nth-child(2n) td {
+    background-color: var(--process-table-zebra) !important;
+  }
+
+  tbody tr.process-row-selected td {
+    background-color: color-mix(in srgb, var(--color-primary) 9%, var(--color-base-100)) !important;
+  }
+
   /* Celda sticky idx */
   tbody td.sticky-col-idx {
     position: sticky !important;
     left: -1px !important;
     z-index: 1 !important;
-    background-color: #ffffff !important;
+    background-color: var(--process-table-bg) !important;
     overflow: visible !important;
     transform: none !important;
-    box-shadow: 1px 0 0 0 #ffffff !important;
+    box-shadow: 1px 0 0 0 var(--process-table-bg) !important;
     border: none !important;
   }
 
@@ -155,10 +172,10 @@
     position: sticky !important;
     left: 47px !important;
     z-index: 3 !important; /* Debe poder mostrar tooltip sobre radicado */
-    background-color: #ffffff !important;
+    background-color: var(--process-table-bg) !important;
     overflow: visible !important;
     transform: none !important;
-    box-shadow: 1px 0 0 0 #ffffff !important;
+    box-shadow: 1px 0 0 0 var(--process-table-bg) !important;
     border: none !important;
 
     & .sticky-cell-bg {
@@ -175,8 +192,8 @@
     position: sticky !important;
     left: 127px !important;
     z-index: 2 !important;
-    background-color: #ffffff !important;
-    box-shadow: 2px 0 4px rgba(0,0,0,0.1), 1px 0 0 0 #ffffff !important;
+    background-color: var(--process-table-bg) !important;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.18), 1px 0 0 0 var(--process-table-bg) !important;
     border: none !important;
     min-width: 340px !important;
     max-width: 340px !important;
@@ -203,14 +220,14 @@
   tbody tr:nth-child(2n) td.sticky-col-radicado,
   tbody tr:nth-child(2n) td.sticky-col-alert,
   tbody tr:nth-child(2n) td.sticky-col-idx {
-    background-color: #f9fafb !important;
+    background-color: var(--process-table-zebra) !important;
   }
 
   /* Filas de instancias: siempre el mismo accent claro (override zebra nth-child) */
   tbody tr.process-table-instance-row td,
   tbody tr.process-table-instance-row:nth-child(2n) td {
-    background-color: #F3F0F9 !important;
-    background: #F3F0F9 !important;
+    background-color: var(--process-table-accent) !important;
+    background: var(--process-table-accent) !important;
   }
 
   tbody tr.process-table-instance-row td.sticky-col-radicado,
@@ -219,12 +236,12 @@
   tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-alert,
   tbody tr.process-table-instance-row td.sticky-col-idx,
   tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-idx {
-    background-color: #F3F0F9 !important;
-    background: #F3F0F9 !important;
-    box-shadow: 1px 0 0 0 #F3F0F9 !important;
+    background-color: var(--process-table-accent) !important;
+    background: var(--process-table-accent) !important;
+    box-shadow: 1px 0 0 0 var(--process-table-accent) !important;
     
     &.sticky-col-radicado {
-      box-shadow: 2px 0 4px rgba(0,0,0,0.1), 1px 0 0 0 #F3F0F9 !important;
+      box-shadow: 2px 0 4px rgba(0,0,0,0.18), 1px 0 0 0 var(--process-table-accent) !important;
     }
   }
 
@@ -234,12 +251,12 @@
   tbody tr.process-row-hovered td.sticky-col-radicado,
   tbody tr.process-row-hovered td.sticky-col-alert,
   tbody tr.process-row-hovered td.sticky-col-idx {
-    background-color: #F3F0F9 !important;
-    background: #F3F0F9 !important;
+    background-color: var(--process-table-accent) !important;
+    background: var(--process-table-accent) !important;
   }
 
   tbody tr.process-row-hovered td.sticky-col-radicado {
-    box-shadow: 2px 0 4px rgba(0,0,0,0.1), 1px 0 0 0 #F3F0F9 !important;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.18), 1px 0 0 0 var(--process-table-accent) !important;
   }
 }
 
@@ -284,9 +301,9 @@
     visibility: hidden;
     transition: all 0.15s ease-out;
     pointer-events: none;
-    background-color: #ffffff !important;
+    background-color: var(--color-base-100) !important;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid color-mix(in srgb, var(--color-base-content) 14%, transparent) !important;
     padding: 1rem !important;
     border-radius: 0.75rem !important;
 
@@ -298,7 +315,7 @@
       left: 50%;
       transform: translateX(-50%);
       border: 6px solid transparent;
-      border-top-color: #ffffff;
+      border-top-color: var(--color-base-100);
       z-index: 101;
     }
   }
@@ -334,7 +351,7 @@
           top: auto !important;
           bottom: 100% !important;
           border-top-color: transparent !important;
-          border-bottom-color: #ffffff !important;
+          border-bottom-color: var(--color-base-100) !important;
           transform: translateX(-50%) !important;
         }
       }
@@ -413,6 +430,36 @@
   }
 }
 
+.pagination-page {
+  color: color-mix(in srgb, var(--color-base-content) 72%, transparent);
+
+  &:hover:not(.pagination-page--current) {
+    background-color: color-mix(in srgb, var(--color-primary) 12%, var(--color-base-100));
+    color: var(--color-primary);
+  }
+
+  &--current,
+  &--current:hover,
+  &--current:focus-visible {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary-content) !important;
+    font-weight: 800;
+    box-shadow:
+      0 0 0 2px var(--color-base-100),
+      0 0 0 4px color-mix(in srgb, var(--color-primary) 45%, transparent);
+    position: relative;
+    z-index: 1;
+  }
+}
+
+:host-context([data-theme='dark']) .process-instance-count {
+  background-color: rgba(124, 82, 184, 0.34) !important;
+  border-color: rgba(196, 168, 240, 0.34) !important;
+  color: #e0cef9 !important;
+  box-shadow: inset 0 0 0 1px rgba(124, 82, 184, 0.1);
+}
+
 // Checkbox visibility and contrast improvements (using native DaisyUI)
 .checkbox {
   // Ultra-clean minimalist borders
@@ -439,12 +486,12 @@
 
   // Row checkbox: Subtle and clear
   &.checkbox-primary {
-    border-color: rgba(0, 0, 0, 0.15) !important; 
-    background-color: #ffffff !important;
+    border-color: color-mix(in srgb, var(--color-base-content) 32%, transparent) !important;
+    background-color: var(--color-base-100) !important;
     
     &:hover {
       border-color: #7c4dff !important; // Slightly softer primary
-      background-color: #fbfaff !important;
+      background-color: color-mix(in srgb, var(--color-primary) 10%, var(--color-base-100)) !important;
     }
 
     &:checked {
@@ -466,4 +513,88 @@ tr[class*="bg-primary/5"] .checkbox-primary {
 // Mobile Card checkboxes
 .card .checkbox-primary {
   border-width: 1.5px !important;
+}
+
+/* Role cards need a stronger outline than the generic base border in dark mode. */
+.role-option {
+  border-color: color-mix(in srgb, var(--color-base-content) 24%, transparent) !important;
+  background-color: color-mix(in srgb, var(--color-base-100) 92%, var(--color-base-200)) !important;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--color-primary) 65%, transparent) !important;
+    background-color: color-mix(in srgb, var(--color-primary) 10%, var(--color-base-100)) !important;
+  }
+
+  &--selected {
+    border-color: var(--color-primary) !important;
+    background-color: color-mix(in srgb, var(--color-primary) 14%, var(--color-base-100)) !important;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-primary) 35%, transparent);
+  }
+
+  .radio {
+    border-color: color-mix(in srgb, var(--color-base-content) 42%, transparent) !important;
+    background-color: transparent !important;
+
+    &:checked {
+      border-color: var(--color-primary) !important;
+      background-color: var(--color-primary) !important;
+      color: var(--color-primary-content) !important;
+    }
+  }
+}
+
+/* Tooltip shown when a process still needs a lawyer role. DaisyUI's generic
+   tooltip variables can conflict with the custom floating panel, so this
+   surface owns its colors explicitly. */
+.process-list-tooltip .semaphore-role-tooltip {
+  background-color: var(--color-base-100) !important;
+  border-color: color-mix(in srgb, var(--color-base-content) 16%, transparent) !important;
+  color: var(--color-base-content) !important;
+
+  span,
+  p,
+  b,
+  svg {
+    color: inherit !important;
+  }
+
+  span {
+    opacity: 0.58;
+  }
+
+  p {
+    opacity: 0.9;
+  }
+
+  &::after {
+    border-top-color: var(--color-base-100) !important;
+  }
+}
+
+:host-context([data-theme='dark']) .process-list-tooltip .semaphore-role-tooltip {
+  background-color: #241c35 !important;
+  border-color: rgba(196, 168, 240, 0.24) !important;
+  color: #e8e0f5 !important;
+  box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.7) !important;
+
+  span {
+    color: #c4a8f0 !important;
+    opacity: 0.78;
+  }
+
+  p {
+    color: #eee8f7 !important;
+    opacity: 1;
+  }
+
+  &::after {
+    border-top-color: #241c35 !important;
+  }
+}
+
+:host-context([data-theme='dark'])
+  .process-list-tooltip.tooltip-bottom
+  .semaphore-role-tooltip::after {
+  border-top-color: transparent !important;
+  border-bottom-color: #241c35 !important;
 }

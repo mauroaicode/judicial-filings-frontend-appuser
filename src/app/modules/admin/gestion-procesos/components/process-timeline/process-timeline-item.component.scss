@@ -1,0 +1,191 @@
+:host {
+  display: block;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  min-height: 7rem;
+}
+
+.timeline-item__rail {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.timeline-item__rail::after {
+  position: absolute;
+  top: 2.35rem;
+  bottom: 0;
+  width: 2px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-primary) 13%, transparent);
+  content: '';
+}
+
+.timeline-item__marker {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 2.15rem;
+  height: 2.15rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-radius: 9999px;
+  background: color-mix(in srgb, currentColor 6%, var(--color-base-100));
+  color: color-mix(in srgb, var(--color-base-content) 65%, transparent);
+  box-shadow: 0 0 0 4px var(--color-base-100);
+}
+
+.timeline-item__marker svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.timeline-item__marker[data-tone='info'] { color: var(--color-info); }
+.timeline-item__marker[data-tone='warning'] { color: #a16207; }
+.timeline-item__marker[data-tone='success'] { color: var(--color-success); }
+.timeline-item__marker[data-tone='muted'] {
+  color: color-mix(in srgb, var(--color-base-content) 38%, transparent);
+}
+.timeline-item__marker[data-tone='dynamic'] { color: var(--color-primary); }
+
+.timeline-item__content {
+  min-width: 0;
+  margin: -0.35rem 0 0 0.35rem;
+  padding: 0.65rem 0.85rem 1.4rem;
+  border-radius: 0.75rem;
+  transition: background-color 160ms ease;
+}
+
+.timeline-item__content:hover {
+  background: color-mix(in srgb, var(--color-base-content) 2.5%, transparent);
+}
+
+.timeline-item__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+h4 {
+  margin: 0;
+  color: var(--color-base-content);
+  font-size: 0.975rem;
+  font-weight: 780;
+  line-height: 1.35;
+}
+
+.timeline-item__description {
+  max-width: 62rem;
+  margin: 0.3rem 0 0;
+  color: color-mix(in srgb, var(--color-base-content) 70%, transparent);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.timeline-item__time {
+  flex: none;
+  border: 1px solid color-mix(in srgb, var(--color-base-content) 9%, transparent);
+  border-radius: 9999px;
+  background: var(--color-base-100);
+  padding: 0.25rem 0.55rem;
+  color: color-mix(in srgb, var(--color-base-content) 55%, transparent);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.timeline-item__details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.5rem 1.5rem;
+  margin: 0.8rem 0 0;
+  padding: 0.7rem 0.85rem;
+  border-left: 3px solid color-mix(in srgb, var(--color-primary) 28%, transparent);
+  border-radius: 0 0.6rem 0.6rem 0;
+  background: color-mix(in srgb, var(--color-base-content) 2.5%, transparent);
+}
+
+.timeline-item__details div {
+  min-width: 0;
+}
+
+.timeline-item__details dt,
+.timeline-item__details dd {
+  display: inline;
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.timeline-item__details dt {
+  color: color-mix(in srgb, var(--color-base-content) 45%, transparent);
+  font-weight: 700;
+}
+
+.timeline-item__details dt::after {
+  content: ': ';
+}
+
+.timeline-item__details dd {
+  color: color-mix(in srgb, var(--color-base-content) 75%, transparent);
+  overflow-wrap: anywhere;
+}
+
+.timeline-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  color: color-mix(in srgb, var(--color-base-content) 45%, transparent);
+  font-size: 0.6875rem;
+}
+
+.timeline-item__badge {
+  border: 1px solid color-mix(in srgb, var(--color-base-content) 7%, transparent);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-base-content) 4%, transparent);
+  padding: 0.15rem 0.45rem;
+  font-weight: 650;
+}
+
+@media (max-width: 639px) {
+  .timeline-item {
+    grid-template-columns: 2.15rem minmax(0, 1fr);
+  }
+
+  .timeline-item__marker {
+    width: 1.8rem;
+    height: 1.8rem;
+    box-shadow: 0 0 0 3px var(--color-base-100);
+  }
+
+  .timeline-item__rail::after {
+    top: 2rem;
+  }
+
+  .timeline-item__content {
+    margin-left: 0.15rem;
+    padding-right: 0;
+  }
+
+  .timeline-item__heading {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .timeline-item__time {
+    grid-row: 1;
+    justify-self: start;
+  }
+
+  .timeline-item__details {
+    grid-template-columns: 1fr;
+  }
+}

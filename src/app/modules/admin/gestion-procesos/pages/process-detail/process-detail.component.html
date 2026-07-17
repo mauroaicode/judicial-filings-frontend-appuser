@@ -433,6 +433,24 @@
           </div>
         </div>
 
+        <!-- Item: Línea de tiempo de eventos relevantes del sistema -->
+        <div class="collapse collapse-plus bg-base-100 border border-base-200 rounded-2xl shadow-sm overflow-hidden">
+          <input type="radio" name="process-accordion" />
+          <div class="collapse-title flex items-center gap-3 py-4 px-6 hover:bg-base-200/20 transition-colors">
+            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 6v6l4 2m5-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span class="text-base font-bold">{{ 'processDetail.timeline.title' | transloco }}</span>
+          </div>
+          <div class="collapse-content px-5 sm:px-6 pb-6 pt-0">
+            <app-process-timeline [processId]="process()!.id" />
+          </div>
+        </div>
+
         <!-- Item: Lista de Actuaciones -->
         <div
           class="collapse collapse-plus bg-base-100 border border-base-200 rounded-2xl shadow-sm overflow-hidden mb-8">

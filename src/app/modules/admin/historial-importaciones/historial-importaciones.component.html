@@ -112,11 +112,11 @@
                   <div class="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
                     @for (processNumber of item.enqueued_process_numbers || []; track processNumber) {
                     <div class="flex items-center justify-between gap-2 rounded-xl border border-primary/15 bg-base-100 px-3 py-2">
-                      <span class="font-bold text-primary text-sm">{{ processNumber | processNumber }}</span>
+                      <span class="font-bold text-base-content/90 text-sm">{{ processNumber | processNumber }}</span>
                       <span class="tooltip tooltip-left" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
                         <button
                           type="button"
-                          class="btn btn-ghost btn-xs btn-circle text-primary/50 hover:text-primary"
+                          class="btn btn-ghost btn-xs btn-circle text-base-content/35 hover:text-base-content"
                           (click)="copyToClipboard(processNumber, $event)">
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
@@ -154,7 +154,10 @@
             (click)="onPageChange({ page: paginationInfo.current_page - 1, perPage: paginationInfo.per_page })"
             [disabled]="paginationInfo.current_page === 1">«</button>
           @for (page of getPageNumbers(); track page) {
-          <button class="join-item btn btn-sm" [class.btn-active]="page === paginationInfo.current_page"
+          <button class="join-item btn btn-sm import-pagination-page"
+            [class.btn-active]="page === paginationInfo.current_page"
+            [class.import-pagination-page--current]="page === paginationInfo.current_page"
+            [attr.aria-current]="page === paginationInfo.current_page ? 'page' : null"
             (click)="onPageChange({ page, perPage: paginationInfo.per_page })">
             {{ page }}
           </button>

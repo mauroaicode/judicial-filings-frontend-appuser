@@ -1,8 +1,8 @@
 <div
-    class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-all duration-300 relative group rounded-2xl">
-    <div class="card-body p-5">
+    class="keyword-card-shell card bg-base-100 shadow-sm border border-base-content/20 hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 relative group rounded-2xl overflow-hidden min-h-[250px]">
+    <div class="card-body p-6">
         <!-- Header: Status and Actions -->
-        <div class="flex justify-between items-start mb-4">
+        <div class="flex justify-between items-start mb-5">
             <div class="badge badge-sm font-bold uppercase tracking-wider h-6 px-3 border-none"
                 [class.badge-success]="keyword.status === 'active'" [class.badge-error]="keyword.status === 'inactive'">
                 {{ 'keywords.status.' + keyword.status | transloco }}
@@ -27,22 +27,22 @@
         </div>
 
         <!-- Content: Name and Date -->
-        <div class="flex items-center gap-3 mb-6">
-            <div class="p-2.5 bg-base-200 rounded-xl text-base-content/60">
+        <div class="flex items-center gap-4 mb-5">
+            <div class="p-3 bg-base-200/70 border border-base-content/15 rounded-xl text-base-content/60">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         [attr.d]="getIconPath('keywords')"></path>
                 </svg>
             </div>
             <div class="flex flex-col min-w-0">
-                <h3 class="font-bold text-base text-base-content truncate leading-tight">{{ keyword.name }}</h3>
+                <h3 class="font-bold text-lg text-base-content truncate leading-tight">{{ keyword.name }}</h3>
                 <span class="text-[10px] font-medium text-base-content/40 uppercase tracking-widest mt-0.5">{{
                     keyword.created_at | date:'dd/MM/yyyy' }}</span>
             </div>
         </div>
 
-        <!-- Keyword Box: Clean and Soft -->
-        <div class="flex flex-col p-4 bg-base-200/40 rounded-xl border border-base-200/50">
+        <!-- Keyword information separated like the recent-actions cards -->
+        <div class="flex flex-col pt-5 mt-auto border-t border-base-content/15">
             <span class="text-[9px] font-bold uppercase text-base-content/30 tracking-[0.2em] mb-1.5">{{
                 'keywords.fields.keyword' | transloco }}</span>
             <div class="flex items-center gap-2">

@@ -20,15 +20,15 @@
 }
 
 .notification-row:hover {
-  background-color: color-mix(in srgb, var(--color-base-200) 75%, white);
+  background-color: color-mix(in srgb, var(--color-base-200) 78%, var(--color-base-100));
 }
 
 .notification-row.is-unread {
-  background-color: color-mix(in srgb, var(--color-primary) 7%, white);
+  background-color: color-mix(in srgb, var(--color-primary) 10%, var(--color-base-100));
 }
 
 .notification-row.is-unread:hover {
-  background-color: color-mix(in srgb, var(--color-primary) 12%, white);
+  background-color: color-mix(in srgb, var(--color-primary) 16%, var(--color-base-100));
 }
 
 .unread-dot {
@@ -36,5 +36,18 @@
   height: 9px;
   border-radius: 9999px;
   background-color: var(--color-primary);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 18%, white);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 28%, transparent);
+}
+
+.notification-panel {
+  color: var(--color-base-content);
+
+  .tabs .tab {
+    color: color-mix(in srgb, var(--color-base-content) 62%, transparent);
+  }
+
+  .tabs .tab-active {
+    background-color: var(--color-primary) !important;
+    color: var(--color-primary-content) !important;
+  }
 }
