@@ -73,9 +73,9 @@ aside {
   z-index: 200;
   transform: translateY(-50%);
   padding: 0.5rem 0.875rem;
-  background-color: #ffffff;
-  color: hsl(var(--bc));
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: var(--color-base-100);
+  color: var(--color-base-content);
+  border: 1px solid color-mix(in srgb, var(--color-base-content) 12%, transparent);
   border-radius: 0.625rem;
   box-shadow:
     0 10px 25px -5px rgba(0, 0, 0, 0.12),
@@ -94,7 +94,7 @@ aside {
     top: 50%;
     transform: translateY(-50%);
     border: 6px solid transparent;
-    border-right-color: #ffffff;
+    border-right-color: var(--color-base-100);
   }
 }
 

@@ -30,7 +30,7 @@
 
     <!-- Dropdown Content -->
     <div tabindex="0"
-        class="dropdown-content mt-4 w-[calc(100vw-2rem)] sm:w-96 !fixed !left-4 sm:!left-auto !right-4 sm:!right-6 !top-14 bg-base-100 rounded-xl shadow-2xl border border-base-200 overflow-hidden z-[2147483647]">
+        class="notification-panel dropdown-content mt-4 w-[calc(100vw-2rem)] sm:w-96 !fixed !left-4 sm:!left-auto !right-4 sm:!right-6 !top-14 bg-base-100 rounded-xl shadow-2xl border border-base-300 overflow-hidden z-[2147483647]">
         <!-- Header -->
         <div class="flex items-center justify-between p-4 bg-base-100/50 backdrop-blur-sm border-b border-base-200">
             <h3 class="font-bold text-base text-base-content/90">{{ 'notifications.title' | transloco }}</h3>
@@ -54,7 +54,7 @@
         </div>
 
         <!-- Notifications List -->
-        <div class="max-h-[26rem] overflow-y-auto bg-base-100 divide-y divide-base-100/50">
+        <div class="max-h-[26rem] overflow-y-auto bg-base-100 divide-y divide-base-300">
             @if (filteredNotifications().length > 0) {
             @for (notification of filteredNotifications(); track notification.id) {
             <div class="notification-row flex gap-3 cursor-pointer p-4 transition-colors group relative"

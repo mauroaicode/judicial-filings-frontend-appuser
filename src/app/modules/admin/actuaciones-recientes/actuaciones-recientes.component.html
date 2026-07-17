@@ -11,9 +11,11 @@
       </p>
     </div>
     <div class="flex gap-2 items-center">
-      <div class="hidden sm:flex items-center gap-2 text-sm text-base-content/50 bg-base-100 border border-base-200 px-4 py-2 rounded-xl mr-2">
-        <span class="font-medium">Total:</span>
-        <span class="font-black text-primary">{{ totalItems() }}</span>
+      <div class="recent-total hidden sm:flex items-center gap-2 bg-base-100 border border-base-300 px-3 py-2 rounded-xl mr-2">
+        <span class="text-xs font-medium text-base-content/55">Total:</span>
+        <span class="recent-total__value text-sm font-semibold tabular-nums">
+          {{ totalItems() }}
+        </span>
       </div>
 
       <button type="button" class="hidden sm:inline-flex btn btn-sm sm:btn-md rounded-xl px-4 transition-all border"
@@ -43,7 +45,7 @@
 
   <!-- Filters Card -->
   @if (showFilters()) {
-  <div id="actuaciones-filters-section" class="card bg-white shadow-sm border border-base-200 animate-fade-in-up">
+  <div id="actuaciones-filters-section" class="card bg-base-100 shadow-sm border border-base-200 animate-fade-in-up">
     <div class="card-body p-6">
       <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="digest-filters-form grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4" autocomplete="off">
 
@@ -268,7 +270,7 @@
       @if (selectedDigest()) {
         <div class="flex flex-col flex-1 min-h-0 overflow-hidden">
         <!-- Modal Sticky Header -->
-        <div class="sticky top-0 z-50 shrink-0 bg-white border-b border-base-200 px-6 py-4 space-y-4">
+        <div class="sticky top-0 z-50 shrink-0 bg-base-100 border-b border-base-200 px-6 py-4 space-y-4">
           <div class="flex flex-wrap justify-between items-start gap-4">
             <div class="space-y-1">
               @if (selectedDigest()!.date) {
@@ -317,7 +319,7 @@
 
               <div class="rounded-xl border border-base-200 bg-base-100 px-3 py-2.5">
                 <p class="text-[10px] font-black uppercase tracking-widest text-base-content/35 mb-1">{{ 'actuacionesRecientes.digest.movementsLabel' | transloco }}</p>
-                <div class="text-2xl font-black text-primary leading-none">{{ selectedDigest()!.actions_count }}</div>
+                <div class="text-2xl font-black text-base-content leading-none">{{ selectedDigest()!.actions_count }}</div>
                 <p class="text-xs text-base-content/55 mt-1">{{ 'table.results' | transloco }}</p>
               </div>
 
@@ -372,7 +374,7 @@
 
             <div class="rounded-xl border border-base-200 bg-base-100 px-3 py-2.5">
               <p class="text-[10px] font-black uppercase tracking-widest text-base-content/35 mb-1">{{ 'actuacionesRecientes.digest.movementsLabel' | transloco }}</p>
-              <div class="text-2xl font-black text-primary leading-none">{{ selectedDigest()!.actions_count }}</div>
+              <div class="text-2xl font-black text-base-content leading-none">{{ selectedDigest()!.actions_count }}</div>
               <p class="text-xs text-base-content/55 mt-1">{{ 'table.results' | transloco }}</p>
             </div>
 
@@ -420,7 +422,7 @@
             <!-- Mobile layout: Cards view (similar a Gestión de Procesos) -->
             <div class="block lg:hidden w-full space-y-3 digest-mobile-cards">
               @for (action of selectedDigestDetails(); track digestRowTrack(action, i); let i = $index) {
-                <div class="card border border-base-200 bg-white shadow-sm overflow-hidden">
+                <div class="card border border-base-200 bg-base-100 shadow-sm overflow-hidden">
                   <div class="p-3 flex items-start justify-between gap-3 border-b border-base-200/70 bg-base-100/70">
                     <div class="flex items-start gap-2 min-w-0">
                       <span class="text-[11px] text-base-content/40 font-bold mt-1">#{{ digestRowIndex(i) }}</span>
@@ -430,12 +432,12 @@
                           @if (processNavigationIdMobile) {
                             <button
                               type="button"
-                              class="font-bold text-primary text-sm text-left cursor-pointer hover:underline underline-offset-2 decoration-primary/40"
+                              class="font-bold text-base-content/90 text-sm text-left cursor-pointer hover:text-base-content hover:underline underline-offset-2 decoration-base-content/40"
                               (click)="goToProcessDetail(processNavigationIdMobile, $event)">
                               {{ action.process_number | processNumber }}
                             </button>
                           } @else {
-                            <span class="font-bold text-primary/80 text-sm">{{ action.process_number | processNumber }}</span>
+                            <span class="font-bold text-base-content/90 text-sm">{{ action.process_number | processNumber }}</span>
                           }
                           <button
                             type="button"
@@ -534,7 +536,7 @@
                       (click)="openActionDetailModal(action, $event)">
                       <div class="space-y-2">
                         <div class="flex items-start gap-2">
-                          <span class="badge badge-sm bg-primary/10 text-primary border-none font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0 mt-0.5">
+                          <span class="digest-badge digest-badge--primary badge badge-sm bg-primary/10 text-primary font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0 mt-0.5">
                             @if (action.is_merged || action.related_action) {
                               {{ getFijacionBadgeLabel(action.action_text || action.action) }}
                             } @else {
@@ -545,13 +547,13 @@
                         </div>
                         @if (action.is_merged && action.linked_action_text) {
                           <div class="flex items-start gap-2">
-                            <span class="badge badge-sm bg-accent/10 text-accent border-none font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0 mt-0.5">Auto</span>
+                            <span class="digest-badge digest-badge--accent badge badge-sm bg-accent/10 text-accent font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0 mt-0.5">Auto</span>
                             <p class="font-semibold text-base-content leading-snug mobile-two-lines mb-0">{{ digestLinkedActionText(action) }}</p>
                           </div>
                         }
                         @if (!action.is_merged && action.related_action) {
                           <div class="flex items-start gap-2">
-                            <span class="badge badge-sm bg-accent/10 text-accent border-none font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0 mt-0.5">Auto</span>
+                            <span class="digest-badge digest-badge--accent badge badge-sm bg-accent/10 text-accent font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0 mt-0.5">Auto</span>
                             <p class="font-semibold text-base-content leading-snug mobile-two-lines mb-0">{{ digestActionLineText(action.related_action) }}</p>
                           </div>
                         }
@@ -586,7 +588,7 @@
                 </div>
               </div>
 
-              <div class="overflow-x-scroll overflow-y-auto w-full h-full min-h-0 process-list-table digest-detail-table-scroll border border-base-200 rounded-xl bg-white shadow-sm">
+              <div class="overflow-x-scroll overflow-y-auto w-full h-full min-h-0 process-list-table digest-detail-table-scroll border border-base-200 rounded-xl bg-base-100 shadow-sm">
               <table class="table table-zebra digest-detail-table" style="min-width: 1480px;">
                 <thead style="background-color: #24163E; color: #ffffff;">
                   <tr>
@@ -630,7 +632,7 @@
                           } @else {
                             @if (!action.lawyer_role) {
                               <span class="process-list-tooltip tooltip-left-aligned" [class.tooltip-bottom]="i < 2">
-                                <div class="tooltip-content text-left text-sm max-w-xs rounded-xl shadow-2xl bg-white border border-base-200 p-4 space-y-2 z-[1000]">
+                                <div class="tooltip-content text-left text-sm max-w-xs rounded-xl shadow-2xl bg-base-100 border border-base-200 p-4 space-y-2 z-[1000]">
                                   <div class="flex items-center gap-2 mb-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -674,16 +676,16 @@
                             @if (processNavigationIdDesktop) {
                               <button
                                 type="button"
-                                class="radicado-number font-bold text-primary cursor-pointer hover:underline underline-offset-2 decoration-primary/40 transition-colors text-left"
+                                class="radicado-number font-bold text-base-content/90 cursor-pointer hover:text-base-content hover:underline underline-offset-2 decoration-base-content/40 transition-colors text-left"
                                 (click)="goToProcessDetail(processNavigationIdDesktop, $event)">
                                 {{ action.process_number | processNumber }}
                               </button>
                             } @else {
-                              <span class="radicado-number font-bold text-primary/80">{{ action.process_number | processNumber }}</span>
+                              <span class="radicado-number font-bold text-base-content/90">{{ action.process_number | processNumber }}</span>
                             }
                             <span class="radicado-copy tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
                               <button type="button"
-                                class="btn btn-ghost btn-xs btn-circle h-6 w-6 min-h-6 min-w-6 text-primary/40 hover:bg-primary/10 hover:text-primary transition-colors"
+                                class="btn btn-ghost btn-xs btn-circle h-6 w-6 min-h-6 min-w-6 text-base-content/35 hover:bg-base-200 hover:text-base-content transition-colors"
                                 (click)="copyToClipboard(action.process_number, $event)">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
@@ -772,13 +774,13 @@
                           @if (action.is_merged) {
                             <div class="flex flex-col gap-1.5">
                               <div class="flex items-start gap-1.5">
-                                <span class="badge badge-sm bg-primary/10 text-primary border-none font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0">{{ getFijacionBadgeLabel(action.action_text || action.action) }}</span>
+                                <span class="digest-badge digest-badge--primary badge badge-sm bg-primary/10 text-primary font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0">{{ getFijacionBadgeLabel(action.action_text || action.action) }}</span>
                                 <span class="font-semibold text-base-content/90">{{ digestActionLineText(action) }}</span>
                               </div>
                               @if (action.linked_action_text) {
                               <div class="flex flex-col gap-0.5">
                                 <div class="flex items-start gap-1.5">
-                                  <span class="badge badge-sm bg-accent/10 text-accent border-none font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0">Auto</span>
+                                  <span class="digest-badge digest-badge--accent badge badge-sm bg-accent/10 text-accent font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0">Auto</span>
                                   <span class="font-semibold text-base-content leading-snug">{{ digestLinkedActionText(action) }}</span>
                                 </div>
                               </div>
@@ -787,11 +789,11 @@
                           } @else if (action.related_action) {
                             <div class="flex flex-col gap-1.5">
                               <div class="flex items-start gap-1.5">
-                                <span class="badge badge-sm bg-primary/10 text-primary border-none font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0">{{ getFijacionBadgeLabel(action.action_text || action.action) }}</span>
+                                <span class="digest-badge digest-badge--primary badge badge-sm bg-primary/10 text-primary font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0">{{ getFijacionBadgeLabel(action.action_text || action.action) }}</span>
                                 <span class="font-semibold text-base-content/90">{{ digestActionLineText(action) }}</span>
                               </div>
                               <div class="flex items-start gap-1.5">
-                                <span class="badge badge-sm bg-accent/10 text-accent border-none font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0">Auto</span>
+                                <span class="digest-badge digest-badge--accent badge badge-sm bg-accent/10 text-accent font-bold text-[9px] px-1.5 min-h-4 h-auto py-0.5 uppercase tracking-tighter shrink-0">Auto</span>
                                 <span class="font-semibold text-base-content">{{ digestActionLineText(action.related_action) }}</span>
                               </div>
                             </div>
@@ -845,7 +847,10 @@
                 (click)="onDigestDetailPageChange({ page: paginationInfo.current_page - 1, perPage: paginationInfo.per_page })"
                 [disabled]="paginationInfo.current_page === 1">«</button>
               @for (page of getDigestPageNumbers(); track page) {
-              <button type="button" class="join-item btn btn-sm" [class.btn-active]="page === paginationInfo.current_page"
+              <button type="button" class="join-item btn btn-sm digest-pagination-page"
+                [class.btn-active]="page === paginationInfo.current_page"
+                [class.digest-pagination-page--current]="page === paginationInfo.current_page"
+                [attr.aria-current]="page === paginationInfo.current_page ? 'page' : null"
                 (click)="onDigestDetailPageChange({ page, perPage: paginationInfo.per_page })">
                 {{ page }}
               </button>
@@ -893,7 +898,7 @@
               @if (actionDetailNavigationId) {
                 <button
                   type="button"
-                  class="text-base md:text-lg font-bold text-primary cursor-pointer hover:underline underline-offset-2 decoration-primary/40 transition-colors text-left"
+                  class="text-base md:text-lg font-bold text-base-content/90 cursor-pointer hover:text-base-content hover:underline underline-offset-2 decoration-base-content/40 transition-colors text-left"
                   (click)="goToProcessDetail(actionDetailNavigationId, $event)">
                   {{ detail.process_number | processNumber }}
                 </button>
@@ -921,7 +926,7 @@
 
           <div class="space-y-3 mb-6">
             <div>
-              <span class="badge bg-primary/10 text-primary border-none font-bold text-[10px] px-2.5 py-1.5 uppercase tracking-wider">{{ getFijacionBadgeLabel(detail.action_text || detail.action) }}</span>
+              <span class="digest-badge digest-badge--primary badge bg-primary/10 text-primary font-bold text-[10px] px-2.5 py-1.5 uppercase tracking-wider">{{ getFijacionBadgeLabel(detail.action_text || detail.action) }}</span>
             </div>
             <div class="rounded-2xl border border-base-200 bg-base-100 px-5 py-4">
               <p class="text-sm md:text-base font-semibold text-base-content">{{ digestActionLineText(detail) }}</p>

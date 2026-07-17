@@ -201,18 +201,20 @@
                 <!-- Process Associated Search -->
                 <div class="form-control">
                     <label class="label pt-0 pb-1">
-                        <span class="label-standard inline-flex items-center gap-1.5">
-                            {{ (isSuspensionType() ? 'tasks.form.processRequired' : 'tasks.form.process') | transloco }}
+                        <span class="label-standard task-process-label">
+                            <span>{{ (isSuspensionType() ? 'tasks.form.processRequired' : 'tasks.form.process') | transloco }}</span>
                             @if (isSuspensionType()) {
-                                <span class="text-error" aria-hidden="true">*</span>
-                                <span class="relative group/procinfo inline-flex cursor-help" tabindex="0">
-                                    <span class="w-4 h-4 rounded-full bg-warning/15 flex items-center justify-center text-warning group-hover/procinfo:bg-warning/25 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </span>
-                                    <span class="absolute left-0 top-full mt-2 w-72 p-3.5 rounded-2xl bg-base-100 border border-base-200 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] text-left opacity-0 invisible group-hover/procinfo:opacity-100 group-hover/procinfo:visible group-focus-within/procinfo:opacity-100 group-focus-within/procinfo:visible transition-all z-[1200] pointer-events-none">
-                                        <p class="text-[11px] font-semibold text-base-content/80 leading-relaxed">{{ 'tasks.form.processSuspensionHint' | transloco }}</p>
+                                <span class="inline-flex items-center gap-1.5 shrink-0">
+                                    <span class="text-error" aria-hidden="true">*</span>
+                                    <span class="relative group/procinfo inline-flex cursor-help" tabindex="0">
+                                        <span class="w-4 h-4 rounded-full bg-warning/15 flex items-center justify-center text-warning group-hover/procinfo:bg-warning/25 transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </span>
+                                        <span class="absolute left-0 top-full mt-2 w-72 p-3.5 rounded-2xl bg-base-100 border border-base-200 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] text-left opacity-0 invisible group-hover/procinfo:opacity-100 group-hover/procinfo:visible group-focus-within/procinfo:opacity-100 group-focus-within/procinfo:visible transition-all z-[1200] pointer-events-none">
+                                            <p class="text-[11px] font-semibold text-base-content/80 leading-relaxed">{{ 'tasks.form.processSuspensionHint' | transloco }}</p>
+                                        </span>
                                     </span>
                                 </span>
                             }
@@ -273,18 +275,17 @@
 
                                 @for (p of processes(); track p.id) {
                                     <button type="button" 
-                                        class="w-full text-left px-5 py-3 hover:bg-primary/5 border-b border-base-100 last:border-0 group transition-all flex items-center gap-4 active:bg-primary/10"
+                                        class="w-full text-left px-5 py-3 hover:bg-primary/5 border-b border-base-100 last:border-0 group/process-option transition-all flex items-center gap-4 active:bg-primary/10 cursor-pointer"
                                         [class.bg-primary/5]="taskForm.get('process_id')?.value === p.id"
                                         (click)="selectProcess(p)">
-                                        <div class="w-10 h-10 rounded-xl bg-base-100 border border-base-200 group-hover:border-primary/20 flex items-center justify-center transition-all shadow-sm font-black text-xs text-base-content/20 group-hover:text-primary/40 uppercase"
+                                        <div class="w-10 h-10 rounded-xl bg-base-100 border border-base-200 group-hover/process-option:border-primary/20 flex items-center justify-center transition-all shadow-sm font-black text-xs text-base-content/20 group-hover/process-option:text-primary/40 uppercase"
                                             [class.border-primary/30]="taskForm.get('process_id')?.value === p.id"
                                             [class.text-primary/60]="taskForm.get('process_id')?.value === p.id">
                                             {{ (p.despacho || '-').charAt(0) }}
                                         </div>
                                         <div class="flex flex-col min-w-0 flex-1">
                                             <div class="flex items-center gap-2">
-                                                <span class="text-sm font-black text-base-content group-hover:text-primary transition-colors"
-                                                    [class.text-primary]="taskForm.get('process_id')?.value === p.id">
+                                                <span class="text-sm font-black text-base-content">
                                                     {{ p.number | processNumber }}
                                                 </span>
                                                 @if (taskForm.get('process_id')?.value === p.id) {
@@ -293,7 +294,7 @@
                                             </div>
                                             <span class="text-[10px] font-bold text-base-content/40 truncate uppercase tracking-tight leading-tight mt-0.5">{{ p.despacho }}</span>
                                         </div>
-                                        <div class="ml-auto flex items-center opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                                        <div class="ml-auto flex items-center opacity-0 group-hover/process-option:opacity-100 group-hover/process-option:translate-x-1 transition-all">
                                             <div class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />

@@ -124,3 +124,76 @@
     }
   }
 }
+
+/* Preserve status meaning without using near-white cards in dark mode. */
+:host-context([data-theme='dark']) {
+  .semaphore-panel {
+    border-color: color-mix(in srgb, var(--color-base-content) 12%, transparent) !important;
+  }
+
+  .semaphore-segment {
+    &--red {
+      background-color: rgba(127, 29, 29, 0.28);
+
+      .semaphore-segment__label,
+      .semaphore-segment__action { color: #fca5a5; }
+      .semaphore-segment__value { color: #fecaca; }
+      .semaphore-segment__subtitle { color: rgba(254, 202, 202, 0.68); }
+
+      &:hover,
+      &.semaphore-segment--active {
+        background-color: rgba(127, 29, 29, 0.42);
+      }
+    }
+
+    &--yellow {
+      background-color: rgba(120, 53, 15, 0.28);
+
+      .semaphore-segment__label,
+      .semaphore-segment__action { color: #fcd34d; }
+      .semaphore-segment__value { color: #fde68a; }
+      .semaphore-segment__subtitle { color: rgba(253, 230, 138, 0.68); }
+
+      &:hover,
+      &.semaphore-segment--active {
+        background-color: rgba(120, 53, 15, 0.42);
+      }
+    }
+
+    &--green {
+      background-color: rgba(20, 83, 45, 0.3);
+
+      .semaphore-segment__label,
+      .semaphore-segment__action { color: #86efac; }
+      .semaphore-segment__value { color: #bbf7d0; }
+      .semaphore-segment__subtitle { color: rgba(187, 247, 208, 0.68); }
+
+      &:hover,
+      &.semaphore-segment--active {
+        background-color: rgba(20, 83, 45, 0.45);
+      }
+    }
+  }
+
+  .stats-card--important {
+    border: 1px solid color-mix(in srgb, var(--color-base-content) 10%, transparent) !important;
+
+    &.stats-card--actuacion {
+      background-color: rgba(3, 105, 161, 0.2) !important;
+
+      .text-sky-700,
+      .text-sky-600 { color: #7dd3fc !important; }
+      .text-sky-900 { color: #bae6fd !important; }
+      .bg-sky-100 { background-color: rgba(14, 165, 233, 0.18) !important; }
+    }
+
+    &.stats-card--alerta {
+      background-color: rgba(120, 53, 15, 0.24) !important;
+
+      .text-amber-700,
+      .text-amber-600 { color: #fcd34d !important; }
+      .text-amber-900 { color: #fde68a !important; }
+      .bg-amber-100 { background-color: rgba(245, 158, 11, 0.18) !important; }
+    }
+  }
+}

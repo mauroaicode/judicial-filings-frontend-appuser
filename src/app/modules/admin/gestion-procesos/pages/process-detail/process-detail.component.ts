@@ -34,6 +34,7 @@ import { ProcessAlertTooltipComponent } from '@app/shared/components/process-ale
 import { RoleSelectionModalComponent } from '../../components/role-selection-modal/role-selection-modal.component';
 import { ProcessAiChatComponent } from '../../components/process-ai-chat/process-ai-chat.component';
 import { ProcessTasksDrawerComponent } from '../../components/process-tasks-drawer/process-tasks-drawer.component';
+import { ProcessTimelineComponent } from '../../components/process-timeline/process-timeline.component';
 import { AiCoreService } from '@app/core/services/ai-chat/ai-core.service';
 import { PageHeaderContextService } from '@app/core/services/layout/page-header-context.service';
 import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
@@ -56,6 +57,7 @@ const DETAIL_HEADER_SCROLL_THRESHOLD = 80;
     RoleSelectionModalComponent,
     ProcessAiChatComponent,
     ProcessTasksDrawerComponent,
+    ProcessTimelineComponent,
   ],
   templateUrl: './process-detail.component.html',
   styleUrls: ['./process-detail.component.scss'],

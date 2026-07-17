@@ -74,7 +74,7 @@
 
   <!-- Filters Card -->
   @if (showFilters()) {
-  <div id="filters-section" class="card bg-white shadow-sm border border-base-200 animate-fade-in-up">
+  <div id="filters-section" class="card bg-base-100 shadow-sm border border-base-200 animate-fade-in-up">
     <div class="card-body p-6">
       <h2 class="label-standard mb-6">{{ 'gestionProcesos.filters.title' | transloco }}</h2>
       <form [formGroup]="filterForm"
@@ -454,7 +454,7 @@
             class="bg-base-200/40 p-3 sm:px-4 border-t border-base-200 flex justify-between items-center cursor-pointer hover:bg-base-200/60 transition-colors"
             (click)="toggleExpand(process); $event.stopPropagation()">
             <div class="flex items-center gap-2">
-              <span class="badge badge-primary badge-sm font-bold shadow-sm">{{ getInstanceCount(process) }}</span>
+              <span class="process-instance-count badge badge-primary badge-sm font-bold shadow-sm">{{ getInstanceCount(process) }}</span>
               <span class="text-[11px] font-bold text-base-content/70 uppercase tracking-widest">Instancias</span>
             </div>
             <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/60">
@@ -550,6 +550,7 @@
             @for (process of processes(); track process.id; let i = $index) {
             <tr class="cursor-pointer group process-table-main-row transition-colors"
               [class.process-row-hovered]="hoveredRowId() === process.id"
+              [class.process-row-selected]="selectedProcessIds().has(process.id)"
               [class.bg-primary/5]="selectedProcessIds().has(process.id)"
               [class.rounded-b-none]="isExpanded(process) && process.instances?.length"
               [class.border-b-0]="isExpanded(process) && process.instances?.length"
@@ -611,7 +612,7 @@
                     <div class="flex justify-center items-center h-full w-full">
                       @if (!process.lawyer_role) {
                         <span class="process-list-tooltip tooltip-left-aligned" [class.tooltip-bottom]="i < 2">
-                          <div class="tooltip-content text-left text-sm max-w-xs rounded-xl shadow-2xl bg-white border border-base-200 p-4 space-y-2 z-[1000]">
+                          <div class="tooltip-content semaphore-role-tooltip text-left text-sm max-w-xs rounded-xl shadow-2xl border p-4 space-y-2 z-[1000]">
                             <div class="flex items-center gap-2 mb-1">
                               <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -761,7 +762,7 @@
                 }
               </td>
               <td class="text-center align-middle">
-                <span class="badge badge-sm font-bold" [class.badge-primary]="getInstanceCount(process) > 1"
+                <span class="process-instance-count badge badge-sm font-bold" [class.badge-primary]="getInstanceCount(process) > 1"
                   [class.badge-ghost]="getInstanceCount(process) <= 1"
                   [class.text-primary-content]="getInstanceCount(process) > 1">
                   {{ getInstanceCount(process) }}
@@ -813,7 +814,7 @@
                     <div class="flex justify-center items-center h-full w-full">
                       @if (!instance.lawyer_role) {
                         <span class="process-list-tooltip tooltip-left-aligned" [class.tooltip-bottom]="i < 2">
-                          <div class="tooltip-content text-left text-sm max-w-xs rounded-xl shadow-2xl bg-white border border-base-200 p-4 space-y-2 z-[1000]">
+                          <div class="tooltip-content semaphore-role-tooltip text-left text-sm max-w-xs rounded-xl shadow-2xl border p-4 space-y-2 z-[1000]">
                             <div class="flex items-center gap-2 mb-1">
                               <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -950,7 +951,7 @@
                 }
               </td>
               <td class="text-center align-middle">
-                <span class="badge badge-sm font-bold" [class.badge-primary]="getInstanceCount(process) > 1"
+                <span class="process-instance-count badge badge-sm font-bold" [class.badge-primary]="getInstanceCount(process) > 1"
                   [class.badge-ghost]="getInstanceCount(process) <= 1"
                   [class.text-primary-content]="getInstanceCount(process) > 1">
                   {{ getInstanceCount(process) }}
@@ -988,7 +989,10 @@
             (click)="onPageChange({ page: paginationInfo.current_page - 1, perPage: paginationInfo.per_page })"
             [disabled]="paginationInfo.current_page === 1">«</button>
           @for (page of getPageNumbers(); track page) {
-          <button class="join-item btn btn-sm" [class.btn-active]="page === paginationInfo.current_page"
+          <button class="join-item btn btn-sm pagination-page"
+            [class.btn-active]="page === paginationInfo.current_page"
+            [class.pagination-page--current]="page === paginationInfo.current_page"
+            [attr.aria-current]="page === paginationInfo.current_page ? 'page' : null"
             (click)="onPageChange({ page, perPage: paginationInfo.per_page })">
             {{ page }}
           </button>
@@ -1120,7 +1124,8 @@
             </label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               @for (role of roles; track role.value) {
-                <label class="relative flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 group hover:border-primary/40 active:scale-[0.98]"
+                <label class="role-option relative flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 group active:scale-[0.98]"
+                       [class.role-option--selected]="addProcessForm.get('lawyer_role')?.value === role.value"
                        [class.border-primary]="addProcessForm.get('lawyer_role')?.value === role.value"
                        [class.bg-primary/5]="addProcessForm.get('lawyer_role')?.value === role.value"
                        [class.border-base-200]="addProcessForm.get('lawyer_role')?.value !== role.value"

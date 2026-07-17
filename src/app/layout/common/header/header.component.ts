@@ -18,6 +18,7 @@ import { SessionLockService } from '@app/core/services/session-lock/session-lock
 import { PageHeaderContextService } from '@app/core/services/layout/page-header-context.service';
 import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
 import { ProcessAlertTooltipComponent } from '@app/shared/components/process-alert-tooltip/process-alert-tooltip.component';
+import { ThemeService } from '@app/core/services/theme/theme.service';
 
 @Component({
   selector: 'app-header',
@@ -32,6 +33,7 @@ export class HeaderComponent {
   private _authService = inject(AuthService);
   private _sessionLockService = inject(SessionLockService);
   private _headerContext = inject(PageHeaderContextService);
+  readonly themeService = inject(ThemeService);
 
   // Inputs
   public pageTitle = input<string>('');

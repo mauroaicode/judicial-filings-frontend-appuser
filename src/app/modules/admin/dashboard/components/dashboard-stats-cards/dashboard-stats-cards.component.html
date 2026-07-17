@@ -122,6 +122,8 @@
     <div
       class="stats-card--important group relative overflow-hidden rounded-2xl border-0 cursor-pointer transition-all duration-200 hover:-translate-y-0.5"
       [class]="card.type === 'actuacion' ? 'bg-sky-50 shadow-[0_8px_28px_-8px_rgba(3,105,161,0.18)]' : 'bg-amber-50 shadow-[0_8px_28px_-8px_rgba(245,158,11,0.22)]'"
+      [class.stats-card--actuacion]="card.type === 'actuacion'"
+      [class.stats-card--alerta]="card.type !== 'actuacion'"
       [class.stats-card--compact]="isGestionProcesos()"
       [attr.role]="'button'"
       [attr.tabindex]="0"
