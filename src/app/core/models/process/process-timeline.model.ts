@@ -28,6 +28,22 @@ export type ProcessTimelineActorType =
   | 'system'
   | (string & {});
 
+export type ProcessTimelineDisplayDateKey =
+  | 'semaphore_recorded_at'
+  | 'action_date'
+  | 'registration_date'
+  | 'last_activity_date'
+  | 'speaker_changed_at'
+  | (string & {});
+
+export interface ProcessTimelineDisplayDate {
+  key: ProcessTimelineDisplayDateKey;
+  attribute: string;
+  label: string;
+  value: string;
+  formatted: string;
+}
+
 export interface ProcessTimelineEventDisplay {
   title: string;
   summary: string | null;
@@ -40,6 +56,7 @@ export interface ProcessTimelineEventDisplay {
   source: string | null;
   actor: string | null;
   time?: string | null;
+  dates?: ProcessTimelineDisplayDate[];
   show_technical_metadata: boolean;
 }
 
