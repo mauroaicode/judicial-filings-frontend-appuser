@@ -192,7 +192,7 @@ export function presentTimelineEvent(
         translate('processDetail.timeline.fields.role'),
         event.display?.role ?? stringValue(payload['lawyer_role'])
       );
-      pushDetail(details, translate('processDetail.timeline.fields.lastActivity'), formatDate(stringValue(payload['last_activity_date']), locale));
+      pushDisplayDates(details, event);
       pushDetail(details, translate('processDetail.timeline.fields.persistedLevel'), semaphoreLevel(payload['stored_level_after_reset']));
       break;
     }
@@ -201,6 +201,7 @@ export function presentTimelineEvent(
         from: displayValue(payload['from'], translate),
         to: displayValue(payload['to'], translate),
       });
+      pushDisplayDates(details, event);
       break;
   }
 
@@ -214,6 +215,15 @@ export function presentTimelineEvent(
     details,
     semaphore,
   };
+}
+
+function pushDisplayDates(details: TimelineDetail[], event: ProcessTimelineEvent): void {
+  const dates = event.display?.dates;
+  if (!dates?.length) return;
+
+  for (const date of dates) {
+    pushDetail(details, date.label, date.formatted);
+  }
 }
 
 function displayTransition(

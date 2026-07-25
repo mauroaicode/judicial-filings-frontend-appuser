@@ -198,6 +198,133 @@ describe('process timeline presentation', () => {
     expect(result.semaphore?.fromLabel).toBe('Sin nivel anterior');
   });
 
+  it('renders display.dates in backend order for semaphore_changed', () => {
+    const result = presentTimelineEvent(
+      event(
+        'semaphore_changed',
+        { from: 'yellow', to: 'green', last_activity_date: '2020-01-01' },
+        {
+          display: {
+            title: 'Cambió el semáforo',
+            summary: 'El semáforo cambió de Amarillo a Verde.',
+            reason: 'Nueva actuación judicial',
+            role: 'Demandante',
+            from: 'Amarillo',
+            to: 'Verde',
+            source: 'Sistema',
+            actor: 'Sistema',
+            dates: [
+              {
+                key: 'semaphore_recorded_at',
+                attribute: 'occurred_at',
+                label: 'Fecha del semáforo',
+                value: '2026-07-25',
+                formatted: '25 de julio de 2026',
+              },
+              {
+                key: 'action_date',
+                attribute: 'action_date',
+                label: 'Fecha de actuación',
+                value: '2026-07-26',
+                formatted: '26 de julio de 2026',
+              },
+              {
+                key: 'registration_date',
+                attribute: 'registration_date',
+                label: 'Fecha de registro',
+                value: '2026-07-24',
+                formatted: '24 de julio de 2026',
+              },
+            ],
+            show_technical_metadata: false,
+          },
+        }
+      ),
+      translate,
+      'es'
+    );
+
+    const dateDetails = result.details.filter((detail) =>
+      [
+        'Fecha del semáforo',
+        'Fecha de actuación',
+        'Fecha de registro',
+      ].includes(detail.label)
+    );
+
+    expect(dateDetails).toEqual([
+      { label: 'Fecha del semáforo', value: '25 de julio de 2026' },
+      { label: 'Fecha de actuación', value: '26 de julio de 2026' },
+      { label: 'Fecha de registro', value: '24 de julio de 2026' },
+    ]);
+    expect(result.details.some((detail) => detail.label === 'processDetail.timeline.fields.lastActivity')).toBeFalse();
+  });
+
+  it('does not render a dates block when display.dates is empty', () => {
+    const result = presentTimelineEvent(
+      event(
+        'semaphore_changed',
+        { from: 'yellow', to: 'green', last_activity_date: '2026-07-01' },
+        {
+          display: {
+            title: 'Cambió el semáforo',
+            summary: null,
+            reason: null,
+            role: null,
+            from: 'Amarillo',
+            to: 'Verde',
+            source: 'Sistema',
+            actor: 'Sistema',
+            dates: [],
+            show_technical_metadata: false,
+          },
+        }
+      ),
+      translate,
+      'es'
+    );
+
+    expect(result.details.some((detail) => detail.label === 'processDetail.timeline.fields.lastActivity')).toBeFalse();
+    expect(result.details.some((detail) => detail.label.startsWith('Fecha'))).toBeFalse();
+  });
+
+  it('renders display.dates for speaker_changed', () => {
+    const result = presentTimelineEvent(
+      event(
+        'speaker_changed',
+        { from: 'Ana', to: 'Carlos' },
+        {
+          display: {
+            title: 'Cambió el ponente',
+            summary: 'El ponente cambió de Ana a Carlos.',
+            reason: null,
+            role: null,
+            from: 'Ana',
+            to: 'Carlos',
+            source: 'Sistema',
+            actor: 'Sistema',
+            dates: [
+              {
+                key: 'speaker_changed_at',
+                attribute: 'occurred_at',
+                label: 'Fecha del cambio de ponente',
+                value: '2026-07-25',
+                formatted: '25 de julio de 2026',
+              },
+            ],
+            show_technical_metadata: false,
+          },
+        }
+      ),
+      translate,
+      'es'
+    );
+
+    expect(result.details).toEqual([
+      { label: 'Fecha del cambio de ponente', value: '25 de julio de 2026' },
+    ]);
+  });
+
   function event(
     eventType: string,
     payload: Record<string, unknown> = {},

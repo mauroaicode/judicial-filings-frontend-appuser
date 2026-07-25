@@ -84,8 +84,24 @@ export class ProcessTimelineApiService {
       this.isNullableString(value['to']) &&
       this.isNullableString(value['source']) &&
       this.isNullableString(value['actor']) &&
+      (value['dates'] === undefined || this.isTimelineDisplayDates(value['dates'])) &&
       typeof value['show_technical_metadata'] === 'boolean'
     );
+  }
+
+  private isTimelineDisplayDates(value: unknown): boolean {
+    if (!Array.isArray(value)) return false;
+
+    return value.every((item) => {
+      if (!this.isRecord(item)) return false;
+      return (
+        typeof item['key'] === 'string' &&
+        typeof item['attribute'] === 'string' &&
+        typeof item['label'] === 'string' &&
+        typeof item['value'] === 'string' &&
+        typeof item['formatted'] === 'string'
+      );
+    });
   }
 
   private readNumber(value: Record<string, unknown>, key: string): number {
