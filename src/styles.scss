@@ -178,6 +178,13 @@ app-date-range-picker .flatpickr-day,
     border-color: hsl(var(--n)) !important;
   }
 
+  &.prevMonthDay,
+  &.nextMonthDay {
+    visibility: hidden !important;
+    pointer-events: none !important;
+    background: transparent !important;
+  }
+
   &.inRange {
     background: rgba(75, 42, 125, 0.1) !important;
     color: #4B2A7D !important;
