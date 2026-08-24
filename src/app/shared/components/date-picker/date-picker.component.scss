@@ -77,6 +77,13 @@
     align-items: center !important;
     justify-content: center !important;
 
+    &.prevMonthDay,
+    &.nextMonthDay {
+      visibility: hidden !important;
+      pointer-events: none !important;
+      background: transparent !important;
+    }
+
     &:hover:not(.today):not(.selected):not(.flatpickr-disabled) {
       background: hsl(var(--n)) !important;
       color: hsl(var(--nc)) !important;
