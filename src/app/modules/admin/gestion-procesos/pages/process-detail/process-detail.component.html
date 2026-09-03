@@ -1,4 +1,4 @@
-<div class="w-full">
+<div class="w-full process-detail-page">
   <!-- Toast: éxito al copiar al portapapeles (IDÉNTICO A ACTUACIONES RECIENTES) -->
   @if (copiedMessage()) {
     <div class="toast toast-end toast-bottom z-[10060] pointer-events-none">
@@ -47,7 +47,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
         <div
-          class="w-8 h-8 sm:w-12 sm:h-12 bg-primary/10 text-primary rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+          class="detail-section-icon w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -58,7 +58,7 @@
           <div
             class="inline-flex max-w-full items-center gap-1.5 group/header-radicado cursor-default">
             <span
-              class="min-w-0 text-sm sm:text-base md:text-lg font-bold text-primary tracking-tight break-words sm:break-all leading-tight">
+              class="min-w-0 text-sm sm:text-base md:text-lg font-bold text-base-content tracking-tight break-words sm:break-all leading-tight">
               {{ process()!.process_number | processNumber }}
             </span>
             <button (click)="copyToClipboard(process()!.process_number, $event)" 
@@ -125,7 +125,7 @@
           <div class="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10 md:ml-auto md:mr-6">
             <!-- Col: Última Actuación -->
             <div class="text-left md:text-right group cursor-help relative">
-              <h2 class="text-[9px] uppercase font-bold text-base-content/30 mb-1 tracking-widest flex items-center gap-1.5 md:justify-end">
+              <h2 class="detail-meta-label text-[9px] uppercase font-bold text-base-content/85 mb-1 tracking-widest flex items-center gap-1.5 md:justify-end">
                 <span>Última Actuación</span>
                 <div class="w-3.5 h-3.5 rounded-full bg-base-200/50 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-2 w-2 opacity-50 group-hover:text-primary group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -133,12 +133,12 @@
                   </svg>
                 </div>
               </h2>
-              <p class="text-[13px] font-semibold text-base-content/70 tracking-tight leading-none group-hover:text-base-content transition-colors">
+              <p class="text-[13px] font-semibold text-base-content tracking-tight leading-none transition-colors">
                 {{ formatDateSafe(process()!.last_activity_date, 'shortDate') }}
               </p>
               
               <!-- Tooltip Informativo -->
-              <div class="absolute top-full md:right-0 mt-3 w-56 p-4 bg-white border border-base-200 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[110] translate-y-2 group-hover:translate-y-0">
+              <div class="absolute top-full md:right-0 mt-3 w-56 p-4 bg-base-100 border border-base-200 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[110] translate-y-2 group-hover:translate-y-0">
                 <div class="flex items-center gap-2 mb-2 pb-2 border-b border-base-100">
                   <span class="text-[9px] font-black uppercase text-base-content/30 tracking-widest">En el Juzgado</span>
                 </div>
@@ -153,7 +153,7 @@
 
             <!-- Col: Última Sincronización -->
             <div class="text-left md:text-right group cursor-help relative">
-              <h2 class="text-[9px] uppercase font-bold text-base-content/30 mb-1 tracking-widest flex items-center gap-1.5 md:justify-end">
+              <h2 class="detail-meta-label text-[9px] uppercase font-bold text-base-content/85 mb-1 tracking-widest flex items-center gap-1.5 md:justify-end">
                 <span>Última Sincronización</span>
                 <div class="w-3.5 h-3.5 rounded-full bg-base-200/50 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-2 w-2 opacity-50 group-hover:text-primary group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -161,12 +161,12 @@
                   </svg>
                 </div>
               </h2>
-              <p class="text-[13px] font-semibold text-base-content/70 tracking-tight leading-none group-hover:text-base-content transition-colors">
+              <p class="text-[13px] font-semibold text-base-content tracking-tight leading-none transition-colors">
                 {{ formatDateSafe(process()!.last_api_update, 'short') }}
               </p>
 
               <!-- Tooltip Informativo -->
-              <div class="absolute top-full md:right-0 mt-3 w-56 p-4 bg-white border border-base-200 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[110] translate-y-2 group-hover:translate-y-0">
+              <div class="absolute top-full md:right-0 mt-3 w-56 p-4 bg-base-100 border border-base-200 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[110] translate-y-2 group-hover:translate-y-0">
                 <div class="flex items-center gap-2 mb-2 pb-2 border-b border-base-100">
                   <span class="text-[9px] font-black uppercase text-base-content/30 tracking-widest">En el Sistema</span>
                 </div>
@@ -306,10 +306,10 @@
       <!-- MODULE: ACCORDIÓN DE INFORMACIÓN -->
       <div class="space-y-4">
         <!-- Item: Información General -->
-        <div class="collapse collapse-plus bg-base-100 border border-base-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="collapse collapse-plus detail-accordion bg-base-100 border border-base-200 rounded-2xl shadow-sm overflow-hidden">
           <input type="radio" name="process-accordion" checked="checked" />
           <div class="collapse-title flex items-center gap-3 py-4 px-6 hover:bg-base-200/20 transition-colors">
-            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+            <div class="detail-section-icon w-8 h-8 rounded-lg flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -349,10 +349,10 @@
         </div>
 
         <!-- Item: Sujetos Procesales -->
-        <div class="collapse collapse-plus bg-base-100 border border-base-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="collapse collapse-plus detail-accordion bg-base-100 border border-base-200 rounded-2xl shadow-sm overflow-hidden">
           <input type="radio" name="process-accordion" />
           <div class="collapse-title flex items-center gap-3 py-4 px-6 hover:bg-base-200/20 transition-colors">
-            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+            <div class="detail-section-icon w-8 h-8 rounded-lg flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -369,12 +369,12 @@
             } @else if (hasClassicSubjectLayout()) {
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-3">
               <div class="space-y-4">
-                <h4 class="text-[9px] uppercase font-bold text-base-content/40 tracking-wider">Demandante(s)</h4>
+                <h4 class="detail-subject-label text-[9px] uppercase font-bold text-base-content/80 tracking-wider">Demandante(s)</h4>
                 <div class="space-y-2">
                   @for (subject of plaintiffSubjects(); track subject.id; let i = $index) {
                   <div
                     class="flex items-center gap-3 p-3 bg-base-200/30 rounded-xl border border-transparent hover:border-primary/5 transition-all">
-                    <span class="text-[10px] font-bold text-primary/40">{{ i + 1 }}.</span>
+                    <span class="detail-subject-index detail-subject-index--plaintiff text-[10px] font-bold">{{ i + 1 }}.</span>
                     <p class="text-sm font-semibold text-base-content leading-tight">{{ subject.name_or_business_name }}
                     </p>
                   </div>
@@ -382,12 +382,12 @@
                 </div>
               </div>
               <div class="space-y-4">
-                <h4 class="text-[9px] uppercase font-bold text-base-content/40 tracking-wider">Demandado(s)</h4>
+                <h4 class="detail-subject-label text-[9px] uppercase font-bold text-base-content/80 tracking-wider">Demandado(s)</h4>
                 <div class="space-y-2">
                   @for (subject of defendantSubjects(); track subject.id; let i = $index) {
                   <div
                     class="flex items-center gap-3 p-3 bg-base-200/30 rounded-xl border border-transparent hover:border-secondary/5 transition-all">
-                    <span class="text-[10px] font-bold text-secondary/40">{{ i + 1 }}.</span>
+                    <span class="detail-subject-index detail-subject-index--defendant text-[10px] font-bold">{{ i + 1 }}.</span>
                     <p class="text-sm font-semibold text-base-content leading-tight">{{ subject.name_or_business_name }}
                     </p>
                   </div>
@@ -397,12 +397,12 @@
             </div>
             @if (otherSubjects().length > 0) {
             <div class="space-y-4 mt-6">
-              <h4 class="text-[9px] uppercase font-bold text-base-content/40 tracking-wider">{{ 'processDetail.subjects.others' | transloco }}</h4>
+              <h4 class="detail-subject-label text-[9px] uppercase font-bold text-base-content/80 tracking-wider">{{ 'processDetail.subjects.others' | transloco }}</h4>
               <div class="space-y-2">
                 @for (subject of otherSubjects(); track subject.id; let i = $index) {
                 <div
                   class="flex items-center gap-3 p-3 bg-base-200/30 rounded-xl border border-transparent hover:border-base-300/50 transition-all">
-                  <span class="text-[10px] font-bold text-base-content/30">{{ i + 1 }}.</span>
+                  <span class="detail-subject-index text-[10px] font-bold">{{ i + 1 }}.</span>
                   <div class="min-w-0 flex-1">
                     <p class="text-sm font-semibold text-base-content leading-tight">{{ subject.name_or_business_name }}</p>
                     @if (subject.subject_type) {
@@ -419,7 +419,7 @@
               @for (subject of subjects(); track subject.id; let i = $index) {
               <div
                 class="flex items-center gap-3 p-3 bg-base-200/30 rounded-xl border border-transparent hover:border-base-300/50 transition-all">
-                <span class="text-[10px] font-bold text-base-content/30">{{ i + 1 }}.</span>
+                <span class="detail-subject-index text-[10px] font-bold">{{ i + 1 }}.</span>
                 <div class="min-w-0 flex-1">
                   <p class="text-sm font-semibold text-base-content leading-tight">{{ subject.name_or_business_name }}</p>
                   @if (subject.subject_type) {
@@ -434,10 +434,10 @@
         </div>
 
         <!-- Item: Línea de tiempo de eventos relevantes del sistema -->
-        <div class="collapse collapse-plus bg-base-100 border border-base-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="collapse collapse-plus detail-accordion bg-base-100 border border-base-200 rounded-2xl shadow-sm overflow-hidden">
           <input type="radio" name="process-accordion" />
           <div class="collapse-title flex items-center gap-3 py-4 px-6 hover:bg-base-200/20 transition-colors">
-            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+            <div class="detail-section-icon w-8 h-8 rounded-lg flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -456,7 +456,7 @@
           class="collapse collapse-plus bg-base-100 border border-base-200 rounded-2xl shadow-sm overflow-hidden mb-8">
           <input type="radio" name="process-accordion" />
           <div class="collapse-title flex items-center gap-3 py-4 px-6 hover:bg-base-200/20 transition-colors">
-            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+            <div class="detail-section-icon w-8 h-8 rounded-lg flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -472,7 +472,7 @@
               <div class="flex flex-wrap gap-2 mt-2">
                 @for (stat of alertKeywordStats(); track stat.id) {
                 <button type="button" (click)="applyAlertFilter(stat.slug)"
-                  class="btn btn-xs h-auto py-2 px-3 bg-white hover:bg-primary/10 border border-base-200 hover:border-primary/30 rounded-lg gap-2 transition-all">
+                  class="btn btn-xs h-auto py-2 px-3 bg-base-100 hover:bg-primary/10 border border-base-200 hover:border-primary/30 rounded-lg gap-2 transition-all">
                   <span class="text-[9px] font-bold text-base-content/60">{{ stat.name }}</span>
                   <span class="badge badge-xs bg-primary/5 text-primary border-none font-bold">{{ stat.count }}</span>
                 </button>
@@ -481,9 +481,9 @@
               }
 
               <!-- Search Area -->
-              <div class="p-6 bg-white rounded-2xl border border-base-200 shadow-sm shadow-base-200/50">
+              <div class="detail-filters-panel card bg-base-100 shadow-sm border border-base-200 p-6 rounded-2xl">
                 <div class="flex items-center gap-2 mb-8">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 opacity-30" fill="none" viewBox="0 0 24 24"
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-base-content/55" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                       d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -546,7 +546,7 @@
               </div>
 
               <!-- Actions Table/Cards (No rounded corners for table container on desktop) -->
-              <div class="bg-white border border-base-200 overflow-hidden shadow-sm action-data-container">
+              <div class="bg-base-100 border border-base-200 overflow-hidden shadow-sm action-data-container">
                 <!-- Desktop: Table (lg and up) -->
                 <div class="hidden lg:block">
                   <app-data-table [columns]="actionColumns" [data]="actions()" [pagination]="actionsPagination()"
@@ -684,7 +684,7 @@
         </li>
         <li class="mb-1">
           <button (click)="openRoleModal()" class="flex items-center gap-3 py-3 px-4 hover:bg-primary/5 hover:text-primary transition-all group w-full text-left">
-            <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform shadow-sm">
+            <div class="detail-section-icon w-8 h-8 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -808,7 +808,7 @@
                 <div class="w-3.5 h-3.5 rounded-full bg-base-300 ring-2 ring-base-200 shadow-inner group-hover/espera:bg-base-400 transition-all"></div>
                 
                 <!-- Simple Tooltip (Bottom to avoid cut off) -->
-                <div class="absolute top-full right-0 mt-3 w-44 p-3 bg-white border border-base-200 rounded-xl shadow-2xl opacity-0 group-hover/espera:opacity-100 transition-all pointer-events-none z-[100] translate-y-2 group-hover/espera:translate-y-0">
+                <div class="absolute top-full right-0 mt-3 w-44 p-3 bg-base-100 border border-base-200 rounded-xl shadow-2xl opacity-0 group-hover/espera:opacity-100 transition-all pointer-events-none z-[100] translate-y-2 group-hover/espera:translate-y-0">
                   <div class="flex items-center gap-2 mb-1.5">
                     <div class="w-2 h-2 rounded-full bg-base-300"></div>
                     <span class="text-[9px] font-black uppercase text-base-content/30 tracking-widest">Estado</span>
@@ -848,11 +848,11 @@
   <!-- TEMPLATE: INFO ITEM -->
   <ng-template #infoItem let-label="label" let-value="value" let-strong="strong" let-isCopyable="isCopyable" let-originalValue="originalValue">
     <div
-      class="p-4 bg-base-200/20 border border-base-200/50 rounded-xl hover:bg-white hover:border-primary/10 transition-all h-full group/item relative cursor-default">
-      <span class="block text-[9px] uppercase font-bold text-base-content/30 tracking-wider mb-1">{{ label | transloco
+      class="detail-info-item p-4 bg-base-200/30 border border-base-200/60 rounded-xl hover:bg-base-200/40 hover:border-primary/10 transition-all h-full group/item relative cursor-default">
+      <span class="detail-info-label block text-[9px] uppercase font-bold text-base-content/80 tracking-wider mb-1">{{ label | transloco
         }}</span>
       <div class="flex items-center justify-between gap-2">
-        <p class="text-sm font-semibold text-base-content leading-snug break-words flex-1" [class.text-primary]="strong">
+        <p class="text-sm font-semibold text-base-content leading-snug break-words flex-1" [class.font-bold]="strong">
           {{ value || '–' }}
         </p>
         @if (isCopyable && (originalValue || value) && value !== '–') {

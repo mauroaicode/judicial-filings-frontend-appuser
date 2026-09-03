@@ -14,6 +14,7 @@ import {
   AlertKeywordsResponse,
   AlertKeywordStatsResponse,
   ProcessDetailInstance,
+  OrganizationProcessQuota,
 } from '@app/core/models/process/process.model';
 import { TaskPagination, TaskStatus, TaskType } from '@app/core/models/tasks/task.model';
 
@@ -104,6 +105,16 @@ export class ProcessService {
         };
       })
     );
+  }
+
+  /**
+   * Get the organization's effective active-process quota
+   *
+   * @returns Observable with quota (count, limit, remaining, flags)
+   */
+  getProcessQuota(): Observable<OrganizationProcessQuota> {
+    const url = `${environment.apiBaseUrl}/process-quota`;
+    return this._http.get<OrganizationProcessQuota>(url);
   }
 
   /**
