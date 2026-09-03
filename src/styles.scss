@@ -555,4 +555,152 @@ app-gestion-procesos .process-list-table tbody tr.process-row-hovered td {
     -webkit-text-fill-color: #eee3ff;
     box-shadow: inset 0 0 0 1px rgba(196, 168, 240, 0.12) !important;
   }
+
+  /* Modal Agregar Radicado — recomendaciones en blanco */
+  app-gestion-procesos .add-process-recommendations {
+    color: #eee8f7 !important;
+
+    h4,
+    li,
+    [class*="text-info"] {
+      color: #eee8f7 !important;
+      -webkit-text-fill-color: #eee8f7;
+    }
+
+    .add-process-recommendations__icon {
+      color: #eee8f7 !important;
+      background-color: rgba(226, 217, 243, 0.12) !important;
+    }
+
+    .add-process-recommendations__bullet {
+      background-color: rgba(226, 217, 243, 0.75) !important;
+    }
+  }
+
+  /* Modal / header — cupo de radicados activos */
+  app-gestion-procesos .process-quota-banner--info,
+  app-gestion-procesos .process-quota-chip {
+    [class*="text-info"],
+    [class*="text-base-content"] {
+      color: #eee8f7 !important;
+      -webkit-text-fill-color: #eee8f7;
+    }
+  }
+
+  app-gestion-procesos .process-quota-banner--info {
+    color: #eee8f7 !important;
+  }
+
+  /* Detalle del proceso — tooltips del header */
+  app-process-detail .detail-header-card .absolute.top-full {
+    background: #241c35 !important;
+    border-color: rgba(196, 168, 240, 0.22) !important;
+    color: #eee8f7 !important;
+
+    span {
+      color: color-mix(in srgb, var(--color-base-content) 78%, transparent) !important;
+    }
+
+    p {
+      color: #f3eefb !important;
+    }
+  }
+
+  /* Detalle del proceso — labels de filtros */
+  app-process-detail .detail-filters-panel .label-standard {
+    color: rgba(255, 255, 255, 0.88) !important;
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.88);
+  }
+
+  /* Detalle del proceso — textos más blancos (gana sobre text-base-content/XX) */
+  app-process-detail {
+    color: #f8f5ff;
+
+    [class*='text-base-content'] {
+      color: #f8f5ff !important;
+      -webkit-text-fill-color: #f8f5ff;
+    }
+
+    .detail-info-label,
+    .detail-meta-label,
+    .detail-subject-label,
+    .label-standard {
+      color: rgba(255, 255, 255, 0.86) !important;
+      -webkit-text-fill-color: rgba(255, 255, 255, 0.86);
+    }
+
+    .detail-info-item p,
+    .collapse-title .text-base.font-bold,
+    .detail-header-card .text-base-content {
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff;
+    }
+
+    .input-standard,
+    .select-standard,
+    .input,
+    .select {
+      color: #f8f5ff !important;
+      -webkit-text-fill-color: #f8f5ff;
+    }
+
+    .input-standard::placeholder,
+    .input::placeholder,
+    .select-standard option {
+      color: rgba(255, 255, 255, 0.55) !important;
+      opacity: 1 !important;
+    }
+
+    .action-data-container .table tbody td,
+    .action-data-container .table tbody td *:not(.badge):not([class*='badge-']) {
+      color: #f8f5ff !important;
+      -webkit-text-fill-color: #f8f5ff;
+    }
+
+    .pagination-container,
+    .pagination-container *:not(.btn-active) {
+      color: rgba(255, 255, 255, 0.9) !important;
+      -webkit-text-fill-color: rgba(255, 255, 255, 0.9);
+    }
+
+    .process-timeline,
+    .process-timeline p,
+    .process-timeline h4,
+    .process-timeline dt,
+    .process-timeline dd,
+    .process-timeline span,
+    .timeline-item__time {
+      color: #f8f5ff !important;
+      -webkit-text-fill-color: #f8f5ff;
+    }
+
+    .timeline-group h3 {
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff;
+    }
+
+    .detail-subject-index {
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff;
+    }
+
+    .detail-subject-index--plaintiff {
+      color: #d8c3f7 !important;
+      -webkit-text-fill-color: #d8c3f7;
+    }
+
+    .detail-subject-index--defendant {
+      color: #c4b5fd !important;
+      -webkit-text-fill-color: #c4b5fd;
+    }
+
+    .date-range-picker-input {
+      color: #f8f5ff !important;
+      -webkit-text-fill-color: #f8f5ff;
+    }
+
+    .date-range-icon {
+      color: rgba(255, 255, 255, 0.65) !important;
+    }
+  }
 }

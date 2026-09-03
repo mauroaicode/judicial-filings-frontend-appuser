@@ -17,6 +17,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ProcessAlertTooltipComponent } from '@app/shared/components/process-alert-tooltip/process-alert-tooltip.component';
 import { ProcessService } from '@app/core/services/process/process.service';
 import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
+import { ProcessQuotaService } from '@app/core/services/process/process-quota.service';
 import { Process, ProcessInstance, ProcessFilter, ProcessResponseMeta, CreateProcessResponse } from '@app/core/models/process/process.model';
 import { DataTableColumn } from '@app/shared/components/data-table/data-table.component';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
@@ -55,6 +56,7 @@ import type { ProcessSemaphore } from '@app/core/models/process/process.model';
 export class GestionProcesosComponent {
   private _processService = inject(ProcessService);
   private _processRefresh = inject(ProcessRefreshService);
+  private _quotaService = inject(ProcessQuotaService);
   private _dashboardService = inject(DashboardService);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
@@ -68,6 +70,12 @@ export class GestionProcesosComponent {
   readonly stats = this._dashboardService.stats;
   readonly statsLoading = this._dashboardService.isLoading;
   readonly statsError = this._dashboardService.error;
+
+  readonly quota = this._quotaService.quota;
+  readonly quotaLoading = this._quotaService.isLoading;
+  readonly quotaTone = this._quotaService.tone;
+  readonly quotaUsagePercent = this._quotaService.usagePercent;
+  readonly canAddProcess = this._quotaService.canAddProcess;
 
   private _drawerState = inject(NotificationsDrawerStateService);
 
@@ -223,6 +231,7 @@ export class GestionProcesosComponent {
 
     this._loadFiltersFromQueryParams();
     this.loadProcesses();
+    this._quotaService.loadQuota();
 
     // Subscribe to process refresh events (WebSocket notifications)
     this._notificationService.refreshProcesses$
@@ -275,6 +284,7 @@ export class GestionProcesosComponent {
           })
         );
         this._dashboardService.loadStats();
+        this._quotaService.loadQuota();
       },
       error: () => {
         // Ignore — list can be refreshed manually
@@ -677,6 +687,7 @@ export class GestionProcesosComponent {
     this.isModalOpen.set(true);
     this.error.set(null);
     this.addProcessForm.reset();
+    this._quotaService.loadQuota();
   }
 
   /**
@@ -697,6 +708,10 @@ export class GestionProcesosComponent {
       return;
     }
 
+    if (!this.canAddProcess() || this.quotaLoading()) {
+      return;
+    }
+
     this.submitting.set(true);
     this.error.set(null);
 
@@ -707,6 +722,7 @@ export class GestionProcesosComponent {
       next: (response) => {
         this.submitting.set(false);
         this.closeAddProcessModal();
+        this._quotaService.loadQuota();
 
         // Always reload processes table
         this.loadProcesses(1, this.pagination()?.per_page || 20);
@@ -726,6 +742,7 @@ export class GestionProcesosComponent {
       },
       error: (error) => {
         this.submitting.set(false);
+        this._quotaService.loadQuota();
 
         // Handle error response
         if (error.error && error.error.messages && Array.isArray(error.error.messages)) {

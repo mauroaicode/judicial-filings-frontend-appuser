@@ -365,3 +365,16 @@ export interface ActionResponseMeta {
   from: number;
   to: number;
 }
+
+/**
+ * Effective active-process quota for the authenticated user's organization.
+ * GET /app-user/process-quota — app_user only sees the effective limit.
+ */
+export interface OrganizationProcessQuota {
+  active_processes_count: number;
+  max_active_processes: number | null;
+  remaining_slots: number | null;
+  is_unlimited: boolean;
+  is_at_limit: boolean;
+  can_add_process: boolean;
+}

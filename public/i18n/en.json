@@ -208,6 +208,16 @@
   "gestionProcesos": {
     "title": "Process Management",
     "description": "Manage and consult all judicial processes",
+    "quota": {
+      "activeLabel": "Active processes",
+      "activeOfMax": "Active processes: {{active}} of {{max}}",
+      "activeCount": "{{active}}",
+      "headerLimited": "{{active}} / {{max}}",
+      "headerUnlimited": "{{active}} · unlimited",
+      "remaining": "{{remaining}} slots available",
+      "atLimitShort": "Limit reached",
+      "atLimitMessage": "The organization reached the limit of {{max}} active processes (currently {{active}}). Deactivate a process or request a quota increase."
+    },
     "addProcess": {
       "button": "Add Process",
       "title": "Add New Process",

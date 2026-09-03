@@ -213,6 +213,16 @@
   "gestionProcesos": {
     "title": "Gestión de Procesos",
     "description": "Gestiona y consulta todos los procesos judiciales",
+    "quota": {
+      "activeLabel": "Radicados activos",
+      "activeOfMax": "Radicados activos: {{active}} de {{max}}",
+      "activeCount": "{{active}}",
+      "headerLimited": "{{active}} / {{max}}",
+      "headerUnlimited": "{{active}} · ilimitado",
+      "remaining": "{{remaining}} cupos disponibles",
+      "atLimitShort": "Límite alcanzado",
+      "atLimitMessage": "La organización alcanzó el límite de {{max}} radicados activos (actualmente {{active}}). Desactive algún radicado o solicite ampliar el cupo."
+    },
     "addProcess": {
       "button": "Agregar Radicado",
       "title": "Agregar Nuevo Radicado",

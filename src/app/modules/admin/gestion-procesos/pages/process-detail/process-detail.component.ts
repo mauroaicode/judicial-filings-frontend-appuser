@@ -38,6 +38,7 @@ import { ProcessTimelineComponent } from '../../components/process-timeline/proc
 import { AiCoreService } from '@app/core/services/ai-chat/ai-core.service';
 import { PageHeaderContextService } from '@app/core/services/layout/page-header-context.service';
 import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
+import { ProcessQuotaService } from '@app/core/services/process/process-quota.service';
 import { getSemaphorePauseMessage, isSemaphorePaused } from '@app/core/utils/process-semaphore.util';
 
 const DETAIL_HEADER_SCROLL_THRESHOLD = 80;
@@ -74,6 +75,7 @@ export class ProcessDetailComponent {
   private _aiCoreService = inject(AiCoreService);
   private _headerContext = inject(PageHeaderContextService);
   private _processRefresh = inject(ProcessRefreshService);
+  private _quotaService = inject(ProcessQuotaService);
 
   // AI Permission State
   public isAiEnabled = this._aiCoreService.isAiEnabled;
@@ -189,11 +191,11 @@ export class ProcessDetailComponent {
               <div class="flex flex-col gap-1">
                 <div class="flex items-center gap-1.5">
                    <span class="badge badge-sm bg-primary/10 text-primary border-none font-bold text-[9px] px-1.5 h-4 uppercase tracking-tighter">${badgeLabel}</span>
-                   <div class="font-bold text-base-content/90 leading-tight">${actionHtml}</div>
+                   <div class="font-bold text-white leading-tight">${actionHtml}</div>
                 </div>
                 <div class="flex items-center gap-1.5">
                    <span class="badge badge-sm bg-accent/10 text-accent border-none font-bold text-[9px] px-1.5 h-4 uppercase tracking-tighter">Auto</span>
-                   <div class="font-bold text-base-content leading-tight">${relatedActionHtml}</div>
+                   <div class="font-bold text-white leading-tight">${relatedActionHtml}</div>
                 </div>
               </div>
             `;
@@ -740,6 +742,8 @@ export class ProcessDetailComponent {
         });
         this.confirmModalOpen.set(false);
 
+        this._quotaService.loadQuota();
+
         // Show success toast
         this.showToast('success', response.message);
 
@@ -751,7 +755,14 @@ export class ProcessDetailComponent {
       error: (error) => {
         console.error('Error changing process status:', error);
         this.confirmModalOpen.set(false);
-        this.showToast('error', 'Error al cambiar el estado del proceso');
+        this._quotaService.loadQuota();
+        const apiMessage =
+          (error.error?.messages && Array.isArray(error.error.messages)
+            ? error.error.messages.join('. ')
+            : null) ||
+          error.error?.message ||
+          'Error al cambiar el estado del proceso';
+        this.showToast('error', apiMessage);
       }
     });
   }

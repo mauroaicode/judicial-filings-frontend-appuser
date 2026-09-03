@@ -139,3 +139,20 @@
     margin-left: 2.55rem;
   }
 }
+
+[data-theme='dark'] .process-timeline {
+  .process-timeline__intro p {
+    color: color-mix(in srgb, var(--color-base-content) 72%, transparent);
+  }
+
+  .timeline-group h3 {
+    background: rgba(124, 82, 184, 0.16);
+    border-color: rgba(196, 168, 240, 0.22);
+    color: #d8c3f7;
+  }
+
+  .timeline-state,
+  .process-timeline__end {
+    color: color-mix(in srgb, var(--color-base-content) 62%, transparent);
+  }
+}
