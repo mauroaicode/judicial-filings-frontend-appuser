@@ -15,6 +15,7 @@ import {
   AlertKeywordStatsResponse,
   ProcessDetailInstance,
   OrganizationProcessQuota,
+  TrashProcessesResponse,
 } from '@app/core/models/process/process.model';
 import { TaskPagination, TaskStatus, TaskType } from '@app/core/models/tasks/task.model';
 
@@ -286,6 +287,34 @@ export class ProcessService {
     return this._http.patch<import('@app/core/models/process/process.model').BulkRoleUpdateResponse>(url, { 
       process_ids: processIds,
       lawyer_role: role 
+    });
+  }
+
+  /**
+   * Soft-delete a single process from the active organization.
+   */
+  deleteProcess(processId: string): Observable<TrashProcessesResponse> {
+    const url = `${environment.apiBaseUrl}/processes/${processId}`;
+    return this._http.delete<TrashProcessesResponse>(url);
+  }
+
+  /**
+   * Soft-delete several processes by id.
+   */
+  deleteProcesses(processIds: string[]): Observable<TrashProcessesResponse> {
+    const url = `${environment.apiBaseUrl}/processes`;
+    return this._http.delete<TrashProcessesResponse>(url, {
+      body: { process_ids: processIds },
+    });
+  }
+
+  /**
+   * Soft-delete every process in the active organization.
+   */
+  deleteAllProcesses(): Observable<TrashProcessesResponse> {
+    const url = `${environment.apiBaseUrl}/processes`;
+    return this._http.delete<TrashProcessesResponse>(url, {
+      body: { all: true },
     });
   }
 }

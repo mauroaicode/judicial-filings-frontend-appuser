@@ -316,7 +316,24 @@
       "save": "Save Configuration",
       "saving": "Saving...",
       "plaintiffDesc": "Your client is the one suing",
-      "defendantDesc": "Your client is the被告"
+      "defendantDesc": "Your client is the defendant"
+    },
+    "delete": {
+      "action": "Delete",
+      "selected": "Delete",
+      "all": "Delete all",
+      "confirmTitle": "Delete process",
+      "confirmTitleBulk": "Delete processes",
+      "confirmTitleAll": "Delete all processes",
+      "confirmSingle": "This will free quota slots and stop tracking for this process. Do you want to continue?",
+      "confirmBulk": "This will free quota slots and stop tracking for {{count}} processes. Do you want to continue?",
+      "confirmAll": "You are about to delete ALL processes in the organization. Tracking will stop and quota slots will be freed. This cannot be undone from here.",
+      "confirmLabel": "Delete",
+      "confirmLabelAll": "Yes, delete all",
+      "deleting": "Deleting...",
+      "success": "{{count}} process deleted. Quota updated.",
+      "successPlural": "{{count}} processes deleted. Quota updated.",
+      "error": "Could not delete. Please try again."
     }
   },
   "actuacionesRecientes": {

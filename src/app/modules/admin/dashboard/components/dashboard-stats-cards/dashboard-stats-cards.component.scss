@@ -140,9 +140,15 @@
       .semaphore-segment__value { color: #fecaca; }
       .semaphore-segment__subtitle { color: rgba(254, 202, 202, 0.68); }
 
-      &:hover,
+      &:hover {
+        background-color: rgba(127, 29, 29, 0.38);
+        border-color: rgba(239, 68, 68, 0.45);
+      }
+
       &.semaphore-segment--active {
-        background-color: rgba(127, 29, 29, 0.42);
+        background-color: rgba(185, 28, 28, 0.55);
+        border-color: #f87171;
+        box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.28);
       }
     }
 
@@ -154,9 +160,15 @@
       .semaphore-segment__value { color: #fde68a; }
       .semaphore-segment__subtitle { color: rgba(253, 230, 138, 0.68); }
 
-      &:hover,
+      &:hover {
+        background-color: rgba(120, 53, 15, 0.38);
+        border-color: rgba(245, 158, 11, 0.5);
+      }
+
       &.semaphore-segment--active {
-        background-color: rgba(120, 53, 15, 0.42);
+        background-color: rgba(180, 83, 9, 0.5);
+        border-color: #fbbf24;
+        box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.28);
       }
     }
 
@@ -168,9 +180,15 @@
       .semaphore-segment__value { color: #bbf7d0; }
       .semaphore-segment__subtitle { color: rgba(187, 247, 208, 0.68); }
 
-      &:hover,
+      &:hover {
+        background-color: rgba(20, 83, 45, 0.42);
+        border-color: rgba(34, 197, 94, 0.5);
+      }
+
       &.semaphore-segment--active {
-        background-color: rgba(20, 83, 45, 0.45);
+        background-color: rgba(22, 163, 74, 0.45);
+        border-color: #4ade80;
+        box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.28);
       }
     }
   }

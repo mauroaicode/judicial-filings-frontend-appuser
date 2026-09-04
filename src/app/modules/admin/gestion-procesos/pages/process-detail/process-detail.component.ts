@@ -191,11 +191,11 @@ export class ProcessDetailComponent {
               <div class="flex flex-col gap-1">
                 <div class="flex items-center gap-1.5">
                    <span class="badge badge-sm bg-primary/10 text-primary border-none font-bold text-[9px] px-1.5 h-4 uppercase tracking-tighter">${badgeLabel}</span>
-                   <div class="font-bold text-white leading-tight">${actionHtml}</div>
+                   <div class="font-bold text-base-content leading-tight">${actionHtml}</div>
                 </div>
                 <div class="flex items-center gap-1.5">
                    <span class="badge badge-sm bg-accent/10 text-accent border-none font-bold text-[9px] px-1.5 h-4 uppercase tracking-tighter">Auto</span>
-                   <div class="font-bold text-white leading-tight">${relatedActionHtml}</div>
+                   <div class="font-bold text-base-content leading-tight">${relatedActionHtml}</div>
                 </div>
               </div>
             `;

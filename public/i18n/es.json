@@ -334,6 +334,23 @@
         "understand": "Entendido",
         "issue": "Radicados con Incidencias"
       }
+    },
+    "delete": {
+      "action": "Eliminar",
+      "selected": "Eliminar",
+      "all": "Eliminar todos",
+      "confirmTitle": "Eliminar radicado",
+      "confirmTitleBulk": "Eliminar radicados",
+      "confirmTitleAll": "Eliminar todos los radicados",
+      "confirmSingle": "Esto liberará cupos y quitará el seguimiento de este radicado. ¿Desea continuar?",
+      "confirmBulk": "Esto liberará cupos y quitará el seguimiento de {{count}} radicados. ¿Desea continuar?",
+      "confirmAll": "Va a eliminar TODOS los radicados de la organización. Se quitará el seguimiento y se liberarán los cupos. Esta acción no se puede deshacer desde aquí.",
+      "confirmLabel": "Eliminar",
+      "confirmLabelAll": "Sí, eliminar todos",
+      "deleting": "Eliminando...",
+      "success": "Se eliminó {{count}} radicado. Cupos actualizados.",
+      "successPlural": "Se eliminaron {{count}} radicados. Cupos actualizados.",
+      "error": "No se pudo eliminar. Intente de nuevo."
     }
   },
   "actuacionesRecientes": {

@@ -56,4 +56,9 @@ export class ProcessQuotaService {
       },
     });
   }
+
+  /** Apply quota from a mutating endpoint (create/delete) without an extra GET. */
+  applyQuota(quota: OrganizationProcessQuota): void {
+    this._quota.set(quota);
+  }
 }

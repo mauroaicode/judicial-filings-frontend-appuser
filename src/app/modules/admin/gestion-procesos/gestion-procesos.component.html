@@ -77,6 +77,12 @@
         </svg>
         {{ 'gestionProcesos.addProcess.button' | transloco }}
       </button>
+      <button type="button"
+        class="btn btn-ghost btn-sm sm:btn-md rounded-xl px-4 text-error hover:bg-error/10 normal-case font-bold"
+        [disabled]="deleting() || (pagination()?.total ?? 0) === 0"
+        (click)="openDeleteAllConfirm()">
+        {{ 'gestionProcesos.delete.all' | transloco }}
+      </button>
 
       <!-- FAB Mobile Actions Container -->
       <div class="lg:hidden fixed bottom-20 right-4 z-[50] flex flex-col gap-3">
@@ -112,7 +118,7 @@
       [loading]="statsLoading()"
       [error]="statsError()"
       variant="gestion-procesos"
-      [activeSeverityColor]="filterForm.get('severity_color')?.value || null"
+      [activeSeverityColor]="activeSeverityColor()"
       (semaphoreClick)="onSemaphoreFilter($event)"
     />
   </section>
@@ -292,31 +298,23 @@
             </svg>
             Asignar Rol
           </button>
-          
-          <!-- 
-          <button class="btn btn-sm bg-white/5 hover:bg-white/15 border border-white/35 text-white font-semibold normal-case rounded-xl h-10 px-4 transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17v-2a4 4 0 014-4h4m-4 4l-4-4m4 4l4-4" />
-            </svg>
-            Exportar
-          </button>
 
-          <button class="btn btn-sm bg-white/5 hover:bg-white/15 border border-white/35 text-white font-semibold normal-case rounded-xl h-10 px-4 transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636" />
-            </svg>
-            Inactivar
-          </button>
-
-          <div class="divider divider-horizontal divider-white/10 mx-1"></div>
-
-          <button class="btn btn-sm bg-error/10 hover:bg-error/30 border border-error/35 text-white font-semibold normal-case rounded-xl h-10 px-4 transition-all">
+          <button type="button"
+            class="btn btn-sm bg-error/20 hover:bg-error/35 border border-error/50 text-white font-semibold normal-case rounded-xl h-10 px-4 transition-all"
+            [disabled]="deleting()"
+            (click)="openDeleteBulkConfirm()">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
-            Eliminar
+            {{ 'gestionProcesos.delete.selected' | transloco }}
           </button>
-          -->
+
+          <button type="button"
+            class="btn btn-sm btn-ghost border border-white/25 text-white/90 hover:bg-error/25 font-semibold normal-case rounded-xl h-10 px-4 transition-all"
+            [disabled]="deleting()"
+            (click)="openDeleteAllConfirm()">
+            {{ 'gestionProcesos.delete.all' | transloco }}
+          </button>
         </div>
       </div>
     }
@@ -395,6 +393,16 @@
               <span class="badge badge-sm font-semibold" [ngClass]="getStatusBadgeClass(process.status_label)">
                 {{ process.status_label }}
               </span>
+              <button type="button"
+                class="btn btn-ghost btn-xs btn-circle text-error/70 hover:bg-error/10 hover:text-error"
+                [attr.title]="'gestionProcesos.delete.action' | transloco"
+                [disabled]="deleting()"
+                (click)="openDeleteSingleConfirm(process, $event)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -592,6 +600,7 @@
                 {{ column.label | transloco }}
               </th>
               }
+              <th class="text-center" style="width: 72px;">{{ 'gestionProcesos.delete.action' | transloco }}</th>
             </tr>
           </thead>
           <tbody>
@@ -819,6 +828,18 @@
               <td class="text-center align-middle whitespace-nowrap">{{ formatProcessDate(process.created_at) }}</td>
               <td class="text-center align-middle whitespace-nowrap">{{ formatProcessDate(process.last_activity_date) }}
               </td>
+              <td class="text-center align-middle">
+                <button type="button"
+                  class="btn btn-ghost btn-xs btn-circle text-error/60 hover:bg-error/10 hover:text-error"
+                  [attr.title]="'gestionProcesos.delete.action' | transloco"
+                  [disabled]="deleting()"
+                  (click)="openDeleteSingleConfirm(process, $event)">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </td>
             </tr>
 
             @if (isExpanded(process) && process.instances && process.instances.length > 0) {
@@ -1009,6 +1030,7 @@
                 formatProcessDate(instance.created_at) }}</td>
               <td class="text-center align-middle whitespace-nowrap text-base-content/70">{{
                 formatProcessDate(instance.last_activity_date) }}</td>
+              <td></td>
             </tr>
             }
             }
@@ -1516,6 +1538,22 @@
   </dialog>
 
   <!-- Toast: éxito al copiar al portapapeles -->
+  @if (toastVisible()) {
+    <div class="toast toast-end toast-bottom z-[10000] pointer-events-none">
+      <div class="alert shadow-lg border-none"
+        [class.alert-success]="toastType() === 'success'"
+        [class.alert-error]="toastType() === 'error'">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            [attr.d]="toastType() === 'success'
+              ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
+              : 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'" />
+        </svg>
+        <span>{{ toastMessage() }}</span>
+      </div>
+    </div>
+  }
+
   @if (copiedMessage()) {
     <div class="toast toast-end toast-bottom z-[10000] pointer-events-none">
       <div class="alert alert-success shadow-lg">
@@ -1639,4 +1677,15 @@
       <button type="button">close</button>
     </form>
   </dialog>
+
+  <app-confirmation-dialog
+    [open]="deleteConfirmOpen()"
+    [title]="deleteConfirmTitle()"
+    [message]="deleteConfirmMessage()"
+    [confirmLabel]="deleting() ? ('gestionProcesos.delete.deleting' | transloco) : deleteConfirmLabel()"
+    [cancelLabel]="'gestionProcesos.addProcess.cancel' | transloco"
+    [confirmClass]="'btn-error'"
+    (confirm)="onConfirmDelete()"
+    (cancel)="onCancelDelete()">
+  </app-confirmation-dialog>
 </div>
