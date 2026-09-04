@@ -1087,7 +1087,11 @@ export class GestionProcesosComponent {
 
     const count = response.trashed_count ?? (mode === 'single' ? 1 : this.selectedCount());
     const key = count === 1 ? 'gestionProcesos.delete.success' : 'gestionProcesos.delete.successPlural';
-    this._showToast('success', response.message || this._transloco.translate(key, { count }));
+    const successMessage =
+      response.message ||
+      this._transloco.translate(key, { count }) ||
+      'Cupos actualizados.';
+    this._showToast('success', successMessage);
 
     this.clearSelection();
 
@@ -1108,12 +1112,11 @@ export class GestionProcesosComponent {
   private _onDeleteError(error: { error?: { messages?: string[]; message?: string } }): void {
     this.deleting.set(false);
     this.deleteConfirmOpen.set(false);
-    const apiMessage =
-      (error.error?.messages && Array.isArray(error.error.messages)
-        ? error.error.messages.join('. ')
-        : null) ||
-      error.error?.message ||
-      this._transloco.translate('gestionProcesos.delete.error');
+    const fallback = this._transloco.translate('gestionProcesos.delete.error') || 'No se pudo eliminar. Intente de nuevo.';
+    const joined = Array.isArray(error.error?.messages)
+      ? error.error.messages.join('. ')
+      : '';
+    const apiMessage = joined || error.error?.message || fallback;
     this._showToast('error', apiMessage);
   }
 
