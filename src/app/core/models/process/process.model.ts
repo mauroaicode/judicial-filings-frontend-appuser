@@ -378,3 +378,21 @@ export interface OrganizationProcessQuota {
   is_at_limit: boolean;
   can_add_process: boolean;
 }
+
+/**
+ * Soft-delete processes from the lawyer's organization.
+ * DELETE /app-user/processes/{id} or DELETE /app-user/processes
+ */
+export interface TrashProcessesSkipped {
+  id?: string;
+  process_id?: string;
+  reason?: string;
+}
+
+export interface TrashProcessesResponse {
+  message?: string;
+  trashed_count: number;
+  trashed_ids: string[];
+  skipped?: TrashProcessesSkipped[] | string[];
+  quota?: OrganizationProcessQuota;
+}

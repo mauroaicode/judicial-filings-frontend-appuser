@@ -123,14 +123,13 @@
 
         td {
           padding: 1.25rem 1rem !important;
-          font-weight: 600 !important;
+          font-weight: 500 !important;
           font-size: 0.825rem !important;
-          color: var(--color-base-content) !important;
-          border-bottom-color: color-mix(in srgb, var(--color-base-content) 8%, transparent) !important;
+          border-bottom-color: hsl(var(--bc) / 0.05) !important;
         }
 
         tbody tr:hover {
-          background-color: color-mix(in srgb, var(--color-primary) 14%, var(--color-base-100)) !important;
+          background-color: #F3F0F9 !important;
         }
       }
     }

@@ -18,7 +18,7 @@ import { ProcessAlertTooltipComponent } from '@app/shared/components/process-ale
 import { ProcessService } from '@app/core/services/process/process.service';
 import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
 import { ProcessQuotaService } from '@app/core/services/process/process-quota.service';
-import { Process, ProcessInstance, ProcessFilter, ProcessResponseMeta, CreateProcessResponse } from '@app/core/models/process/process.model';
+import { Process, ProcessInstance, ProcessFilter, ProcessResponseMeta, CreateProcessResponse, TrashProcessesResponse } from '@app/core/models/process/process.model';
 import { DataTableColumn } from '@app/shared/components/data-table/data-table.component';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
 import { DashboardService } from '@app/core/services/dashboard/dashboard.service';
@@ -31,6 +31,8 @@ import type { OrganizationNotificationRow } from '@app/core/models/notification/
 
 import { RoleSelectionModalComponent } from './components/role-selection-modal/role-selection-modal.component';
 import { AuthenticatedLayoutComponent } from '@app/layout/layouts/authenticated/authenticated.component';
+import { ConfirmationDialogComponent } from '@app/shared/components/confirmation-dialog/confirmation-dialog.component';
+import { Observable } from 'rxjs';
 import { isSemaphorePaused, getSemaphorePauseMessage } from '@app/core/utils/process-semaphore.util';
 import type { ProcessSemaphore } from '@app/core/models/process/process.model';
 
@@ -47,6 +49,7 @@ import type { ProcessSemaphore } from '@app/core/models/process/process.model';
     ProcessNumberPipe,
     ProcessAlertTooltipComponent,
     RoleSelectionModalComponent,
+    ConfirmationDialogComponent,
   ],
   templateUrl: './gestion-procesos.component.html',
   styleUrls: ['./gestion-procesos.component.scss'],
@@ -115,6 +118,35 @@ export class GestionProcesosComponent {
   public isRoleModalOpen = signal(false);
   public roleModalProcessId = signal<string | null>(null);
 
+  // Delete confirmation
+  public deleteConfirmOpen = signal(false);
+  public deleteMode = signal<'single' | 'bulk' | 'all'>('bulk');
+  public deleteTargetId = signal<string | null>(null);
+  public deleting = signal(false);
+  public toastVisible = signal(false);
+  public toastType = signal<'success' | 'error'>('success');
+  public toastMessage = signal('');
+
+  public deleteConfirmTitle = computed(() => {
+    const mode = this.deleteMode();
+    if (mode === 'all') return this._transloco.translate('gestionProcesos.delete.confirmTitleAll');
+    if (mode === 'single') return this._transloco.translate('gestionProcesos.delete.confirmTitle');
+    return this._transloco.translate('gestionProcesos.delete.confirmTitleBulk');
+  });
+
+  public deleteConfirmMessage = computed(() => {
+    const mode = this.deleteMode();
+    if (mode === 'all') return this._transloco.translate('gestionProcesos.delete.confirmAll');
+    if (mode === 'single') return this._transloco.translate('gestionProcesos.delete.confirmSingle');
+    return this._transloco.translate('gestionProcesos.delete.confirmBulk', { count: this.selectedCount() });
+  });
+
+  public deleteConfirmLabel = computed(() =>
+    this.deleteMode() === 'all'
+      ? this._transloco.translate('gestionProcesos.delete.confirmLabelAll')
+      : this._transloco.translate('gestionProcesos.delete.confirmLabel')
+  );
+
   // Roles for selection
   public readonly roles = [
     { value: 'plaintiff', label: 'Demandante' },
@@ -150,6 +182,8 @@ export class GestionProcesosComponent {
 
   // Filter Visibility
   public showFilters = signal<boolean>(false);
+  /** Semaphore color currently applied (`red` | `yellow` | `green` | `none` | `suspended`). */
+  public activeSeverityColor = signal<string | null>(null);
 
   /**
    * Toggle filter visibility
@@ -283,7 +317,8 @@ export class GestionProcesosComponent {
             return process;
           })
         );
-        this._dashboardService.loadStats();
+        const { page: _page, per_page: _perPage, ...statsFilters } = this._buildProcessFilters();
+        this._dashboardService.loadStats(statsFilters);
         this._quotaService.loadQuota();
       },
       error: () => {
@@ -330,6 +365,7 @@ export class GestionProcesosComponent {
     }
     if (isValidValue(queryParams['severity_color'])) {
       this.filterForm.patchValue({ severity_color: queryParams['severity_color'] });
+      this.activeSeverityColor.set(queryParams['severity_color']);
     }
     // Load date ranges from query params - only if they have valid values
     if (isValidValue(queryParams['process_date_from']) || isValidValue(queryParams['process_date_to'])) {
@@ -432,11 +468,9 @@ export class GestionProcesosComponent {
   }
 
   /**
-   * Load processes with current filters
+   * Build API filters from the current form (without empty values).
    */
-  loadProcesses(page: number = 1, perPage: number = 20): void {
-    this.loading.set(true);
-
+  private _buildProcessFilters(page: number = 1, perPage: number = 20): ProcessFilter {
     const formValue = this.filterForm.value;
     const processDateRange: DateRange | null = formValue.process_date_range;
     const createdAtRange: DateRange | null = formValue.created_at_range;
@@ -462,13 +496,24 @@ export class GestionProcesosComponent {
       per_page: perPage,
     };
 
-    // Remove empty values, but keep date range params if at least one is set
     Object.keys(filters).forEach((key) => {
       const value = filters[key as keyof ProcessFilter];
       if (value === '' || value === null || value === undefined) {
         delete filters[key as keyof ProcessFilter];
       }
     });
+
+    return filters;
+  }
+
+  /**
+   * Load processes with current filters
+   */
+  loadProcesses(page: number = 1, perPage: number = 20): void {
+    this.loading.set(true);
+
+    const filters = this._buildProcessFilters(page, perPage);
+    this.activeSeverityColor.set(filters.severity_color?.trim() || null);
 
     this._updateQueryParams(filters, false);
     // Dashboard stats must follow the same active filters (without pagination)
@@ -509,6 +554,7 @@ export class GestionProcesosComponent {
     const current = this.filterForm.get('severity_color')?.value;
     const next = current === color ? '' : color;
     this.filterForm.patchValue({ severity_color: next });
+    this.activeSeverityColor.set(next || null);
     this.onSearch();
   }
 
@@ -530,6 +576,7 @@ export class GestionProcesosComponent {
       created_at_range: null,
       last_api_update_range: null,
     });
+    this.activeSeverityColor.set(null);
 
     // Navigate with empty query params (no null values, just empty object)
     this._router.navigate([], {
@@ -972,6 +1019,109 @@ export class GestionProcesosComponent {
   public closeBulkResultModal(): void {
     this.isBulkResultModalOpen.set(false);
     this.bulkUpdateResult.set(null);
+  }
+
+  public openDeleteSingleConfirm(process: Process, event?: Event): void {
+    event?.stopPropagation();
+    event?.preventDefault();
+    this.deleteMode.set('single');
+    this.deleteTargetId.set(process.id);
+    this.deleteConfirmOpen.set(true);
+  }
+
+  public openDeleteBulkConfirm(): void {
+    if (this.selectedCount() === 0 || this.deleting()) return;
+    this.deleteMode.set('bulk');
+    this.deleteTargetId.set(null);
+    this.deleteConfirmOpen.set(true);
+  }
+
+  public openDeleteAllConfirm(): void {
+    if (this.deleting()) return;
+    this.deleteMode.set('all');
+    this.deleteTargetId.set(null);
+    this.deleteConfirmOpen.set(true);
+  }
+
+  public onCancelDelete(): void {
+    if (this.deleting()) return;
+    this.deleteConfirmOpen.set(false);
+    this.deleteTargetId.set(null);
+  }
+
+  public onConfirmDelete(): void {
+    if (this.deleting()) return;
+
+    const mode = this.deleteMode();
+    let request$: Observable<TrashProcessesResponse>;
+
+    if (mode === 'all') {
+      request$ = this._processService.deleteAllProcesses();
+    } else if (mode === 'single') {
+      const id = this.deleteTargetId();
+      if (!id) return;
+      request$ = this._processService.deleteProcess(id);
+    } else {
+      const ids = Array.from(this.selectedProcessIds());
+      if (ids.length === 0) return;
+      request$ = this._processService.deleteProcesses(ids);
+    }
+
+    this.deleting.set(true);
+    request$.subscribe({
+      next: (response) => this._onDeleteSuccess(response, mode),
+      error: (error) => this._onDeleteError(error),
+    });
+  }
+
+  private _onDeleteSuccess(response: TrashProcessesResponse, mode: 'single' | 'bulk' | 'all'): void {
+    this.deleting.set(false);
+    this.deleteConfirmOpen.set(false);
+    this.deleteTargetId.set(null);
+
+    if (response.quota) {
+      this._quotaService.applyQuota(response.quota);
+    } else {
+      this._quotaService.loadQuota();
+    }
+
+    const count = response.trashed_count ?? (mode === 'single' ? 1 : this.selectedCount());
+    const key = count === 1 ? 'gestionProcesos.delete.success' : 'gestionProcesos.delete.successPlural';
+    this._showToast('success', response.message || this._transloco.translate(key, { count }));
+
+    this.clearSelection();
+
+    const perPage = this.pagination()?.per_page || 20;
+    if (mode === 'all') {
+      this.loadProcesses(1, perPage);
+      return;
+    }
+
+    let page = this.pagination()?.current_page || 1;
+    const remainingOnPage = this.processes().length - count;
+    if (remainingOnPage <= 0 && page > 1) {
+      page -= 1;
+    }
+    this.loadProcesses(page, perPage);
+  }
+
+  private _onDeleteError(error: { error?: { messages?: string[]; message?: string } }): void {
+    this.deleting.set(false);
+    this.deleteConfirmOpen.set(false);
+    const apiMessage =
+      (error.error?.messages && Array.isArray(error.error.messages)
+        ? error.error.messages.join('. ')
+        : null) ||
+      error.error?.message ||
+      this._transloco.translate('gestionProcesos.delete.error');
+    this._showToast('error', apiMessage);
+  }
+
+  private _showToast(type: 'success' | 'error', message: string): void {
+    this.toastType.set(type);
+    this.toastMessage.set(message);
+    this.toastVisible.set(true);
+    setTimeout(() => this.toastVisible.set(false), 4000);
   }
 
   /**
