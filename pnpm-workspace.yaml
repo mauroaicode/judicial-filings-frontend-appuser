@@ -1,7 +1,4 @@
-# Single-package workspace (needed so pnpm can read onlyBuiltDependencies here on newer pnpm).
-packages:
-  - '.'
-
+# Allow native postinstall scripts required by the Angular/esbuild toolchain (pnpm 10+).
 onlyBuiltDependencies:
   - '@parcel/watcher'
   - esbuild
