@@ -1,0 +1,10 @@
+# Single-package workspace (needed so pnpm can read onlyBuiltDependencies here on newer pnpm).
+packages:
+  - '.'
+
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - esbuild
+  - lmdb
+  - msgpackr-extract
+  - protobufjs

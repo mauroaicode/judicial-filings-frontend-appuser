@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "prestart": "node scripts/copy-vad-assets.mjs",
-    "build": "ng build",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 ng build",
     "prebuild": "node scripts/copy-vad-assets.mjs",
     "vad:assets": "node scripts/copy-vad-assets.mjs",
     "watch": "ng build --watch --configuration development",
@@ -60,6 +60,15 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17",
     "typescript": "~5.9.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild",
+      "lmdb",
+      "msgpackr-extract",
+      "protobufjs"
+    ]
   },
   "packageManager": "pnpm@10.22.0+sha1.3e9e4d522d30f3cf4cabb7506f5d15b89feffd04"
 }
