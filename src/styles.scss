@@ -453,6 +453,28 @@ app-gestion-procesos .process-list-table tbody tr.process-row-hovered td {
 
 /* --- END STANDARDIZED UI CLASSES --- */
 
+/* Badge de rol — light: chip liviano (metadata), sin competir con status/tareas */
+app-gestion-procesos .process-role-badge,
+app-actuaciones-recientes .process-role-badge,
+app-process-detail .process-role-badge,
+app-header .process-role-badge {
+  display: inline-flex;
+  align-items: center;
+  background: #f1eef6 !important;
+  border: 1px solid #ddd6e8 !important;
+  color: #5a526e !important;
+  -webkit-text-fill-color: #5a526e;
+  box-shadow: none;
+}
+
+/* Contador del tab activo en drawer de tareas — siempre blanco sobre primary */
+app-process-tasks-drawer .task-tab--active .badge {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+  background-color: var(--color-primary) !important;
+  border-color: transparent !important;
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
    DARK MODE OVERRIDES
    Scoped to [data-theme="dark"] so they only apply when dark mode is active.
@@ -460,6 +482,54 @@ app-gestion-procesos .process-list-table tbody tr.process-row-hovered td {
 ──────────────────────────────────────────────────────────────────────────── */
 
 [data-theme="dark"] {
+
+  /* Icono copiar junto a radicado — más visible en dark (light sin cambios) */
+  .radicado-copy-btn {
+    color: #c4a8f0 !important;
+    opacity: 0.9 !important;
+    -webkit-text-fill-color: #c4a8f0;
+
+    svg {
+      color: #c4a8f0 !important;
+      stroke: #c4a8f0 !important;
+      opacity: 1 !important;
+    }
+
+    &:hover,
+    &:focus-visible {
+      color: #eee3ff !important;
+      opacity: 1 !important;
+      -webkit-text-fill-color: #eee3ff;
+
+      svg {
+        color: #eee3ff !important;
+        stroke: #eee3ff !important;
+      }
+    }
+  }
+
+  /* Timeline — puntos de semáforo con color semántico (igual que gestión) */
+  app-process-timeline-semaphore-change .semaphore-level[data-level='red'] {
+    color: #fca5a5 !important;
+  }
+  app-process-timeline-semaphore-change .semaphore-level[data-level='yellow'] {
+    color: #fcd34d !important;
+  }
+  app-process-timeline-semaphore-change .semaphore-level[data-level='green'] {
+    color: #86efac !important;
+  }
+  app-process-timeline-semaphore-change .semaphore-level[data-level='red'] .semaphore-level__dot {
+    background-color: #ef4444 !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3) !important;
+  }
+  app-process-timeline-semaphore-change .semaphore-level[data-level='yellow'] .semaphore-level__dot {
+    background-color: #f59e0b !important;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3) !important;
+  }
+  app-process-timeline-semaphore-change .semaphore-level[data-level='green'] .semaphore-level__dot {
+    background-color: #22c55e !important;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3) !important;
+  }
 
   /* Flatpickr calendar */
   app-date-range-picker .flatpickr-calendar,
@@ -556,6 +626,115 @@ app-gestion-procesos .process-list-table tbody tr.process-row-hovered td {
     box-shadow: inset 0 0 0 1px rgba(196, 168, 240, 0.12) !important;
   }
 
+  /* Badge de rol (DEMANDANTE / DEMANDADO) en tablas de gestión, consolidado y detalle */
+  /* Badge de rol (DEMANDANTE / DEMANDADO) */
+  app-gestion-procesos .process-role-badge,
+  app-actuaciones-recientes .process-role-badge,
+  app-process-detail .process-role-badge {
+    background: rgba(124, 82, 184, 0.34) !important;
+    border: 1px solid rgba(196, 168, 240, 0.38) !important;
+    color: #eee3ff !important;
+    -webkit-text-fill-color: #eee3ff;
+    box-shadow: inset 0 0 0 1px rgba(196, 168, 240, 0.1);
+  }
+
+  /* Badge de tareas en detalle del proceso */
+  app-process-detail .process-tasks-badge {
+    background: rgba(124, 82, 184, 0.34) !important;
+    border-color: rgba(196, 168, 240, 0.38) !important;
+    color: #eee3ff !important;
+    -webkit-text-fill-color: #eee3ff;
+
+    .process-tasks-badge__count {
+      background: rgba(216, 195, 247, 0.95) !important;
+      color: #2a1f40 !important;
+      -webkit-text-fill-color: #2a1f40;
+    }
+  }
+
+  /* Header compacto al hacer scroll en detalle del proceso */
+  app-header .header-compact-process__number {
+    color: #f8f5ff !important;
+    -webkit-text-fill-color: #f8f5ff;
+  }
+
+  app-header .header-compact-process .process-role-badge {
+    background: rgba(124, 82, 184, 0.34) !important;
+    border: 1px solid rgba(196, 168, 240, 0.38) !important;
+    color: #eee3ff !important;
+    -webkit-text-fill-color: #eee3ff;
+    box-shadow: inset 0 0 0 1px rgba(196, 168, 240, 0.1);
+  }
+
+  /* Drawer de tareas del proceso — tab activa legible en dark */
+  app-process-tasks-drawer .task-tab {
+    color: #e8e0f5 !important;
+  }
+
+  app-process-tasks-drawer .task-tab--active {
+    background: rgba(124, 82, 184, 0.32) !important;
+    border-color: rgba(196, 168, 240, 0.4) !important;
+    color: #f3eefb !important;
+  }
+
+  app-process-tasks-drawer .task-tab--active .badge {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff;
+    background-color: rgba(124, 82, 184, 0.95) !important;
+  }
+
+  /* Actuaciones recientes — Total más claro en dark */
+  app-actuaciones-recientes .recent-total__value {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff;
+  }
+
+  /* Tooltips de ayuda de filtros por encima del sidebar */
+  app-actuaciones-recientes .filter-help-tooltip {
+    z-index: 80;
+
+    &::before,
+    &::after {
+      z-index: 90 !important;
+    }
+  }
+
+  /* Tooltip del semáforo — fondo oscuro + texto legible */
+  app-process-alert-tooltip .process-alert-tooltip .tooltip-content {
+    background: #241c35 !important;
+    background-color: #241c35 !important;
+    border-color: rgba(196, 168, 240, 0.28) !important;
+    color: #eee8f7 !important;
+    box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.7) !important;
+
+    &::after {
+      border-top-color: #241c35 !important;
+    }
+
+    .alert-tooltip-label,
+    span[class*='text-base-content'] {
+      color: #c4a8f0 !important;
+      -webkit-text-fill-color: #c4a8f0;
+    }
+
+    .alert-tooltip-body,
+    p {
+      color: #eee8f7 !important;
+      -webkit-text-fill-color: #eee8f7;
+    }
+
+    .alert-tooltip-role {
+      color: rgba(238, 232, 247, 0.8) !important;
+      -webkit-text-fill-color: rgba(238, 232, 247, 0.8);
+      border-top-color: rgba(196, 168, 240, 0.22) !important;
+    }
+  }
+
+  app-process-alert-tooltip .process-alert-tooltip.tooltip-bottom .tooltip-content::after {
+    border-top-color: transparent !important;
+    border-bottom-color: #241c35 !important;
+  }
+
   /* Modal Agregar Radicado — recomendaciones en blanco */
   app-gestion-procesos .add-process-recommendations {
     color: #eee8f7 !important;
@@ -589,6 +768,28 @@ app-gestion-procesos .process-list-table tbody tr.process-row-hovered td {
 
   app-gestion-procesos .process-quota-banner--info {
     color: #eee8f7 !important;
+  }
+
+  /* Modal Asignar Rol — contraste en dark (light intacto) */
+  app-role-selection-modal .role-selection-modal {
+    .role-modal-subtitle,
+    .role-modal-info-desc,
+    .role-option-desc,
+    .role-modal-cancel {
+      color: rgba(248, 245, 255, 0.85) !important;
+      -webkit-text-fill-color: rgba(248, 245, 255, 0.85);
+    }
+
+    .role-modal-info-title,
+    .role-modal-count {
+      color: #e8dcff !important;
+      -webkit-text-fill-color: #e8dcff;
+    }
+
+    .role-modal-info {
+      background: rgba(124, 82, 184, 0.18) !important;
+      border-color: rgba(196, 168, 240, 0.28) !important;
+    }
   }
 
   /* Detalle del proceso — tooltips del header */

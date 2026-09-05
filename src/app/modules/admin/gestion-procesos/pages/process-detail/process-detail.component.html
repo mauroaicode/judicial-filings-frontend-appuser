@@ -62,7 +62,7 @@
               {{ process()!.process_number | processNumber }}
             </span>
             <button (click)="copyToClipboard(process()!.process_number, $event)" 
-                    class="btn btn-ghost btn-circle btn-xs sm:btn-sm shrink-0 opacity-20 group-hover/header-radicado:opacity-100 transition-all hover:bg-primary/20 text-primary active:scale-90"
+                    class="radicado-copy-btn btn btn-ghost btn-circle btn-xs sm:btn-sm shrink-0 opacity-20 group-hover/header-radicado:opacity-100 transition-all hover:bg-primary/20 text-primary active:scale-90"
                     title="Copiar radicado (solo números)">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
@@ -97,7 +97,7 @@
 
             <button
               type="button"
-              class="inline-flex items-center gap-1.5 h-6 pl-1.5 pr-1.5 rounded-lg border border-primary/25 bg-primary/10 text-primary text-[10px] font-extrabold uppercase tracking-wider cursor-pointer transition-colors hover:bg-primary/20 hover:border-primary/40 active:scale-[0.97]"
+              class="process-tasks-badge inline-flex items-center gap-1.5 h-6 pl-1.5 pr-1.5 rounded-lg border border-primary/25 bg-primary/10 text-primary text-[10px] font-extrabold uppercase tracking-wider cursor-pointer transition-colors hover:bg-primary/20 hover:border-primary/40 active:scale-[0.97]"
               (click)="openProcessTasksDrawer()"
               [attr.aria-label]="'processDetail.tasks.label' | transloco"
             >
@@ -105,13 +105,13 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
               <span class="pointer-events-none">{{ 'processDetail.tasks.label' | transloco }}</span>
-              <span class="inline-flex items-center justify-center min-w-[1.15rem] h-[1.15rem] px-1 rounded-full bg-primary text-primary-content text-[10px] font-extrabold leading-none pointer-events-none">
+              <span class="process-tasks-badge__count inline-flex items-center justify-center min-w-[1.15rem] h-[1.15rem] px-1 rounded-full bg-primary text-primary-content text-[10px] font-extrabold leading-none pointer-events-none">
                 {{ process()!.tasks_count ?? 0 }}
               </span>
             </button>
 
             @if (process()!.lawyer_role) {
-              <span class="badge badge-primary badge-outline font-extrabold text-[9px] uppercase tracking-widest px-2 h-5">
+              <span class="process-role-badge px-2 py-0.5 rounded-md text-[9px] uppercase font-black tracking-widest">
                 {{ getRoleLabel(process()!.lawyer_role) }}
               </span>
             }
@@ -711,6 +711,22 @@
             </span>
           </button>
         </li>
+        <li>
+          <button
+            type="button"
+            (click)="openDeleteConfirm()"
+            [disabled]="deletingProcess()"
+            class="flex items-center gap-3 py-3 px-4 text-error hover:bg-error/10 transition-all group w-full text-left disabled:opacity-50"
+          >
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-error/10 text-error group-hover:scale-110 transition-transform shadow-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </div>
+            <span class="font-bold text-sm tracking-tight">{{ 'processDetail.actionsMenu.delete' | transloco }}</span>
+          </button>
+        </li>
       </ul>
     </div>
   </ng-template>
@@ -827,7 +843,7 @@
           
           <!-- Lawyer Role Badge -->
           @if (instance.lawyer_role) {
-            <span class="badge badge-primary badge-outline font-extrabold text-[9px] uppercase tracking-widest px-3 h-5">
+            <span class="process-role-badge px-2 py-0.5 rounded-md text-[9px] uppercase font-black tracking-widest">
               {{ getRoleLabel(instance.lawyer_role) }}
             </span>
           }
@@ -857,7 +873,7 @@
         </p>
         @if (isCopyable && (originalValue || value) && value !== '–') {
           <button (click)="copyToClipboard(originalValue || value, $event)" 
-                  class="btn btn-xs btn-circle btn-ghost opacity-20 group-hover/item:opacity-100 transition-opacity hover:bg-primary/10 hover:text-primary active:scale-90"
+                  class="radicado-copy-btn btn btn-xs btn-circle btn-ghost opacity-20 group-hover/item:opacity-100 transition-opacity hover:bg-primary/10 hover:text-primary active:scale-90"
                   title="Copiar (solo números)">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
@@ -873,6 +889,17 @@
     [confirmLabel]="'Confirmar'" [cancelLabel]="'Cancelar'"
     [confirmClass]="confirmModalAction() === 'deactivate' ? 'btn-error' : 'btn-success'"
     (confirm)="onConfirmStatusChange()" (cancel)="onCancelStatusChange()"></app-confirmation-dialog>
+
+  <app-confirmation-dialog
+    [open]="deleteConfirmOpen()"
+    [title]="'gestionProcesos.delete.confirmTitle' | transloco"
+    [message]="'gestionProcesos.delete.confirmSingle' | transloco"
+    [confirmLabel]="deletingProcess() ? ('gestionProcesos.delete.deleting' | transloco) : ('gestionProcesos.delete.confirmLabel' | transloco)"
+    [cancelLabel]="'common.cancel' | transloco"
+    confirmClass="btn-error"
+    (confirm)="onConfirmDelete()"
+    (cancel)="onCancelDelete()">
+  </app-confirmation-dialog>
 
   <!-- Modal Selección de Rol -->
   <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="showRoleModal()">
@@ -926,6 +953,7 @@
     <app-process-tasks-drawer
       [isOpen]="showProcessTasksDrawer()"
       [processId]="detailProcess.id"
+      [processNumber]="detailProcess.process_number"
       (closed)="closeProcessTasksDrawer()"
       (tasksCountChange)="onProcessTasksCountChange($event)"
       (processReactivated)="onProcessReactivatedFromTasks()">

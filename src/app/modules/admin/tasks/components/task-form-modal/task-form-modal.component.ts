@@ -65,6 +65,9 @@ export class TaskFormModalComponent implements OnInit, OnDestroy {
 
     // Inputs/Outputs
     public task = input<Task | null>(null);
+    /** Prefill process when opening create form from process detail / deep link. */
+    public initialProcessId = input<string | null>(null);
+    public initialProcessNumber = input<string | null>(null);
     public closed = output<void>();
     public saved = output<void>();
     public openSuspensionGuide = output<void>();
@@ -143,6 +146,21 @@ export class TaskFormModalComponent implements OnInit, OnDestroy {
 
             if (this.isStatusOnlyMode()) {
                 this._disableEditableFields();
+            }
+        } else if (this.initialProcessId()) {
+            const processId = this.initialProcessId()!;
+            const rawNumber = this.initialProcessNumber();
+            const formattedProcessNumber = rawNumber
+                ? new ProcessNumberPipe().transform(rawNumber)
+                : '';
+
+            this.taskForm.patchValue({
+                process_id: processId,
+                process_search: formattedProcessNumber,
+            });
+
+            if (formattedProcessNumber) {
+                this._selectedProcessDisplay.set(formattedProcessNumber);
             }
         }
 

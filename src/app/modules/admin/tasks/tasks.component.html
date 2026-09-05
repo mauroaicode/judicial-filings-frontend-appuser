@@ -285,7 +285,7 @@
                                             {{ task.process_number ? (task.process_number | processNumber) : ('ID: ' + task.process_id) }}
                                         </a>
                                         @if (task.process_number) {
-                                            <button type="button" class="btn btn-ghost btn-xs btn-circle shrink-0 text-base-content/35 hover:text-base-content"
+                                            <button type="button" class="radicado-copy-btn btn btn-ghost btn-xs btn-circle shrink-0 text-base-content/35 hover:text-base-content"
                                                 (click)="copyToClipboard(task.process_number, $event)"
                                                 [attr.aria-label]="'tasks.copyRadicado' | transloco">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -336,7 +336,9 @@
 @if (showFormModal()) {
     <app-task-form-modal
         [task]="selectedTask()"
-        (closed)="showFormModal.set(false); selectedTask.set(null)"
+        [initialProcessId]="createProcessId()"
+        [initialProcessNumber]="createProcessNumber()"
+        (closed)="closeFormModal()"
         (saved)="onTaskSaved()"
         (openSuspensionGuide)="showSuspensionGuide.set(true)" />
 }
