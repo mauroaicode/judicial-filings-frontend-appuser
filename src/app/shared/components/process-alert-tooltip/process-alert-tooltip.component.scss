@@ -94,3 +94,39 @@
     }
   }
 }
+
+/* Dark mode: panel oscuro + texto claro (light mode intacto) */
+:host-context([data-theme='dark']) .process-alert-tooltip {
+  .tooltip-content {
+    background: #241c35 !important;
+    background-color: #241c35 !important;
+    border-color: rgba(196, 168, 240, 0.28) !important;
+    color: #eee8f7 !important;
+    box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.7) !important;
+
+    &::after {
+      border-top-color: #241c35 !important;
+    }
+
+    .alert-tooltip-label {
+      color: #c4a8f0 !important;
+      -webkit-text-fill-color: #c4a8f0;
+    }
+
+    .alert-tooltip-body {
+      color: #eee8f7 !important;
+      -webkit-text-fill-color: #eee8f7;
+    }
+
+    .alert-tooltip-role {
+      color: rgba(238, 232, 247, 0.78) !important;
+      -webkit-text-fill-color: rgba(238, 232, 247, 0.78);
+      border-top-color: rgba(196, 168, 240, 0.22) !important;
+    }
+  }
+
+  &.tooltip-bottom .tooltip-content::after {
+    border-top-color: transparent !important;
+    border-bottom-color: #241c35 !important;
+  }
+}

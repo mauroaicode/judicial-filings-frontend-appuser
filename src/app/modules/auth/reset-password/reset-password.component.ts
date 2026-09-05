@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  OnDestroy,
   OnInit,
   signal,
   ViewEncapsulation,
@@ -21,6 +22,7 @@ import { TitleSystemAuth } from '@app/shared/components/title-system-auth/title-
 import { AlertComponent } from '@app/shared/components/alert/alert.component';
 import { AuthService } from '@app/core/auth/auth.service';
 import { ErrorHandlerService } from '@app/core/services/error/error-handler.service';
+import { ThemeService } from '@app/core/services/theme/theme.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -31,12 +33,13 @@ import { ErrorHandlerService } from '@app/core/services/error/error-handler.serv
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ResetPasswordComponent implements OnInit {
+export class ResetPasswordComponent implements OnInit, OnDestroy {
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
   private _formBuilder = inject(FormBuilder);
   private _authService = inject(AuthService);
   private _errorHandler = inject(ErrorHandlerService);
+  private _themeService = inject(ThemeService);
 
   public resetPasswordForm!: FormGroup;
   public isLoading = signal<boolean>(false);
@@ -54,6 +57,8 @@ export class ResetPasswordComponent implements OnInit {
   private _identification: string | null = null;
 
   ngOnInit(): void {
+    this._themeService.lockAuthLight();
+
     // Get query params
     this._token = this._activatedRoute.snapshot.queryParamMap.get('token');
     this._encodedId = this._activatedRoute.snapshot.queryParamMap.get('id');
@@ -82,6 +87,10 @@ export class ResetPasswordComponent implements OnInit {
     }, {
       validators: this._passwordsMatchValidator
     });
+  }
+
+  ngOnDestroy(): void {
+    this._themeService.unlockAuthLight();
   }
 
   /**

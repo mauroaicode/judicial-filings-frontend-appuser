@@ -197,6 +197,10 @@ export class GestionProcesosComponent {
     }
   }
 
+  public closeFilters(): void {
+    this.showFilters.set(false);
+  }
+
   // Table columns
   public columns: DataTableColumn[] = [
     {

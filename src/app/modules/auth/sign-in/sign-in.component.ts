@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  OnDestroy,
   OnInit,
   signal,
   ViewEncapsulation,
@@ -25,6 +26,7 @@ import { STORAGE } from '@app/core/constants/storage.constant';
 import type { RoleName } from '@app/core/constants/router.constant';
 import { ErrorHandlerService } from '@app/core/services/error/error-handler.service';
 import { safeRemoveLocalStorageItem } from '@app/core/utils/local-storage.util';
+import { ThemeService } from '@app/core/services/theme/theme.service';
 
 @Component({
   selector: 'app-sign-in',
@@ -35,12 +37,13 @@ import { safeRemoveLocalStorageItem } from '@app/core/utils/local-storage.util';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SignInComponent implements OnInit {
+export class SignInComponent implements OnInit, OnDestroy {
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
   private _formBuilder = inject(FormBuilder);
   private _authService = inject(AuthService);
   private _errorHandler = inject(ErrorHandlerService);
+  private _themeService = inject(ThemeService);
 
   public signInForm!: FormGroup;
   public isLoading = signal<boolean>(false);
@@ -53,12 +56,17 @@ export class SignInComponent implements OnInit {
   private _returnUrl = signal<string | null>(null);
 
   ngOnInit(): void {
+    this._themeService.lockAuthLight();
     this._returnUrl.set(this.getSafeReturnUrl(this._activatedRoute.snapshot.queryParamMap.get('returnUrl')));
     this.signInForm = this._formBuilder.group({
       identification: ['', [Validators.required]],
       password: ['', [Validators.required]],
       rememberMe: [false],
     });
+  }
+
+  ngOnDestroy(): void {
+    this._themeService.unlockAuthLight();
   }
 
   /**

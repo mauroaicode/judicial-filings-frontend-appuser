@@ -71,6 +71,8 @@ export class TasksComponent implements OnInit, OnDestroy {
     public showDetailModal = signal(false);
     public showSuspensionGuide = signal(false);
     public selectedTask = signal<Task | null>(null);
+    public createProcessId = signal<string | null>(null);
+    public createProcessNumber = signal<string | null>(null);
     public detailTask = signal<Task | null>(null);
     public showDeleteConfirm = signal(false);
     public showForceDeleteConfirm = signal(false);
@@ -81,14 +83,24 @@ export class TasksComponent implements OnInit, OnDestroy {
     public alert = signal<{ type: 'success' | 'error'; message: string } | null>(null);
 
     ngOnInit(): void {
-        const initialTaskId = this._activatedRoute.snapshot.queryParamMap.get('task');
-        if (initialTaskId) {
+        const initialParams = this._activatedRoute.snapshot.queryParamMap;
+        const initialTaskId = initialParams.get('task');
+        const shouldCreate = this._isCreateQuery(initialParams.get('create'));
+
+        if (shouldCreate) {
+            this._openCreateFromQuery(initialParams);
+            this.loadTasks();
+        } else if (initialTaskId) {
             this._openTaskFromId(initialTaskId, true);
         } else {
             this.loadTasks();
         }
 
         this._queryParamsSubscription = this._activatedRoute.queryParamMap.subscribe((params) => {
+            if (this._isCreateQuery(params.get('create'))) {
+                this._openCreateFromQuery(params);
+                return;
+            }
             this._handleTaskQueryParam(params);
         });
     }
@@ -151,6 +163,14 @@ export class TasksComponent implements OnInit, OnDestroy {
     public openCreateModal(): void {
         this.selectedTask.set(null);
         this.showFormModal.set(true);
+    }
+
+    public closeFormModal(): void {
+        this.showFormModal.set(false);
+        this.selectedTask.set(null);
+        this.createProcessId.set(null);
+        this.createProcessNumber.set(null);
+        this.clearCreateQueryParams();
     }
 
     public openEditModal(task: Task): void {
@@ -329,6 +349,8 @@ export class TasksComponent implements OnInit, OnDestroy {
         const wasStatusOnly = editedTask?.status === 'completed';
         this.showFormModal.set(false);
         this.selectedTask.set(null);
+        this.createProcessId.set(null);
+        this.createProcessNumber.set(null);
         this.loadTasks(1);
         this.showAlert(
             'success',
@@ -508,6 +530,31 @@ export class TasksComponent implements OnInit, OnDestroy {
         this._router.navigate([], {
             relativeTo: this._activatedRoute,
             queryParams: { task: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true,
+        });
+    }
+
+    private _isCreateQuery(value: string | null): boolean {
+        return value === '1' || value === 'true';
+    }
+
+    private _openCreateFromQuery(params: ParamMap): void {
+        this.createProcessId.set(params.get('process_id'));
+        this.createProcessNumber.set(params.get('process_number'));
+        this.selectedTask.set(null);
+        this.showFormModal.set(true);
+        this.clearCreateQueryParams();
+    }
+
+    private clearCreateQueryParams(): void {
+        this._router.navigate([], {
+            relativeTo: this._activatedRoute,
+            queryParams: {
+                create: null,
+                process_id: null,
+                process_number: null,
+            },
             queryParamsHandling: 'merge',
             replaceUrl: true,
         });

@@ -2,31 +2,31 @@
       [class.tooltip-left-aligned]="leftAligned()"
       [class.tooltip-bottom]="position() === 'bottom'"
       [class.process-alert-tooltip--paused]="isPaused()">
-  <div class="tooltip-content text-left text-sm max-w-xs rounded-xl shadow-2xl bg-white border border-base-200 p-4 space-y-2 z-[1000]">
+  <div class="tooltip-content text-left text-sm max-w-xs rounded-xl shadow-2xl bg-base-100 border border-base-200 p-4 space-y-2 z-[1000]">
     @if (isPaused()) {
       <div class="flex items-center gap-2 mb-1">
         <div class="w-3 h-3 rounded-full alert-dot alert-paused"></div>
-        <span class="font-extrabold text-[10px] uppercase text-base-content/40 tracking-wider">
+        <span class="alert-tooltip-label font-extrabold text-[10px] uppercase text-base-content/50 tracking-wider">
           {{ 'alertSemafor.paused.title' | transloco }}
         </span>
       </div>
-      <p class="text-base-content leading-relaxed font-bold text-[13px]">
+      <p class="alert-tooltip-body text-base-content leading-relaxed font-bold text-[13px]">
         {{ pausedMessage() || ('alertSemafor.paused.message' | transloco) }}
       </p>
     } @else {
       <div class="flex items-center gap-2 mb-1">
         <div class="w-3 h-3 rounded-full alert-dot" [class]="'alert-' + alertLevel()"></div>
-        <span class="font-extrabold text-[10px] uppercase text-base-content/40 tracking-wider">
+        <span class="alert-tooltip-label font-extrabold text-[10px] uppercase text-base-content/50 tracking-wider">
           {{ 'alertSemafor.alertLevel' | transloco }}
         </span>
       </div>
 
-      <p class="text-base-content leading-relaxed font-bold text-[13px]">
+      <p class="alert-tooltip-body text-base-content leading-relaxed font-bold text-[13px]">
         {{ getAlertTooltipMessage() | transloco }}
       </p>
 
       @if (lawyerRole()) {
-        <div class="mt-2 pt-2 border-t border-base-100 text-[10px] text-base-content/30 uppercase font-black tracking-tight text-left">
+        <div class="alert-tooltip-role mt-2 pt-2 border-t border-base-200 text-[10px] text-base-content/50 uppercase font-black tracking-tight text-left">
           Rol del abogado:
           @if (getLawyerRoleLabelKey(); as roleLabelKey) {
             {{ roleLabelKey | transloco }}

@@ -291,11 +291,29 @@ function displayValue(value: unknown, translate: TimelineTranslator): string {
 }
 
 function semaphoreLevel(value: unknown): string | null {
-  if (value === null) return null;
+  if (value === null || value === undefined) return null;
+  let raw: string | null = null;
   if (isRecord(value)) {
-    return stringValue(value['level']) ?? stringValue(value['alert_level']);
+    raw = stringValue(value['level']) ?? stringValue(value['alert_level']);
+  } else {
+    raw = stringValue(value);
   }
-  return stringValue(value);
+  return normalizeSemaphoreLevel(raw);
+}
+
+/** Maps API/display labels to canonical alert levels used by UI dots. */
+function normalizeSemaphoreLevel(value: string | null): string | null {
+  if (!value) return null;
+  const v = value.trim().toLowerCase();
+  if (['red', 'rojo', 'r', 'critical'].includes(v)) return 'red';
+  if (['yellow', 'amarillo', 'y', 'amber', 'warning'].includes(v)) return 'yellow';
+  if (['green', 'verde', 'g', 'ok', 'success'].includes(v)) return 'green';
+  if (
+    ['none', 'null', 'n/a', 'sin nivel', 'sin nivel anterior', 'sin_nivel', 'unknown'].includes(v)
+  ) {
+    return null;
+  }
+  return null;
 }
 
 function semaphoreLabel(value: string | null, translate: TimelineTranslator): string {

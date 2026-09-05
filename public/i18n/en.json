@@ -462,6 +462,9 @@
     },
     "activateProcess": "Activate Tracking",
     "deactivateProcess": "Deactivate Tracking",
+    "actionsMenu": {
+      "delete": "Delete process"
+    },
     "back": "Back",
     "generalInfo": "General Information",
     "processNumber": "Process Number",
@@ -634,7 +637,8 @@
       "drawerDescription": "Pending, draft, and completed tasks linked to this filing.",
       "close": "Close",
       "emptyTitle": "No tasks in this view",
-      "emptyDescription": "Switch tabs or create a task from the Judicial Agenda."
+      "emptyDescription": "Switch tabs or create a task from the Judicial Agenda.",
+      "createInAgenda": "Create task in Judicial Agenda"
     }
   },
   "table": {

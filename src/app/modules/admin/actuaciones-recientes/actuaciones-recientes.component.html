@@ -53,7 +53,7 @@
         <div class="form-control">
           <label class="label pt-0 pb-1 flex items-center gap-1.5">
             <span class="label-standard">{{ 'actuacionesRecientes.filters.processNumber' | transloco }}</span>
-            <span class="tooltip tooltip-left" [attr.data-tip]="'actuacionesRecientes.filters.processNumberHelp' | transloco">
+            <span class="filter-help-tooltip tooltip tooltip-right" [attr.data-tip]="'actuacionesRecientes.filters.processNumberHelp' | transloco">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -67,7 +67,7 @@
         <div class="form-control">
           <label class="label pt-0 pb-1 flex items-center gap-1.5">
             <span class="label-standard">{{ 'actuacionesRecientes.filters.createdAtRange' | transloco }}</span>
-            <span class="tooltip tooltip-left" [attr.data-tip]="'actuacionesRecientes.filters.createdAtRangeHelp' | transloco">
+            <span class="filter-help-tooltip filter-help-tooltip--near-right tooltip tooltip-left" [attr.data-tip]="'actuacionesRecientes.filters.createdAtRangeHelp' | transloco">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -83,7 +83,7 @@
         <div class="form-control">
           <label class="label pt-0 pb-1 flex items-center gap-1.5">
             <span class="label-standard">{{ 'actuacionesRecientes.filters.actionDateRange' | transloco }}</span>
-            <span class="tooltip tooltip-left" [attr.data-tip]="'actuacionesRecientes.filters.actionDateRangeHelp' | transloco">
+            <span class="filter-help-tooltip tooltip tooltip-right" [attr.data-tip]="'actuacionesRecientes.filters.actionDateRangeHelp' | transloco">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -99,7 +99,7 @@
         <div class="form-control">
           <label class="label pt-0 pb-1 flex items-center gap-1.5">
             <span class="label-standard">{{ 'actuacionesRecientes.filters.termStartRange' | transloco }}</span>
-            <span class="tooltip tooltip-left" [attr.data-tip]="'actuacionesRecientes.filters.termStartRangeHelp' | transloco">
+            <span class="filter-help-tooltip filter-help-tooltip--near-right tooltip tooltip-left" [attr.data-tip]="'actuacionesRecientes.filters.termStartRangeHelp' | transloco">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -115,7 +115,7 @@
         <div class="form-control">
           <label class="label pt-0 pb-1 flex items-center gap-1.5">
             <span class="label-standard">{{ 'actuacionesRecientes.filters.termEndRange' | transloco }}</span>
-            <span class="tooltip tooltip-left" [attr.data-tip]="'actuacionesRecientes.filters.termEndRangeHelp' | transloco">
+            <span class="filter-help-tooltip tooltip tooltip-right" [attr.data-tip]="'actuacionesRecientes.filters.termEndRangeHelp' | transloco">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -441,7 +441,7 @@
                           }
                           <button
                             type="button"
-                            class="btn btn-ghost btn-xs btn-circle text-primary/40 hover:bg-primary/10 hover:text-primary"
+                            class="radicado-copy-btn btn btn-ghost btn-xs btn-circle text-primary/40 hover:bg-primary/10 hover:text-primary"
                             (click)="copyToClipboard(action.process_number, $event)">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
@@ -450,7 +450,7 @@
                         </div>
                         @if (action.lawyer_role) {
                           <div class="mt-1">
-                            <span class="px-2 py-0.5 rounded-md bg-base-200/70 text-[9px] uppercase font-black tracking-widest text-base-content/50">{{ action.lawyer_role }}</span>
+                            <span class="process-role-badge px-2 py-0.5 rounded-md text-[9px] uppercase font-black tracking-widest">{{ action.lawyer_role }}</span>
                           </div>
                         }
                       </div>
@@ -685,7 +685,7 @@
                             }
                             <span class="radicado-copy tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
                               <button type="button"
-                                class="btn btn-ghost btn-xs btn-circle h-6 w-6 min-h-6 min-w-6 text-base-content/35 hover:bg-base-200 hover:text-base-content transition-colors"
+                                class="radicado-copy-btn btn btn-ghost btn-xs btn-circle h-6 w-6 min-h-6 min-w-6 text-base-content/35 hover:bg-base-200 hover:text-base-content transition-colors"
                                 (click)="copyToClipboard(action.process_number, $event)">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
@@ -695,7 +695,7 @@
                           </div>
                           @if (action.lawyer_role) {
                             <div class="flex items-center mt-1">
-                              <span class="px-2 py-0.5 rounded-md bg-base-200/60 text-[9px] uppercase font-black tracking-widest text-base-content/40">{{ action.lawyer_role }}</span>
+                              <span class="process-role-badge px-2 py-0.5 rounded-md text-[9px] uppercase font-black tracking-widest">{{ action.lawyer_role }}</span>
                             </div>
                           }
                         </div>

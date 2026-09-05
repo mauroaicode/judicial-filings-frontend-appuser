@@ -24,6 +24,7 @@ import { ConfirmationDialogComponent } from '@app/shared/components/confirmation
 import { IconService } from '@app/core/services/icon/icon.service';
 import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
 import { TranslocoService } from '@jsverse/transloco';
+import { Router } from '@angular/router';
 
 const PER_PAGE = 20;
 const SCROLL_LOAD_THRESHOLD = 200;
@@ -53,9 +54,11 @@ export class ProcessTasksDrawerComponent {
   private _destroyRef = inject(DestroyRef);
   private _processRefresh = inject(ProcessRefreshService);
   private _transloco = inject(TranslocoService);
+  private _router = inject(Router);
 
   readonly isOpen = input(false);
   readonly processId = input.required<string>();
+  readonly processNumber = input<string | null>(null);
 
   readonly closed = output<void>();
   readonly tasksCountChange = output<number>();
@@ -152,6 +155,24 @@ export class ProcessTasksDrawerComponent {
 
   openDetail(task: Task): void {
     this.selectedTask.set(task);
+  }
+
+  openCreateTaskInAgenda(): void {
+    const queryParams: Record<string, string> = { create: '1' };
+    const processId = this.processId();
+    const processNumber = this.processNumber();
+
+    if (processId) {
+      queryParams['process_id'] = processId;
+    }
+    if (processNumber) {
+      queryParams['process_number'] = processNumber;
+    }
+
+    const url = this._router.serializeUrl(
+      this._router.createUrlTree(['/tareas'], { queryParams })
+    );
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   closeDetail(): void {

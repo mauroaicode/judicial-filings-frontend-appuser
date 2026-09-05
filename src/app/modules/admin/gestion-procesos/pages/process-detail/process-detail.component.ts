@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticatedLayoutComponent } from '@app/layout/layouts/authenticated/authenticated.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProcessService } from '@app/core/services/process/process.service';
@@ -25,6 +25,7 @@ import {
   ActionResponseMeta,
   AlertKeyword,
   AlertKeywordStat,
+  TrashProcessesResponse,
 } from '@app/core/models/process/process.model';
 import { buildTextWithHighlights } from '@app/core/utils/alert-highlight.utils';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
@@ -76,6 +77,7 @@ export class ProcessDetailComponent {
   private _headerContext = inject(PageHeaderContextService);
   private _processRefresh = inject(ProcessRefreshService);
   private _quotaService = inject(ProcessQuotaService);
+  private _transloco = inject(TranslocoService);
 
   // AI Permission State
   public isAiEnabled = this._aiCoreService.isAiEnabled;
@@ -116,6 +118,10 @@ export class ProcessDetailComponent {
   public confirmModalTitle = signal<string>('');
   public confirmModalMessage = signal<string>('');
   public confirmModalAction = signal<'activate' | 'deactivate'>('deactivate');
+
+  /** Eliminar proceso (mismo endpoint que gestión) */
+  public deleteConfirmOpen = signal(false);
+  public deletingProcess = signal(false);
 
   /** Estado del mensaje de copiado (idéntico a Actuaciones Recientes) */
   public copiedMessage = signal<string | null>(null);
@@ -772,6 +778,64 @@ export class ProcessDetailComponent {
    */
   onCancelStatusChange(): void {
     this.confirmModalOpen.set(false);
+  }
+
+  openDeleteConfirm(): void {
+    if (this.deletingProcess() || !this.process()?.id) return;
+    (document.activeElement as HTMLElement | null)?.blur?.();
+    this.deleteConfirmOpen.set(true);
+  }
+
+  onCancelDelete(): void {
+    if (this.deletingProcess()) return;
+    this.deleteConfirmOpen.set(false);
+  }
+
+  onConfirmDelete(): void {
+    if (this.deletingProcess()) return;
+    const processId = this.process()?.id;
+    if (!processId) return;
+
+    this.deletingProcess.set(true);
+    this._processService
+      .deleteProcess(processId)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (response) => this._onDeleteSuccess(response),
+        error: (error) => this._onDeleteError(error),
+      });
+  }
+
+  private _onDeleteSuccess(response: TrashProcessesResponse): void {
+    this.deletingProcess.set(false);
+    this.deleteConfirmOpen.set(false);
+
+    if (response.quota) {
+      this._quotaService.applyQuota(response.quota);
+    } else {
+      this._quotaService.loadQuota();
+    }
+
+    const count = response.trashed_count ?? 1;
+    const key = count === 1 ? 'gestionProcesos.delete.success' : 'gestionProcesos.delete.successPlural';
+    const successMessage =
+      response.message ||
+      this._transloco.translate(key, { count }) ||
+      'Cupos actualizados.';
+
+    this.showToast('success', successMessage);
+    this._router.navigate(['/gestion-procesos']);
+  }
+
+  private _onDeleteError(error: { error?: { messages?: string[]; message?: string } }): void {
+    this.deletingProcess.set(false);
+    this.deleteConfirmOpen.set(false);
+    const fallback =
+      this._transloco.translate('gestionProcesos.delete.error') ||
+      'No se pudo eliminar. Intente de nuevo.';
+    const message =
+      error?.error?.messages?.[0] || error?.error?.message || fallback;
+    this.showToast('error', message);
   }
 
   /**

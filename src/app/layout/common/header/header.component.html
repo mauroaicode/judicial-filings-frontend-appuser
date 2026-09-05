@@ -41,12 +41,12 @@
         [attr.aria-label]="'processDetail.title' | transloco"
       >
         <div class="header-compact-process__radicado flex items-center gap-0.5 shrink-0">
-          <span class="header-compact-process__number font-bold text-primary tabular-nums tracking-tight">
+          <span class="header-compact-process__number font-bold text-base-content tabular-nums tracking-tight">
             {{ ctx.processNumber | processNumber }}
           </span>
           <button
             type="button"
-            class="btn btn-ghost btn-circle btn-xs text-primary/50 hover:text-primary hover:bg-primary/10 shrink-0"
+            class="radicado-copy-btn btn btn-ghost btn-circle btn-xs text-base-content/40 hover:text-base-content hover:bg-base-200 shrink-0"
             (click)="copyProcessNumber(ctx.processNumber, $event)"
             [attr.title]="'gestionProcesos.table.copyTooltip' | transloco"
             [attr.aria-label]="'gestionProcesos.table.copyTooltip' | transloco"
@@ -80,7 +80,7 @@
         </span>
         @if (ctx.lawyerRoleLabel) {
         <span class="header-compact-process__separator" aria-hidden="true"></span>
-        <span class="badge badge-primary badge-outline badge-sm font-extrabold text-[9px] uppercase tracking-widest shrink-0 px-2 h-5">
+        <span class="process-role-badge px-2 py-0.5 rounded-md text-[9px] uppercase font-black tracking-widest shrink-0">
           {{ ctx.lawyerRoleLabel }}
         </span>
         }

@@ -1,0 +1,22 @@
+---
+description: UI changes must look correct in both light and dark themes
+alwaysApply: true
+---
+
+# Light + Dark theme (always)
+
+Every UI/style change must work in **both** `light` and `dark` (`data-theme` on `<html>`).
+
+## Rules
+
+- Do not ship a fix for only one theme. Verify (or style for) both.
+- Prefer semantic tokens (`base-content`, `base-100`, `primary`, etc.) over hardcoded light-only colors (`bg-white`, `#fff`, low-opacity text that fails in dark).
+- If a utility fights the theme, add scoped overrides under `[data-theme="dark"]` in `src/styles.scss` and/or `:host-context([data-theme='dark'])` in the component SCSS — **without** breaking light.
+- Never set parent `color` / `-webkit-text-fill-color` that leaks into badges, icons, or nested text with different backgrounds; scope child colors explicitly.
+- Do not regress light mode when fixing dark (or vice versa). Partner previously flagged light regressions.
+
+## Checklist before finishing a UI task
+
+1. Light: contrast of text, badges, tabs, borders, empty states.
+2. Dark: same elements remain legible on brand-purple dark surfaces.
+3. Interactive chips (tabs, badges with counts): label and count both readable in both themes.

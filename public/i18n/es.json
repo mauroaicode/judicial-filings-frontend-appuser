@@ -479,6 +479,9 @@
     },
     "activateProcess": "Activar Seguimiento",
     "deactivateProcess": "Desactivar Seguimiento",
+    "actionsMenu": {
+      "delete": "Eliminar proceso"
+    },
     "back": "Volver",
     "generalInfo": "Información General",
     "processNumber": "Número de Radicado",
@@ -651,7 +654,8 @@
       "drawerDescription": "Pendientes, borradores y cumplidas asociadas a este radicado.",
       "close": "Cerrar",
       "emptyTitle": "No hay tareas en esta vista",
-      "emptyDescription": "Cambia de pestaña o crea una tarea desde la Agenda Judicial."
+      "emptyDescription": "Cambia de pestaña o crea una tarea desde la Agenda Judicial.",
+      "createInAgenda": "Crear tarea en Agenda Judicial"
     }
   },
   "table": {

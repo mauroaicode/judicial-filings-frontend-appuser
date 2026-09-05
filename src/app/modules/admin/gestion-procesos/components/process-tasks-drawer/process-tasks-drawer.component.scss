@@ -169,10 +169,48 @@ body.process-tasks-drawer-body-open {
 .task-tab {
   border: 1px solid transparent;
   transition: all 0.2s ease;
+  color: hsl(var(--bc) / 0.72);
 
   &--active {
-    background: rgba(75, 42, 125, 0.08);
-    border-color: rgba(75, 42, 125, 0.15);
-    color: #4b2a7d;
+    background: color-mix(in srgb, var(--color-primary) 12%, var(--color-base-100));
+    border-color: color-mix(in srgb, var(--color-primary) 28%, transparent);
+    color: var(--color-primary);
+
+    .badge,
+    .badge-primary {
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff;
+      background-color: var(--color-primary) !important;
+      border-color: transparent !important;
+    }
+  }
+}
+
+:host-context([data-theme='dark']),
+[data-theme='dark'] {
+  .task-tab {
+    color: #e8e0f5;
+
+    &--active {
+      background: rgba(124, 82, 184, 0.32);
+      border-color: rgba(196, 168, 240, 0.4);
+      color: #f3eefb;
+
+      .badge,
+      .badge-primary {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff;
+        background-color: rgba(124, 82, 184, 0.95) !important;
+      }
+    }
+
+    &.btn-ghost:not(.task-tab--active) {
+      color: #d4c8e8;
+    }
+  }
+
+  .process-tasks-drawer-header-icon {
+    background-color: rgba(124, 82, 184, 0.28);
+    color: #e8dcff;
   }
 }

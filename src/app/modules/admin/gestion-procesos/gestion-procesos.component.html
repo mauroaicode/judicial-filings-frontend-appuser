@@ -130,7 +130,18 @@
   @if (showFilters()) {
   <div id="filters-section" class="card bg-base-100 shadow-sm border border-base-200 animate-fade-in-up">
     <div class="card-body p-6">
-      <h2 class="label-standard mb-6">{{ 'gestionProcesos.filters.title' | transloco }}</h2>
+      <div class="flex items-center justify-between gap-3 mb-6">
+        <h2 class="label-standard">{{ 'gestionProcesos.filters.title' | transloco }}</h2>
+        <button type="button"
+          class="btn btn-ghost btn-sm btn-circle shrink-0 text-base-content/50 hover:text-base-content hover:bg-base-200 border border-base-300/70 hover:border-base-300"
+          (click)="closeFilters()"
+          [attr.aria-label]="'common.close' | transloco"
+          [attr.title]="'common.close' | transloco">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
       <form [formGroup]="filterForm"
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4" autocomplete="off">
 
@@ -254,20 +265,27 @@
         </div>
 
         <!-- Actions -->
-        <div class="md:col-span-2 lg:col-span-3 xl:col-span-4 flex justify-end items-center gap-4 mt-4">
+        <div class="md:col-span-2 lg:col-span-3 xl:col-span-4 flex flex-wrap justify-between items-center gap-3 mt-4">
           <button type="button"
-            class="btn btn-link btn-sm normal-case text-base-content/60 no-underline hover:text-base-content font-bold"
-            (click)="onResetFilters()">
-            {{ 'gestionProcesos.filters.reset' | transloco }}
+            class="btn btn-ghost btn-sm h-10 px-4 rounded-xl normal-case font-bold text-base-content/70 hover:text-base-content hover:bg-base-200 border border-base-300/80"
+            (click)="closeFilters()">
+            {{ 'common.close' | transloco }}
           </button>
-          <button type="button" class="btn-standard-search" (click)="onSearch()">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            {{ 'gestionProcesos.filters.search' | transloco }}
-          </button>
+          <div class="flex items-center gap-3 sm:gap-4 ml-auto">
+            <button type="button"
+              class="btn btn-link btn-sm normal-case text-base-content/60 no-underline hover:text-base-content font-bold"
+              (click)="onResetFilters()">
+              {{ 'gestionProcesos.filters.reset' | transloco }}
+            </button>
+            <button type="button" class="btn-standard-search" (click)="onSearch()">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              {{ 'gestionProcesos.filters.search' | transloco }}
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -379,7 +397,7 @@
               <div class="flex items-center gap-2">
                 <span class="font-bold text-primary">{{ process.process_number | processNumber }}</span>
                 <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
-                  <button type="button" class="btn btn-ghost btn-xs btn-circle text-primary/40 hover:bg-primary/5 hover:text-primary"
+                  <button type="button" class="radicado-copy-btn btn btn-ghost btn-xs btn-circle text-primary/40 hover:bg-primary/5 hover:text-primary"
                     (click)="copyToClipboard(process.process_number, $event)">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
@@ -429,7 +447,7 @@
 
             @if (process.lawyer_role) {
               <div class="flex items-center mb-3 px-3 sm:px-4">
-                <span class="px-2 py-0.5 rounded-md bg-base-200/60 text-[9px] uppercase font-black tracking-widest text-base-content/40">{{ process.lawyer_role }}</span>
+                <span class="process-role-badge px-2 py-0.5 rounded-md text-[9px] uppercase font-black tracking-widest">{{ process.lawyer_role }}</span>
               </div>
             }
             <!-- Court & Class -->
@@ -541,7 +559,7 @@
                   <div class="flex items-center gap-2">
                     <span class="font-bold text-base-content text-sm truncate">{{ instance.process_number | processNumber }}</span>
                     <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
-                      <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/30 hover:bg-primary/5 hover:text-primary"
+                      <button type="button" class="radicado-copy-btn btn btn-ghost btn-xs btn-circle text-base-content/30 hover:bg-primary/5 hover:text-primary"
                         (click)="copyToClipboard(instance.process_number, $event)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
@@ -641,7 +659,7 @@
                 <span class="opacity-0 group-hover:opacity-30">–</span>
                 }
               </td>
-              <td class="text-center align-middle sticky-col-idx font-bold text-[11px] text-base-content/40">{{ process.index }}</td>
+              <td class="process-row-index text-center align-middle sticky-col-idx font-bold text-sm text-base-content/80">{{ process.index }}</td>
               <td class="text-center align-middle sticky-col-alert">
                 <span class="sticky-cell-bg" aria-hidden="true"></span>
                 <div class="sticky-cell-txt flex justify-center">
@@ -717,7 +735,7 @@
                     <span class="font-bold">{{ process.process_number | processNumber }}</span>
                     <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
                       <button type="button"
-                        class="btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary"
+                        class="radicado-copy-btn btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary"
                         (click)="copyToClipboard(process.process_number, $event)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
                           stroke="currentColor">
@@ -729,7 +747,7 @@
                   </div>
                   @if (process.lawyer_role) {
                   <div class="flex items-center mt-1">
-                    <span class="px-2 py-0.5 rounded-md bg-base-200/60 text-[9px] uppercase font-black tracking-widest text-base-content/40">{{ process.lawyer_role }}</span>
+                    <span class="process-role-badge px-2 py-0.5 rounded-md text-[9px] uppercase font-black tracking-widest">{{ process.lawyer_role }}</span>
                   </div>
                   }
                 </div>
@@ -855,7 +873,7 @@
                 </span>
               </td>
               <td class="text-center align-middle p-2"></td>
-              <td class="text-center align-middle sticky-col-idx font-bold text-[11px] text-base-content/40">{{ instance.index }}</td>
+              <td class="process-row-index text-center align-middle sticky-col-idx font-bold text-sm text-base-content/80">{{ instance.index }}</td>
               <td class="text-center align-middle sticky-col-alert">
                 <span class="sticky-cell-bg" aria-hidden="true"></span>
                 <div class="sticky-cell-txt flex justify-center">
@@ -927,7 +945,7 @@
                 <div class="sticky-cell-txt flex items-center gap-2">
                   <span>{{ instance.process_number | processNumber }}</span>
                   <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
-                    <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary"
+                    <button type="button" class="radicado-copy-btn btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary"
                       (click)="copyToClipboard(instance.process_number, $event)">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
@@ -1416,7 +1434,7 @@
                             {{ proc?.process_number }}
                           </span>
                           <span class="tooltip tooltip-top" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
-                            <button type="button" class="btn btn-ghost btn-xs btn-circle text-base-content/35 hover:bg-base-200 hover:text-base-content/70"
+                            <button type="button" class="radicado-copy-btn btn btn-ghost btn-xs btn-circle text-base-content/35 hover:bg-base-200 hover:text-base-content/70"
                               (click)="copyToClipboard(proc?.process_number!, $event)">
                               <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
