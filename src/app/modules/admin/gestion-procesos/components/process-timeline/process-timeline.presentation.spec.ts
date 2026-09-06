@@ -15,7 +15,12 @@ describe('process timeline presentation', () => {
       'processDetail.timeline.descriptions.semaphoreChanged':
         `Semáforo ${params?.['from']} → ${params?.['to']}.`,
       'processDetail.timeline.descriptions.semaphoreRed': 'Nivel rojo.',
+      'processDetail.timeline.descriptions.speakerChanged':
+        `El ponente cambió de ${params?.['from']} a ${params?.['to']}.`,
+      'processDetail.timeline.descriptions.speakerChangedUnknown': 'Se registró un cambio de ponente.',
       'processDetail.timeline.descriptions.unknown': 'Evento nuevo.',
+      'processDetail.timeline.titles.speakerChanged': 'Cambió el ponente',
+      'processDetail.timeline.fields.speakerChangedAt': 'Fecha del cambio de ponente',
       'processDetail.timeline.sources.judicial_branch': 'Rama Judicial',
       'processDetail.timeline.sources.samai': 'SAMAI',
       'processDetail.timeline.semaphore.red': 'Rojo',
@@ -156,14 +161,100 @@ describe('process timeline presentation', () => {
     });
   }
 
-  it('prepares speaker changes visually', () => {
+  it('presents speaker_changed as a from → to event using display names', () => {
     const result = presentTimelineEvent(
-      event('speaker_changed', { from: 'Ana', to: 'Carlos' }),
+      event(
+        'speaker_changed',
+        { from: 'Ana', to: 'Carlos' },
+        {
+          display: {
+            title: 'Cambió el ponente',
+            summary: 'El ponente cambió de Ana a Carlos.',
+            reason: null,
+            role: null,
+            from: 'Juan Pablo Dossman Cortez',
+            to: 'Carlos Andrés Zambrano San Juan',
+            source: 'Sistema',
+            actor: 'Sistema',
+            show_technical_metadata: false,
+          },
+        }
+      ),
       translate,
       'es'
     );
+
+    expect(result.title).toBe('Cambió el ponente');
+    expect(result.description).toBe('El ponente cambió de Ana a Carlos.');
     expect(result.tone).toBe('info');
-    expect(result.iconPath).toBeTruthy();
+    expect(result.speaker).toEqual({
+      from: 'Juan Pablo Dossman Cortez',
+      to: 'Carlos Andrés Zambrano San Juan',
+    });
+    expect(result.semaphore).toBeNull();
+  });
+
+  it('falls back to payload names when display.from/to are missing', () => {
+    const result = presentTimelineEvent(
+      event('speaker_changed', {
+        from: 'Ronald Otto Cedeño Blume',
+        to: 'John Alexander Hurtado Paredes',
+      }),
+      translate,
+      'es'
+    );
+
+    expect(result.title).toBe('Cambió el ponente');
+    expect(result.speaker).toEqual({
+      from: 'Ronald Otto Cedeño Blume',
+      to: 'John Alexander Hurtado Paredes',
+    });
+    expect(result.description).toContain('Ronald Otto Cedeño Blume');
+    expect(result.description).toContain('John Alexander Hurtado Paredes');
+  });
+
+  it('degrades to title and summary when speaker from or to is null', () => {
+    const result = presentTimelineEvent(
+      event(
+        'speaker_changed',
+        { from: null, to: 'Carlos' },
+        {
+          display: {
+            title: 'Cambió el ponente',
+            summary: 'El ponente cambió.',
+            reason: null,
+            role: null,
+            from: null,
+            to: null,
+            source: 'Sistema',
+            actor: 'Sistema',
+            show_technical_metadata: false,
+          },
+        }
+      ),
+      translate,
+      'es'
+    );
+
+    expect(result.title).toBe('Cambió el ponente');
+    expect(result.description).toBe('El ponente cambió.');
+    expect(result.speaker).toBeNull();
+    expect(result.description).not.toContain('Sin información');
+  });
+
+  it('does not parse judicial proceeding text for speaker changes', () => {
+    const result = presentTimelineEvent(
+      event('speaker_changed', {
+        annotation: 'Constancia Secretarial Cambio de Ponente',
+        action: 'Constancia Secretarial Cambio de Ponente (Ana → Carlos)',
+      }),
+      translate,
+      'es'
+    );
+
+    expect(result.speaker).toBeNull();
+    expect(result.description).toBe('Se registró un cambio de ponente.');
+    expect(result.description).not.toContain('Constancia Secretarial');
   });
 
   it('falls back safely for unknown event types', () => {
@@ -322,6 +413,25 @@ describe('process timeline presentation', () => {
 
     expect(result.details).toEqual([
       { label: 'Fecha del cambio de ponente', value: '25 de julio de 2026' },
+    ]);
+    expect(result.speaker).toEqual({ from: 'Ana', to: 'Carlos' });
+  });
+
+  it('falls back to occurred_at when speaker_changed has no display.dates', () => {
+    const occurredAt = '2026-07-16T20:30:00.000000Z';
+    const result = presentTimelineEvent(
+      event('speaker_changed', { from: 'Ana', to: 'Carlos' }, { occurred_at: occurredAt }),
+      translate,
+      'es'
+    );
+    const expected = new Intl.DateTimeFormat('es', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date(occurredAt));
+
+    expect(result.details).toEqual([
+      { label: 'Fecha del cambio de ponente', value: expected },
     ]);
   });
 

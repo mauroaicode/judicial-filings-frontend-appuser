@@ -26,11 +26,15 @@ class TimelineTestLoader implements TranslocoLoader {
           estimated: 'Fecha aproximada',
           historicalHelp: 'Evento reconstruido con información histórica.',
           notAvailable: 'Sin información',
-          titles: { trackingActivated: 'Seguimiento activado', unknown: 'Evento' },
+          titles: { trackingActivated: 'Seguimiento activado', speakerChanged: 'Cambió el ponente', unknown: 'Evento' },
           descriptions: {
             trackingActivated: 'Se activó el seguimiento.',
+            speakerChanged: 'El ponente cambió de {{ from }} a {{ to }}.',
+            speakerChangedUnknown: 'Se registró un cambio de ponente.',
             unknown: 'Evento nuevo.',
           },
+          speaker: { from: 'De', to: 'A', transition: 'Cambio de ponente' },
+          fields: { speakerChangedAt: 'Fecha del cambio de ponente' },
           actors: { system: 'Sistema', unknown: 'Sistema' },
         },
       },
@@ -104,6 +108,54 @@ describe('ProcessTimelineComponent', () => {
     const articles = Array.from(element.querySelectorAll('article'));
     expect(articles.length).toBe(3);
     expect(articles[0].querySelector('time')?.textContent).toContain('10:30');
+  });
+
+  it('renders speaker_changed with from → to names and change date', () => {
+    api.getTimeline.and.returnValue(
+      of(
+        response([
+          event('speaker-1', '2026-07-16T10:30:00', {
+            event_type: 'speaker_changed',
+            payload: {
+              from: 'Juan Pablo Dossman Cortez',
+              to: 'Carlos Andrés Zambrano San Juan',
+            },
+            display: {
+              title: 'Cambió el ponente',
+              summary: 'El ponente cambió de Juan Pablo Dossman Cortez a Carlos Andrés Zambrano San Juan.',
+              reason: null,
+              role: null,
+              from: 'Juan Pablo Dossman Cortez',
+              to: 'Carlos Andrés Zambrano San Juan',
+              source: 'Sistema',
+              actor: 'Sistema',
+              time: '10:30 AM',
+              dates: [
+                {
+                  key: 'speaker_changed_at',
+                  attribute: 'occurred_at',
+                  label: 'Fecha del cambio de ponente',
+                  value: '2026-07-16',
+                  formatted: '16 de julio de 2026',
+                },
+              ],
+              show_technical_metadata: false,
+            },
+          }),
+        ])
+      )
+    );
+    const element = render();
+    const article = element.querySelector('article[data-event-type="speaker_changed"]');
+    expect(article?.textContent).toContain('Cambió el ponente');
+    expect(article?.textContent).toContain('De');
+    expect(article?.textContent).toContain('A');
+    expect(article?.textContent).toContain('Juan Pablo Dossman Cortez');
+    expect(article?.textContent).toContain('Carlos Andrés Zambrano San Juan');
+    expect(article?.textContent).toContain('Fecha del cambio de ponente');
+    expect(article?.textContent).toContain('16 de julio de 2026');
+    expect(article?.querySelector('app-process-timeline-speaker-change')).toBeTruthy();
+    expect(article?.textContent).not.toContain('Constancia Secretarial');
   });
 
   it('hides reconstructed and approximate technical metadata when display requests it', () => {

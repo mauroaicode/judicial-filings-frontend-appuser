@@ -4,11 +4,12 @@ import { ProcessTimelineEvent } from '@app/core/models/process/process-timeline.
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { presentTimelineEvent } from './process-timeline.presentation';
 import { ProcessTimelineSemaphoreChangeComponent } from './process-timeline-semaphore-change.component';
+import { ProcessTimelineSpeakerChangeComponent } from './process-timeline-speaker-change.component';
 
 @Component({
   selector: 'app-process-timeline-item',
   standalone: true,
-  imports: [TranslocoPipe, ProcessTimelineSemaphoreChangeComponent],
+  imports: [TranslocoPipe, ProcessTimelineSemaphoreChangeComponent, ProcessTimelineSpeakerChangeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <article class="timeline-item" [attr.data-event-type]="event().event_type">
@@ -51,6 +52,10 @@ import { ProcessTimelineSemaphoreChangeComponent } from './process-timeline-sema
             [fromLabel]="semaphore.fromLabel"
             [toLabel]="semaphore.toLabel"
           />
+        }
+
+        @if (presentation().speaker; as speaker) {
+          <app-process-timeline-speaker-change [from]="speaker.from" [to]="speaker.to" />
         }
 
         @if (presentation().details.length > 0) {

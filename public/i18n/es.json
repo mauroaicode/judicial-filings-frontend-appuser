@@ -576,6 +576,7 @@
         "semaphoreRed": "El proceso pasó a nivel rojo por inactividad.",
         "semaphorePaused": "El semáforo quedó pausado por una tarea de suspensión.",
         "speakerChanged": "El ponente cambió de {{ from }} a {{ to }}.",
+        "speakerChangedUnknown": "Se registró un cambio de ponente.",
         "unknown": "Se registró un nuevo evento relevante para este proceso."
       },
       "fields": {
@@ -589,7 +590,8 @@
         "role": "Rol",
         "lastActivity": "Última actuación",
         "persistedLevel": "Nivel persistido",
-        "relatedTask": "Tarea relacionada"
+        "relatedTask": "Tarea relacionada",
+        "speakerChangedAt": "Fecha del cambio de ponente"
       },
       "actors": {
         "app_user": "Usuario",
@@ -608,6 +610,11 @@
         "green": "Verde",
         "none": "Sin nivel persistido",
         "transition": "Transición del semáforo"
+      },
+      "speaker": {
+        "from": "De",
+        "to": "A",
+        "transition": "Cambio de ponente"
       }
     },
     "actions": {

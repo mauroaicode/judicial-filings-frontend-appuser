@@ -531,6 +531,22 @@ app-process-tasks-drawer .task-tab--active .badge {
     box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3) !important;
   }
 
+  /* Timeline — cambio de ponente (De → A) */
+  app-process-timeline-speaker-change .speaker-party {
+    border-color: rgba(216, 195, 247, 0.28) !important;
+    background: color-mix(in srgb, var(--color-base-200) 70%, var(--color-base-100)) !important;
+  }
+  app-process-timeline-speaker-change .speaker-party__label {
+    color: #d8c3f7 !important;
+  }
+  app-process-timeline-speaker-change .speaker-party__name {
+    color: #f8f5ff !important;
+    -webkit-text-fill-color: #f8f5ff;
+  }
+  app-process-timeline-speaker-change .speaker-transition__arrow {
+    color: #d8c3f7 !important;
+  }
+
   /* Flatpickr calendar */
   app-date-range-picker .flatpickr-calendar,
   app-date-picker .flatpickr-calendar,
