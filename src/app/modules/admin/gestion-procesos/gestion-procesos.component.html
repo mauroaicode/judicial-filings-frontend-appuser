@@ -77,12 +77,6 @@
         </svg>
         {{ 'gestionProcesos.addProcess.button' | transloco }}
       </button>
-      <button type="button"
-        class="btn btn-ghost btn-sm sm:btn-md rounded-xl px-4 text-error hover:bg-error/10 normal-case font-bold"
-        [disabled]="deleting() || (pagination()?.total ?? 0) === 0"
-        (click)="openDeleteAllConfirm()">
-        {{ 'gestionProcesos.delete.all' | transloco }}
-      </button>
 
       <!-- FAB Mobile Actions Container -->
       <div class="lg:hidden fixed bottom-20 right-4 z-[50] flex flex-col gap-3">
@@ -318,7 +312,7 @@
           </button>
 
           <button type="button"
-            class="btn btn-sm bg-error/20 hover:bg-error/35 border border-error/50 text-white font-semibold normal-case rounded-xl h-10 px-4 transition-all"
+            class="btn btn-sm bg-white/5 hover:bg-white/15 border border-white/35 text-white font-semibold normal-case rounded-xl h-10 px-4 transition-all"
             [disabled]="deleting()"
             (click)="openDeleteBulkConfirm()">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
