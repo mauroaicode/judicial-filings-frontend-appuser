@@ -593,13 +593,13 @@
         <table class="table table-zebra" style="min-width: 1900px;">
           <thead style="background-color: #4B2A7D; color: #ffffff;">
             <tr>
-              <th style="width: 40px;" class="text-center">
+              <th style="width: 48px;" class="text-center sticky-col-check">
                 <input type="checkbox" 
                        class="checkbox checkbox-sm border-white/40 rounded-lg"
                        [checked]="isAllSelected()"
                        (change)="toggleSelectAll()" />
               </th>
-              <th style="width: 48px;" class="text-center"></th> <!-- Expander header -->
+              <th style="width: 48px;" class="text-center sticky-col-expand"></th>
               <th style="width: 48px;" class="text-center sticky-col-idx">#</th>
               <th style="width: 80px;" class="text-center sticky-col-alert">
                 {{ 'alertSemafor.alertLevel' | transloco }}
@@ -625,14 +625,14 @@
               [class.border-b-0]="isExpanded(process) && process.instances?.length"
               (mouseenter)="hoveredRowId.set(process.id)" (mouseleave)="hoveredRowId.set(null)"
               (dblclick)="onRowDblClick(process)">
-              <td class="text-center align-middle p-2">
+              <td class="text-center align-middle p-2 sticky-col-check">
                 <input type="checkbox" 
                        class="checkbox checkbox-primary checkbox-sm rounded-lg"
                        [checked]="selectedProcessIds().has(process.id)"
                        (change)="toggleSelect(process.id)"
                        (click)="$event.stopPropagation()" />
               </td>
-              <td class="text-center align-middle p-2">
+              <td class="text-center align-middle p-2 sticky-col-expand">
                 @if (process.has_multiple_instances && process.instances && process.instances.length > 1) {
                 <button type="button" class="btn btn-ghost btn-xs btn-square"
                   (click)="toggleExpand(process); $event.stopPropagation()" [attr.aria-expanded]="isExpanded(process)"
@@ -856,17 +856,17 @@
 
             @if (isExpanded(process) && process.instances && process.instances.length > 0) {
             @for (instance of process.instances; track instance.id; let idx = $index) {
-            <tr class="cursor-pointer bg-primary/5 process-table-instance-row border-l-4 border-primary"
+            <tr class="cursor-pointer bg-primary/5 process-table-instance-row"
               [class.process-row-hovered]="hoveredRowId() === instance.id" (mouseenter)="hoveredRowId.set(instance.id)"
               (mouseleave)="hoveredRowId.set(null)" (dblclick)="onRowDblClick(instance)">
-              <td class="text-center align-middle p-2 pl-4">
+              <td class="text-center align-middle p-2 sticky-col-check"></td>
+              <td class="text-center align-middle p-2 sticky-col-expand">
                 <span aria-hidden="true"
                   class="inline-flex items-center justify-center text-primary text-xl font-black leading-none opacity-50"
                   title="Instancia relacionada">
                   ↳
                 </span>
               </td>
-              <td class="text-center align-middle p-2"></td>
               <td class="process-row-index text-center align-middle sticky-col-idx font-bold text-sm text-base-content/80">{{ instance.index }}</td>
               <td class="text-center align-middle sticky-col-alert">
                 <span class="sticky-cell-bg" aria-hidden="true"></span>
@@ -1042,7 +1042,7 @@
                 formatProcessDate(instance.created_at) }}</td>
               <td class="text-center align-middle whitespace-nowrap text-base-content/70">{{
                 formatProcessDate(instance.last_activity_date) }}</td>
-              <td></td>
+              <td class="text-center align-middle" style="width: 72px;"></td>
             </tr>
             }
             }

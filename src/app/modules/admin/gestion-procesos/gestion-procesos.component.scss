@@ -65,6 +65,8 @@
 .process-list-table tbody tr.process-row-hovered td.sticky-col-radicado,
 .process-list-table tbody tr.process-row-hovered td.sticky-col-alert,
 .process-list-table tbody tr.process-row-hovered td.sticky-col-idx,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-check,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-expand,
 .process-list-table tbody tr.process-row-hovered td.sticky-col-radicado::before,
 .process-list-table tbody tr.process-row-hovered td.sticky-col-alert::before,
 .process-list-table tbody tr.process-row-hovered td.sticky-col-radicado .sticky-cell-bg,
@@ -85,6 +87,15 @@
   --process-table-bg: var(--color-base-100);
   --process-table-zebra: color-mix(in srgb, var(--color-base-200) 65%, var(--color-base-100));
   --process-table-accent: color-mix(in srgb, var(--color-primary) 14%, var(--color-base-100));
+  --sticky-check-width: 48px;
+  --sticky-expand-width: 48px;
+  --sticky-idx-width: 48px;
+  --sticky-alert-width: 80px;
+  --sticky-check-left: 0px;
+  --sticky-expand-left: 48px;
+  --sticky-idx-left: 96px;
+  --sticky-alert-left: 144px;
+  --sticky-radicado-left: 224px;
   overflow-x: auto !important;
   overflow-y: auto !important;
   max-height: calc(100vh - 280px);
@@ -112,27 +123,55 @@
     padding: 1rem !important;
     transform: none !important;
     box-shadow: 0 0 0 0.5px #4B2A7D !important;
+    box-sizing: border-box !important;
+  }
+
+  thead th.sticky-col-check,
+  thead th.sticky-col-expand,
+  thead th.sticky-col-idx,
+  thead th.sticky-col-alert {
+    padding: 0.75rem 0.25rem !important;
+  }
+
+  thead th.sticky-col-check {
+    left: var(--sticky-check-left) !important;
+    z-index: 12 !important;
+    width: var(--sticky-check-width) !important;
+    min-width: var(--sticky-check-width) !important;
+    max-width: var(--sticky-check-width) !important;
+    box-shadow: 0 0 0 0.5px #4B2A7D !important;
+  }
+
+  thead th.sticky-col-expand {
+    left: var(--sticky-expand-left) !important;
+    z-index: 12 !important;
+    width: var(--sticky-expand-width) !important;
+    min-width: var(--sticky-expand-width) !important;
+    max-width: var(--sticky-expand-width) !important;
+    box-shadow: 0 0 0 0.5px #4B2A7D !important;
   }
 
   thead th.sticky-col-idx {
-    left: -1px !important;
-    z-index: 11 !important;
-    transform: none !important;
-    box-shadow: 1px 0 0 0 #4B2A7D, 0 0 0 0.5px #4B2A7D !important;
-    border: none !important;
+    left: var(--sticky-idx-left) !important;
+    z-index: 12 !important;
+    width: var(--sticky-idx-width) !important;
+    min-width: var(--sticky-idx-width) !important;
+    max-width: var(--sticky-idx-width) !important;
+    box-shadow: 0 0 0 0.5px #4B2A7D !important;
   }
 
   thead th.sticky-col-alert {
-    left: 47px !important; 
-    z-index: 11 !important;
-    transform: none !important;
-    box-shadow: 1px 0 0 0 #4B2A7D, 0 0 0 0.5px #4B2A7D !important;
-    border: none !important;
+    left: var(--sticky-alert-left) !important;
+    z-index: 12 !important;
+    width: var(--sticky-alert-width) !important;
+    min-width: var(--sticky-alert-width) !important;
+    max-width: var(--sticky-alert-width) !important;
+    box-shadow: 0 0 0 0.5px #4B2A7D !important;
   }
 
   thead th.sticky-col-radicado {
-    left: 127px !important;
-    z-index: 11 !important; /* Header + Sticky */
+    left: var(--sticky-radicado-left) !important;
+    z-index: 12 !important;
     min-width: 340px !important;
     max-width: 340px !important;
     width: 340px !important;
@@ -155,28 +194,47 @@
     background-color: color-mix(in srgb, var(--color-primary) 9%, var(--color-base-100)) !important;
   }
 
-  /* Celda sticky idx */
-  tbody td.sticky-col-idx {
+  tbody td.sticky-col-check,
+  tbody td.sticky-col-expand,
+  tbody td.sticky-col-idx,
+  tbody td.sticky-col-alert,
+  tbody td.sticky-col-radicado {
     position: sticky !important;
-    left: -1px !important;
     z-index: 1 !important;
     background-color: var(--process-table-bg) !important;
     overflow: visible !important;
     transform: none !important;
-    box-shadow: 1px 0 0 0 var(--process-table-bg) !important;
     border: none !important;
+    box-sizing: border-box !important;
   }
 
-  /* Celda sticky alert */
+  tbody td.sticky-col-check {
+    left: var(--sticky-check-left) !important;
+    width: var(--sticky-check-width) !important;
+    min-width: var(--sticky-check-width) !important;
+    max-width: var(--sticky-check-width) !important;
+  }
+
+  tbody td.sticky-col-expand {
+    left: var(--sticky-expand-left) !important;
+    width: var(--sticky-expand-width) !important;
+    min-width: var(--sticky-expand-width) !important;
+    max-width: var(--sticky-expand-width) !important;
+  }
+
+  tbody td.sticky-col-idx {
+    left: var(--sticky-idx-left) !important;
+    width: var(--sticky-idx-width) !important;
+    min-width: var(--sticky-idx-width) !important;
+    max-width: var(--sticky-idx-width) !important;
+  }
+
   tbody td.sticky-col-alert {
-    position: sticky !important;
-    left: 47px !important;
-    z-index: 3 !important; /* Debe poder mostrar tooltip sobre radicado */
-    background-color: var(--process-table-bg) !important;
-    overflow: visible !important;
-    transform: none !important;
-    box-shadow: 1px 0 0 0 var(--process-table-bg) !important;
-    border: none !important;
+    left: var(--sticky-alert-left) !important;
+    z-index: 3 !important;
+    width: var(--sticky-alert-width) !important;
+    min-width: var(--sticky-alert-width) !important;
+    max-width: var(--sticky-alert-width) !important;
 
     & .sticky-cell-bg {
       position: absolute !important;
@@ -187,20 +245,14 @@
     }
   }
 
-  /* Celda sticky radicado */
   tbody td.sticky-col-radicado {
-    position: sticky !important;
-    left: 127px !important;
+    left: var(--sticky-radicado-left) !important;
     z-index: 2 !important;
-    background-color: var(--process-table-bg) !important;
     box-shadow: 2px 0 4px rgba(0,0,0,0.18), 1px 0 0 0 var(--process-table-bg) !important;
-    border: none !important;
     min-width: 340px !important;
     max-width: 340px !important;
     width: 340px !important;
     white-space: nowrap !important;
-    overflow: visible !important;
-    transform: none !important;
 
     & .sticky-cell-bg {
       position: absolute !important;
@@ -219,7 +271,9 @@
   /* Filas pares (zebra) */
   tbody tr:nth-child(2n) td.sticky-col-radicado,
   tbody tr:nth-child(2n) td.sticky-col-alert,
-  tbody tr:nth-child(2n) td.sticky-col-idx {
+  tbody tr:nth-child(2n) td.sticky-col-idx,
+  tbody tr:nth-child(2n) td.sticky-col-check,
+  tbody tr:nth-child(2n) td.sticky-col-expand {
     background-color: var(--process-table-zebra) !important;
   }
 
@@ -230,19 +284,33 @@
     background: var(--process-table-accent) !important;
   }
 
+  tbody tr.process-table-instance-row {
+    box-shadow: inset 3px 0 0 0 var(--color-primary);
+  }
+
   tbody tr.process-table-instance-row td.sticky-col-radicado,
   tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-radicado,
   tbody tr.process-table-instance-row td.sticky-col-alert,
   tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-alert,
   tbody tr.process-table-instance-row td.sticky-col-idx,
-  tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-idx {
+  tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-idx,
+  tbody tr.process-table-instance-row td.sticky-col-expand,
+  tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-expand {
     background-color: var(--process-table-accent) !important;
     background: var(--process-table-accent) !important;
-    box-shadow: 1px 0 0 0 var(--process-table-accent) !important;
-    
-    &.sticky-col-radicado {
-      box-shadow: 2px 0 4px rgba(0,0,0,0.18), 1px 0 0 0 var(--process-table-accent) !important;
-    }
+    box-shadow: none !important;
+  }
+
+  tbody tr.process-table-instance-row td.sticky-col-check,
+  tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-check {
+    background-color: var(--process-table-accent) !important;
+    background: var(--process-table-accent) !important;
+    box-shadow: inset 3px 0 0 0 var(--color-primary) !important;
+  }
+
+  tbody tr.process-table-instance-row td.sticky-col-radicado,
+  tbody tr.process-table-instance-row:nth-child(2n) td.sticky-col-radicado {
+    box-shadow: 2px 0 4px rgba(0,0,0,0.18), 1px 0 0 0 var(--process-table-accent) !important;
   }
 
   /* Hover universal para celdas sticky y normales */
@@ -250,7 +318,9 @@
   tbody tr.process-row-hovered td,
   tbody tr.process-row-hovered td.sticky-col-radicado,
   tbody tr.process-row-hovered td.sticky-col-alert,
-  tbody tr.process-row-hovered td.sticky-col-idx {
+  tbody tr.process-row-hovered td.sticky-col-idx,
+  tbody tr.process-row-hovered td.sticky-col-check,
+  tbody tr.process-row-hovered td.sticky-col-expand {
     background-color: var(--process-table-accent) !important;
     background: var(--process-table-accent) !important;
   }
@@ -400,7 +470,11 @@
 }
 
 .process-list-table tbody tr:hover td.sticky-col-idx,
-.process-list-table tbody tr.process-row-hovered td.sticky-col-idx {
+.process-list-table tbody tr.process-row-hovered td.sticky-col-idx,
+.process-list-table tbody tr:hover td.sticky-col-check,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-check,
+.process-list-table tbody tr:hover td.sticky-col-expand,
+.process-list-table tbody tr.process-row-hovered td.sticky-col-expand {
   z-index: 2 !important;
 }
 
