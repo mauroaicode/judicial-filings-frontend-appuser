@@ -1040,13 +1040,6 @@ export class GestionProcesosComponent {
     this.deleteConfirmOpen.set(true);
   }
 
-  public openDeleteAllConfirm(): void {
-    if (this.deleting()) return;
-    this.deleteMode.set('all');
-    this.deleteTargetId.set(null);
-    this.deleteConfirmOpen.set(true);
-  }
-
   public onCancelDelete(): void {
     if (this.deleting()) return;
     this.deleteConfirmOpen.set(false);
