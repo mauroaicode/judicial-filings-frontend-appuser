@@ -320,13 +320,6 @@
             </svg>
             {{ 'gestionProcesos.delete.selected' | transloco }}
           </button>
-
-          <button type="button"
-            class="btn btn-sm btn-ghost border border-white/25 text-white/90 hover:bg-error/25 font-semibold normal-case rounded-xl h-10 px-4 transition-all"
-            [disabled]="deleting()"
-            (click)="openDeleteAllConfirm()">
-            {{ 'gestionProcesos.delete.all' | transloco }}
-          </button>
         </div>
       </div>
     }
