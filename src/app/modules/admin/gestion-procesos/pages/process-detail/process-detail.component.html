@@ -115,6 +115,10 @@
                 {{ getRoleLabel(process()!.lawyer_role) }}
               </span>
             }
+
+            @if (process()!.is_manual_sync) {
+              <app-process-manual-sync-badge />
+            }
           </div>
           }
         </div>
@@ -846,6 +850,10 @@
             <span class="process-role-badge px-2 py-0.5 rounded-md text-[9px] uppercase font-black tracking-widest">
               {{ getRoleLabel(instance.lawyer_role) }}
             </span>
+          }
+
+          @if (instance.is_manual_sync) {
+            <app-process-manual-sync-badge />
           }
 
           @if (isSelectedInstance(instance.id)) {

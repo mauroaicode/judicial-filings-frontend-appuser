@@ -118,6 +118,9 @@
       "activeProcesses": "Active processes",
       "inactiveProcesses": "Inactive processes",
       "multipleInstancesTotal": "Total Multiple instances",
+      "pendingManualRegistrations": "Pending registration",
+      "pendingManualRegistrationsSubtitle": "Under advisor review",
+      "viewList": "View list",
       "notifications": {
         "actuacion": "Notifications by actuación",
         "sujetoProcesal": "Notifications by subject",
@@ -240,6 +243,9 @@
       },
       "error": {
         "generic": "Error adding process. Please try again."
+      },
+      "manualReview": {
+        "message": "This filing is not available for automatic lookup. We left it in review with your advisor; we will confirm when it is registered."
       }
     },
     "filters": {
@@ -287,7 +293,24 @@
       "otherSubjects": "Other subjects",
       "multipleInstances": "Multiple instances",
       "processDate": "Registration date",
-      "lastActivityDate": "Last activity date"
+      "lastActivityDate": "Last activity date",
+      "manualSync": "Manual",
+      "manualSyncHint": "Uploaded manually"
+    },
+    "manualRegistrationRequests": {
+      "title": "Awaiting registration",
+      "subtitle": "Filings sent for advisor review. They are not in your process list yet.",
+      "empty": "There are no filings awaiting registration.",
+      "loading": "Loading",
+      "error": "Could not load the list. Please try again.",
+      "retry": "Retry",
+      "count": "{{count}} pending",
+      "requestedBy": "Requested by",
+      "requestedAt": "Requested at",
+      "role": "Role",
+      "actions": "Actions",
+      "unassignedActions": "{{count}} unassigned actions",
+      "statusPending": "Pending"
     },
     "infoModal": {
       "title": "Registered Process Information",

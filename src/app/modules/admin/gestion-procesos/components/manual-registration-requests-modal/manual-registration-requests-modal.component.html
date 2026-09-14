@@ -1,0 +1,134 @@
+<div class="manual-reg-modal modal-box p-0 bg-base-100 overflow-hidden shadow-2xl rounded-t-3xl sm:rounded-2xl max-w-2xl w-full">
+  <div class="p-6 pb-4 border-b border-base-200/60">
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex items-center gap-4 min-w-0">
+        <div class="manual-reg-modal__icon w-12 h-12 rounded-2xl bg-info/10 flex items-center justify-center text-info shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <h3 class="text-xl font-bold text-base-content leading-tight">
+            {{ 'gestionProcesos.manualRegistrationRequests.title' | transloco }}
+          </h3>
+          <p class="text-sm text-base-content/60 font-medium mt-0.5">
+            {{ 'gestionProcesos.manualRegistrationRequests.subtitle' | transloco }}
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-error shrink-0"
+        (click)="onClose()"
+        [attr.aria-label]="'common.close' | transloco"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="p-5 sm:p-6 max-h-[70vh] overflow-y-auto">
+    @if (loading()) {
+      <div class="flex flex-col items-center justify-center py-12 gap-3">
+        <span class="loading loading-spinner loading-lg text-info"></span>
+        <span class="text-xs font-bold text-base-content/50 uppercase tracking-widest">
+          {{ 'gestionProcesos.manualRegistrationRequests.loading' | transloco }}
+        </span>
+      </div>
+    } @else if (error()) {
+      <div class="flex flex-col items-center justify-center py-10 gap-4 text-center">
+        <p class="text-sm text-error font-medium">{{ error()! | transloco }}</p>
+        <button type="button" class="btn btn-outline btn-sm rounded-xl" (click)="load()">
+          {{ 'gestionProcesos.manualRegistrationRequests.retry' | transloco }}
+        </button>
+      </div>
+    } @else if (items().length === 0) {
+      <div class="flex flex-col items-center justify-center py-12 gap-2 text-center px-4">
+        <div class="w-12 h-12 rounded-2xl bg-base-200 flex items-center justify-center text-base-content/40 mb-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <p class="text-sm font-medium text-base-content/70">
+          {{ 'gestionProcesos.manualRegistrationRequests.empty' | transloco }}
+        </p>
+      </div>
+    } @else {
+      <p class="text-[11px] font-semibold uppercase tracking-wider text-base-content/45 mb-3">
+        {{ 'gestionProcesos.manualRegistrationRequests.count' | transloco:{ count: count() } }}
+      </p>
+      <ul class="space-y-3">
+        @for (item of items(); track item.id) {
+          <li class="manual-reg-item rounded-2xl border border-base-200 bg-base-100 p-4">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <p class="font-bold text-base-content text-sm tracking-tight">
+                {{ item.process_number | processNumber }}
+              </p>
+              <span class="badge badge-sm badge-ghost font-semibold uppercase tracking-wider text-info bg-info/10 border-info/20">
+                {{ 'gestionProcesos.manualRegistrationRequests.statusPending' | transloco }}
+              </span>
+            </div>
+
+            @if (item.reason_label || item.reason) {
+              <p class="text-xs text-base-content/70 mt-2 leading-snug">
+                {{ item.reason_label || item.reason }}
+              </p>
+            }
+
+            <dl class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs">
+              @if (item.requested_by_name) {
+                <div>
+                  <dt class="text-[10px] uppercase font-bold tracking-wider text-base-content/45 mb-0.5">
+                    {{ 'gestionProcesos.manualRegistrationRequests.requestedBy' | transloco }}
+                  </dt>
+                  <dd class="font-medium text-base-content">
+                    {{ item.requested_by_name }}
+                    @if (item.requested_by_identification) {
+                      <span class="text-base-content/50 font-normal"> · {{ item.requested_by_identification }}</span>
+                    }
+                  </dd>
+                </div>
+              }
+              @if (roleLabelKey(item.lawyer_role); as roleKey) {
+                <div>
+                  <dt class="text-[10px] uppercase font-bold tracking-wider text-base-content/45 mb-0.5">
+                    {{ 'gestionProcesos.manualRegistrationRequests.role' | transloco }}
+                  </dt>
+                  <dd class="font-medium text-base-content">{{ roleKey | transloco }}</dd>
+                </div>
+              }
+              <div>
+                <dt class="text-[10px] uppercase font-bold tracking-wider text-base-content/45 mb-0.5">
+                  {{ 'gestionProcesos.manualRegistrationRequests.requestedAt' | transloco }}
+                </dt>
+                <dd class="font-medium text-base-content">{{ formatDate(item.created_at) }}</dd>
+              </div>
+              @if (item.unassigned_actions_count > 0) {
+                <div>
+                  <dt class="text-[10px] uppercase font-bold tracking-wider text-base-content/45 mb-0.5">
+                    {{ 'gestionProcesos.manualRegistrationRequests.actions' | transloco }}
+                  </dt>
+                  <dd class="font-medium text-base-content">
+                    {{ 'gestionProcesos.manualRegistrationRequests.unassignedActions' | transloco:{ count: item.unassigned_actions_count } }}
+                  </dd>
+                </div>
+              }
+            </dl>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <div class="p-5 sm:p-6 border-t border-base-200/60 bg-base-200/20 flex justify-end">
+    <button
+      type="button"
+      class="btn btn-ghost btn-md normal-case font-bold px-8 rounded-xl text-base-content/70 hover:bg-base-300/40"
+      (click)="onClose()"
+    >
+      {{ 'common.close' | transloco }}
+    </button>
+  </div>
+</div>

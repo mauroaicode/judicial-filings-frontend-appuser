@@ -28,6 +28,8 @@ export interface ProcessInstance {
   speaker?: string | null;
   alert_level?: 'red' | 'yellow' | 'green' | null;
   lawyer_role?: string | null;
+  /** True when this instance was registered by an advisor (manual sync). */
+  is_manual_sync?: boolean;
   /** Inactivity semaphore state (paused while a suspension task is active). */
   semaphore?: ProcessSemaphore | null;
 }
@@ -81,6 +83,8 @@ export interface Process {
   speaker?: string | null;
   alert_level?: 'red' | 'yellow' | 'green' | null;
   lawyer_role?: string | null;
+  /** True when this filing was registered by an advisor (manual sync). */
+  is_manual_sync?: boolean;
   /** Inactivity semaphore state (paused while a suspension task is active). */
   semaphore?: ProcessSemaphore | null;
   /** UI State: si la fila está seleccionada */
@@ -153,14 +157,26 @@ export interface ProcessResponseMeta {
 /**
  * Create Process Response
  */
+export type ManualRegistrationReason = 'not_found' | 'private' | 'all_private';
+
 export interface CreateProcessResponse {
   message: string;
+  status?: 'manual_review' | string;
+  reason?: ManualRegistrationReason | string;
+  request_id?: string;
+  unassigned_actions_count?: number;
   has_multiple_instances?: boolean;
   total_processes?: number;
   registered_count?: number;
   private_count?: number;
   process?: Process;
   processes?: Process[];
+}
+
+export function isManualReviewResponse(
+  response: CreateProcessResponse | null | undefined
+): boolean {
+  return response?.status === 'manual_review';
 }
 
 /**
@@ -190,6 +206,8 @@ export interface ProcessDetail {
   updated_at: string;
   alert_level?: 'red' | 'yellow' | 'green' | null;
   lawyer_role?: string | null;
+  /** True when this filing was registered by an advisor (manual sync). */
+  is_manual_sync?: boolean;
   /** Related judicial agenda tasks for this process. */
   tasks_count?: number;
   /** Inactivity semaphore state (paused while a suspension task is active). */
@@ -207,6 +225,8 @@ export interface ProcessDetailInstance {
   last_api_update: string;
   status_label: string;
   lawyer_role?: string | null;
+  /** True when this instance was registered by an advisor (manual sync). */
+  is_manual_sync?: boolean;
   inactivity_alert_level?: 'red' | 'yellow' | 'green' | null;
 }
 
@@ -395,4 +415,26 @@ export interface TrashProcessesResponse {
   trashed_ids: string[];
   skipped?: TrashProcessesSkipped[] | string[];
   quota?: OrganizationProcessQuota;
+}
+
+/**
+ * Filing waiting for advisor registration (not a process yet).
+ * GET /app-user/processes/manual-registration-requests
+ */
+export interface ManualRegistrationRequest {
+  id: string;
+  process_number: string;
+  reason: string;
+  reason_label: string;
+  status: string;
+  lawyer_role: string | null;
+  unassigned_actions_count: number;
+  requested_by_name: string | null;
+  requested_by_identification: string | null;
+  created_at: string;
+}
+
+export interface ManualRegistrationRequestsResponse {
+  count: number;
+  data: ManualRegistrationRequest[];
 }

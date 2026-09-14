@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+.manual-reg-item {
+  background-color: var(--color-base-100);
+}
+
+:host-context([data-theme='dark']) {
+  .manual-reg-modal__icon {
+    background-color: color-mix(in srgb, var(--color-info) 18%, transparent);
+    color: #7dd3fc;
+  }
+
+  .manual-reg-item {
+    border-color: color-mix(in srgb, var(--color-base-content) 14%, transparent);
+    background-color: color-mix(in srgb, var(--color-base-100) 80%, #1a1228);
+  }
+}

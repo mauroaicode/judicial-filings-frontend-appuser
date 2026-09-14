@@ -5,6 +5,7 @@ import {
   inject,
   OnInit,
   DestroyRef,
+  signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
@@ -16,11 +17,19 @@ import { NotificationsDrawerComponent } from '@app/shared/components/notificatio
 import { NotificationsDrawerStateService } from '@app/core/services/notification/notifications-drawer-state.service';
 import { NotificationService } from '@app/core/services/notification/notification.service';
 import type { OrganizationNotificationRow } from '@app/core/models/notification/organization-notification.model';
+import { ManualRegistrationRequestsModalComponent } from '../gestion-procesos/components/manual-registration-requests-modal/manual-registration-requests-modal.component';
+import type { DashboardStatsCardType } from '@app/core/models/dashboard/dashboard-stats.model';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, TranslocoPipe, DashboardStatsCardsComponent, NotificationsDrawerComponent],
+  imports: [
+    CommonModule,
+    TranslocoPipe,
+    DashboardStatsCardsComponent,
+    NotificationsDrawerComponent,
+    ManualRegistrationRequestsModalComponent,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -37,6 +46,7 @@ export class DashboardComponent implements OnInit {
   readonly stats = this._dashboardService.stats;
   readonly isLoading = this._dashboardService.isLoading;
   readonly error = this._dashboardService.error;
+  readonly isManualRegistrationModalOpen = signal(false);
 
   constructor() {
     // Refresh stats when specified notifications arrive
@@ -52,6 +62,16 @@ export class DashboardComponent implements OnInit {
     this._dashboardService.loadStats();
   }
 
+  onStatsCardClick(type: DashboardStatsCardType): void {
+    if (type === 'pending_manual_registrations') {
+      this.isManualRegistrationModalOpen.set(true);
+    }
+  }
+
+  closeManualRegistrationModal(): void {
+    this.isManualRegistrationModalOpen.set(false);
+  }
+
   onNotificationsDrawerClosed(): void {
     this._drawerState.closeDrawer();
   }
@@ -63,4 +83,3 @@ export class DashboardComponent implements OnInit {
     }
   }
 }
-

@@ -467,6 +467,19 @@ app-header .process-role-badge {
   box-shadow: none;
 }
 
+/* Badge “subido manualmente” — distinto del rol (púrpura) y del estado */
+app-gestion-procesos .process-manual-badge,
+app-process-detail .process-manual-badge,
+app-header .process-manual-badge {
+  display: inline-flex;
+  align-items: center;
+  background: #e8f4fc !important;
+  border: 1px solid #c5dff0 !important;
+  color: #1d6494 !important;
+  -webkit-text-fill-color: #1d6494;
+  box-shadow: none;
+}
+
 /* Contador del tab activo en drawer de tareas — siempre blanco sobre primary */
 app-process-tasks-drawer .task-tab--active .badge {
   color: #ffffff !important;
@@ -652,6 +665,16 @@ app-process-tasks-drawer .task-tab--active .badge {
     color: #eee3ff !important;
     -webkit-text-fill-color: #eee3ff;
     box-shadow: inset 0 0 0 1px rgba(196, 168, 240, 0.1);
+  }
+
+  app-gestion-procesos .process-manual-badge,
+  app-process-detail .process-manual-badge,
+  app-header .process-manual-badge {
+    background: rgba(56, 189, 248, 0.18) !important;
+    border: 1px solid rgba(125, 211, 252, 0.36) !important;
+    color: #bae6fd !important;
+    -webkit-text-fill-color: #bae6fd;
+    box-shadow: inset 0 0 0 1px rgba(125, 211, 252, 0.1);
   }
 
   /* Badge de tareas en detalle del proceso */

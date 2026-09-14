@@ -16,6 +16,7 @@ import {
   ProcessDetailInstance,
   OrganizationProcessQuota,
   TrashProcessesResponse,
+  ManualRegistrationRequestsResponse,
 } from '@app/core/models/process/process.model';
 import { TaskPagination, TaskStatus, TaskType } from '@app/core/models/tasks/task.model';
 
@@ -109,6 +110,15 @@ export class ProcessService {
   }
 
   /**
+   * Filings waiting for advisor registration (not processes yet).
+   * GET /processes/manual-registration-requests
+   */
+  getManualRegistrationRequests(): Observable<ManualRegistrationRequestsResponse> {
+    const url = `${environment.apiBaseUrl}/processes/manual-registration-requests`;
+    return this._http.get<ManualRegistrationRequestsResponse>(url);
+  }
+
+  /**
    * Get the organization's effective active-process quota
    *
    * @returns Observable with quota (count, limit, remaining, flags)
@@ -127,10 +137,27 @@ export class ProcessService {
    */
   createProcess(processNumber: string, lawyerRole: string): Observable<CreateProcessResponse> {
     const url = `${environment.apiBaseUrl}/processes`;
-    return this._http.post<CreateProcessResponse>(url, {
-      process_number: processNumber,
-      lawyer_role: lawyerRole,
-    });
+    return this._http
+      .post<CreateProcessResponse>(
+        url,
+        {
+          process_number: processNumber,
+          lawyer_role: lawyerRole,
+        },
+        { observe: 'response' }
+      )
+      .pipe(
+        map((res) => {
+          const body = res.body ?? { message: '' };
+          if (res.status === 202) {
+            return {
+              ...body,
+              status: body.status ?? 'manual_review',
+            };
+          }
+          return body;
+        })
+      );
   }
 
   /**

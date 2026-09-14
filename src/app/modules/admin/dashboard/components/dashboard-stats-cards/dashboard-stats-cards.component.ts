@@ -117,6 +117,15 @@ export class DashboardStatsCardsComponent {
         clickable: false,
       },
       {
+        type: 'pending_manual_registrations',
+        value: s.pending_manual_registrations ?? 0,
+        labelKey: 'dashboard.stats.pendingManualRegistrations',
+        subtitleKey: 'dashboard.stats.pendingManualRegistrationsSubtitle',
+        valueClass: 'text-info',
+        dotClass: 'bg-info',
+        clickable: true,
+      },
+      {
         type: 'actuacion',
         value: byType.actuacion,
         labelKey: 'dashboard.stats.notifications.actuacion',
@@ -177,6 +186,10 @@ export class DashboardStatsCardsComponent {
   }
 
   onCardClick(item: DashboardStatsCardItem): void {
+    if (item.type === 'pending_manual_registrations') {
+      this.cardClick.emit(item.type);
+      return;
+    }
     if (item.clickable && NOTIFICATION_CARD_TYPES.includes(item.type)) {
       this._drawerState.openDrawer(item.type as OrganizationNotificationType);
       this.cardClick.emit(item.type);
