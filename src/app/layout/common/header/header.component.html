@@ -84,6 +84,10 @@
           {{ ctx.lawyerRoleLabel }}
         </span>
         }
+        @if (ctx.isManualSync) {
+        <span class="header-compact-process__separator" aria-hidden="true"></span>
+        <app-process-manual-sync-badge class="shrink-0" />
+        }
         @if (ctx.instanceName) {
         <span class="header-compact-process__separator" aria-hidden="true"></span>
         <span class="header-compact-process__instance text-sm font-semibold text-base-content/75 truncate min-w-0">

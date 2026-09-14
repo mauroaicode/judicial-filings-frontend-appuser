@@ -18,20 +18,22 @@ import { ProcessAlertTooltipComponent } from '@app/shared/components/process-ale
 import { ProcessService } from '@app/core/services/process/process.service';
 import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
 import { ProcessQuotaService } from '@app/core/services/process/process-quota.service';
-import { Process, ProcessInstance, ProcessFilter, ProcessResponseMeta, CreateProcessResponse, TrashProcessesResponse } from '@app/core/models/process/process.model';
+import { Process, ProcessInstance, ProcessFilter, ProcessResponseMeta, CreateProcessResponse, TrashProcessesResponse, isManualReviewResponse } from '@app/core/models/process/process.model';
 import { DataTableColumn } from '@app/shared/components/data-table/data-table.component';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
 import { DashboardService } from '@app/core/services/dashboard/dashboard.service';
 import { DashboardStatsCardsComponent } from '../dashboard/components/dashboard-stats-cards/dashboard-stats-cards.component';
 import { NotificationsDrawerComponent } from '@app/shared/components/notifications-drawer/notifications-drawer.component';
-import type { SemaphoreColor } from '@app/core/models/dashboard/dashboard-stats.model';
+import type { SemaphoreColor, DashboardStatsCardType } from '@app/core/models/dashboard/dashboard-stats.model';
 import { NotificationsDrawerStateService } from '@app/core/services/notification/notifications-drawer-state.service';
 import { NotificationService } from '@app/core/services/notification/notification.service';
 import type { OrganizationNotificationRow } from '@app/core/models/notification/organization-notification.model';
 
 import { RoleSelectionModalComponent } from './components/role-selection-modal/role-selection-modal.component';
+import { ManualRegistrationRequestsModalComponent } from './components/manual-registration-requests-modal/manual-registration-requests-modal.component';
 import { AuthenticatedLayoutComponent } from '@app/layout/layouts/authenticated/authenticated.component';
 import { ConfirmationDialogComponent } from '@app/shared/components/confirmation-dialog/confirmation-dialog.component';
+import { ProcessManualSyncBadgeComponent } from '@app/shared/components/process-manual-sync-badge/process-manual-sync-badge.component';
 import { Observable } from 'rxjs';
 import { isSemaphorePaused, getSemaphorePauseMessage } from '@app/core/utils/process-semaphore.util';
 import type { ProcessSemaphore } from '@app/core/models/process/process.model';
@@ -50,6 +52,8 @@ import type { ProcessSemaphore } from '@app/core/models/process/process.model';
     ProcessAlertTooltipComponent,
     RoleSelectionModalComponent,
     ConfirmationDialogComponent,
+    ProcessManualSyncBadgeComponent,
+    ManualRegistrationRequestsModalComponent,
   ],
   templateUrl: './gestion-procesos.component.html',
   styleUrls: ['./gestion-procesos.component.scss'],
@@ -117,6 +121,7 @@ export class GestionProcesosComponent {
   // Single-process role modal (from table "Vincular rol")
   public isRoleModalOpen = signal(false);
   public roleModalProcessId = signal<string | null>(null);
+  public isManualRegistrationModalOpen = signal(false);
 
   // Delete confirmation
   public deleteConfirmOpen = signal(false);
@@ -124,7 +129,7 @@ export class GestionProcesosComponent {
   public deleteTargetId = signal<string | null>(null);
   public deleting = signal(false);
   public toastVisible = signal(false);
-  public toastType = signal<'success' | 'error'>('success');
+  public toastType = signal<'success' | 'error' | 'info'>('success');
   public toastMessage = signal('');
 
   public deleteConfirmTitle = computed(() => {
@@ -562,6 +567,21 @@ export class GestionProcesosComponent {
     this.onSearch();
   }
 
+  onStatsCardClick(type: DashboardStatsCardType): void {
+    if (type === 'pending_manual_registrations') {
+      this.isManualRegistrationModalOpen.set(true);
+    }
+  }
+
+  closeManualRegistrationModal(): void {
+    this.isManualRegistrationModalOpen.set(false);
+  }
+
+  private _reloadDashboardStats(): void {
+    const { page: _page, per_page: _perPage, ...statsFilters } = this._buildProcessFilters();
+    this._dashboardService.loadStats(statsFilters);
+  }
+
   /**
    * Handle filter reset
    */
@@ -772,6 +792,17 @@ export class GestionProcesosComponent {
     this._processService.createProcess(processNumber, lawyerRole).subscribe({
       next: (response) => {
         this.submitting.set(false);
+
+        if (isManualReviewResponse(response)) {
+          this.closeAddProcessModal();
+          const message =
+            response.message?.trim() ||
+            this._transloco.translate('gestionProcesos.addProcess.manualReview.message');
+          this._showToast('info', message, 8000);
+          this._reloadDashboardStats();
+          return;
+        }
+
         this.closeAddProcessModal();
         this._quotaService.loadQuota();
 
@@ -795,9 +826,18 @@ export class GestionProcesosComponent {
         this.submitting.set(false);
         this._quotaService.loadQuota();
 
-        // Handle error response
+        if (error.status === 202 && error.error) {
+          this.closeAddProcessModal();
+          const message =
+            error.error.message?.trim() ||
+            this._transloco.translate('gestionProcesos.addProcess.manualReview.message');
+          this._showToast('info', message, 8000);
+          this._reloadDashboardStats();
+          return;
+        }
+
+        // Handle error response (401 / 422 validation / already registered)
         if (error.error && error.error.messages && Array.isArray(error.error.messages)) {
-          // Join all error messages
           this.error.set(error.error.messages.join('. '));
         } else if (error.error && error.error.message) {
           this.error.set(error.error.message);
@@ -1117,11 +1157,11 @@ export class GestionProcesosComponent {
     this._showToast('error', apiMessage);
   }
 
-  private _showToast(type: 'success' | 'error', message: string): void {
+  private _showToast(type: 'success' | 'error' | 'info', message: string, durationMs = 4000): void {
     this.toastType.set(type);
     this.toastMessage.set(message);
     this.toastVisible.set(true);
-    setTimeout(() => this.toastVisible.set(false), 4000);
+    setTimeout(() => this.toastVisible.set(false), durationMs);
   }
 
   /**

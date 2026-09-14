@@ -18,6 +18,8 @@ export interface ProcessDetailHeaderContext {
   instanceName: string | null;
   /** Formatted last activity date (última actuación) */
   lastActivityDate: string | null;
+  /** True when the filing was registered by an advisor. */
+  isManualSync?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

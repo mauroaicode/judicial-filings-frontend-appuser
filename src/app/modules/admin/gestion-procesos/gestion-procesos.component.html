@@ -114,6 +114,7 @@
       variant="gestion-procesos"
       [activeSeverityColor]="activeSeverityColor()"
       (semaphoreClick)="onSemaphoreFilter($event)"
+      (cardClick)="onStatsCardClick($event)"
     />
   </section>
 
@@ -432,9 +433,14 @@
               </div>
             }
 
-            @if (process.lawyer_role) {
-              <div class="flex items-center mb-3 px-3 sm:px-4">
-                <span class="process-role-badge px-2 py-0.5 rounded-md text-[9px] uppercase font-black tracking-widest">{{ process.lawyer_role }}</span>
+            @if (process.lawyer_role || process.is_manual_sync) {
+              <div class="flex items-center gap-2 mb-3 px-3 sm:px-4">
+                @if (process.lawyer_role) {
+                  <span class="process-role-badge px-2 py-0.5 rounded-md text-[9px] uppercase font-black tracking-widest">{{ process.lawyer_role }}</span>
+                }
+                @if (process.is_manual_sync) {
+                  <app-process-manual-sync-badge />
+                }
               </div>
             }
             <!-- Court & Class -->
@@ -553,6 +559,9 @@
                         </svg>
                       </button>
                     </span>
+                    @if (instance.is_manual_sync) {
+                      <app-process-manual-sync-badge />
+                    }
                   </div>
                 </div>
                 <span class="badge badge-sm font-semibold whitespace-nowrap" [ngClass]="getStatusBadgeClass(instance.status_label)">
@@ -732,9 +741,14 @@
                       </button>
                     </span>
                   </div>
-                  @if (process.lawyer_role) {
-                  <div class="flex items-center mt-1">
+                  @if (process.lawyer_role || process.is_manual_sync) {
+                  <div class="flex items-center gap-1.5 mt-1">
+                    @if (process.lawyer_role) {
                     <span class="process-role-badge px-2 py-0.5 rounded-md text-[9px] uppercase font-black tracking-widest">{{ process.lawyer_role }}</span>
+                    }
+                    @if (process.is_manual_sync) {
+                    <app-process-manual-sync-badge />
+                    }
                   </div>
                   }
                 </div>
@@ -939,6 +953,9 @@
                       </svg>
                     </button>
                   </span>
+                  @if (instance.is_manual_sync) {
+                    <app-process-manual-sync-badge />
+                  }
                 </div>
               </td>
               <td class="align-middle text-base-content/80">{{ instance.court }}</td>
@@ -1547,14 +1564,17 @@
     <div class="toast toast-end toast-bottom z-[10000] pointer-events-none">
       <div class="alert shadow-lg border-none"
         [class.alert-success]="toastType() === 'success'"
-        [class.alert-error]="toastType() === 'error'">
+        [class.alert-error]="toastType() === 'error'"
+        [class.alert-info]="toastType() === 'info'">
         <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             [attr.d]="toastType() === 'success'
               ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
-              : 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'" />
+              : (toastType() === 'info'
+                ? 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                : 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z')" />
         </svg>
-        <span>{{ toastMessage() }}</span>
+        <span class="max-w-sm text-sm font-medium leading-snug">{{ toastMessage() }}</span>
       </div>
     </div>
   }
@@ -1569,6 +1589,21 @@
       </div>
     </div>
   }
+
+  <!-- Modal de solicitudes en espera de registro por el asesor -->
+  <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="isManualRegistrationModalOpen()">
+    @if (isManualRegistrationModalOpen()) {
+      <div class="modal-box p-0 bg-transparent shadow-none border-none max-w-2xl">
+        <app-manual-registration-requests-modal
+          [open]="isManualRegistrationModalOpen()"
+          (closed)="closeManualRegistrationModal()">
+        </app-manual-registration-requests-modal>
+      </div>
+    }
+    <form method="dialog" class="modal-backdrop" (click)="closeManualRegistrationModal()">
+      <button type="button">close</button>
+    </form>
+  </dialog>
 
   <!-- Modal de asignación de rol individual (desde tabla) -->
   <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="isRoleModalOpen()">

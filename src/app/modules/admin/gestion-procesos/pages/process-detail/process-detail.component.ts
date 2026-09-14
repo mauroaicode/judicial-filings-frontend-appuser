@@ -36,6 +36,7 @@ import { RoleSelectionModalComponent } from '../../components/role-selection-mod
 import { ProcessAiChatComponent } from '../../components/process-ai-chat/process-ai-chat.component';
 import { ProcessTasksDrawerComponent } from '../../components/process-tasks-drawer/process-tasks-drawer.component';
 import { ProcessTimelineComponent } from '../../components/process-timeline/process-timeline.component';
+import { ProcessManualSyncBadgeComponent } from '@app/shared/components/process-manual-sync-badge/process-manual-sync-badge.component';
 import { AiCoreService } from '@app/core/services/ai-chat/ai-core.service';
 import { PageHeaderContextService } from '@app/core/services/layout/page-header-context.service';
 import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
@@ -60,6 +61,7 @@ const DETAIL_HEADER_SCROLL_THRESHOLD = 80;
     ProcessAiChatComponent,
     ProcessTasksDrawerComponent,
     ProcessTimelineComponent,
+    ProcessManualSyncBadgeComponent,
   ],
   templateUrl: './process-detail.component.html',
   styleUrls: ['./process-detail.component.scss'],
@@ -317,6 +319,7 @@ export class ProcessDetailComponent {
         lawyerRoleLabel: lawyerRole ? this.getRoleLabel(lawyerRole) : null,
         instanceName: process.has_multiple_instances ? (instance?.court ?? null) : null,
         lastActivityDate: this.formatDateSafe(lastActivitySource, 'shortDate'),
+        isManualSync: instance?.is_manual_sync ?? process.is_manual_sync ?? false,
       });
     });
 

@@ -18,12 +18,13 @@ import { SessionLockService } from '@app/core/services/session-lock/session-lock
 import { PageHeaderContextService } from '@app/core/services/layout/page-header-context.service';
 import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
 import { ProcessAlertTooltipComponent } from '@app/shared/components/process-alert-tooltip/process-alert-tooltip.component';
+import { ProcessManualSyncBadgeComponent } from '@app/shared/components/process-manual-sync-badge/process-manual-sync-badge.component';
 import { ThemeService } from '@app/core/services/theme/theme.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, TranslocoPipe, NotificationBellComponent, RouterLink, ProcessNumberPipe, ProcessAlertTooltipComponent],
+  imports: [CommonModule, TranslocoPipe, NotificationBellComponent, RouterLink, ProcessNumberPipe, ProcessAlertTooltipComponent, ProcessManualSyncBadgeComponent],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   encapsulation: ViewEncapsulation.None,

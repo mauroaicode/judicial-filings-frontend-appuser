@@ -125,6 +125,9 @@
       "inactiveProcessesSubtitle": "Sin actividad reciente",
       "multipleInstancesTotal": "Doble instancia",
       "multipleInstancesSubtitle": "Casos en tránsito de instancia",
+      "pendingManualRegistrations": "Pendientes de registro",
+      "pendingManualRegistrationsSubtitle": "En revisión con asesor",
+      "viewList": "Ver lista",
       "notifications": {
         "actuacion": "Notificaciones por actuación",
         "actuacionSubtitle": "Nuevas actuaciones registradas",
@@ -246,6 +249,9 @@
       },
       "error": {
         "generic": "Error al agregar el radicado. Por favor, intente nuevamente."
+      },
+      "manualReview": {
+        "message": "Este radicado no está disponible en consulta automática. Lo dejamos en revisión con tu asesor; te confirmaremos cuando quede registrado."
       }
     },
     "filters": {
@@ -294,7 +300,24 @@
       "multipleInstances": "Múltiples instancias",
       "processDate": "Fecha de registro",
       "lastActivityDate": "Fecha última actuación",
-      "copyTooltip": "Copiar número"
+      "copyTooltip": "Copiar número",
+      "manualSync": "Manual",
+      "manualSyncHint": "Subido manualmente"
+    },
+    "manualRegistrationRequests": {
+      "title": "En espera de registro",
+      "subtitle": "Radicados enviados a revisión con el asesor. Aún no están en tu lista de procesos.",
+      "empty": "No hay radicados en espera de registro.",
+      "loading": "Cargando",
+      "error": "No se pudo cargar la lista. Intenta de nuevo.",
+      "retry": "Reintentar",
+      "count": "{{count}} en espera",
+      "requestedBy": "Solicitado por",
+      "requestedAt": "Fecha de solicitud",
+      "role": "Rol",
+      "actions": "Actuaciones",
+      "unassignedActions": "{{count}} actuaciones sin asignar",
+      "statusPending": "Pendiente"
     },
     "infoModal": {
       "title": "Información del Proceso Registrado",

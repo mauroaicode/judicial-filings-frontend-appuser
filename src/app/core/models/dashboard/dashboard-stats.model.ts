@@ -23,6 +23,7 @@ export interface DashboardStats {
   active_processes: number;
   inactive_processes: number;
   processes_with_multiple_instances: number;
+  pending_manual_registrations?: number;
   semaphores?: DashboardStatsSemaphores;
   notifications: {
     by_type: DashboardStatsNotificationsByType;
@@ -39,5 +40,6 @@ export type DashboardStatsCardType =
   | 'active_processes'
   | 'inactive_processes'
   | 'processes_with_multiple_instances'
+  | 'pending_manual_registrations'
   | 'actuacion'
   | 'actuacion_alerta';
