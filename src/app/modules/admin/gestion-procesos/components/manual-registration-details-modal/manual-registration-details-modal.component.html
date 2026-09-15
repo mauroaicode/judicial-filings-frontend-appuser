@@ -1,0 +1,206 @@
+<div class="manual-details-modal modal-box p-0 bg-base-100 overflow-hidden shadow-2xl rounded-t-3xl sm:rounded-2xl max-w-3xl w-full flex flex-col max-h-[95vh]">
+  <div class="p-6 pb-4 border-b border-base-200/60 shrink-0">
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex items-center gap-4 min-w-0">
+        <div class="manual-details-modal__icon w-12 h-12 rounded-2xl bg-warning/15 flex items-center justify-center text-warning shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <h3 class="text-xl font-bold text-base-content leading-tight">
+            {{ 'gestionProcesos.manualRegistrationDetails.title' | transloco }}
+          </h3>
+          <p class="text-sm text-base-content/60 font-medium mt-0.5">
+            {{ 'gestionProcesos.manualRegistrationDetails.subtitle' | transloco }}
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-error shrink-0"
+        (click)="onClose()"
+        [disabled]="submitting()"
+        [attr.aria-label]="'common.close' | transloco"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col min-h-0 flex-1">
+    <div class="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1">
+      <div class="manual-details-modal__info rounded-2xl border border-warning/20 bg-warning/10 p-4 sm:p-5 space-y-2">
+        @if (draft().reason_label) {
+          <p class="text-[10px] font-black uppercase tracking-widest text-warning">
+            {{ draft().reason_label }}
+          </p>
+        }
+        <p class="text-sm font-medium text-base-content leading-snug">
+          {{ draft().message }}
+        </p>
+      </div>
+
+      @if (error()) {
+        <div class="alert alert-error rounded-xl border-none shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="text-sm font-semibold">{{ error() }}</span>
+        </div>
+      }
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="form-control">
+          <label class="label pb-1">
+            <span class="label-standard">{{ 'gestionProcesos.manualRegistrationDetails.processNumber' | transloco }}</span>
+          </label>
+          <input
+            type="text"
+            class="input-standard input w-full bg-base-200/50 text-base-content"
+            [value]="draft().process_number | processNumber"
+            readonly
+            tabindex="-1"
+          />
+        </div>
+        <div class="form-control">
+          <label class="label pb-1">
+            <span class="label-standard">{{ 'gestionProcesos.manualRegistrationDetails.processClass' | transloco }}</span>
+          </label>
+          <input
+            type="text"
+            formControlName="process_class"
+            class="input-standard input w-full"
+            [class.input-error]="form.get('process_class')?.invalid && form.get('process_class')?.touched"
+            [placeholder]="'gestionProcesos.manualRegistrationDetails.processClassPlaceholder' | transloco"
+          />
+          @if (form.get('process_class')?.invalid && form.get('process_class')?.touched) {
+            <label class="label pt-1.5">
+              <span class="text-[10px] font-bold text-error uppercase tracking-wider">
+                {{ 'gestionProcesos.manualRegistrationDetails.errors.processClass' | transloco }}
+              </span>
+            </label>
+          }
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <label class="label pb-0">
+          <span class="label-standard uppercase tracking-widest text-[10px] font-black text-base-content/45">
+            {{ 'gestionProcesos.manualRegistrationDetails.lawyerRole' | transloco }}
+          </span>
+        </label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          @for (role of roles; track role.value) {
+            <label
+              class="role-option relative flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 group active:scale-[0.98]"
+              [class.role-option--selected]="form.get('lawyer_role')?.value === role.value"
+              [class.border-primary]="form.get('lawyer_role')?.value === role.value"
+              [class.bg-primary/5]="form.get('lawyer_role')?.value === role.value"
+              [class.border-base-200]="form.get('lawyer_role')?.value !== role.value"
+              [class.hover:bg-base-200/30]="form.get('lawyer_role')?.value !== role.value"
+            >
+              <input type="radio" formControlName="lawyer_role" [value]="role.value" class="radio radio-primary border-base-300 w-5 h-5" />
+              <div class="ml-3 flex flex-col">
+                <span class="font-bold text-sm text-base-content group-hover:text-primary transition-colors">{{ role.labelKey | transloco }}</span>
+                <span class="text-[9px] uppercase font-bold tracking-tight text-base-content/60">
+                  {{ (role.value === 'plaintiff' ? 'gestionProcesos.roleModal.plaintiffDesc' : 'gestionProcesos.roleModal.defendantDesc') | transloco }}
+                </span>
+              </div>
+            </label>
+          }
+        </div>
+        @if (form.get('lawyer_role')?.invalid && form.get('lawyer_role')?.touched) {
+          <p class="text-[10px] font-bold text-error uppercase tracking-wider px-1">
+            {{ 'gestionProcesos.manualRegistrationDetails.errors.role' | transloco }}
+          </p>
+        }
+      </div>
+
+      <section formArrayName="plaintiffs" class="space-y-3">
+        <div class="flex items-center justify-between gap-3">
+          <h4 class="text-sm font-bold text-base-content">{{ 'gestionProcesos.manualRegistrationDetails.plaintiffs' | transloco }}</h4>
+          <button type="button" class="btn btn-ghost btn-sm rounded-xl font-bold normal-case text-primary" (click)="addParty(plaintiffs)">
+            + {{ 'gestionProcesos.manualRegistrationDetails.add' | transloco }}
+          </button>
+        </div>
+        @for (control of plaintiffs.controls; track $index) {
+          <div [formGroupName]="$index" class="manual-details-party grid grid-cols-1 sm:grid-cols-[1fr_10rem_auto] gap-2 items-center rounded-xl border border-base-200 bg-base-200/20 p-3">
+            <input type="text" formControlName="name" class="input-standard input input-sm w-full" [class.input-error]="asGroup(control).get('name')?.invalid && asGroup(control).get('name')?.touched" [placeholder]="'gestionProcesos.manualRegistrationDetails.namePlaceholder' | transloco" />
+            <input type="text" formControlName="identification" class="input-standard input input-sm w-full" [placeholder]="'gestionProcesos.manualRegistrationDetails.identificationPlaceholder' | transloco" />
+            <button type="button" class="btn btn-ghost btn-sm btn-circle text-base-content/40 hover:text-error" [disabled]="plaintiffs.length <= 1" (click)="removeParty(plaintiffs, $index, 1)" [attr.aria-label]="'gestionProcesos.manualRegistrationDetails.remove' | transloco">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+        }
+      </section>
+
+      <section formArrayName="defendants" class="space-y-3">
+        <div class="flex items-center justify-between gap-3">
+          <h4 class="text-sm font-bold text-base-content">{{ 'gestionProcesos.manualRegistrationDetails.defendants' | transloco }}</h4>
+          <button type="button" class="btn btn-ghost btn-sm rounded-xl font-bold normal-case text-primary" (click)="addParty(defendants)">
+            + {{ 'gestionProcesos.manualRegistrationDetails.add' | transloco }}
+          </button>
+        </div>
+        @for (control of defendants.controls; track $index) {
+          <div [formGroupName]="$index" class="manual-details-party grid grid-cols-1 sm:grid-cols-[1fr_10rem_auto] gap-2 items-center rounded-xl border border-base-200 bg-base-200/20 p-3">
+            <input type="text" formControlName="name" class="input-standard input input-sm w-full" [class.input-error]="asGroup(control).get('name')?.invalid && asGroup(control).get('name')?.touched" [placeholder]="'gestionProcesos.manualRegistrationDetails.namePlaceholder' | transloco" />
+            <input type="text" formControlName="identification" class="input-standard input input-sm w-full" [placeholder]="'gestionProcesos.manualRegistrationDetails.identificationPlaceholder' | transloco" />
+            <button type="button" class="btn btn-ghost btn-sm btn-circle text-base-content/40 hover:text-error" [disabled]="defendants.length <= 1" (click)="removeParty(defendants, $index, 1)" [attr.aria-label]="'gestionProcesos.manualRegistrationDetails.remove' | transloco">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+        }
+      </section>
+
+      <section formArrayName="other_subjects" class="space-y-3">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <h4 class="text-sm font-bold text-base-content">{{ 'gestionProcesos.manualRegistrationDetails.otherSubjects' | transloco }}</h4>
+            <p class="text-[11px] text-base-content/50 font-medium">{{ 'gestionProcesos.manualRegistrationDetails.otherSubjectsHint' | transloco }}</p>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm rounded-xl font-bold normal-case text-primary" (click)="addParty(other_subjects)">
+            + {{ 'gestionProcesos.manualRegistrationDetails.add' | transloco }}
+          </button>
+        </div>
+        @if (other_subjects.length === 0) {
+          <p class="text-xs text-base-content/45 italic px-1">{{ 'gestionProcesos.manualRegistrationDetails.emptyOptional' | transloco }}</p>
+        }
+        @for (control of other_subjects.controls; track $index) {
+          <div [formGroupName]="$index" class="manual-details-party grid grid-cols-1 sm:grid-cols-[1fr_10rem_auto] gap-2 items-center rounded-xl border border-base-200 bg-base-200/20 p-3">
+            <input type="text" formControlName="name" class="input-standard input input-sm w-full" [class.input-error]="asGroup(control).get('name')?.invalid && asGroup(control).get('name')?.touched" [placeholder]="'gestionProcesos.manualRegistrationDetails.namePlaceholder' | transloco" />
+            <input type="text" formControlName="identification" class="input-standard input input-sm w-full" [placeholder]="'gestionProcesos.manualRegistrationDetails.identificationPlaceholder' | transloco" />
+            <button type="button" class="btn btn-ghost btn-sm btn-circle text-base-content/40 hover:text-error" (click)="removeParty(other_subjects, $index, 0)" [attr.aria-label]="'gestionProcesos.manualRegistrationDetails.remove' | transloco">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+        }
+      </section>
+    </div>
+
+    <div class="p-5 sm:p-6 border-t border-base-200/60 bg-base-200/20 flex flex-col-reverse sm:flex-row justify-end items-center gap-3 shrink-0">
+      <button
+        type="button"
+        class="btn btn-ghost btn-md normal-case font-bold px-8 rounded-xl w-full sm:w-auto text-base-content/60 hover:bg-base-300/40"
+        [disabled]="submitting()"
+        (click)="onClose()"
+      >
+        {{ 'gestionProcesos.manualRegistrationDetails.cancel' | transloco }}
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary btn-md normal-case font-bold px-10 rounded-xl w-full sm:w-auto shadow-lg shadow-primary/20"
+        [disabled]="submitting()"
+      >
+        @if (submitting()) {
+          <span class="loading loading-spinner loading-xs mr-2"></span>
+          {{ 'gestionProcesos.manualRegistrationDetails.submitting' | transloco }}
+        } @else {
+          {{ 'gestionProcesos.manualRegistrationDetails.submit' | transloco }}
+        }
+      </button>
+    </div>
+  </form>
+</div>

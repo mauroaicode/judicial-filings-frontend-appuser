@@ -1590,6 +1590,22 @@
     </div>
   }
 
+  <!-- Modal para completar datos de radicado no elegible -->
+  <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="isManualRegistrationDetailsOpen()">
+    @if (isManualRegistrationDetailsOpen() && manualRegistrationDraft(); as draft) {
+      <div class="modal-box p-0 bg-transparent shadow-none border-none max-w-3xl">
+        <app-manual-registration-details-modal
+          [draft]="draft"
+          (closed)="closeManualRegistrationDetails()"
+          (submitted)="onManualRegistrationSubmitted($event)">
+        </app-manual-registration-details-modal>
+      </div>
+    }
+    <form method="dialog" class="modal-backdrop" (click)="closeManualRegistrationDetails()">
+      <button type="button">close</button>
+    </form>
+  </dialog>
+
   <!-- Modal de solicitudes en espera de registro por el asesor -->
   <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="isManualRegistrationModalOpen()">
     @if (isManualRegistrationModalOpen()) {

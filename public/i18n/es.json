@@ -254,6 +254,33 @@
         "message": "Este radicado no está disponible en consulta automática. Lo dejamos en revisión con tu asesor; te confirmaremos cuando quede registrado."
       }
     },
+    "manualRegistrationDetails": {
+      "title": "Radicado no elegible",
+      "subtitle": "Completa la información del proceso para enviarlo a revisión con tu asesor.",
+      "processNumber": "Número de radicado",
+      "processClass": "Clase de proceso",
+      "processClassPlaceholder": "Ej: Verbal, Ejecutivo",
+      "lawyerRole": "Asignar rol",
+      "plaintiffs": "Demandantes",
+      "defendants": "Demandados",
+      "otherSubjects": "Otros sujetos",
+      "otherSubjectsHint": "Opcional",
+      "emptyOptional": "Ninguno por ahora.",
+      "namePlaceholder": "Nombre completo",
+      "identificationPlaceholder": "Identificación (opcional)",
+      "add": "Agregar",
+      "remove": "Quitar",
+      "cancel": "Cancelar",
+      "submit": "Enviar a revisión",
+      "submitting": "Enviando...",
+      "errors": {
+        "plaintiffsMin": "Agrega al menos un demandante con nombre.",
+        "defendantsMin": "Agrega al menos un demandado con nombre.",
+        "processClass": "La clase de proceso es obligatoria",
+        "role": "El rol es obligatorio",
+        "generic": "No se pudo enviar la solicitud. Intenta de nuevo."
+      }
+    },
     "filters": {
       "title": "Filtros de Búsqueda",
       "processNumber": "Número de Radicado",

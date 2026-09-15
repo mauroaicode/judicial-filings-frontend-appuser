@@ -248,6 +248,33 @@
         "message": "This filing is not available for automatic lookup. We left it in review with your advisor; we will confirm when it is registered."
       }
     },
+    "manualRegistrationDetails": {
+      "title": "Filing not eligible",
+      "subtitle": "Complete the process information to send it for advisor review.",
+      "processNumber": "Process number",
+      "processClass": "Process class",
+      "processClassPlaceholder": "E.g. Verbal, Ejecutivo",
+      "lawyerRole": "Assign role",
+      "plaintiffs": "Plaintiffs",
+      "defendants": "Defendants",
+      "otherSubjects": "Other subjects",
+      "otherSubjectsHint": "Optional",
+      "emptyOptional": "None for now.",
+      "namePlaceholder": "Full name",
+      "identificationPlaceholder": "ID (optional)",
+      "add": "Add",
+      "remove": "Remove",
+      "cancel": "Cancel",
+      "submit": "Send for review",
+      "submitting": "Sending...",
+      "errors": {
+        "plaintiffsMin": "Add at least one plaintiff with a name.",
+        "defendantsMin": "Add at least one defendant with a name.",
+        "processClass": "Process class is required",
+        "role": "Role is required",
+        "generic": "Could not send the request. Please try again."
+      }
+    },
     "filters": {
       "title": "Search Filters",
       "processNumber": "Process Number",
