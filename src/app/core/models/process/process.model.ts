@@ -161,8 +161,12 @@ export type ManualRegistrationReason = 'not_found' | 'private' | 'all_private';
 
 export interface CreateProcessResponse {
   message: string;
-  status?: 'manual_review' | string;
+  status?: 'manual_review' | 'manual_registration_required' | string;
   reason?: ManualRegistrationReason | string;
+  reason_label?: string;
+  process_number?: string;
+  lawyer_role?: string;
+  requires_details?: boolean;
   request_id?: string;
   unassigned_actions_count?: number;
   has_multiple_instances?: boolean;
@@ -173,10 +177,43 @@ export interface CreateProcessResponse {
   processes?: Process[];
 }
 
+export function isManualRegistrationRequiredResponse(
+  response: CreateProcessResponse | null | undefined
+): boolean {
+  return (
+    response?.status === 'manual_registration_required' || response?.requires_details === true
+  );
+}
+
 export function isManualReviewResponse(
   response: CreateProcessResponse | null | undefined
 ): boolean {
   return response?.status === 'manual_review';
+}
+
+export interface ManualRegistrationSubject {
+  name: string;
+  identification?: string;
+}
+
+export interface CreateManualRegistrationRequestPayload {
+  process_number: string;
+  reason: string;
+  lawyer_role: string;
+  process_class: string;
+  plaintiffs: ManualRegistrationSubject[];
+  defendants: ManualRegistrationSubject[];
+  other_subjects?: ManualRegistrationSubject[];
+}
+
+export interface CreateManualRegistrationRequestResponse {
+  message: string;
+  status?: 'manual_review' | string;
+  reason?: ManualRegistrationReason | string;
+  reason_label?: string;
+  request_id?: string;
+  unassigned_actions_count?: number;
+  data?: unknown;
 }
 
 /**

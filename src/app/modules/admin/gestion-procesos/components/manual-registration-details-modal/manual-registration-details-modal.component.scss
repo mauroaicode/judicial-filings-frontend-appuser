@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.manual-details-modal__info {
+  color: var(--color-base-content);
+}
+
+:host-context([data-theme='dark']) {
+  .manual-details-modal__icon {
+    background-color: rgba(245, 158, 11, 0.18);
+    color: #fcd34d;
+  }
+
+  .manual-details-modal__info {
+    background-color: rgba(120, 53, 15, 0.28);
+    border-color: rgba(251, 191, 36, 0.28);
+
+    .text-warning {
+      color: #fcd34d;
+    }
+  }
+
+  .manual-details-party {
+    background-color: color-mix(in srgb, var(--color-base-100) 70%, #1a1228);
+    border-color: color-mix(in srgb, var(--color-base-content) 14%, transparent);
+  }
+}

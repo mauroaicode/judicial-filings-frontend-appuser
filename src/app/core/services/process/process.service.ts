@@ -17,6 +17,8 @@ import {
   OrganizationProcessQuota,
   TrashProcessesResponse,
   ManualRegistrationRequestsResponse,
+  CreateManualRegistrationRequestPayload,
+  CreateManualRegistrationRequestResponse,
 } from '@app/core/models/process/process.model';
 import { TaskPagination, TaskStatus, TaskType } from '@app/core/models/tasks/task.model';
 
@@ -119,6 +121,30 @@ export class ProcessService {
   }
 
   /**
+   * Confirm a manual registration request with process details.
+   * POST /processes/manual-registration-requests → 202 manual_review
+   */
+  createManualRegistrationRequest(
+    payload: CreateManualRegistrationRequestPayload
+  ): Observable<CreateManualRegistrationRequestResponse> {
+    const url = `${environment.apiBaseUrl}/processes/manual-registration-requests`;
+    return this._http
+      .post<CreateManualRegistrationRequestResponse>(url, payload, { observe: 'response' })
+      .pipe(
+        map((res) => {
+          const body = res.body ?? { message: '' };
+          if (res.status === 202) {
+            return {
+              ...body,
+              status: body.status ?? 'manual_review',
+            };
+          }
+          return body;
+        })
+      );
+  }
+
+  /**
    * Get the organization's effective active-process quota
    *
    * @returns Observable with quota (count, limit, remaining, flags)
@@ -152,7 +178,7 @@ export class ProcessService {
           if (res.status === 202) {
             return {
               ...body,
-              status: body.status ?? 'manual_review',
+              status: body.status ?? 'manual_registration_required',
             };
           }
           return body;

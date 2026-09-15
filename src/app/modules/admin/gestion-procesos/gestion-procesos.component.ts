@@ -18,7 +18,7 @@ import { ProcessAlertTooltipComponent } from '@app/shared/components/process-ale
 import { ProcessService } from '@app/core/services/process/process.service';
 import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
 import { ProcessQuotaService } from '@app/core/services/process/process-quota.service';
-import { Process, ProcessInstance, ProcessFilter, ProcessResponseMeta, CreateProcessResponse, TrashProcessesResponse, isManualReviewResponse } from '@app/core/models/process/process.model';
+import { Process, ProcessInstance, ProcessFilter, ProcessResponseMeta, CreateProcessResponse, TrashProcessesResponse, isManualReviewResponse, isManualRegistrationRequiredResponse, CreateManualRegistrationRequestResponse } from '@app/core/models/process/process.model';
 import { DataTableColumn } from '@app/shared/components/data-table/data-table.component';
 import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
 import { DashboardService } from '@app/core/services/dashboard/dashboard.service';
@@ -31,6 +31,7 @@ import type { OrganizationNotificationRow } from '@app/core/models/notification/
 
 import { RoleSelectionModalComponent } from './components/role-selection-modal/role-selection-modal.component';
 import { ManualRegistrationRequestsModalComponent } from './components/manual-registration-requests-modal/manual-registration-requests-modal.component';
+import { ManualRegistrationDetailsModalComponent } from './components/manual-registration-details-modal/manual-registration-details-modal.component';
 import { AuthenticatedLayoutComponent } from '@app/layout/layouts/authenticated/authenticated.component';
 import { ConfirmationDialogComponent } from '@app/shared/components/confirmation-dialog/confirmation-dialog.component';
 import { ProcessManualSyncBadgeComponent } from '@app/shared/components/process-manual-sync-badge/process-manual-sync-badge.component';
@@ -54,6 +55,7 @@ import type { ProcessSemaphore } from '@app/core/models/process/process.model';
     ConfirmationDialogComponent,
     ProcessManualSyncBadgeComponent,
     ManualRegistrationRequestsModalComponent,
+    ManualRegistrationDetailsModalComponent,
   ],
   templateUrl: './gestion-procesos.component.html',
   styleUrls: ['./gestion-procesos.component.scss'],
@@ -122,6 +124,8 @@ export class GestionProcesosComponent {
   public isRoleModalOpen = signal(false);
   public roleModalProcessId = signal<string | null>(null);
   public isManualRegistrationModalOpen = signal(false);
+  public isManualRegistrationDetailsOpen = signal(false);
+  public manualRegistrationDraft = signal<CreateProcessResponse | null>(null);
 
   // Delete confirmation
   public deleteConfirmOpen = signal(false);
@@ -577,6 +581,34 @@ export class GestionProcesosComponent {
     this.isManualRegistrationModalOpen.set(false);
   }
 
+  private _openManualRegistrationDetails(
+    response: CreateProcessResponse,
+    processNumber?: string,
+    lawyerRole?: string
+  ): void {
+    this.closeAddProcessModal();
+    this.manualRegistrationDraft.set({
+      ...response,
+      process_number: response.process_number || processNumber,
+      lawyer_role: response.lawyer_role || lawyerRole,
+    });
+    this.isManualRegistrationDetailsOpen.set(true);
+  }
+
+  closeManualRegistrationDetails(): void {
+    this.isManualRegistrationDetailsOpen.set(false);
+    this.manualRegistrationDraft.set(null);
+  }
+
+  onManualRegistrationSubmitted(response: CreateManualRegistrationRequestResponse): void {
+    this.closeManualRegistrationDetails();
+    const message =
+      response.message?.trim() ||
+      this._transloco.translate('gestionProcesos.addProcess.manualReview.message');
+    this._showToast('info', message, 8000);
+    this._reloadDashboardStats();
+  }
+
   private _reloadDashboardStats(): void {
     const { page: _page, per_page: _perPage, ...statsFilters } = this._buildProcessFilters();
     this._dashboardService.loadStats(statsFilters);
@@ -793,6 +825,11 @@ export class GestionProcesosComponent {
       next: (response) => {
         this.submitting.set(false);
 
+        if (isManualRegistrationRequiredResponse(response)) {
+          this._openManualRegistrationDetails(response, processNumber, lawyerRole);
+          return;
+        }
+
         if (isManualReviewResponse(response)) {
           this.closeAddProcessModal();
           const message =
@@ -827,9 +864,16 @@ export class GestionProcesosComponent {
         this._quotaService.loadQuota();
 
         if (error.status === 202 && error.error) {
+          const body = error.error as CreateProcessResponse;
+          if (isManualRegistrationRequiredResponse(body)) {
+            const processNumberFallback = this.addProcessForm.get('process_number')?.value?.trim();
+            const lawyerRoleFallback = this.addProcessForm.get('lawyer_role')?.value;
+            this._openManualRegistrationDetails(body, processNumberFallback, lawyerRoleFallback);
+            return;
+          }
           this.closeAddProcessModal();
           const message =
-            error.error.message?.trim() ||
+            body.message?.trim() ||
             this._transloco.translate('gestionProcesos.addProcess.manualReview.message');
           this._showToast('info', message, 8000);
           this._reloadDashboardStats();
