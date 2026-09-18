@@ -94,6 +94,7 @@ export class OrganizationNotificationService {
         subjects: d?.subjects ?? null,
         term_start_date: d?.term_start_date ?? null,
         term_end_date: d?.term_end_date ?? null,
+        despacho: d?.despacho ?? '',
       };
     });
   }

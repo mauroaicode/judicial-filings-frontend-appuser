@@ -14,6 +14,7 @@ import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -25,6 +26,10 @@ import {
   ManualRegistrationSubject,
 } from '@app/core/models/process/process.model';
 import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
+
+function requiredTrimmed(control: AbstractControl): ValidationErrors | null {
+  return String(control.value ?? '').trim() ? null : { required: true };
+}
 
 @Component({
   selector: 'app-manual-registration-details-modal',
@@ -45,6 +50,10 @@ export class ManualRegistrationDetailsModalComponent {
 
   readonly submitting = signal(false);
   readonly error = signal<string | null>(null);
+  readonly arrayErrors = signal<{ plaintiffs: string | null; defendants: string | null }>({
+    plaintiffs: null,
+    defendants: null,
+  });
 
   readonly roles = [
     { value: 'plaintiff', labelKey: 'gestionProcesos.filters.plaintiff' },
@@ -54,7 +63,7 @@ export class ManualRegistrationDetailsModalComponent {
   readonly form: FormGroup = this._fb.group({
     process_number: [{ value: '', disabled: true }],
     lawyer_role: ['', Validators.required],
-    process_class: ['', Validators.required],
+    process_class: ['', requiredTrimmed],
     plaintiffs: this._fb.array([this._partyGroup()]),
     defendants: this._fb.array([this._partyGroup()]),
     other_subjects: this._fb.array([]),
@@ -92,12 +101,26 @@ export class ManualRegistrationDetailsModalComponent {
   }
 
   addParty(list: FormArray): void {
-    list.push(this._partyGroup(list !== this.other_subjects));
+    list.push(this._partyGroup());
   }
 
   removeParty(list: FormArray, index: number, min = 0): void {
     if (list.length <= min) return;
     list.removeAt(index);
+    if (list === this.plaintiffs) {
+      this.arrayErrors.update((errors) => ({ ...errors, plaintiffs: null }));
+    }
+    if (list === this.defendants) {
+      this.arrayErrors.update((errors) => ({ ...errors, defendants: null }));
+    }
+  }
+
+  fieldError(control: AbstractControl | null, fallbackKey: string): string | null {
+    if (!control || !control.invalid || !control.touched) return null;
+    if (typeof control.errors?.['api'] === 'string' && control.errors['api']) {
+      return control.errors['api'];
+    }
+    return this._transloco.translate(fallbackKey);
   }
 
   onClose(): void {
@@ -107,23 +130,37 @@ export class ManualRegistrationDetailsModalComponent {
 
   onSubmit(): void {
     this.error.set(null);
+    this.arrayErrors.set({ plaintiffs: null, defendants: null });
     this.form.markAllAsTouched();
+    this._clearApiErrors(this.form);
 
-    const plaintiffs = this._collectParties(this.plaintiffs);
-    const defendants = this._collectParties(this.defendants);
+    const rowsValid = this._validateVisibleRows(this.plaintiffs)
+      && this._validateVisibleRows(this.defendants)
+      && this._validateVisibleRows(this.other_subjects);
+
+    const hasPlaintiff = this._hasValidName(this.plaintiffs);
+    const hasDefendant = this._hasValidName(this.defendants);
+    this.arrayErrors.set({
+      plaintiffs: hasPlaintiff
+        ? null
+        : this._transloco.translate('gestionProcesos.manualRegistrationDetails.errors.plaintiffsMin'),
+      defendants: hasDefendant
+        ? null
+        : this._transloco.translate('gestionProcesos.manualRegistrationDetails.errors.defendantsMin'),
+    });
+
     const processClass = String(this.form.get('process_class')?.value ?? '').trim();
     const lawyerRole = String(this.form.get('lawyer_role')?.value ?? '').trim();
-
-    if (!processClass || !lawyerRole || plaintiffs.length < 1 || defendants.length < 1) {
-      if (plaintiffs.length < 1) {
-        this.error.set(this._transloco.translate('gestionProcesos.manualRegistrationDetails.errors.plaintiffsMin'));
-      } else if (defendants.length < 1) {
-        this.error.set(this._transloco.translate('gestionProcesos.manualRegistrationDetails.errors.defendantsMin'));
-      }
-      return;
+    if (!processClass) {
+      this.form.get('process_class')?.setErrors({ required: true });
+    }
+    if (!lawyerRole) {
+      this.form.get('lawyer_role')?.setErrors({ required: true });
     }
 
-    if (this.form.invalid) return;
+    if (!rowsValid || !hasPlaintiff || !hasDefendant || !processClass || !lawyerRole || this.form.invalid) {
+      return;
+    }
 
     const draft = this.draft();
     const processNumber = draft.process_number?.trim();
@@ -142,8 +179,8 @@ export class ManualRegistrationDetailsModalComponent {
         reason,
         lawyer_role: lawyerRole,
         process_class: processClass,
-        plaintiffs,
-        defendants,
+        plaintiffs: this._collectParties(this.plaintiffs),
+        defendants: this._collectParties(this.defendants),
         ...(otherSubjects.length > 0 ? { other_subjects: otherSubjects } : {}),
       })
       .pipe(finalize(() => this.submitting.set(false)))
@@ -157,14 +194,14 @@ export class ManualRegistrationDetailsModalComponent {
             });
             return;
           }
-          this.error.set(this._formatApiError(err));
+          this._applyApiErrors(err);
         },
       });
   }
 
-  private _partyGroup(nameRequired = true): FormGroup {
+  private _partyGroup(): FormGroup {
     return this._fb.group({
-      name: ['', nameRequired ? Validators.required : []],
+      name: ['', requiredTrimmed],
       identification: [''],
     });
   }
@@ -172,6 +209,29 @@ export class ManualRegistrationDetailsModalComponent {
   private _replaceParties(list: FormArray, next: FormGroup[]): void {
     list.clear();
     next.forEach((group) => list.push(group));
+  }
+
+  private _hasValidName(list: FormArray): boolean {
+    return list.controls.some((control) => this._trimmedName(control).length > 0);
+  }
+
+  private _validateVisibleRows(list: FormArray): boolean {
+    let valid = true;
+    list.controls.forEach((control) => {
+      const nameCtrl = (control as FormGroup).get('name');
+      if (!nameCtrl) return;
+      nameCtrl.markAsTouched();
+      nameCtrl.updateValueAndValidity({ emitEvent: false });
+      if (!this._trimmedName(control)) {
+        nameCtrl.setErrors({ ...(nameCtrl.errors ?? {}), required: true });
+        valid = false;
+      }
+    });
+    return valid;
+  }
+
+  private _trimmedName(control: AbstractControl): string {
+    return String((control as FormGroup).get('name')?.value ?? '').trim();
   }
 
   private _collectParties(list: FormArray): ManualRegistrationSubject[] {
@@ -187,16 +247,66 @@ export class ManualRegistrationDetailsModalComponent {
       .filter((party) => party.name.length > 0);
   }
 
-  private _formatApiError(err: { error?: { message?: string; messages?: string[]; errors?: Record<string, string[] | string> } }): string {
+  private _clearApiErrors(control: AbstractControl): void {
+    if (control instanceof FormGroup || control instanceof FormArray) {
+      Object.values(control.controls).forEach((child) => this._clearApiErrors(child));
+    }
+    const errors = control.errors;
+    if (!errors?.['api']) return;
+    const { api: _api, ...rest } = errors;
+    control.setErrors(Object.keys(rest).length ? rest : null);
+  }
+
+  private _applyApiErrors(err: {
+    error?: { message?: string; messages?: string[]; errors?: Record<string, string[] | string> };
+  }): void {
     const body = err.error;
+    const fieldErrors = body?.errors ?? {};
+    const leftover: string[] = [];
+
+    for (const [key, raw] of Object.entries(fieldErrors)) {
+      const message = Array.isArray(raw) ? raw.filter(Boolean).join('. ') : String(raw ?? '');
+      if (!message) continue;
+
+      const nested = key.match(/^(plaintiffs|defendants|other_subjects)\.(\d+)\.(\w+)$/);
+      if (nested) {
+        const [, arrayName, index, field] = nested;
+        const group = (this.form.get(arrayName) as FormArray | null)?.at(Number(index)) as FormGroup | undefined;
+        const ctrl = group?.get(field);
+        if (ctrl) {
+          ctrl.setErrors({ ...(ctrl.errors ?? {}), api: message });
+          ctrl.markAsTouched();
+          continue;
+        }
+      }
+
+      if (key === 'plaintiffs' || key === 'defendants') {
+        this.arrayErrors.update((current) => ({ ...current, [key]: message }));
+        continue;
+      }
+
+      const ctrl = this.form.get(key);
+      if (ctrl) {
+        ctrl.setErrors({ ...(ctrl.errors ?? {}), api: message });
+        ctrl.markAsTouched();
+        continue;
+      }
+
+      leftover.push(message);
+    }
+
     if (body?.messages && Array.isArray(body.messages)) {
-      return body.messages.join('. ');
+      leftover.push(...body.messages.filter(Boolean));
+    } else if (!Object.keys(fieldErrors).length && body?.message) {
+      leftover.push(body.message);
     }
-    if (body?.errors) {
-      const all = Object.values(body.errors).flat();
-      if (all.length) return all.join('. ');
-    }
-    return body?.message?.trim()
-      || this._transloco.translate('gestionProcesos.manualRegistrationDetails.errors.generic');
+
+    this.error.set(
+      leftover.length
+        ? leftover.join('. ')
+        : Object.keys(fieldErrors).length
+          ? null
+          : this._transloco.translate('gestionProcesos.manualRegistrationDetails.errors.generic')
+    );
   }
 }

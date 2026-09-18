@@ -197,6 +197,7 @@
     },
     "table": {
       "processNumber": "Número de radicado",
+      "despacho": "Despacho",
       "action": "Actuación",
       "annotation": "Anotación",
       "actionDate": "Fecha de actuación",
@@ -269,13 +270,17 @@
       "namePlaceholder": "Nombre completo",
       "identificationPlaceholder": "Identificación (opcional)",
       "add": "Agregar",
+      "addPlaintiff": "Demandante",
+      "addDefendant": "Demandado",
+      "addOther": "Otro",
       "remove": "Quitar",
       "cancel": "Cancelar",
       "submit": "Enviar a revisión",
       "submitting": "Enviando...",
       "errors": {
-        "plaintiffsMin": "Agrega al menos un demandante con nombre.",
-        "defendantsMin": "Agrega al menos un demandado con nombre.",
+        "nameRequired": "El nombre es obligatorio",
+        "plaintiffsMin": "Debes agregar al menos un demandante.",
+        "defendantsMin": "Debes agregar al menos un demandado.",
         "processClass": "La clase de proceso es obligatoria",
         "role": "El rol es obligatorio",
         "generic": "No se pudo enviar la solicitud. Intenta de nuevo."

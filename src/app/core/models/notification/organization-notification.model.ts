@@ -33,6 +33,8 @@ export interface OrganizationNotificationDetailActuacion {
   /** Term dates from judicial action */
   term_start_date?: string | null;
   term_end_date?: string | null;
+  /** Court/office already formatted (title case). Empty string when the process has none. */
+  despacho?: string;
 }
 
 /**
@@ -82,7 +84,7 @@ export interface OrganizationNotificationsResponse {
 
 /**
  * Generic table row: id + process_number always; rest depends on notification type.
- * Actuación/actuacion_alerta: action, annotation, action_date, registration_date, subjects, notification_time_human.
+ * Actuación/actuacion_alerta: action, annotation, action_date, registration_date, subjects, notification_time_human, despacho.
  * Sujeto_procesal: subject_type, name_or_business_name, identification.
  */
 export interface OrganizationNotificationRow {
@@ -100,6 +102,7 @@ export interface OrganizationNotificationRow {
   subjects?: OrganizationNotificationSubject[] | null;
   term_start_date?: string | null;
   term_end_date?: string | null;
+  despacho?: string;
   // Sujeto_procesal
   subject_type?: string;
   name_or_business_name?: string;

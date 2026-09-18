@@ -39,7 +39,10 @@
                 <!-- Title -->
                 <div class="form-control">
                     <label class="label pt-0 pb-1">
-                        <span class="label-standard">{{ 'tasks.form.title' | transloco }}</span>
+                        <span class="label-standard">
+                            {{ 'tasks.form.title' | transloco }}
+                            <span class="required-asterisk" aria-hidden="true">*</span>
+                        </span>
                     </label>
                     <input type="text" formControlName="title"
                         [placeholder]="'tasks.form.titlePlaceholder' | transloco"
@@ -60,7 +63,10 @@
                 <!-- Description -->
                 <div class="form-control">
                     <label class="label pt-0 pb-1">
-                        <span class="label-standard">{{ 'tasks.form.description' | transloco }}</span>
+                        <span class="label-standard">
+                            {{ 'tasks.form.description' | transloco }}
+                            <span class="required-asterisk" aria-hidden="true">*</span>
+                        </span>
                     </label>
                     <textarea formControlName="description" rows="4"
                         [placeholder]="'tasks.form.descriptionPlaceholder' | transloco"
@@ -81,7 +87,10 @@
                 <!-- Type -->
                 <div class="form-control">
                     <label class="label pt-0 pb-1">
-                        <span class="label-standard">{{ 'tasks.form.type' | transloco }}</span>
+                        <span class="label-standard">
+                            {{ 'tasks.form.type' | transloco }}
+                            <span class="required-asterisk" aria-hidden="true">*</span>
+                        </span>
                     </label>
                     <select formControlName="type" class="select-standard select select-bordered w-full"
                         [class.select-error]="getBackendError('type')">
@@ -180,7 +189,10 @@
                 <!-- Status -->
                 <div class="form-control">
                     <label class="label pt-0 pb-1">
-                        <span class="label-standard">{{ 'tasks.form.status' | transloco }}</span>
+                        <span class="label-standard">
+                            {{ 'tasks.form.status' | transloco }}
+                            <span class="required-asterisk" aria-hidden="true">*</span>
+                        </span>
                     </label>
                     <select formControlName="status" class="select-standard select select-bordered w-full"
                         [class.select-error]="getBackendError('status')">
@@ -205,7 +217,7 @@
                             <span>{{ (isSuspensionType() ? 'tasks.form.processRequired' : 'tasks.form.process') | transloco }}</span>
                             @if (isSuspensionType()) {
                                 <span class="inline-flex items-center gap-1.5 shrink-0">
-                                    <span class="text-error" aria-hidden="true">*</span>
+                                    <span class="required-asterisk" aria-hidden="true">*</span>
                                     <span class="relative group/procinfo inline-flex cursor-help" tabindex="0">
                                         <span class="w-4 h-4 rounded-full bg-warning/15 flex items-center justify-center text-warning group-hover/procinfo:bg-warning/25 transition-colors">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">

@@ -1118,6 +1118,34 @@
   <dialog class="modal modal-bottom lg:modal-middle" [class.modal-open]="isModalOpen()">
     <div
       class="modal-box p-0 flex flex-col bg-base-100 shadow-2xl lg:max-w-2xl w-full lg:rounded-2xl rounded-t-3xl rounded-b-none pb-8 lg:pb-0 max-h-[95vh] sm:max-h-[90vh]">
+      @if (error()) {
+      <div class="shrink-0 px-6 sm:px-8 pt-6 sm:pt-8 pb-0">
+        <div class="alert alert-error rounded-xl border-none shadow-sm items-start">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5 mt-0.5" fill="none"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="text-sm font-semibold flex-1 min-w-0">
+            @if (error()!.includes('.')) {
+            {{ error() | transloco }}
+            } @else {
+            {{ error() }}
+            }
+          </span>
+          <button
+            type="button"
+            class="btn btn-ghost btn-xs btn-circle shrink-0 text-current hover:bg-black/10"
+            (click)="error.set(null)"
+            [attr.aria-label]="'common.close' | transloco"
+            [attr.title]="'common.close' | transloco">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      }
       <!-- Header -->
       <div class="p-6 sm:p-8 border-b border-base-200 flex-none">
         <h3 class="font-bold text-2xl text-base-content">{{ 'gestionProcesos.addProcess.title' | transloco }}</h3>
@@ -1125,25 +1153,6 @@
       </div>
 
       <div class="p-6 sm:p-8 overflow-y-auto flex-1">
-        <!-- Error Alert -->
-        @if (error()) {
-        <div class="alert alert-error mb-6 rounded-xl border-none shadow-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none"
-            viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span class="text-sm font-semibold">
-            @if (error()!.includes('.')) {
-            {{ error() | transloco }}
-            } @else {
-            {{ error() }}
-            }
-          </span>
-        </div>
-        }
-
-        <!-- Recommendations -->
         <div class="alert add-process-recommendations bg-info/10 border-none rounded-2xl p-6 flex items-start gap-4 mb-8">
           <div class="add-process-recommendations__icon bg-info/20 p-3 rounded-xl text-info">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -1257,7 +1266,10 @@
         <form [formGroup]="addProcessForm" (ngSubmit)="onSubmitAddProcess()" class="space-y-6">
           <div class="form-control">
             <label class="label pb-1">
-              <span class="label-standard">{{ 'gestionProcesos.addProcess.processNumberLabel' | transloco }}</span>
+              <span class="label-standard">
+                {{ 'gestionProcesos.addProcess.processNumberLabel' | transloco }}
+                <span class="required-asterisk" aria-hidden="true">*</span>
+              </span>
             </label>
             <div class="relative">
               <input type="text" formControlName="process_number" class="input-standard input w-full"
@@ -1289,7 +1301,10 @@
           <!-- Role Selection -->
           <div class="space-y-4 pt-2">
             <label class="label pb-0">
-              <span class="label-standard uppercase tracking-widest text-[10px] font-black text-base-content/40">Seleccione su Rol</span>
+              <span class="label-standard uppercase tracking-widest text-[10px] font-black text-base-content/40">
+                Seleccione su Rol
+                <span class="required-asterisk" aria-hidden="true">*</span>
+              </span>
             </label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               @for (role of roles; track role.value) {
@@ -1593,8 +1608,9 @@
   <!-- Modal para completar datos de radicado no elegible -->
   <dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="isManualRegistrationDetailsOpen()">
     @if (isManualRegistrationDetailsOpen() && manualRegistrationDraft(); as draft) {
-      <div class="modal-box p-0 bg-transparent shadow-none border-none max-w-3xl">
+      <div class="modal-box p-0 bg-transparent shadow-none border-none max-w-3xl w-[calc(100%-1.5rem)] max-h-[min(92dvh,calc(100svh-1rem))] overflow-hidden flex flex-col">
         <app-manual-registration-details-modal
+          class="min-h-0 max-h-full"
           [draft]="draft"
           (closed)="closeManualRegistrationDetails()"
           (submitted)="onManualRegistrationSubmitted($event)">
