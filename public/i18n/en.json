@@ -192,6 +192,7 @@
     },
     "table": {
       "processNumber": "Process number",
+      "despacho": "Court",
       "action": "Action",
       "annotation": "Annotation",
       "actionDate": "Action date",
@@ -263,13 +264,17 @@
       "namePlaceholder": "Full name",
       "identificationPlaceholder": "ID (optional)",
       "add": "Add",
+      "addPlaintiff": "Plaintiff",
+      "addDefendant": "Defendant",
+      "addOther": "Other",
       "remove": "Remove",
       "cancel": "Cancel",
       "submit": "Send for review",
       "submitting": "Sending...",
       "errors": {
-        "plaintiffsMin": "Add at least one plaintiff with a name.",
-        "defendantsMin": "Add at least one defendant with a name.",
+        "nameRequired": "Name is required",
+        "plaintiffsMin": "You must add at least one plaintiff.",
+        "defendantsMin": "You must add at least one defendant.",
         "processClass": "Process class is required",
         "role": "Role is required",
         "generic": "Could not send the request. Please try again."

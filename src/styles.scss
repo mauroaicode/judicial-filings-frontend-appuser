@@ -276,6 +276,15 @@ app-gestion-procesos .process-list-table tbody tr.process-row-hovered td {
   line-height: 1.4 !important;
 }
 
+/* Asterisco de campos obligatorios — siempre rojo en light y dark */
+.required-asterisk {
+  color: #ef4444 !important;
+  -webkit-text-fill-color: #ef4444;
+  font-weight: 800 !important;
+  margin-left: 0.15rem;
+  line-height: 1;
+}
+
 .label-standard.task-process-label {
   display: inline-flex !important;
   align-items: center !important;
@@ -558,6 +567,17 @@ app-process-tasks-drawer .task-tab--active .badge {
   }
   app-process-timeline-speaker-change .speaker-transition__arrow {
     color: #d8c3f7 !important;
+  }
+
+  /* Asterisco de campos obligatorios — rojo más claro en dark */
+  .required-asterisk,
+  app-manual-registration-details-modal .required-asterisk,
+  app-gestion-procesos .required-asterisk,
+  app-task-form-modal .required-asterisk,
+  app-tasks .required-asterisk,
+  app-keywords .required-asterisk {
+    color: #f87171 !important;
+    -webkit-text-fill-color: #f87171;
   }
 
   /* Flatpickr calendar */

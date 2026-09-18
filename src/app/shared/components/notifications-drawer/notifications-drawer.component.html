@@ -161,6 +161,14 @@
                             </svg>
                           </button>
                         </div>
+                        @if (isActuacionOrAlerta() && row.despacho) {
+                          <span class="text-[9px] text-base-content/40 uppercase font-bold tracking-widest block mb-0.5 mt-2">
+                            {{ 'notificationsDrawer.table.despacho' | transloco }}
+                          </span>
+                          <span class="text-xs text-base-content/80 font-medium leading-snug block">
+                            {{ row.despacho }}
+                          </span>
+                        }
                       </div>
                     </div>
 
