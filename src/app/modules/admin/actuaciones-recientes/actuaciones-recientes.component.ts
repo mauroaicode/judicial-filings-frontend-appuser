@@ -376,7 +376,7 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     this.digestDetailPagination.set(null);
     this.mobileDigestSummaryExpanded.set(false);
     this._historyService
-      .getDigestDetails(digestId, page, perPage)
+      .getDigestDetails(digestId, page, perPage, this._currentFilters)
       .pipe(finalize(() => this.isLoadingDetails.set(false)))
       .subscribe({
         next: (response: any) => {
