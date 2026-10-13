@@ -4,7 +4,7 @@
 export interface NotificationData {
     title: string;
     description: string;
-    type: string; // e.g., 'import-report', 'task-urgency'
+    type: string; // e.g., 'import-report', 'task-urgency', 'action-documents'
     id?: string;
     task_id?: string;
     task_title?: string;
@@ -15,6 +15,12 @@ export interface NotificationData {
     urgency_label?: string;
     digest_id?: string;
     status?: string;
+    /** Optional: deep-link into process documents accordion / viewer */
+    action_id?: string;
+    media_id?: number | string;
+    /** Filename of the notified document (useful for viewer title before history loads) */
+    original_filename?: string;
+    filename?: string;
 }
 
 /**

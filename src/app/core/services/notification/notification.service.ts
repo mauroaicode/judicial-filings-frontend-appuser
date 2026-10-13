@@ -105,18 +105,24 @@ export class NotificationService {
         console.log('--- [DEBUG] NEW NOTIFICATION RECEIVED ---');
         console.log('Full Payload Structure:', JSON.stringify(payload, null, 2));
 
-        // Attempt to extract business type from all possible locations in the payload
-        const businessType = payload.type || payload.data?.type || payload.notification_type || payload.data?.notification_type;
+        // Prefer semantic type in data (e.g. action-documents) over broadcast class name
+        const broadcastType = payload.type || payload.notification_type;
+        const semanticType =
+            payload.data?.type ||
+            payload.data?.notification_type ||
+            payload.notification_type;
+        const businessType = semanticType || broadcastType;
         const status = payload.status || payload.data?.status;
 
         console.log('--- [DEBUG] EXTRACTED VALUES ---');
         console.log('Business Type:', businessType);
+        console.log('Broadcast Type:', broadcastType);
         console.log('Status:', status);
         console.log('-----------------------------------------');
 
         const newNotification: AppNotification = {
             id: payload.id || payload.data?.id,
-            type: businessType || 'BroadcastNotificationCreated',
+            type: broadcastType || businessType || 'BroadcastNotificationCreated',
             notifiable_type: '',
             notifiable_id: '',
             data: {
@@ -124,7 +130,19 @@ export class NotificationService {
                 description: payload.description || payload.data?.description,
                 type: businessType,
                 id: payload.id_resource || payload.id || payload.data?.id,
-                status: status
+                status: status,
+                process_id: payload.process_id || payload.data?.process_id,
+                process_number: payload.process_number || payload.data?.process_number,
+                action_id: payload.action_id || payload.data?.action_id,
+                media_id: payload.media_id ?? payload.data?.media_id,
+                original_filename:
+                  payload.original_filename ||
+                  payload.data?.original_filename ||
+                  payload.filename ||
+                  payload.data?.filename,
+                filename: payload.filename || payload.data?.filename,
+                task_id: payload.task_id || payload.data?.task_id,
+                digest_id: payload.digest_id || payload.data?.digest_id,
             },
             read_at: null,
             created_at: new Date().toISOString(),
@@ -148,10 +166,18 @@ export class NotificationService {
             'new-action',
             'alert-keyword',
             'actuacion_alerta',
-            'actuacion'
+            'actuacion',
+            'actuacion_documento',
+            'action-documents',
+            'action_documents',
+            'new-documents',
+            'new_documents',
+            'ActionDocumentsAvailable',
         ];
 
-        const shouldRefresh = typesToRefresh.includes(businessType);
+        const shouldRefresh =
+            typesToRefresh.includes(businessType) ||
+            typesToRefresh.includes(broadcastType);
         console.log(`[DEBUG] Result: shouldRefresh = ${shouldRefresh}`);
 
         if (shouldRefresh) {
