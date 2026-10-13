@@ -298,6 +298,59 @@ export interface AlertHighlight {
 }
 
 /**
+ * Attached PDF on a process action (media ACL + org can_view_action_documents).
+ * Empty array when the org cannot view or is not on the ACL.
+ */
+export interface ActionDocument {
+  id: number;
+  original_filename: string;
+  size_bytes: number;
+  mime_type: string;
+}
+
+/**
+ * Document in process-wide history (GET /processes/:id/action-documents).
+ * Newest uploads first. Dates come pre-formatted from the API
+ * (action_date / created_at) — display as-is, do not re-parse as ISO.
+ */
+export interface ProcessActionDocument extends ActionDocument {
+  /** Localized datetime, e.g. "Lunes, 12 de Octubre de 2026 1:16pm" */
+  created_at?: string | null;
+  uploaded_at?: string | null;
+  action_id?: string | null;
+  action?: string | null;
+  /** Localized date, e.g. "Viernes, 9 de Octubre de 2026" */
+  action_date?: string | null;
+  annotation?: string | null;
+}
+
+export interface ProcessActionDocumentsFilter {
+  page?: number;
+  per_page?: number;
+}
+
+/**
+ * Paginated process document history (Laravel-style or { data, meta }).
+ */
+export interface ProcessActionDocumentsResponse {
+  data: ProcessActionDocument[];
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
+  from?: number | null;
+  to?: number | null;
+  meta?: {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+    from?: number | null;
+    to?: number | null;
+  };
+}
+
+/**
  * Action - Process action/actuación
  */
 export interface Action {
@@ -319,6 +372,8 @@ export interface Action {
   notified_action_id?: string | null;
   fijacion_action_id?: string | null;
   related_action?: Action | null;
+  /** PDFs visible to the current org; omit/empty → no document CTA */
+  documents?: ActionDocument[] | null;
 }
 
 /**

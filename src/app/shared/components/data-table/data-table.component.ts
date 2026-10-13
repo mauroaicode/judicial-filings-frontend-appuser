@@ -52,6 +52,8 @@ export class DataTableComponent {
   public pagination = input<PaginationInfo | null>(null);
   public loading = input<boolean>(false);
   public emptyMessage = input<string>('No hay datos disponibles');
+  /** When set, the row whose `id` matches gets a highlight class */
+  public highlightRowId = input<string | null>(null);
 
   // Outputs
   public pageChange = output<{ page: number; perPage: number }>();

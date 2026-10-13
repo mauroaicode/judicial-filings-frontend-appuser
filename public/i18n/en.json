@@ -655,6 +655,17 @@
         "transition": "Speaker change"
       }
     },
+    "documentsHistory": {
+      "title": "Document history",
+      "subtitle": "Newest documents first. Each card shows the related court action.",
+      "empty": "No documents available for this process.",
+      "loadError": "Could not load the document history. If you arrived from a notification or email, confirm the URL includes section=documents and mediaId.",
+      "actionLabel": "Action",
+      "actionUnknown": "Action not specified",
+      "actionDate": "Action date: {{date}}",
+      "uploadedAt": "Uploaded: {{date}}",
+      "loadMore": "Load more documents"
+    },
     "actions": {
       "title": "Actions",
       "empty": "No actions available",
@@ -678,7 +689,21 @@
         "termEndDate": "Term end date",
         "actionDate": "Action date",
         "registrationDate": "Registration date",
-        "court": "Court"
+        "court": "Court",
+        "documents": "Document"
+      },
+      "documents": {
+        "openList": "View documents",
+        "view": "View",
+        "count": "{{count}} documents",
+        "modalTitle": "Action documents",
+        "viewerTitle": "Document viewer",
+        "backToList": "Back to documents",
+        "download": "Download",
+        "empty": "No documents available for this action.",
+        "notFound": "Document unavailable or you do not have permission to view it.",
+        "noOrganization": "Your user does not have an organization assigned.",
+        "downloadError": "Could not open the document. Please try again."
       }
     },
     "error": {

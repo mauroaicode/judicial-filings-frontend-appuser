@@ -126,6 +126,12 @@ export class NotificationBellComponent implements OnInit {
         'task_reminder': (item) => this._resolveTaskNavigation(item),
         'task-urgency': (item) => this._resolveTaskNavigation(item),
         'task': (item) => this._resolveTaskNavigation(item),
+        'action-documents': (item) => this._resolveDocumentsNavigation(item),
+        'action_documents': (item) => this._resolveDocumentsNavigation(item),
+        'actuacion_documento': (item) => this._resolveDocumentsNavigation(item),
+        'new-documents': (item) => this._resolveDocumentsNavigation(item),
+        'new_documents': (item) => this._resolveDocumentsNavigation(item),
+        'ActionDocumentsAvailable': (item) => this._resolveDocumentsNavigation(item),
       };
 
       const resolver = notificationType ? routeResolvers[notificationType] : null;
@@ -137,7 +143,51 @@ export class NotificationBellComponent implements OnInit {
         return this._resolveTaskNavigation(notification);
       }
 
+      // Document upload payloads may only carry media_id + process_id
+      if (notification.data?.process_id && notification.data?.media_id != null) {
+        return this._resolveDocumentsNavigation(notification);
+      }
+
+      if (notification.data?.process_id) {
+        return this._resolveProcessNavigation(notification);
+      }
+
       return null;
+    }
+
+    private _resolveDocumentsNavigation(
+      notification: AppNotification
+    ): { commands: string[]; queryParams?: Record<string, string> } | null {
+      const processId = notification.data?.process_id;
+      if (!processId) return null;
+
+      const queryParams: Record<string, string> = { section: 'documents' };
+      const actionId = notification.data?.action_id;
+      if (actionId) {
+        queryParams['actionId'] = actionId;
+      }
+      const mediaId = notification.data?.media_id;
+      if (mediaId != null && String(mediaId).trim() !== '') {
+        queryParams['mediaId'] = String(mediaId);
+      }
+      const filename =
+        notification.data?.original_filename || notification.data?.filename;
+      if (filename) {
+        queryParams['filename'] = filename;
+      }
+
+      return {
+        commands: ['/gestion-procesos', processId],
+        queryParams,
+      };
+    }
+
+    private _resolveProcessNavigation(
+      notification: AppNotification
+    ): { commands: string[]; queryParams?: Record<string, string> } | null {
+      const processId = notification.data?.process_id;
+      if (!processId) return null;
+      return { commands: ['/gestion-procesos', processId] };
     }
 
     private _resolveTaskNavigation(

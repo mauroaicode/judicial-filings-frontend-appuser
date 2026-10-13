@@ -672,6 +672,17 @@
         "transition": "Cambio de ponente"
       }
     },
+    "documentsHistory": {
+      "title": "Historial de documentos",
+      "subtitle": "Documentos más recientes primero. Cada tarjeta indica la actuación a la que pertenece.",
+      "empty": "No hay documentos disponibles para este proceso.",
+      "loadError": "No se pudo cargar el historial de documentos. Si llegaste desde notificación o correo, confirma que la URL incluye section=documents y mediaId.",
+      "actionLabel": "Actuación",
+      "actionUnknown": "Actuación no indicada",
+      "actionDate": "Fecha actuación: {{date}}",
+      "uploadedAt": "Subido: {{date}}",
+      "loadMore": "Ver más documentos"
+    },
     "actions": {
       "title": "Actuaciones",
       "empty": "No hay actuaciones disponibles",
@@ -695,7 +706,21 @@
         "termEndDate": "Fecha finaliza término",
         "actionDate": "Fecha de actuación",
         "registrationDate": "Fecha de registro",
-        "court": "Despacho"
+        "court": "Despacho",
+        "documents": "Documento"
+      },
+      "documents": {
+        "openList": "Ver documentos",
+        "view": "Ver",
+        "count": "{{count}} documentos",
+        "modalTitle": "Documentos de la actuación",
+        "viewerTitle": "Visor de documento",
+        "backToList": "Volver a documentos",
+        "download": "Descargar",
+        "empty": "No hay documentos disponibles para esta actuación.",
+        "notFound": "Documento no disponible o sin permiso para verlo.",
+        "noOrganization": "Tu usuario no tiene una organización asignada.",
+        "downloadError": "No se pudo abrir el documento. Intenta de nuevo."
       }
     },
     "error": {

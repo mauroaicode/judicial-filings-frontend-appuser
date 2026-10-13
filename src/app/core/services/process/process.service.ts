@@ -19,6 +19,8 @@ import {
   ManualRegistrationRequestsResponse,
   CreateManualRegistrationRequestPayload,
   CreateManualRegistrationRequestResponse,
+  ProcessActionDocumentsFilter,
+  ProcessActionDocumentsResponse,
 } from '@app/core/models/process/process.model';
 import { TaskPagination, TaskStatus, TaskType } from '@app/core/models/tasks/task.model';
 
@@ -292,6 +294,36 @@ export class ProcessService {
 
     const url = `${environment.apiBaseUrl}/processes/${id}/actions`;
     return this._http.get<ActionResponse>(url, { params });
+  }
+
+  /**
+   * Download / stream an action document (PDF) by media id.
+   * Auth required; 404 when missing or org not allowed.
+   *
+   * @param mediaId - Media id from ActionDocument.id
+   */
+  downloadMedia(mediaId: number): Observable<Blob> {
+    const url = `${environment.apiBaseUrl}/media/${mediaId}/download`;
+    return this._http.get(url, { responseType: 'blob' });
+  }
+
+  /**
+   * List documents attached to process actions (newest first).
+   * GET /processes/{id}/action-documents
+   */
+  getProcessActionDocuments(
+    processId: string,
+    filters: ProcessActionDocumentsFilter = {}
+  ): Observable<ProcessActionDocumentsResponse> {
+    let params = new HttpParams();
+    if (filters.page) {
+      params = params.set('page', filters.page.toString());
+    }
+    if (filters.per_page) {
+      params = params.set('per_page', filters.per_page.toString());
+    }
+    const url = `${environment.apiBaseUrl}/processes/${processId}/action-documents`;
+    return this._http.get<ProcessActionDocumentsResponse>(url, { params });
   }
 
   /**

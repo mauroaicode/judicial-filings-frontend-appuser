@@ -31,7 +31,8 @@
     <!-- Table Body -->
     <tbody>
       @for (row of data(); track row.id) {
-      <tr class="cursor-pointer group" (click)="onRowClick(row)" (dblclick)="onRowDblClick(row)">
+      <tr class="cursor-pointer group" [class.data-table-row--highlighted]="highlightRowId() === row.id"
+        [attr.data-row-id]="row.id" (click)="onRowClick(row)" (dblclick)="onRowDblClick(row)">
         @for (column of columns(); track column.key) {
         <td [class.text-left]="!column.align || column.align === 'left'" [class.text-center]="column.align === 'center'"
           [class.text-right]="column.align === 'right'" [class.sticky-cell]="column.key === 'process_number'"

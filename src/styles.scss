@@ -912,9 +912,16 @@ app-process-tasks-drawer .task-tab--active .badge {
     }
 
     .action-data-container .table tbody td,
-    .action-data-container .table tbody td *:not(.badge):not([class*='badge-']) {
+    .action-data-container .table tbody td *:not(.badge):not([class*='badge-']):not(.action-doc-btn):not(.action-doc-btn *) {
       color: #f8f5ff !important;
       -webkit-text-fill-color: #f8f5ff;
+    }
+
+    .action-data-container .action-doc-btn,
+    .action-data-container .action-doc-btn span,
+    .action-data-container .action-doc-btn svg {
+      color: #d8c3f7 !important;
+      -webkit-text-fill-color: #d8c3f7;
     }
 
     .pagination-container,

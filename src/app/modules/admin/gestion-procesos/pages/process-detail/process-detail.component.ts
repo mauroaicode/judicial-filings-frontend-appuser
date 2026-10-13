@@ -9,7 +9,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { AuthenticatedLayoutComponent } from '@app/layout/layouts/authenticated/authenticated.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -21,10 +21,13 @@ import {
   ProcessDetailInstance,
   Subject,
   Action,
+  ActionDocument,
   ActionFilter,
+  ActionResponse,
   ActionResponseMeta,
   AlertKeyword,
   AlertKeywordStat,
+  ProcessActionDocument,
   TrashProcessesResponse,
 } from '@app/core/models/process/process.model';
 import { buildTextWithHighlights } from '@app/core/utils/alert-highlight.utils';
@@ -37,10 +40,12 @@ import { ProcessAiChatComponent } from '../../components/process-ai-chat/process
 import { ProcessTasksDrawerComponent } from '../../components/process-tasks-drawer/process-tasks-drawer.component';
 import { ProcessTimelineComponent } from '../../components/process-timeline/process-timeline.component';
 import { ProcessManualSyncBadgeComponent } from '@app/shared/components/process-manual-sync-badge/process-manual-sync-badge.component';
+import { ActionDocumentsViewerComponent } from '@app/shared/components/action-documents-viewer/action-documents-viewer.component';
 import { AiCoreService } from '@app/core/services/ai-chat/ai-core.service';
 import { PageHeaderContextService } from '@app/core/services/layout/page-header-context.service';
 import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
 import { ProcessQuotaService } from '@app/core/services/process/process-quota.service';
+import { NotificationService } from '@app/core/services/notification/notification.service';
 import { getSemaphorePauseMessage, isSemaphorePaused } from '@app/core/utils/process-semaphore.util';
 
 const DETAIL_HEADER_SCROLL_THRESHOLD = 80;
@@ -62,6 +67,7 @@ const DETAIL_HEADER_SCROLL_THRESHOLD = 80;
     ProcessTasksDrawerComponent,
     ProcessTimelineComponent,
     ProcessManualSyncBadgeComponent,
+    ActionDocumentsViewerComponent,
   ],
   templateUrl: './process-detail.component.html',
   styleUrls: ['./process-detail.component.scss'],
@@ -79,6 +85,7 @@ export class ProcessDetailComponent {
   private _headerContext = inject(PageHeaderContextService);
   private _processRefresh = inject(ProcessRefreshService);
   private _quotaService = inject(ProcessQuotaService);
+  private _notificationService = inject(NotificationService);
   private _transloco = inject(TranslocoService);
 
   // AI Permission State
@@ -132,6 +139,25 @@ export class ProcessDetailComponent {
   public toastType = signal<'success' | 'error'>('success');
   public toastMessage = signal<string>('');
 
+  /** Row id highlighted from ?actionId= deep link */
+  public highlightedActionId = signal<string | null>(null);
+  /** Media id highlighted from ?mediaId= (notification / email deep link) */
+  public highlightedMediaId = signal<number | null>(null);
+  /** Modal listado + visor de documentos de una actuación */
+  public showActionDocumentsModal = signal(false);
+  public actionDocumentsModalDocs = signal<ActionDocument[]>([]);
+  public actionDocumentsModalLabel = signal<string | null>(null);
+  public actionDocumentsAutoOpenFirst = signal(false);
+
+  /** Historial de documentos del proceso (acordeón) */
+  public processDocuments = signal<ProcessActionDocument[]>([]);
+  public loadingProcessDocuments = signal(false);
+  public processDocumentsError = signal<string | null>(null);
+  public processDocumentsPage = signal(1);
+  public processDocumentsLastPage = signal(1);
+  public processDocumentsTotal = signal(0);
+  public loadingMoreProcessDocuments = signal(false);
+
   /** Modal de asignación de rol */
   public showRoleModal = signal<boolean>(false);
 
@@ -157,6 +183,18 @@ export class ProcessDetailComponent {
 
   // Table columns for actions - will be initialized in constructor
   public actionColumns: DataTableColumn[] = [];
+
+  /** Pending deep-link action id from ?actionId= */
+  private _pendingActionId: string | null = null;
+  private _pendingSection: string | null = null;
+  private _pendingMediaId: number | null = null;
+  private _pendingFilename: string | null = null;
+  private _pendingMediaOpened = false;
+  /** Last query deep-link key already handled (avoids re-scan on queryParam re-emits) */
+  private _handledQueryKey: string | null = null;
+  private _actionDeepLinkSearchDepth = 0;
+  private static readonly _MAX_ACTION_DEEP_LINK_PAGES = 50;
+  private static readonly _PROCESS_DOCS_PER_PAGE = 12;
 
   constructor() {
     // Store reference to formatDate method for use in render functions
@@ -258,6 +296,14 @@ export class ProcessDetailComponent {
         align: 'center',
         render: formatDateFn,
       },
+      {
+        key: 'documents',
+        label: 'processDetail.actions.table.documents',
+        width: '140px',
+        align: 'center',
+        html: true,
+        render: (_value: unknown, row: Action) => this.renderActionDocumentsCell(row),
+      },
     ];
 
     this._route.paramMap
@@ -265,10 +311,37 @@ export class ProcessDetailComponent {
       .subscribe((params) => {
         this._headerContext.setCompactVisible(false);
         const id = params.get('id');
+        this.highlightedActionId.set(null);
+        this.highlightedMediaId.set(null);
+        this._handledQueryKey = null;
+        this._pendingMediaOpened = false;
+        this.captureDeepLinkFromQuery(this._route.snapshot.queryParamMap);
+        this._actionDeepLinkSearchDepth = 0;
+        this.resetProcessDocumentsState();
         this.loadProcessDetail(id);
-        queueMicrotask(() => {
-          document.querySelector<HTMLElement>('.process-detail-scroll')?.scrollTo(0, 0);
-        });
+        // Avoid fighting deep-link scroll to documents section
+        if (this._pendingSection !== 'documents' && this._pendingMediaId == null) {
+          queueMicrotask(() => {
+            document.querySelector<HTMLElement>('.process-detail-scroll')?.scrollTo(0, 0);
+          });
+        }
+      });
+
+    this._route.queryParamMap
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((params) => {
+        const key = this.buildDeepLinkKey(params);
+        if (key === this._handledQueryKey) {
+          return;
+        }
+        this._handledQueryKey = key;
+        this._pendingMediaOpened = false;
+        this.captureDeepLinkFromQuery(params);
+        this.highlightedActionId.set(null);
+        this.highlightedMediaId.set(this._pendingMediaId);
+        if (this.process()) {
+          this.applyDeepLink();
+        }
       });
 
     this._processRefresh.refreshed$
@@ -279,16 +352,27 @@ export class ProcessDetailComponent {
         }
       });
 
+    // New actuaciones / action-documents via WebSocket → reload history + actions
+    this._notificationService.refreshProcesses$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => {
+        if (!this.process()) return;
+        this.loadActions();
+        this.loadProcessDocuments(1);
+      });
+
     // Validar estado de IA para la organización
     this._aiCoreService.checkAiStatus().subscribe();
 
-    // Load alert keywords, stats and actions when process is loaded
+    // Load alert keywords, stats, actions and document history when process is loaded
     effect(() => {
       const process = this.process();
       if (process) {
         this.loadAlertKeywords(process.id);
         this.loadAlertKeywordStats(process.id);
         this.loadActions();
+        this.loadProcessDocuments(1);
+        queueMicrotask(() => this.applyDeepLink());
       }
     });
 
@@ -625,6 +709,7 @@ export class ProcessDetailComponent {
           to: Math.min(response.to, response.total - groupedIds.size),
         });
         this.loadingActions.set(false);
+        this.tryFocusPendingAction(response);
       },
       error: (error) => {
         console.error('Error loading actions:', error);
@@ -632,6 +717,375 @@ export class ProcessDetailComponent {
         this.actionsPagination.set(null);
         this.loadingActions.set(false);
       },
+    });
+  }
+
+  /**
+   * Documents visible for a row (own + related auto when grouped).
+   */
+  public getActionDocuments(action: Action): ActionDocument[] {
+    const own = action.documents ?? [];
+    const related = action.related_action?.documents ?? [];
+    if (!related.length) return own;
+    const seen = new Set(own.map((d) => d.id));
+    return [...own, ...related.filter((d) => !seen.has(d.id))];
+  }
+
+  public hasActionDocuments(action: Action): boolean {
+    return this.getActionDocuments(action).length > 0;
+  }
+
+  /**
+   * Event delegation for "Ver documentos" buttons rendered inside data-table HTML cells.
+   */
+  public onActionDocumentsClick(event: MouseEvent): void {
+    const target = (event.target as HTMLElement | null)?.closest(
+      '[data-open-action-docs]'
+    ) as HTMLElement | null;
+    if (!target) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const actionId = target.dataset['openActionDocs'];
+    if (!actionId) return;
+    const action = this.actions().find((a) => a.id === actionId);
+    if (action) {
+      this.openActionDocumentsModal(action);
+    }
+  }
+
+  public openActionDocumentsModal(action: Action): void {
+    const docs = this.getActionDocuments(action);
+    if (!docs.length) return;
+    this.actionDocumentsModalDocs.set(docs);
+    this.actionDocumentsModalLabel.set(action.action ?? null);
+    this.actionDocumentsAutoOpenFirst.set(docs.length === 1);
+    this.showActionDocumentsModal.set(true);
+  }
+
+  public closeActionDocumentsModal(): void {
+    this.showActionDocumentsModal.set(false);
+    this.actionDocumentsModalDocs.set([]);
+    this.actionDocumentsModalLabel.set(null);
+    this.actionDocumentsAutoOpenFirst.set(false);
+  }
+
+  public onActionDocumentsViewerError(message: string): void {
+    this.showToast('error', message);
+  }
+
+  public openProcessDocument(doc: ProcessActionDocument): void {
+    this.actionDocumentsModalDocs.set([
+      {
+        id: doc.id,
+        original_filename: doc.original_filename,
+        size_bytes: doc.size_bytes,
+        mime_type: doc.mime_type,
+      },
+    ]);
+    this.actionDocumentsModalLabel.set(doc.action ?? null);
+    this.actionDocumentsAutoOpenFirst.set(true);
+    this.showActionDocumentsModal.set(true);
+  }
+
+  public loadProcessDocuments(page: number = 1): void {
+    const process = this.process();
+    if (!process) return;
+
+    const isFirstPage = page <= 1;
+    if (isFirstPage) {
+      this.loadingProcessDocuments.set(true);
+      this.processDocumentsError.set(null);
+    } else {
+      this.loadingMoreProcessDocuments.set(true);
+    }
+
+    this._processService
+      .getProcessActionDocuments(process.id, {
+        page,
+        per_page: ProcessDetailComponent._PROCESS_DOCS_PER_PAGE,
+      })
+      .subscribe({
+        next: (response) => {
+          const rows = response.data ?? [];
+          const meta = response.meta;
+          const currentPage = meta?.current_page ?? response.current_page ?? page;
+          const lastPage = meta?.last_page ?? response.last_page ?? 1;
+          const total = meta?.total ?? response.total ?? rows.length;
+
+          this.processDocuments.set(isFirstPage ? rows : [...this.processDocuments(), ...rows]);
+          this.processDocumentsPage.set(currentPage);
+          this.processDocumentsLastPage.set(lastPage);
+          this.processDocumentsTotal.set(total);
+          this.loadingProcessDocuments.set(false);
+          this.loadingMoreProcessDocuments.set(false);
+
+          if (this._pendingMediaId != null || this.highlightedMediaId() != null) {
+            this.tryOpenPendingMedia();
+            // History cards are in the DOM now — re-open accordion and scroll to the file
+            if (this._pendingSection === 'documents' || this.highlightedMediaId() != null) {
+              this.openDocumentsAccordion(true);
+            }
+          }
+        },
+        error: () => {
+          this.loadingProcessDocuments.set(false);
+          this.loadingMoreProcessDocuments.set(false);
+          if (isFirstPage) {
+            this.processDocuments.set([]);
+            this.processDocumentsTotal.set(0);
+          }
+          this.processDocumentsError.set(
+            this._transloco.translate('processDetail.documentsHistory.loadError')
+          );
+        },
+      });
+  }
+
+  public loadMoreProcessDocuments(): void {
+    if (
+      this.loadingMoreProcessDocuments() ||
+      this.loadingProcessDocuments() ||
+      this.processDocumentsPage() >= this.processDocumentsLastPage()
+    ) {
+      return;
+    }
+    this.loadProcessDocuments(this.processDocumentsPage() + 1);
+  }
+
+  public hasMoreProcessDocuments(): boolean {
+    return this.processDocumentsPage() < this.processDocumentsLastPage();
+  }
+
+  /** Backend already localizes created_at (formatDateTimeWithDayOfWeek). */
+  public documentUploadedAt(doc: ProcessActionDocument): string {
+    return (doc.uploaded_at || doc.created_at || '').trim();
+  }
+
+  /** Backend already localizes action_date (formatDateWithDayOfWeek). */
+  public documentActionDate(doc: ProcessActionDocument): string {
+    return (doc.action_date || '').trim();
+  }
+
+  public formatDocumentSize(bytes: number | null | undefined): string {
+    if (bytes == null || !Number.isFinite(bytes) || bytes < 0) return '';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  private resetProcessDocumentsState(): void {
+    this.processDocuments.set([]);
+    this.processDocumentsError.set(null);
+    this.processDocumentsPage.set(1);
+    this.processDocumentsLastPage.set(1);
+    this.processDocumentsTotal.set(0);
+    this.loadingProcessDocuments.set(false);
+    this.loadingMoreProcessDocuments.set(false);
+  }
+
+  private buildDeepLinkKey(params: ParamMap): string {
+    return [
+      params.get('actionId') ?? '',
+      params.get('section') ?? '',
+      params.get('mediaId') ?? '',
+      params.get('filename') ?? '',
+    ].join('|');
+  }
+
+  private captureDeepLinkFromQuery(params: ParamMap): void {
+    this._pendingActionId = params.get('actionId');
+    this._pendingSection = params.get('section');
+    const mediaRaw = params.get('mediaId');
+    const mediaId = mediaRaw != null ? Number(mediaRaw) : NaN;
+    this._pendingMediaId = Number.isFinite(mediaId) && mediaId > 0 ? mediaId : null;
+    this._pendingFilename = params.get('filename');
+    this.highlightedMediaId.set(this._pendingMediaId);
+    this._actionDeepLinkSearchDepth = 0;
+  }
+
+  private applyDeepLink(): void {
+    if (this._pendingSection === 'documents' || this._pendingMediaId != null) {
+      this.openDocumentsAccordion(true);
+      if (this._pendingMediaId != null) {
+        this.tryOpenPendingMedia();
+      }
+      // Prefer documents history for notification/email deep links; skip action modal
+      this._pendingActionId = null;
+      return;
+    }
+
+    if (this._pendingActionId && !this.loadingActions()) {
+      this.tryFocusPendingAction();
+    }
+  }
+
+  /**
+   * Open the documents accordion and scroll to section / highlighted card.
+   * Retries briefly because DaisyUI collapse + async history can race the first paint.
+   */
+  private openDocumentsAccordion(retry = false): void {
+    const openOnce = (): boolean => {
+      const input = document.getElementById(
+        'process-documents-accordion'
+      ) as HTMLInputElement | null;
+      if (!input) return false;
+      input.checked = true;
+      const mediaId = this.highlightedMediaId();
+      const target =
+        (mediaId != null
+          ? document.getElementById(`process-doc-card-${mediaId}`)
+          : null) || document.getElementById('process-documents-section');
+      target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return true;
+    };
+
+    queueMicrotask(() => {
+      const ok = openOnce();
+      if (!ok && retry) {
+        setTimeout(() => openOnce(), 150);
+        setTimeout(() => openOnce(), 400);
+      }
+    });
+  }
+
+  private tryOpenPendingMedia(): void {
+    const mediaId = this._pendingMediaId;
+    if (mediaId == null) {
+      // Still scroll/highlight if we already opened the viewer earlier
+      if (this.highlightedMediaId() != null) {
+        this.openDocumentsAccordion(true);
+      }
+      return;
+    }
+    if (this._pendingMediaOpened) return;
+
+    this.highlightedMediaId.set(mediaId);
+    this.openDocumentsAccordion(true);
+
+    const doc = this.processDocuments().find((d) => d.id === mediaId);
+    if (doc) {
+      this._pendingMediaOpened = true;
+      this._pendingMediaId = null;
+      this.openProcessDocument(doc);
+      return;
+    }
+
+    // Open viewer immediately from deep-link data (don't wait for history pages)
+    this._pendingMediaOpened = true;
+    this._pendingMediaId = null;
+    this.openProcessDocument({
+      id: mediaId,
+      original_filename: this._pendingFilename?.trim() || 'documento.pdf',
+      size_bytes: 0,
+      mime_type: 'application/pdf',
+      action_id: this._pendingActionId,
+    });
+  }
+
+  private renderActionDocumentsCell(row: Action): string {
+    const docs = this.getActionDocuments(row);
+    if (!docs.length) return '–';
+
+    const label = this._transloco.translate('processDetail.actions.documents.openList');
+    const countLabel =
+      docs.length > 1
+        ? this._transloco.translate('processDetail.actions.documents.count', {
+            count: docs.length,
+          })
+        : '';
+    const title = this.escapeHtmlAttr(
+      countLabel ? `${label} (${docs.length})` : label
+    );
+
+    return `<button type="button" class="action-doc-btn btn btn-ghost btn-xs gap-1 h-auto min-h-0 py-1 px-2 text-primary font-bold normal-case"
+      data-open-action-docs="${this.escapeHtmlAttr(row.id)}" title="${title}">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <span>${this.escapeHtmlAttr(label)}</span>
+      ${
+        docs.length > 1
+          ? `<span class="action-doc-btn__count badge badge-sm bg-primary text-white border-none font-bold">${docs.length}</span>`
+          : ''
+      }
+    </button>`;
+  }
+
+  private escapeHtmlAttr(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  /**
+   * Resolve ?actionId= against the loaded actions page (search further pages if needed).
+   */
+  private tryFocusPendingAction(response?: ActionResponse): void {
+    const actionId = this._pendingActionId;
+    if (!actionId) return;
+
+    const match = this.actions().find(
+      (a) => a.id === actionId || a.related_action?.id === actionId
+    );
+
+    if (match) {
+      this._pendingActionId = null;
+      this.highlightedActionId.set(match.id);
+      queueMicrotask(() => {
+        this.scrollToHighlightedAction();
+        if (this.hasActionDocuments(match)) {
+          this.openActionDocumentsModal(match);
+        }
+      });
+      return;
+    }
+
+    // Query-param change while a page is already loaded: restart scan from page 1
+    if (!response) {
+      this._actionDeepLinkSearchDepth = 0;
+      this.loadActions(1, this.actionsPagination()?.per_page || 10);
+      return;
+    }
+
+    if (
+      response.current_page < response.last_page &&
+      this._actionDeepLinkSearchDepth < ProcessDetailComponent._MAX_ACTION_DEEP_LINK_PAGES
+    ) {
+      this._actionDeepLinkSearchDepth += 1;
+      this.loadActions(response.current_page + 1, response.per_page);
+      return;
+    }
+
+    this._pendingActionId = null;
+    this.openActionsAccordion();
+  }
+
+  private openActionsAccordion(): void {
+    const input = document.getElementById(
+      'process-actions-accordion'
+    ) as HTMLInputElement | null;
+    if (input) {
+      input.checked = true;
+    }
+  }
+
+  private scrollToHighlightedAction(): void {
+    this.openActionsAccordion();
+    const section = document.getElementById('process-actions-section');
+    section?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    const rowId = this.highlightedActionId();
+    if (!rowId) return;
+
+    queueMicrotask(() => {
+      const row =
+        document.querySelector<HTMLElement>(`[data-row-id="${rowId}"]`) ||
+        document.getElementById(`action-card-${rowId}`);
+      row?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   }
 
