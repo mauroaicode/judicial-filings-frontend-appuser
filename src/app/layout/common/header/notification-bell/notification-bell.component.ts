@@ -122,6 +122,9 @@ export class NotificationBellComponent implements OnInit {
             queryParams: { import: importId },
           };
         },
+        // Radicado importado: data.id (o process_id) = UUID del proceso → /gestion-procesos/{id}
+        'process-imported': (item) => this._resolveProcessNavigation(item),
+        'process_imported': (item) => this._resolveProcessNavigation(item),
         'task-reminder': (item) => this._resolveTaskNavigation(item),
         'task_reminder': (item) => this._resolveTaskNavigation(item),
         'task-urgency': (item) => this._resolveTaskNavigation(item),
@@ -185,7 +188,8 @@ export class NotificationBellComponent implements OnInit {
     private _resolveProcessNavigation(
       notification: AppNotification
     ): { commands: string[]; queryParams?: Record<string, string> } | null {
-      const processId = notification.data?.process_id;
+      // process-imported envía el UUID del proceso en data.id; otros tipos usan process_id
+      const processId = notification.data?.process_id ?? notification.data?.id;
       if (!processId) return null;
       return { commands: ['/gestion-procesos', processId] };
     }
