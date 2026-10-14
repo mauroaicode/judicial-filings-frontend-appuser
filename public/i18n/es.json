@@ -425,7 +425,11 @@
       "showSummary": "Ver resumen",
       "hideSummary": "Ocultar resumen",
       "horizontalScrollHint": "Puede desplazarse horizontalmente en la tabla",
-      "horizontalScrollHintShort": "Desliza izquierda / derecha"
+      "horizontalScrollHintShort": "Desliza izquierda / derecha",
+      "downloadPdf": "Descargar PDF",
+      "downloadPdfTooltip": "Exportar consolidado en PDF",
+      "downloadPdfLoading": "Generando PDF…",
+      "downloadPdfError": "No se pudo generar el PDF del consolidado. Intenta de nuevo."
     },
     "actionDetail": {
       "title": "Detalle de actuación",

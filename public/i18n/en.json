@@ -408,7 +408,11 @@
       "showSummary": "Show summary",
       "hideSummary": "Hide summary",
       "horizontalScrollHint": "You can scroll horizontally in this table",
-      "horizontalScrollHintShort": "Swipe left / right"
+      "horizontalScrollHintShort": "Swipe left / right",
+      "downloadPdf": "Download PDF",
+      "downloadPdfTooltip": "Export digest as PDF",
+      "downloadPdfLoading": "Generating PDF…",
+      "downloadPdfError": "Could not generate the digest PDF. Please try again."
     },
     "actionDetail": {
       "title": "Action detail",
