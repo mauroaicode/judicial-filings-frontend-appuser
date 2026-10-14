@@ -185,10 +185,10 @@
             <!-- Row 3: Actions count -->
             <div>
               <p class="text-[9px] font-black uppercase tracking-widest text-base-content/30 mb-0.5">Actuaciones detectadas</p>
-              <p class="text-2xl font-black text-primary">{{ item.actions_count }}</p>
+              <p class="digest-actions-count text-2xl font-black text-base-content">{{ item.actions_count }}</p>
             </div>
 
-            <!-- Row 4: Notification channels -->
+            <!-- Row 4: Notification channels + PDF download -->
             <div class="flex items-center gap-2 pt-1">
               <span class="text-[9px] font-black uppercase tracking-widest text-base-content/30 mr-1">Notificado</span>
 
@@ -233,6 +233,24 @@
                   <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
                 </div>
               </div>
+
+              <button
+                type="button"
+                class="digest-pdf-btn digest-pdf-btn--icon ml-auto"
+                [attr.title]="'actuacionesRecientes.digest.downloadPdfTooltip' | transloco"
+                [attr.aria-label]="'actuacionesRecientes.digest.downloadPdf' | transloco"
+                [disabled]="downloadingPdfId() === item.id"
+                (click)="downloadDigestPdf(item, $event)">
+                @if (downloadingPdfId() === item.id) {
+                  <span class="loading loading-spinner loading-xs text-error"></span>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                    <path fill="color-mix(in srgb, var(--color-error) 35%, white)" d="M14 2v6h6l-6-6z"/>
+                    <text x="12" y="17.25" text-anchor="middle" fill="#fff" font-size="6" font-weight="800" font-family="ui-sans-serif, system-ui, sans-serif">PDF</text>
+                  </svg>
+                }
+              </button>
             </div>
 
           </div>
@@ -280,11 +298,31 @@
               }
             </div>
 
-            <button type="button" class="inline-flex btn btn-sm btn-circle btn-ghost bg-base-200/50 hover:bg-base-200" (click)="closeDigestModal()">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            <div class="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                class="digest-pdf-btn digest-pdf-btn--label"
+                [attr.title]="'actuacionesRecientes.digest.downloadPdfTooltip' | transloco"
+                [disabled]="downloadingPdfId() === selectedDigest()!.id"
+                (click)="downloadDigestPdf(selectedDigest()!, $event)">
+                @if (downloadingPdfId() === selectedDigest()!.id) {
+                  <span class="loading loading-spinner loading-xs"></span>
+                  <span>{{ 'actuacionesRecientes.digest.downloadPdfLoading' | transloco }}</span>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                    <path fill="color-mix(in srgb, var(--color-error) 35%, white)" d="M14 2v6h6l-6-6z"/>
+                    <text x="12" y="17.25" text-anchor="middle" fill="#fff" font-size="6" font-weight="800" font-family="ui-sans-serif, system-ui, sans-serif">PDF</text>
+                  </svg>
+                  <span>{{ 'actuacionesRecientes.digest.downloadPdf' | transloco }}</span>
+                }
+              </button>
+              <button type="button" class="inline-flex btn btn-sm btn-circle btn-ghost bg-base-200/50 hover:bg-base-200" (click)="closeDigestModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <div class="sm:hidden">
@@ -1039,13 +1077,22 @@
   </dialog>
 
   <!-- Global Toast -->
-  @if (copiedMessage()) {
+  @if (toastMessage()) {
     <div class="toast toast-end toast-bottom z-[10000] pointer-events-none">
-      <div class="alert alert-success shadow-lg">
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span>{{ copiedMessage() }}</span>
+      <div
+        class="alert shadow-lg"
+        [class.alert-success]="toastType() === 'success'"
+        [class.alert-error]="toastType() === 'error'">
+        @if (toastType() === 'success') {
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        } @else {
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        }
+        <span>{{ toastMessage() }}</span>
       </div>
     </div>
   }

@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { NotificationDigestHistoryService } from '@app/core/services/notification/notification-digest-history.service';
 import {
@@ -43,6 +43,7 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
   private _fb = inject(FormBuilder);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
+  private _transloco = inject(TranslocoService);
 
   /** Misma rejilla que gestión de procesos */
   public readonly digestPageSizeOptions = [10, 20, 25, 50, 100] as const;
@@ -68,7 +69,9 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
   public showLegendModal = signal<boolean>(false);
   public showActionDetailModal = signal<boolean>(false);
   public selectedActionDetail = signal<NotificationDigestDisplayRow | null>(null);
-  public copiedMessage = signal<string | null>(null);
+  public toastMessage = signal<string | null>(null);
+  public toastType = signal<'success' | 'error'>('success');
+  public downloadingPdfId = signal<string | null>(null);
   public mobileDigestSummaryExpanded = signal<boolean>(false);
   public hoveredRowId = signal<string | null>(null);
   public isRoleModalOpen = signal(false);
@@ -408,13 +411,97 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     if (!text) return;
     
     navigator.clipboard.writeText(text).then(() => {
-      this.copiedMessage.set('Copiado al portapapeles');
-      setTimeout(() => {
-        this.copiedMessage.set(null);
-      }, 2000);
+      this.showToast('success', 'Copiado al portapapeles');
     }).catch(err => {
       console.error('Could not copy text: ', err);
     });
+  }
+
+  /**
+   * Descarga el PDF del consolidado (backend DomPDF). No usa window.print().
+   */
+  public downloadDigestPdf(
+    item: Pick<NotificationDigestHistory, 'id' | 'date'>,
+    event?: Event
+  ): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    const id = item?.id?.trim();
+    if (!id || this.downloadingPdfId()) return;
+
+    this.downloadingPdfId.set(id);
+
+    this._historyService
+      .exportPdf(id)
+      .pipe(finalize(() => this.downloadingPdfId.set(null)))
+      .subscribe({
+        next: (response) => {
+          const blob = response.body;
+          if (!blob || blob.size === 0 || blob.type?.includes('application/json')) {
+            this.showToast(
+              'error',
+              this._transloco.translate('actuacionesRecientes.digest.downloadPdfError')
+            );
+            return;
+          }
+
+          const filename =
+            this.parseContentDispositionFilename(
+              response.headers.get('content-disposition')
+            ) || this.buildFallbackPdfFilename(item.date);
+
+          const objectUrl = URL.createObjectURL(blob);
+          const anchor = document.createElement('a');
+          anchor.href = objectUrl;
+          anchor.download = filename;
+          anchor.rel = 'noopener';
+          document.body.appendChild(anchor);
+          anchor.click();
+          anchor.remove();
+          URL.revokeObjectURL(objectUrl);
+        },
+        error: () => {
+          this.showToast(
+            'error',
+            this._transloco.translate('actuacionesRecientes.digest.downloadPdfError')
+          );
+        },
+      });
+  }
+
+  private showToast(type: 'success' | 'error', message: string, durationMs = 3000): void {
+    this.toastType.set(type);
+    this.toastMessage.set(message);
+    setTimeout(() => this.toastMessage.set(null), durationMs);
+  }
+
+  private parseContentDispositionFilename(header: string | null): string | null {
+    if (!header) return null;
+
+    const utf8Match = /filename\*=UTF-8''([^;]+)/i.exec(header);
+    if (utf8Match?.[1]) {
+      try {
+        return decodeURIComponent(utf8Match[1].trim().replace(/^["']|["']$/g, ''));
+      } catch {
+        return utf8Match[1].trim().replace(/^["']|["']$/g, '');
+      }
+    }
+
+    const plainMatch = /filename="?([^";]+)"?/i.exec(header);
+    return plainMatch?.[1]?.trim() || null;
+  }
+
+  private buildFallbackPdfFilename(date?: string | null): string {
+    const slug = (date || 'consolidado')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .toLowerCase();
+    return `consolidado-${slug || 'export'}.pdf`;
   }
 
   public goToProcessDetail(processId: string | null | undefined, event?: Event): void {

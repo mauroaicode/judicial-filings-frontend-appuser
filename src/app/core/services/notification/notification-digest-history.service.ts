@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@app/core/config/environment.config';
 import {
@@ -53,6 +53,18 @@ export class NotificationDigestHistoryService {
       .set('per_page', String(perPage));
     params = this.appendFilterParams(params, filters);
     return this._http.get<NotificationDigestDetailResponse>(url, { params });
+  }
+
+  /**
+   * Descarga el PDF del consolidado generado en backend (DomPDF).
+   * GET /api/admin/notification-digests/{id}/export-pdf
+   */
+  public exportPdf(id: string): Observable<HttpResponse<Blob>> {
+    const url = `${environment.apiBaseUrl}/notification-digests/${id}/export-pdf`;
+    return this._http.get(url, {
+      responseType: 'blob',
+      observe: 'response',
+    });
   }
 
   private appendFilterParams(

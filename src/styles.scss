@@ -748,6 +748,12 @@ app-process-tasks-drawer .task-tab--active .badge {
     -webkit-text-fill-color: #ffffff;
   }
 
+  /* Tarjetas de consolidado — actuaciones detectadas en blanco */
+  app-actuaciones-recientes .digest-actions-count {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff;
+  }
+
   /* Tooltips de ayuda de filtros por encima del sidebar */
   app-actuaciones-recientes .filter-help-tooltip {
     z-index: 80;
