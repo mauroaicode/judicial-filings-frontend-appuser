@@ -62,14 +62,15 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     constructor() {
         effect(() => {
             const user = this._authService.user();
-            console.log('User effect triggered, user:', user?.id || 'null');
             if (user) {
-                this._websocketService.refreshConnection();
+                this._websocketService.connect();
                 this._subscribeToChannels(user);
                 this._loadInitialData();
             } else {
                 this._unsubscribeFromChannels();
-                this._websocketService.disconnect();
+                if (!this._authService.accessToken) {
+                    this._websocketService.disconnect();
+                }
             }
         });
     }

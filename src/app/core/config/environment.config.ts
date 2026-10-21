@@ -35,7 +35,7 @@ export const environment = {
     appKey: import.meta.env.NG_APP_REVERB_APP_KEY || '',
     appSecret: import.meta.env.NG_APP_REVERB_APP_SECRET || '',
     host: import.meta.env.NG_APP_REVERB_HOST || '127.0.0.1',
-    port: import.meta.env.NG_APP_REVERB_PORT || 8080,
+    port: import.meta.env.NG_APP_REVERB_PORT || 8081,
     scheme: import.meta.env.NG_APP_REVERB_SCHEME || 'http',
   },
   voice: {

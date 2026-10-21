@@ -9,6 +9,7 @@ import { routes } from './app.routes';
 import { AVAILABLE_LANGUAGES } from './core/transloco/languages.constants';
 import { TranslocoHttpLoader } from './core/transloco/transloco.http-loader';
 import { ThemeService } from './core/services/theme/theme.service';
+import { WebsocketService } from './core/services/websocket/websocket.service';
 import { authInterceptor } from './core/interceptors/auth/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
@@ -31,6 +32,10 @@ export const appConfig: ApplicationConfig = {
         prodMode: !isDevMode(),
       },
       loader: TranslocoHttpLoader,
+    }),
+    provideAppInitializer(() => {
+      // Stored sessions join presence before the first paint.
+      inject(WebsocketService);
     }),
     provideAppInitializer(() => {
       const translocoService = inject(TranslocoService);
