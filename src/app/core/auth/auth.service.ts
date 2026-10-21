@@ -34,6 +34,8 @@ export class AuthService {
 
   public readonly isAuthenticated = signal<boolean>(false);
 
+  private _onAccessTokenChange: ((token: string | null) => void) | null = null;
+
   constructor() {
     this._loadFromStorage();
   }
@@ -57,11 +59,22 @@ export class AuthService {
       this._token.set(token);
       this._sessionStorageService.saveJwt(token);
       safeSetLocalStorageItem(STORAGE.JWT, token);
+      this._notifyAccessTokenChange(token);
       return;
     }
     this._token.set(null);
     this._sessionStorageService.removeJwt();
     safeRemoveLocalStorageItem(STORAGE.JWT);
+    this._notifyAccessTokenChange(null);
+  }
+
+  /**
+   * Notifies when the access token is stored or removed.
+   * Invokes the listener immediately with the current token.
+   */
+  onAccessTokenChange(listener: (token: string | null) => void): void {
+    this._onAccessTokenChange = listener;
+    listener(this._token());
   }
 
   /**
@@ -155,6 +168,10 @@ export class AuthService {
   // -----------------------------------------------------------------------------------------------------
   // @ Private methods
   // -----------------------------------------------------------------------------------------------------
+
+  private _notifyAccessTokenChange(token: string | null): void {
+    this._onAccessTokenChange?.(token);
+  }
 
   /**
    * Load user and token from storage
