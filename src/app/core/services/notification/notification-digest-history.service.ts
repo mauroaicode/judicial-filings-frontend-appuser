@@ -45,12 +45,14 @@ export class NotificationDigestHistoryService {
     id: string,
     page: number = 1,
     perPage: number = 20,
-    filters?: NotificationDigestHistoryFilter
+    filters?: NotificationDigestHistoryFilter,
+    openedVia: 'app' | 'email' = 'app',
   ): Observable<NotificationDigestDetailResponse> {
     const url = `${environment.apiBaseUrl}/notification-digests/${id}`;
     let params = new HttpParams()
       .set('page', String(page))
-      .set('per_page', String(perPage));
+      .set('per_page', String(perPage))
+      .set('opened_via', openedVia);
     params = this.appendFilterParams(params, filters);
     return this._http.get<NotificationDigestDetailResponse>(url, { params });
   }
