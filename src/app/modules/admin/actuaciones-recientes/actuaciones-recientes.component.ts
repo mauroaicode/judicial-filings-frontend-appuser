@@ -249,8 +249,8 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     this.mobileDigestSummaryExpanded.set(false);
     this.isModalOpen.set(true);
     this.isLoadingDetails.set(true);
-    this.syncDigestQueryParams(item.id, page, pp);
-    this.fetchDigestDetails(item.id, page, pp);
+    this.syncDigestQueryParams(item.id, page, pp, true);
+    this.fetchDigestDetails(item.id, page, pp, 'app');
   }
 
   /**
@@ -260,9 +260,10 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     const digest = this.selectedDigest();
     if (!digest) return;
     const pp = this.normalizeDigestPerPage(event.perPage);
+    const openedVia = this._activatedRoute.snapshot.queryParamMap.get('from') === 'email' ? 'email' : 'app';
     this.isLoadingDetails.set(true);
     this.syncDigestQueryParams(digest.id, event.page, pp);
-    this.fetchDigestDetails(digest.id, event.page, pp);
+    this.fetchDigestDetails(digest.id, event.page, pp, openedVia);
   }
 
   public getDigestPageNumbers(): number[] {
@@ -340,7 +341,12 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     this.selectedDigest.set(stub);
     this.isModalOpen.set(true);
     this.isLoadingDetails.set(true);
-    this.fetchDigestDetails(digestId, page, perPage);
+    this.fetchDigestDetails(
+      digestId,
+      page,
+      perPage,
+      q.get('from') === 'email' ? 'email' : 'app',
+    );
   }
 
   private normalizeDigestPerPage(n: number): number {
@@ -349,11 +355,17 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
       : this.defaultDigestPerPage;
   }
 
-  private syncDigestQueryParams(digestId: string, page: number, perPage: number): void {
+  private syncDigestQueryParams(
+    digestId: string,
+    page: number,
+    perPage: number,
+    clearFrom = false,
+  ): void {
     this._router.navigate([], {
       relativeTo: this._activatedRoute,
       queryParams: {
         digest: digestId,
+        ...(clearFrom ? { from: null } : {}),
         page: page > 1 ? String(page) : null,
         per_page: perPage !== this.defaultDigestPerPage ? String(perPage) : null,
       },
@@ -367,6 +379,7 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
       relativeTo: this._activatedRoute,
       queryParams: {
         digest: null,
+        from: null,
         page: null,
         per_page: null,
       },
@@ -375,11 +388,16 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     });
   }
 
-  private fetchDigestDetails(digestId: string, page: number, perPage: number): void {
+  private fetchDigestDetails(
+    digestId: string,
+    page: number,
+    perPage: number,
+    openedVia: 'app' | 'email' = 'app',
+  ): void {
     this.digestDetailPagination.set(null);
     this.mobileDigestSummaryExpanded.set(false);
     this._historyService
-      .getDigestDetails(digestId, page, perPage, this._currentFilters)
+      .getDigestDetails(digestId, page, perPage, this._currentFilters, openedVia)
       .pipe(finalize(() => this.isLoadingDetails.set(false)))
       .subscribe({
         next: (response: any) => {
