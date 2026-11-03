@@ -238,6 +238,17 @@
           </select>
         </div>
 
+        <div class="form-control">
+          <label class="label pt-0 pb-1">
+            <span class="label-standard">{{ 'gestionProcesos.filters.removedFromRama' | transloco }}</span>
+          </label>
+          <select formControlName="removed_from_judicial_branch" class="select-standard select w-full">
+            <option value="">{{ 'gestionProcesos.filters.removedFromRamaAll' | transloco }}</option>
+            <option value="true">{{ 'gestionProcesos.filters.removedFromRamaWith' | transloco }}</option>
+            <option value="false">{{ 'gestionProcesos.filters.removedFromRamaWithout' | transloco }}</option>
+          </select>
+        </div>
+
         <!-- Radicación Date Range -->
         <div class="form-control">
           <app-date-range-picker [label]="'gestionProcesos.filters.createdAtRange' | transloco"

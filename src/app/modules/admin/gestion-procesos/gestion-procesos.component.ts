@@ -179,6 +179,8 @@ export class GestionProcesosComponent {
     has_multiple_instances: [null as boolean | null],
     lawyer_role: [''],
     severity_color: [''],
+    /** '' | 'true' | 'false' */
+    removed_from_judicial_branch: [''],
     process_date_range: [null as DateRange | null],
     created_at_range: [null as DateRange | null],
     last_api_update_range: [null as DateRange | null],
@@ -380,6 +382,13 @@ export class GestionProcesosComponent {
       this.filterForm.patchValue({ severity_color: queryParams['severity_color'] });
       this.activeSeverityColor.set(queryParams['severity_color']);
     }
+    if (isValidValue(queryParams['removed_from_judicial_branch'])) {
+      const raw = queryParams['removed_from_judicial_branch'];
+      this.filterForm.patchValue({
+        removed_from_judicial_branch:
+          raw === 'true' || raw === '1' ? 'true' : raw === 'false' || raw === '0' ? 'false' : '',
+      });
+    }
     // Load date ranges from query params - only if they have valid values
     if (isValidValue(queryParams['process_date_from']) || isValidValue(queryParams['process_date_to'])) {
       const dateRange: DateRange = {
@@ -437,6 +446,11 @@ export class GestionProcesosComponent {
     }
     if (filters.severity_color && filters.severity_color.trim()) {
       queryParams['severity_color'] = filters.severity_color;
+    }
+    if (filters.removed_from_judicial_branch === true) {
+      queryParams['removed_from_judicial_branch'] = 'true';
+    } else if (filters.removed_from_judicial_branch === false) {
+      queryParams['removed_from_judicial_branch'] = 'false';
     }
     if (filters.process_date_from && filters.process_date_from.trim()) {
       queryParams['process_date_from'] = filters.process_date_from;
@@ -499,6 +513,12 @@ export class GestionProcesosComponent {
       has_multiple_instances: formValue.has_multiple_instances !== null && formValue.has_multiple_instances !== '' ? formValue.has_multiple_instances : undefined,
       lawyer_role: formValue.lawyer_role?.trim() || undefined,
       severity_color: formValue.severity_color?.trim() || undefined,
+      removed_from_judicial_branch:
+        formValue.removed_from_judicial_branch === 'true'
+          ? true
+          : formValue.removed_from_judicial_branch === 'false'
+            ? false
+            : undefined,
       process_date_from: processDateRange?.from && processDateRange.from.trim() ? processDateRange.from : undefined,
       process_date_to: processDateRange?.to && processDateRange.to.trim() ? processDateRange.to : undefined,
       created_at_from: createdAtRange?.from && createdAtRange.from.trim() ? createdAtRange.from : undefined,
@@ -628,6 +648,7 @@ export class GestionProcesosComponent {
       has_multiple_instances: null,
       lawyer_role: '',
       severity_color: '',
+      removed_from_judicial_branch: '',
       process_date_range: null,
       created_at_range: null,
       last_api_update_range: null,

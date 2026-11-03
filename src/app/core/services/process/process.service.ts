@@ -91,6 +91,11 @@ export class ProcessService {
     if (filters.severity_color) {
       params = params.set('severity_color', filters.severity_color);
     }
+    if (filters.removed_from_judicial_branch === true) {
+      params = params.set('removed_from_judicial_branch', 'true');
+    } else if (filters.removed_from_judicial_branch === false) {
+      params = params.set('removed_from_judicial_branch', 'false');
+    }
 
     const url = `${environment.apiBaseUrl}/processes`;
 
@@ -290,6 +295,15 @@ export class ProcessService {
     }
     if (filters.alert_slug) {
       params = params.set('alert_slug', filters.alert_slug);
+    }
+    if (
+      filters.removed_from_judicial_branch === true ||
+      filters.removed_from_judicial_branch === false
+    ) {
+      params = params.set(
+        'removed_from_judicial_branch',
+        filters.removed_from_judicial_branch ? 'true' : 'false',
+      );
     }
 
     const url = `${environment.apiBaseUrl}/processes/${id}/actions`;

@@ -112,6 +112,10 @@ export class ProcessDetailComponent {
     () => this.plaintiffSubjects().length > 0 || this.defendantSubjects().length > 0
   );
   public actions = signal<Action[]>([]);
+  /** Conteo del proceso; 0 u omitido se oculta en la UI. */
+  public removedFromBranchCount = computed(
+    () => this.process()?.removed_from_judicial_branch_count ?? 0,
+  );
   public loading = signal<boolean>(false);
   public loadingActions = signal<boolean>(false);
   public error = signal<string | null>(null);
@@ -179,6 +183,8 @@ export class ProcessDetailComponent {
     registration_date_range: [null as DateRange | null],
     alert_slug: [null as string | null],
     search: [''],
+    /** 'all' omite el query param; 'only' = true; 'hide' = false */
+    removed_from_judicial_branch: ['all' as 'all' | 'only' | 'hide'],
   });
 
   // Table columns for actions - will be initialized in constructor
@@ -225,29 +231,38 @@ export class ProcessDetailComponent {
         render: (value: string | null, row: Action) => {
           const mainAction = row.action ?? value;
           const related = row.related_action;
-          
+          const wrapMuted = (html: string): string =>
+            this.isActionRemoved(row) ? `<div class="process-action-muted-cell">${html}</div>` : html;
+
           const actionHtml = buildTextWithHighlights(mainAction, row.alert_highlights, 'action');
-          
+
           if (related) {
             const relatedActionHtml = buildTextWithHighlights(related.action ?? '', related.alert_highlights, 'action');
             const lowerAction = mainAction?.toLowerCase() || '';
             const badgeLabel = lowerAction.includes('notificacion') || lowerAction.includes('notificación') ? 'Notificación' : 'Fijación';
             
-            return `
+            return wrapMuted(`
               <div class="flex flex-col gap-1">
                 <div class="flex items-center gap-1.5">
                    <span class="badge badge-sm bg-primary/10 text-primary border-none font-bold text-[9px] px-1.5 h-4 uppercase tracking-tighter">${badgeLabel}</span>
-                   <div class="font-bold text-base-content leading-tight">${actionHtml}</div>
+                   <div class="font-bold text-base-content/90 leading-tight">${actionHtml}</div>
                 </div>
                 <div class="flex items-center gap-1.5">
                    <span class="badge badge-sm bg-accent/10 text-accent border-none font-bold text-[9px] px-1.5 h-4 uppercase tracking-tighter">Auto</span>
                    <div class="font-bold text-base-content leading-tight">${relatedActionHtml}</div>
                 </div>
               </div>
-            `;
+            `);
           }
-          return actionHtml;
+          return wrapMuted(actionHtml);
         },
+      },
+      {
+        key: 'removed_from_judicial_branch',
+        label: 'processDetail.actions.table.judicialBranch',
+        width: '220px',
+        html: true,
+        render: (_value: unknown, row: Action) => this.renderRemovedBranchCell(row),
       },
       {
         key: 'annotation',
@@ -264,8 +279,11 @@ export class ProcessDetailComponent {
           }
 
           if (!annotationToUse || annotationToUse === '---' || annotationToUse === '–') return '–';
-          
-          return buildTextWithHighlights(annotationToUse, highlightsToUse, 'annotation');
+
+          const annotationHtml = buildTextWithHighlights(annotationToUse, highlightsToUse, 'annotation');
+          return this.isActionRemoved(row)
+            ? `<div class="process-action-muted-cell">${annotationHtml}</div>`
+            : annotationHtml;
         },
       },
       {
@@ -648,6 +666,7 @@ export class ProcessDetailComponent {
     const actionDateRange: DateRange | null = formValue.action_date_range;
     const registrationDateRange: DateRange | null = formValue.registration_date_range;
     const alertSlug = formValue.alert_slug?.trim();
+    const branchFilter = formValue.removed_from_judicial_branch as 'all' | 'only' | 'hide' | null;
 
     const filters: ActionFilter = {
       action_date_from: actionDateRange?.from && actionDateRange.from.trim() ? actionDateRange.from : undefined,
@@ -656,6 +675,8 @@ export class ProcessDetailComponent {
       registration_date_to: registrationDateRange?.to && registrationDateRange.to.trim() ? registrationDateRange.to : undefined,
       alert_slug: alertSlug || undefined,
       search: formValue.search?.trim() || undefined,
+      removed_from_judicial_branch:
+        branchFilter === 'only' ? true : branchFilter === 'hide' ? false : undefined,
       page,
       per_page: perPage,
     };
@@ -1021,6 +1042,54 @@ export class ProcessDetailComponent {
       .replace(/'/g, '&#39;');
   }
 
+  /** Fila atenuada si la actuación o el auto agrupado fue retirado en Rama. */
+  public readonly actionRowClass = (row: Action): string =>
+    this.isActionRemoved(row) ? 'process-action-row--removed' : '';
+
+  public isActionRemoved(action: Action): boolean {
+    return this.removalSources(action).length > 0;
+  }
+
+  public removalSources(action: Action): Action[] {
+    const sources: Action[] = [];
+    if (action.removed_from_judicial_branch) {
+      sources.push(action);
+    }
+    const related = action.related_action;
+    if (related?.removed_from_judicial_branch && related.id !== action.id) {
+      sources.push(related);
+    }
+    return sources;
+  }
+
+  private renderRemovedBranchCell(row: Action): string {
+    const sources = this.removalSources(row);
+    if (!sources.length) return '–';
+
+    const label = this.escapeHtmlAttr(
+      this._transloco.translate('processDetail.actions.removedBadge'),
+    );
+
+    return sources
+      .map((source) => {
+        const date = source.removed_from_judicial_branch_at?.trim();
+        const reason = source.removed_from_judicial_branch_reason?.trim();
+        const chunks = [`<span class="rama-removed-badge">${label}</span>`];
+        if (date) {
+          chunks.push(
+            `<p class="text-[10px] font-semibold text-base-content/60 mt-1 mb-0">${this.escapeHtmlAttr(date)}</p>`,
+          );
+        }
+        if (reason) {
+          chunks.push(
+            `<p class="text-[10px] text-base-content/50 mt-0.5 mb-0 italic">${this.escapeHtmlAttr(reason)}</p>`,
+          );
+        }
+        return `<div class="rama-status-cell flex flex-col gap-0.5">${chunks.join('')}</div>`;
+      })
+      .join('');
+  }
+
   /**
    * Resolve ?actionId= against the loaded actions page (search further pages if needed).
    */
@@ -1105,6 +1174,7 @@ export class ProcessDetailComponent {
       registration_date_range: null,
       alert_slug: null,
       search: '',
+      removed_from_judicial_branch: 'all',
     });
     this.loadActions(1, this.actionsPagination()?.per_page || 10);
   }

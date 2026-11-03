@@ -52,6 +52,11 @@ export class DashboardService {
     if (filters.last_api_update_to) params = params.set('last_api_update_to', filters.last_api_update_to);
     if (filters.lawyer_role) params = params.set('lawyer_role', filters.lawyer_role);
     if (filters.severity_color) params = params.set('severity_color', filters.severity_color);
+    if (filters.removed_from_judicial_branch === true) {
+      params = params.set('removed_from_judicial_branch', 'true');
+    } else if (filters.removed_from_judicial_branch === false) {
+      params = params.set('removed_from_judicial_branch', 'false');
+    }
 
     this._http
       .get<DashboardStats>(url, { params })
