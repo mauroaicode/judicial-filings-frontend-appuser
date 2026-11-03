@@ -120,6 +120,20 @@
       }
     }
 
+    tr.process-action-row--removed,
+    tr.process-action-row--removed:hover {
+      background-color: #eceff3 !important;
+      cursor: default;
+
+      td,
+      td.sticky-cell,
+      td.sticky-cell::before {
+        background-color: #eceff3 !important;
+        background: #eceff3 !important;
+        color: color-mix(in srgb, var(--color-base-content) 46%, transparent);
+      }
+    }
+
     // Additional rule with maximum specificity to ensure sticky cell hover works
     tr:hover td.sticky-cell {
       background-color: #F3F0F9 !important; // Solid color - no transparency
@@ -277,4 +291,15 @@
       }
     }
   }
+}
+
+[data-theme='dark'] .table tbody tr.process-action-row--removed,
+[data-theme='dark'] .table tbody tr.process-action-row--removed:hover,
+[data-theme='dark'] .table tbody tr.process-action-row--removed td,
+[data-theme='dark'] .table tbody tr.process-action-row--removed:hover td,
+[data-theme='dark'] .table tbody tr.process-action-row--removed td.sticky-cell,
+[data-theme='dark'] .table tbody tr.process-action-row--removed td.sticky-cell::before {
+  background-color: color-mix(in srgb, #7c52b8 10%, #140f1e) !important;
+  background: color-mix(in srgb, #7c52b8 10%, #140f1e) !important;
+  color: color-mix(in srgb, #e2d9f3 72%, transparent);
 }

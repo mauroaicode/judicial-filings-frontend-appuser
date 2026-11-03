@@ -104,6 +104,8 @@ export interface ProcessFilter {
   has_multiple_instances?: boolean;
   lawyer_role?: string; // 'plaintiff' | 'defendant'
   severity_color?: string; // 'red' | 'yellow' | 'green' | 'none' | 'suspended'
+  /** true: con actuaciones retiradas en Rama; false: sin ellas; omitido: todos */
+  removed_from_judicial_branch?: boolean;
   process_date_from?: string;
   process_date_to?: string;
   created_at_from?: string;
@@ -249,6 +251,8 @@ export interface ProcessDetail {
   tasks_count?: number;
   /** Inactivity semaphore state (paused while a suspension task is active). */
   semaphore?: ProcessSemaphore | null;
+  /** Actuaciones de este proceso marcadas como retiradas en Rama Judicial. */
+  removed_from_judicial_branch_count?: number;
 }
 
 /**
@@ -374,6 +378,11 @@ export interface Action {
   related_action?: Action | null;
   /** PDFs visible to the current org; omit/empty → no document CTA */
   documents?: ActionDocument[] | null;
+  /** True when an admin marked this actuación as withdrawn from Rama Judicial. */
+  removed_from_judicial_branch?: boolean;
+  /** Pre-formatted datetime from the API. */
+  removed_from_judicial_branch_at?: string | null;
+  removed_from_judicial_branch_reason?: string | null;
 }
 
 /**
@@ -414,6 +423,10 @@ export interface ActionFilter {
   /** Filtrar por tipo de alerta (slug del keyword) */
   alert_slug?: string;
   search?: string;
+  /**
+   * Omitido: todas. true: solo retiradas en Rama. false: ocultar retiradas.
+   */
+  removed_from_judicial_branch?: boolean;
   page?: number;
   per_page?: number;
 }

@@ -460,7 +460,8 @@
             <!-- Mobile layout: Cards view (similar a Gestión de Procesos) -->
             <div class="block lg:hidden w-full space-y-3 digest-mobile-cards">
               @for (action of selectedDigestDetails(); track digestRowTrack(action, i); let i = $index) {
-                <div class="card border border-base-200 bg-base-100 shadow-sm overflow-hidden">
+                <div class="card border border-base-200 bg-base-100 shadow-sm overflow-hidden"
+                  [class.digest-card--removed]="isDigestRemoved(action)">
                   <div class="p-3 flex items-start justify-between gap-3 border-b border-base-200/70 bg-base-100/70">
                     <div class="flex items-start gap-2 min-w-0">
                       <span class="text-[11px] text-base-content/40 font-bold mt-1">#{{ digestRowIndex(i) }}</span>
@@ -508,6 +509,7 @@
                   </div>
 
                   <div class="p-3 space-y-3 text-sm">
+                    <ng-container *ngTemplateOutlet="removedBranchNotes; context: { row: action }"></ng-container>
                     @if (!action.lawyer_role) {
                       <div
                         class="bg-primary/5 rounded-xl p-3 border border-primary/10 flex items-center justify-between group cursor-pointer"
@@ -647,6 +649,7 @@
                     @let rowTrackId = digestRowTrack(action, i);
                     <tr
                       class="transition-colors cursor-default border-b border-base-200/60"
+                      [class.digest-row--removed]="isDigestRemoved(action)"
                       [class.process-row-hovered]="hoveredRowId() === rowTrackId"
                       (mouseenter)="hoveredRowId.set(rowTrackId)"
                       (mouseleave)="hoveredRowId.set(null)">
@@ -803,6 +806,7 @@
 
                       <!-- Actuación: fijación + auto (is_merged en API o emparejado en cliente) -->
                       <td class="align-middle text-sm text-base-content leading-snug digest-col-action">
+                        <ng-container *ngTemplateOutlet="removedBranchNotes; context: { row: action }"></ng-container>
                         <button
                           type="button"
                           class="w-full text-left rounded-lg p-1.5 -m-1.5 hover:bg-primary/5 transition-colors cursor-pointer"
@@ -951,6 +955,8 @@
             </button>
           </div>
 
+          <ng-container *ngTemplateOutlet="removedBranchNotes; context: { row: detail }"></ng-container>
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
             <div>
               <p class="text-[10px] uppercase tracking-[0.22em] font-black text-base-content/35 mb-2">{{ 'gestionProcesos.table.court' | transloco }}</p>
@@ -1075,6 +1081,20 @@
       <button (click)="closeLegendModal()">close</button>
     </form>
   </dialog>
+
+  <ng-template #removedBranchNotes let-row="row">
+    @for (note of digestRemovalSources(row); track note.process_action_id ?? $index) {
+    <div class="removed-branch-cell" [class.mb-4]="$last">
+      <span class="rama-removed-badge">{{ 'processDetail.actions.removedBadge' | transloco }}</span>
+      @if (note.removed_from_judicial_branch_at) {
+      <span class="removed-branch-date">{{ note.removed_from_judicial_branch_at }}</span>
+      }
+      @if (note.removed_from_judicial_branch_reason) {
+      <span class="removed-branch-reason">{{ note.removed_from_judicial_branch_reason }}</span>
+      }
+    </div>
+    }
+  </ng-template>
 
   <!-- Global Toast -->
   @if (toastMessage()) {

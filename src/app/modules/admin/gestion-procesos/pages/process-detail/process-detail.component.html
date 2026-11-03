@@ -347,6 +347,11 @@
                   *ngTemplateOutlet="infoItem; context: { label: '', value: process()!.lawyer_role, strong: true }"></ng-container>
               }
 
+              @if (removedFromBranchCount() > 0) {
+              <ng-container
+                *ngTemplateOutlet="infoItem; context: { label: 'processDetail.removedFromJudicialBranch', value: removedFromBranchCount(), strong: true }"></ng-container>
+              }
+
               <!-- Alert Level Card Removed as requested -->
             </div>
           </div>
@@ -580,6 +585,9 @@
               </svg>
             </div>
             <span class="text-base font-bold">{{ 'processDetail.actions.title' | transloco }}</span>
+            @if (removedFromBranchCount() > 0) {
+            <span class="rama-removed-badge ml-1">{{ removedFromBranchCount() }} {{ 'processDetail.actions.removedCountShort' | transloco }}</span>
+            }
           </div>
           <div class="collapse-content px-0 pb-6 pt-0">
             <div class="px-5 sm:px-6 space-y-6">
@@ -641,6 +649,16 @@
                     <input type="text" formControlName="search" class="input-standard input input-bordered"
                       [placeholder]="'processDetail.actions.filters.searchPlaceholder' | transloco" />
                   </div>
+
+                  <div class="form-control">
+                    <label class="label !pt-0 !pb-1"><span class="label-standard">{{
+                        'processDetail.actions.filters.removedFromBranch' | transloco }}</span></label>
+                    <select formControlName="removed_from_judicial_branch" class="select-standard select select-bordered">
+                      <option value="all">{{ 'processDetail.actions.filters.removedFromBranchAll' | transloco }}</option>
+                      <option value="only">{{ 'processDetail.actions.filters.removedFromBranchOnly' | transloco }}</option>
+                      <option value="hide">{{ 'processDetail.actions.filters.removedFromBranchHide' | transloco }}</option>
+                    </select>
+                  </div>
                 </form>
 
                 <!-- Unified Action Buttons (Filter style) -->
@@ -669,6 +687,7 @@
                   <app-data-table [columns]="actionColumns" [data]="actions()" [pagination]="actionsPagination()"
                     [loading]="loadingActions()" [emptyMessage]="'processDetail.actions.empty' | transloco"
                     [highlightRowId]="highlightedActionId()"
+                    [rowClass]="actionRowClass"
                     (pageChange)="onActionsPageChange($event)"></app-data-table>
                 </div>
 
@@ -686,7 +705,8 @@
                   <div class="divide-y divide-base-200">
                     @for (action of actions(); track action.id; let i = $index) {
                     <div [id]="'action-card-' + action.id"
-                      class="p-4 sm:p-5 hover:bg-base-200/5 transition-colors"
+                      class="p-4 sm:p-5 transition-colors"
+                      [class.process-action-row--removed]="isActionRemoved(action)"
                       [class.action-card--highlighted]="highlightedActionId() === action.id">
                       <div class="flex items-start gap-4">
                         <span
@@ -694,6 +714,17 @@
                           {{ (actionsPagination()?.from || 0) + i }}
                         </span>
                         <div class="min-w-0 flex-1 space-y-3">
+                          @for (note of removalSources(action); track note.id) {
+                          <div class="rama-status-cell flex flex-col gap-0.5">
+                            <span class="rama-removed-badge">{{ 'processDetail.actions.removedBadge' | transloco }}</span>
+                            @if (note.removed_from_judicial_branch_at) {
+                            <p class="text-[10px] font-semibold text-base-content/60 mt-1 mb-0">{{ note.removed_from_judicial_branch_at }}</p>
+                            }
+                            @if (note.removed_from_judicial_branch_reason) {
+                            <p class="text-[10px] text-base-content/50 mt-0.5 mb-0 italic">{{ note.removed_from_judicial_branch_reason }}</p>
+                            }
+                          </div>
+                          }
                           <div class="flex justify-between items-start gap-3">
                             <h4 class="text-sm font-bold text-base-content leading-tight">{{ action.action }}</h4>
                             <span

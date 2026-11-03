@@ -698,6 +698,124 @@
   z-index: 8 !important;
 }
 
+.process-list-table tbody tr.digest-row--removed td,
+.process-list-table tbody tr.digest-row--removed:hover td,
+.process-list-table tbody tr.digest-row--removed.process-row-hovered td,
+.process-list-table tbody tr.digest-row--removed td.sticky-col-idx,
+.process-list-table tbody tr.digest-row--removed td.sticky-col-alert,
+.process-list-table tbody tr.digest-row--removed td.sticky-col-radicado,
+.process-list-table tbody tr.digest-row--removed:hover td.sticky-col-idx,
+.process-list-table tbody tr.digest-row--removed:hover td.sticky-col-alert,
+.process-list-table tbody tr.digest-row--removed:hover td.sticky-col-radicado,
+.process-list-table tbody tr.digest-row--removed.process-row-hovered td.sticky-col-idx,
+.process-list-table tbody tr.digest-row--removed.process-row-hovered td.sticky-col-alert,
+.process-list-table tbody tr.digest-row--removed.process-row-hovered td.sticky-col-radicado {
+  background-color: #e6e3ee !important;
+  color: #6d657c;
+}
+
+.process-list-table tbody tr.digest-row--removed td .sticky-cell-bg,
+.process-list-table tbody tr.digest-row--removed:hover td .sticky-cell-bg,
+.process-list-table tbody tr.digest-row--removed.process-row-hovered td .sticky-cell-bg {
+  background: #e6e3ee !important;
+  background-color: #e6e3ee !important;
+}
+
+.digest-mobile-cards .digest-card--removed {
+  background-color: #e6e3ee !important;
+}
+
+.removed-branch-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.28rem;
+  max-width: 18rem;
+  margin-bottom: 0.65rem;
+}
+
+.removed-branch-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0.18rem 0.55rem !important;
+  border-radius: 999px !important;
+  background: #ffffff !important;
+  color: #3c3450 !important;
+  -webkit-text-fill-color: #3c3450 !important;
+  border: 1px solid rgba(60, 52, 80, 0.14) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  white-space: normal !important;
+}
+
+.removed-branch-date,
+.removed-branch-reason {
+  display: block;
+  color: inherit;
+}
+
+.removed-branch-date {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.removed-branch-reason {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+:host-context([data-theme='dark']) {
+  .process-list-table tbody tr.digest-row--removed td,
+  .process-list-table tbody tr.digest-row--removed:hover td,
+  .process-list-table tbody tr.digest-row--removed.process-row-hovered td,
+  .process-list-table tbody tr.digest-row--removed td.sticky-col-idx,
+  .process-list-table tbody tr.digest-row--removed td.sticky-col-alert,
+  .process-list-table tbody tr.digest-row--removed td.sticky-col-radicado,
+  .process-list-table tbody tr.digest-row--removed:hover td.sticky-col-idx,
+  .process-list-table tbody tr.digest-row--removed:hover td.sticky-col-alert,
+  .process-list-table tbody tr.digest-row--removed:hover td.sticky-col-radicado,
+  .process-list-table tbody tr.digest-row--removed.process-row-hovered td.sticky-col-idx,
+  .process-list-table tbody tr.digest-row--removed.process-row-hovered td.sticky-col-alert,
+  .process-list-table tbody tr.digest-row--removed.process-row-hovered td.sticky-col-radicado {
+    background-color: #241c33 !important;
+    color: rgba(248, 245, 255, 0.72);
+  }
+
+  .process-list-table tbody tr.digest-row--removed td .sticky-cell-bg,
+  .process-list-table tbody tr.digest-row--removed:hover td .sticky-cell-bg,
+  .process-list-table tbody tr.digest-row--removed.process-row-hovered td .sticky-cell-bg {
+    background: #241c33 !important;
+    background-color: #241c33 !important;
+  }
+
+  .digest-mobile-cards .digest-card--removed {
+    background-color: #241c33 !important;
+  }
+
+  .removed-branch-badge {
+    background: rgba(255, 255, 255, 0.94) !important;
+    color: #2c2440 !important;
+    -webkit-text-fill-color: #2c2440 !important;
+    border-color: transparent !important;
+  }
+
+  .removed-branch-date,
+  .removed-branch-reason {
+    color: rgba(248, 245, 255, 0.78);
+    -webkit-text-fill-color: rgba(248, 245, 255, 0.78);
+  }
+}
+
 // Paginación del modal de consolidado (misma estructura que gestión de procesos / data-table)
 .digest-modal-pagination.pagination-container {
   display: flex;
@@ -878,5 +996,12 @@
     transition: none !important;
     transform: translateY(0) !important;
     opacity: 1 !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .digest-detail-dialog .digest-detail-modal .digest-mobile-cards .removed-branch-badge {
+    font-size: 11px !important;
+    text-transform: none !important;
   }
 }

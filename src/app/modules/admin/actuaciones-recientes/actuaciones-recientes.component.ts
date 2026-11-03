@@ -707,6 +707,25 @@ export class ActuacionesRecientesComponent implements OnInit, OnDestroy {
     return `${main}_${rel}`;
   }
 
+  public isDigestRemoved(row: NotificationDigestDisplayRow): boolean {
+    return this.digestRemovalSources(row).length > 0;
+  }
+
+  public digestRemovalSources(row: NotificationDigestDisplayRow): NotificationDigestDetailItem[] {
+    const sources: NotificationDigestDetailItem[] = [];
+    if (row.removed_from_judicial_branch) {
+      sources.push(row);
+    }
+    const related = row.related_action;
+    if (
+      related?.removed_from_judicial_branch &&
+      related.process_action_id !== row.process_action_id
+    ) {
+      sources.push(related);
+    }
+    return sources;
+  }
+
   public toggleMobileDigestSummary(event?: Event): void {
     if (event) {
       event.preventDefault();

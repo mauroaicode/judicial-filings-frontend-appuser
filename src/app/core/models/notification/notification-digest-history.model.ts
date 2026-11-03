@@ -75,6 +75,10 @@ export interface NotificationDigestDetailItem {
   linked_action_text?: string | null;
   linked_annotation?: string | null;
   alert_highlights?: unknown[];
+  /** Enriquecido al leer el consolidado; el snapshot guardado puede no traerlo. */
+  removed_from_judicial_branch?: boolean;
+  removed_from_judicial_branch_at?: string | null;
+  removed_from_judicial_branch_reason?: string | null;
 }
 
 /** Fila ya fusionada para la tabla del consolidado */

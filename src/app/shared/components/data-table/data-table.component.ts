@@ -54,6 +54,8 @@ export class DataTableComponent {
   public emptyMessage = input<string>('No hay datos disponibles');
   /** When set, the row whose `id` matches gets a highlight class */
   public highlightRowId = input<string | null>(null);
+  /** Extra CSS class for a row (for example a muted withdrawn actuación). */
+  public rowClass = input<((row: any) => string) | undefined>(undefined);
 
   // Outputs
   public pageChange = output<{ page: number; perPage: number }>();
