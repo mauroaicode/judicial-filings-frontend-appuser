@@ -95,7 +95,8 @@
     "keywords": "Procedural Stages",
     "toggleSidebar": "Toggle sidebar",
     "security": "Security",
-    "config": "Settings"
+    "config": "Settings",
+    "notificationChannels": "Notifications"
   },
   "header": {
     "searchPlaceholder": "Search...",
@@ -845,6 +846,55 @@
     "saveError": "Error saving settings.",
     "saving": "Saving...",
     "saveButton": "Save changes"
+  },
+  "notificationChannels": {
+    "title": "Notification channels",
+    "description": "Choose where we notify you when there are new filings. Each channel has a quota; once you reach it, another destination cannot be added.",
+    "loading": "Loading channels…",
+    "retry": "Retry",
+    "used": "{{used}} of {{limit}}",
+    "remaining": "You can add {{remaining}} more.",
+    "atLimit": "Only {{limit}} {{label}} are allowed.",
+    "empty": "There are no destinations on this channel yet.",
+    "add": "Add",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this destination? It will stop receiving alerts.",
+    "confirmDelete": "Yes, delete",
+    "active": "Active",
+    "inactive": "Inactive",
+    "loadError": "Could not load the channels.",
+    "saveSuccess": "Channel updated.",
+    "createSuccess": "Channel added.",
+    "deleteSuccess": "Channel deleted.",
+    "saveError": "Could not save the channel.",
+    "types": {
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "sms": "SMS"
+    },
+    "typeLabels": {
+      "email": "email addresses",
+      "whatsapp": "WhatsApp numbers",
+      "sms": "SMS numbers"
+    },
+    "typeLabelsOne": {
+      "email": "email address",
+      "whatsapp": "WhatsApp number",
+      "sms": "SMS number"
+    },
+    "descriptions": {
+      "email": "Receives the digest when there are new filings.",
+      "whatsapp": "Alerts to the WhatsApp number you register.",
+      "sms": "Alerts by text message."
+    },
+    "placeholders": {
+      "email": "name@example.com",
+      "whatsapp": "+57 300 123 4567",
+      "sms": "+57 300 123 4567"
+    }
   },
   "tasks": {
     "title": "Judicial Agenda",

@@ -13,6 +13,10 @@ export default [
       {
         path: 'seguridad',
         loadComponent: () => import('./pages/security-settings/security-settings.component').then((m) => m.SecuritySettingsComponent),
+      },
+      {
+        path: 'canales',
+        loadComponent: () => import('./pages/notification-channels/notification-channels.component').then((m) => m.NotificationChannelsComponent),
       }
     ]
   }

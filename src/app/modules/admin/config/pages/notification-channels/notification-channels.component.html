@@ -1,0 +1,168 @@
+<div class="card bg-base-100 shadow-sm border border-base-content/10">
+  <div class="card-body">
+    <h2 class="card-title text-xl mb-1">{{ 'notificationChannels.title' | transloco }}</h2>
+    <p class="text-sm text-base-content/70 mb-5">{{ 'notificationChannels.description' | transloco }}</p>
+
+    @if (loading()) {
+      <div class="flex items-center gap-3 py-10 justify-center text-base-content/70">
+        <span class="loading loading-spinner loading-md text-primary"></span>
+        <span>{{ 'notificationChannels.loading' | transloco }}</span>
+      </div>
+    } @else if (loadError()) {
+      <div class="alert alert-error">
+        <span>{{ loadError() }}</span>
+      </div>
+      <div class="mt-4">
+        <button type="button" class="btn btn-primary btn-sm" (click)="load()">
+          {{ 'notificationChannels.retry' | transloco }}
+        </button>
+      </div>
+    } @else {
+      @if (successMessage()) {
+        <div class="alert alert-success mb-4">
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+      @if (errorMessage()) {
+        <div class="alert alert-error mb-4">
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      <div class="space-y-4">
+        @for (group of groups(); track group.type) {
+          <section class="bg-base-200/50 rounded-xl p-5 border border-base-content/5">
+            <div class="flex items-start gap-4">
+              <div class="bg-primary/10 text-primary p-3 rounded-lg">
+                @if (group.type === 'email') {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                } @else if (group.type === 'whatsapp') {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.2-3.6A7.7 7.7 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                }
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                  <div>
+                    <h3 class="font-bold text-base-content">{{ ('notificationChannels.types.' + group.type) | transloco }}</h3>
+                    <p class="text-sm text-base-content/70 mt-1">{{ ('notificationChannels.descriptions.' + group.type) | transloco }}</p>
+                  </div>
+                  @if (group.limit) {
+                    <span class="badge badge-outline badge-primary whitespace-nowrap">
+                      {{ 'notificationChannels.used' | transloco: { used: group.limit.used, limit: group.limit.limit } }}
+                    </span>
+                  }
+                </div>
+
+                @if (group.limit && !group.limit.can_add) {
+                  <div class="mt-3 text-sm text-warning bg-warning/10 border border-warning/20 rounded-lg px-3 py-2">
+                    {{ 'notificationChannels.atLimit' | transloco: { limit: group.limit.limit, label: typeLabel(group.type, group.limit.limit) } }}
+                  </div>
+                } @else if (group.limit) {
+                  <p class="mt-2 text-xs text-base-content/60">
+                    {{ 'notificationChannels.remaining' | transloco: { remaining: group.limit.remaining } }}
+                  </p>
+                }
+
+                <div class="mt-4 space-y-2">
+                  @if (group.items.length === 0) {
+                    <p class="text-sm text-base-content/60">{{ 'notificationChannels.empty' | transloco }}</p>
+                  }
+
+                  @for (channel of group.items; track channel.id) {
+                    <div class="rounded-lg border border-base-content/10 bg-base-100 px-3 py-3">
+                      @if (editingId() === channel.id) {
+                        <div class="flex flex-col sm:flex-row gap-2">
+                          <input
+                            class="input input-bordered input-sm flex-1"
+                            [ngModel]="editingValue()"
+                            (ngModelChange)="editingValue.set($event)"
+                          />
+                          <div class="flex gap-2">
+                            <button type="button" class="btn btn-primary btn-sm" [disabled]="busyKey() === channel.id" (click)="saveEdit(channel)">
+                              {{ 'notificationChannels.save' | transloco }}
+                            </button>
+                            <button type="button" class="btn btn-ghost btn-sm" (click)="cancelEdit()">
+                              {{ 'notificationChannels.cancel' | transloco }}
+                            </button>
+                          </div>
+                        </div>
+                      } @else if (pendingDeleteId() === channel.id) {
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <p class="text-sm">{{ 'notificationChannels.deleteConfirm' | transloco }}</p>
+                          <div class="flex gap-2">
+                            <button type="button" class="btn btn-error btn-sm" [disabled]="busyKey() === channel.id" (click)="confirmDelete(channel)">
+                              {{ 'notificationChannels.confirmDelete' | transloco }}
+                            </button>
+                            <button type="button" class="btn btn-ghost btn-sm" (click)="cancelDelete()">
+                              {{ 'notificationChannels.cancel' | transloco }}
+                            </button>
+                          </div>
+                        </div>
+                      } @else {
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                          <div class="min-w-0 flex-1">
+                            <p class="font-medium break-all">{{ channel.channel_value }}</p>
+                            <p class="text-xs text-base-content/60 mt-0.5">
+                              {{ channel.is_active ? ('notificationChannels.active' | transloco) : ('notificationChannels.inactive' | transloco) }}
+                            </p>
+                          </div>
+                          <div class="flex items-center gap-2 shrink-0">
+                            <input
+                              type="checkbox"
+                              class="toggle toggle-success toggle-sm"
+                              [checked]="channel.is_active"
+                              [disabled]="busyKey() === channel.id"
+                              (change)="toggleActive(channel)"
+                              [attr.aria-label]="'notificationChannels.active' | transloco"
+                            />
+                            <button type="button" class="btn btn-ghost btn-sm" (click)="startEdit(channel)">
+                              {{ 'notificationChannels.edit' | transloco }}
+                            </button>
+                            <button type="button" class="btn btn-ghost btn-sm text-error" (click)="askDelete(channel)">
+                              {{ 'notificationChannels.delete' | transloco }}
+                            </button>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <div class="mt-4 flex flex-col sm:flex-row gap-2">
+                  <input
+                    class="input input-bordered input-sm flex-1"
+                    [placeholder]="('notificationChannels.placeholders.' + group.type) | transloco"
+                    [disabled]="!!group.limit && !group.limit.can_add"
+                    [ngModel]="drafts()[group.type]"
+                    (ngModelChange)="setDraft(group.type, $event)"
+                    (keyup.enter)="add(group.type)"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-sm"
+                    [disabled]="busyKey() === 'add:' + group.type || (!!group.limit && !group.limit.can_add) || !drafts()[group.type].trim()"
+                    (click)="add(group.type)"
+                  >
+                    @if (busyKey() === 'add:' + group.type) {
+                      <span class="loading loading-spinner loading-xs"></span>
+                    }
+                    {{ 'notificationChannels.add' | transloco }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        }
+      </div>
+    }
+  </div>
+</div>
