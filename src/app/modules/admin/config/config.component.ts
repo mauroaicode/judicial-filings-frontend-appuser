@@ -7,5 +7,6 @@ import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslocoPipe],
   templateUrl: './config.component.html',
+  styleUrl: './config.component.scss',
 })
 export class ConfigComponent {}

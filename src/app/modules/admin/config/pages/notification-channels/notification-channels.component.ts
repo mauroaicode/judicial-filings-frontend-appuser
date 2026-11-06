@@ -20,6 +20,7 @@ interface ChannelGroup {
   standalone: true,
   imports: [CommonModule, FormsModule, TranslocoPipe],
   templateUrl: './notification-channels.component.html',
+  styleUrl: './notification-channels.component.scss',
 })
 export class NotificationChannelsComponent implements OnInit {
   private _channelsService = inject(NotificationChannelService);
@@ -68,6 +69,14 @@ export class NotificationChannelsComponent implements OnInit {
     });
   }
 
+  isComingSoon(type: NotificationChannelType): boolean {
+    return type === 'whatsapp' || type === 'sms';
+  }
+
+  isPendingValidation(channel: OrganizationNotificationChannel): boolean {
+    return channel.channel_type === 'email' && channel.is_validated === false;
+  }
+
   typeLabel(type: NotificationChannelType, count = 2): string {
     const key = count === 1 ? 'typeLabelsOne' : 'typeLabels';
     return this._transloco.translate(`notificationChannels.${key}.${type}`);
@@ -78,6 +87,10 @@ export class NotificationChannelsComponent implements OnInit {
   }
 
   add(type: NotificationChannelType): void {
+    if (this.isComingSoon(type)) {
+      return;
+    }
+
     const limit = this.limits().find((item) => item.channel_type === type);
     if (limit && !limit.can_add) {
       this.errorMessage.set(
@@ -98,9 +111,12 @@ export class NotificationChannelsComponent implements OnInit {
     this._clearMessages();
 
     this._channelsService.create({ channel_type: type, channel_value: value }).subscribe({
-      next: () => {
+      next: (created) => {
         this.setDraft(type, '');
-        this.successMessage.set(this._transloco.translate('notificationChannels.createSuccess'));
+        const key = this.isPendingValidation(created)
+          ? 'notificationChannels.createPending'
+          : 'notificationChannels.createSuccess';
+        this.successMessage.set(this._transloco.translate(key));
         this.busyKey.set(null);
         this.reload();
       },
@@ -132,9 +148,12 @@ export class NotificationChannelsComponent implements OnInit {
     this._clearMessages();
 
     this._channelsService.update(channel.id, { channel_value: value }).subscribe({
-      next: () => {
+      next: (updated) => {
         this.cancelEdit();
-        this.successMessage.set(this._transloco.translate('notificationChannels.saveSuccess'));
+        const key = this.isPendingValidation(updated)
+          ? 'notificationChannels.updatePending'
+          : 'notificationChannels.saveSuccess';
+        this.successMessage.set(this._transloco.translate(key));
         this.busyKey.set(null);
         this.reload();
       },
@@ -161,6 +180,26 @@ export class NotificationChannelsComponent implements OnInit {
       error: (err) => {
         this.busyKey.set(null);
         this.errorMessage.set(this._errorText(err, 'notificationChannels.saveError'));
+      },
+    });
+  }
+
+  resend(channel: OrganizationNotificationChannel): void {
+    if (!this.isPendingValidation(channel) || this.busyKey()) {
+      return;
+    }
+
+    this.busyKey.set(channel.id);
+    this._clearMessages();
+
+    this._channelsService.resendVerification(channel.id).subscribe({
+      next: () => {
+        this.successMessage.set(this._transloco.translate('notificationChannels.resendSuccess'));
+        this.busyKey.set(null);
+      },
+      error: (err) => {
+        this.busyKey.set(null);
+        this.errorMessage.set(this._errorText(err, 'notificationChannels.resendError'));
       },
     });
   }

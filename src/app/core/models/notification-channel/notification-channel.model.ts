@@ -6,6 +6,7 @@ export interface OrganizationNotificationChannel {
   channel_type: NotificationChannelType;
   channel_value: string;
   is_active: boolean;
+  is_validated: boolean;
   priority: number;
 }
 
