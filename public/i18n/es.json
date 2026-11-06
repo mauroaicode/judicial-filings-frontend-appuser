@@ -98,7 +98,8 @@
     "keywords": "Etapas Procesales",
     "toggleSidebar": "Alternar menú lateral",
     "security": "Seguridad",
-    "config": "Configuración"
+    "config": "Configuración",
+    "notificationChannels": "Notificaciones"
   },
   "header": {
     "searchPlaceholder": "Buscar...",
@@ -1041,5 +1042,54 @@
     "saveError": "Error al guardar la configuración.",
     "saving": "Guardando...",
     "saveButton": "Guardar cambios"
+  },
+  "notificationChannels": {
+    "title": "Canales de notificación",
+    "description": "Elige a dónde avisamos cuando hay nuevas actuaciones. Cada canal tiene un cupo; al llegar al límite no se puede agregar otro.",
+    "loading": "Cargando canales…",
+    "retry": "Reintentar",
+    "used": "{{used}} de {{limit}}",
+    "remaining": "Puedes agregar {{remaining}} más.",
+    "atLimit": "Solo está permitido tener {{limit}} {{label}}.",
+    "empty": "Aún no hay destinos en este canal.",
+    "add": "Agregar",
+    "edit": "Editar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "deleteConfirm": "¿Eliminar este destino? Dejará de recibir avisos.",
+    "confirmDelete": "Sí, eliminar",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "loadError": "No se pudieron cargar los canales.",
+    "saveSuccess": "Canal actualizado.",
+    "createSuccess": "Canal agregado.",
+    "deleteSuccess": "Canal eliminado.",
+    "saveError": "No se pudo guardar el canal.",
+    "types": {
+      "email": "Correo electrónico",
+      "whatsapp": "WhatsApp",
+      "sms": "SMS"
+    },
+    "typeLabels": {
+      "email": "correos electrónicos",
+      "whatsapp": "números de WhatsApp",
+      "sms": "números de SMS"
+    },
+    "typeLabelsOne": {
+      "email": "correo electrónico",
+      "whatsapp": "número de WhatsApp",
+      "sms": "número de SMS"
+    },
+    "descriptions": {
+      "email": "Recibe el consolidado cuando hay nuevas actuaciones.",
+      "whatsapp": "Avisos al número de WhatsApp que registres.",
+      "sms": "Avisos por mensaje de texto."
+    },
+    "placeholders": {
+      "email": "correo@ejemplo.com",
+      "whatsapp": "+57 300 123 4567",
+      "sms": "+57 300 123 4567"
+    }
   }
 }
