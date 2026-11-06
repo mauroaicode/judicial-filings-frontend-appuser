@@ -1,0 +1,41 @@
+<div class="auth-light-page flex min-h-screen bg-slate-50" data-theme="light">
+  <div class="flex w-full flex-col items-center justify-center p-8">
+    <div class="w-full max-w-md">
+      <app-title-system-auth />
+
+      <div class="card bg-white shadow-2xl shadow-slate-200/50 border border-slate-100 rounded-3xl overflow-hidden">
+        <div class="card-body p-8 sm:p-10 text-center">
+          @if (status() === 'ok') {
+            <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800 tracking-tight">{{ 'emailConfirmation.okTitle' | transloco }}</h2>
+            <p class="mt-3 text-sm text-slate-500 leading-relaxed">{{ 'emailConfirmation.okBody' | transloco }}</p>
+          } @else if (status() === 'expired') {
+            <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 text-amber-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800 tracking-tight">{{ 'emailConfirmation.expiredTitle' | transloco }}</h2>
+            <p class="mt-3 text-sm text-slate-500 leading-relaxed">{{ 'emailConfirmation.expiredBody' | transloco }}</p>
+          } @else {
+            <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-rose-50 text-rose-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 3a9 9 0 100 18 9 9 0 000-18z" />
+              </svg>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800 tracking-tight">{{ 'emailConfirmation.invalidTitle' | transloco }}</h2>
+            <p class="mt-3 text-sm text-slate-500 leading-relaxed">{{ 'emailConfirmation.invalidBody' | transloco }}</p>
+          }
+
+          <a routerLink="/config/canales" class="btn btn-primary mt-8 w-full">
+            {{ 'emailConfirmation.continue' | transloco }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

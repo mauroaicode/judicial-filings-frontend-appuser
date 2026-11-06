@@ -1,0 +1,11 @@
+.menu .config-nav-link.active {
+  background: var(--color-base-200);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+:host-context([data-theme='dark']) .menu .config-nav-link.active,
+:host-context([data-theme='dark']) .menu .config-nav-link.active:hover {
+  background: color-mix(in srgb, #e4d7fb 18%, var(--color-base-100));
+  color: #f7f3ff;
+}

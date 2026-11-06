@@ -868,8 +868,17 @@
     "loadError": "Could not load the channels.",
     "saveSuccess": "Channel updated.",
     "createSuccess": "Channel added.",
+    "createPending": "Email added. It stays pending until the confirmation link is opened.",
+    "updatePending": "Email updated. It is pending confirmation.",
+    "pendingValidation": "Pending validation",
+    "pendingValidationHint": "We sent a confirmation email. It will not be used for alerts until it is confirmed.",
+    "resendValidation": "Resend email",
+    "resendSuccess": "We sent the confirmation email again.",
+    "resendError": "Could not resend the confirmation email.",
     "deleteSuccess": "Channel deleted.",
     "saveError": "Could not save the channel.",
+    "comingSoon": "Coming soon",
+    "comingSoonHint": "This channel will be available soon.",
     "types": {
       "email": "Email",
       "whatsapp": "WhatsApp",
@@ -1062,5 +1071,14 @@
       "confirmMoveToTrashTitle": "Move to trash",
       "confirmStatusChange": "Do you want to change the status of this archived task?"
     }
+  },
+  "emailConfirmation": {
+    "okTitle": "Email confirmed",
+    "okBody": "We can now send alerts about new filings to this email.",
+    "expiredTitle": "This link expired",
+    "expiredBody": "Ask to resend the email from Notification channels.",
+    "invalidTitle": "We could not confirm this email",
+    "invalidBody": "The link is not valid. If you already confirmed it, you do not need to do anything else.",
+    "continue": "Go to notifications"
   }
 }

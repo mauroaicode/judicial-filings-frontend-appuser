@@ -36,4 +36,8 @@ export class NotificationChannelService {
   delete(id: string): Observable<void> {
     return this._httpClient.delete<void>(`${this._baseUrl}/${id}`);
   }
+
+  resendVerification(id: string): Observable<OrganizationNotificationChannel> {
+    return this._httpClient.post<OrganizationNotificationChannel>(`${this._baseUrl}/${id}/resend-verification`, {});
+  }
 }

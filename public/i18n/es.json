@@ -1064,8 +1064,17 @@
     "loadError": "No se pudieron cargar los canales.",
     "saveSuccess": "Canal actualizado.",
     "createSuccess": "Canal agregado.",
+    "createPending": "Correo agregado. Queda pendiente hasta que confirmen el enlace.",
+    "updatePending": "Correo actualizado. Queda pendiente de confirmación.",
+    "pendingValidation": "Pendiente de validar",
+    "pendingValidationHint": "Enviamos un correo de confirmación. Hasta que lo confirmen, no se usa para avisos.",
+    "resendValidation": "Reenviar correo",
+    "resendSuccess": "Reenviamos el correo de confirmación.",
+    "resendError": "No se pudo reenviar el correo de confirmación.",
     "deleteSuccess": "Canal eliminado.",
     "saveError": "No se pudo guardar el canal.",
+    "comingSoon": "Muy pronto",
+    "comingSoonHint": "Este canal estará disponible pronto.",
     "types": {
       "email": "Correo electrónico",
       "whatsapp": "WhatsApp",
@@ -1091,5 +1100,14 @@
       "whatsapp": "+57 300 123 4567",
       "sms": "+57 300 123 4567"
     }
+  },
+  "emailConfirmation": {
+    "okTitle": "Correo confirmado",
+    "okBody": "Ya podemos enviar avisos de nuevas actuaciones a este correo.",
+    "expiredTitle": "El enlace venció",
+    "expiredBody": "Pide que reenvíen el correo desde Canales de notificación.",
+    "invalidTitle": "No pudimos confirmar este correo",
+    "invalidBody": "El enlace no es válido. Si ya lo confirmaste, no necesitas hacer nada más.",
+    "continue": "Ir a notificaciones"
   }
 }

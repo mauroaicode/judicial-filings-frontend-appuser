@@ -30,6 +30,11 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./modules/auth/reset-password/reset-password.routes'),
   },
+  {
+    path: 'confirmar-correo',
+    loadChildren: () =>
+      import('./modules/auth/confirm-notification-email/confirm-notification-email.routes'),
+  },
 
   // Admin routes (protected - only for authenticated users)
   {
