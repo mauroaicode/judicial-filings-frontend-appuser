@@ -39,7 +39,7 @@ export class WebsocketService implements OnDestroy {
     constructor() {
         this._authService.onAccessTokenChange((token) => {
             if (this._destroyed) return;
-            if (token) {
+            if (token && !this._authService.isAwaitingTwoFactor()) {
                 this.connect();
                 return;
             }
@@ -58,7 +58,7 @@ export class WebsocketService implements OnDestroy {
      */
     public connect(): void {
         const token = this._authService.accessToken;
-        if (!token || this._destroyed) return;
+        if (!token || this._destroyed || this._authService.isAwaitingTwoFactor()) return;
 
         if (this._echo && this._connectedToken === token) {
             this._intentionalDisconnect = false;
@@ -122,7 +122,7 @@ export class WebsocketService implements OnDestroy {
      * @param callback Function to handle the received data
      */
     public listenPrivate(channelName: string, event: string, callback: (data: unknown) => void): void {
-        if (!this._authService.accessToken) return;
+        if (!this._authService.accessToken || this._authService.isAwaitingTwoFactor()) return;
         this.connect();
         this._echo?.private(channelName).listen(event, callback);
     }
@@ -133,7 +133,7 @@ export class WebsocketService implements OnDestroy {
      * @param channelName The name of the private channel
      */
     public joinPrivate(channelName: string) {
-        if (!this._authService.accessToken) return null;
+        if (!this._authService.accessToken || this._authService.isAwaitingTwoFactor()) return null;
         this.connect();
         return this._echo?.private(channelName) ?? null;
     }

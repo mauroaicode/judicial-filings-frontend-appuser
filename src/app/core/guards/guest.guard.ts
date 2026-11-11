@@ -16,6 +16,11 @@ export const guestGuard: CanActivateFn = async (route, state) => {
   const token = authService.accessToken;
   const user = authService.currentUser;
 
+  if (authService.isAwaitingTwoFactor() && token) {
+    await router.navigate([ROUTES_ADMIN.TWO_FACTOR_CHALLENGE]);
+    return false;
+  }
+
   if (token && user) {
     const userRoles = user?.roles ?? [];
 

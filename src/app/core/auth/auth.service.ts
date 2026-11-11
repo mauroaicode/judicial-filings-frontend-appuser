@@ -7,6 +7,8 @@ import {
   ForgotPasswordRequest,
   LoginRequest,
   ResetPasswordRequest,
+  TwoFactorSetupResponse,
+  TwoFactorTokenResponse,
   User,
   VerifyPasswordRequest,
   VerifyPasswordResponse
@@ -28,9 +30,11 @@ export class AuthService {
 
   private _user = signal<User | null>(null);
   private _token = signal<string | null>(null);
+  private _awaitingTwoFactor = signal(false);
 
   public readonly user = this._user.asReadonly();
   public readonly token = this._token.asReadonly();
+  public readonly isAwaitingTwoFactor = this._awaitingTwoFactor.asReadonly();
 
   public readonly isAuthenticated = signal<boolean>(false);
 
@@ -59,7 +63,7 @@ export class AuthService {
       this._token.set(token);
       this._sessionStorageService.saveJwt(token);
       safeSetLocalStorageItem(STORAGE.JWT, token);
-      this._notifyAccessTokenChange(token);
+      this._notifyAccessTokenChange(this._sessionTokenForClients());
       return;
     }
     this._token.set(null);
@@ -74,7 +78,15 @@ export class AuthService {
    */
   onAccessTokenChange(listener: (token: string | null) => void): void {
     this._onAccessTokenChange = listener;
-    listener(this._token());
+    listener(this._sessionTokenForClients());
+  }
+
+  /**
+   * True when the stored token may call the rest of the API.
+   * A login token that still needs a TOTP code is not enough.
+   */
+  canEnterApp(): boolean {
+    return !!this.accessToken && !!this.currentUser && !this._awaitingTwoFactor();
   }
 
   /**
@@ -98,12 +110,20 @@ export class AuthService {
     this._user.set(user);
     if (user) {
       safeSetLocalStorageItem(STORAGE.USER, JSON.stringify(user));
-      this.isAuthenticated.set(true);
-
+      this.isAuthenticated.set(!this._awaitingTwoFactor());
       return;
     }
     safeRemoveLocalStorageItem(STORAGE.USER);
     this.isAuthenticated.set(false);
+  }
+
+  /**
+   * Merges fields into the stored user, for example after profile or 2FA changes.
+   */
+  updateCurrentUser(patch: Partial<User>): void {
+    const current = this._user();
+    if (!current) return;
+    this.currentUser = { ...current, ...patch };
   }
 
   // -----------------------------------------------------------------------------------------------------
@@ -119,6 +139,55 @@ export class AuthService {
   signIn(credentials: LoginRequest): Observable<AuthResponse> {
     const url = `${environment.apiBaseUrl}/login`;
     return this._httpClient.post<AuthResponse>(url, credentials);
+  }
+
+  /**
+   * Stores the login token and user. When 2FA is required, other clients
+   * keep seeing no session token until validate replaces it.
+   */
+  acceptLogin(response: AuthResponse): void {
+    this._setAwaitingTwoFactor(!!response.requires_2fa);
+    this.accessToken = response.token;
+    this.currentUser = response.user;
+    safeRemoveLocalStorageItem(STORAGE.SESSION_LOCKED);
+  }
+
+  /**
+   * Replaces the current token with the one returned by verify, validate or disable.
+   * Those endpoints delete every previous token.
+   */
+  replaceAccessToken(token: string): void {
+    this._setAwaitingTwoFactor(false);
+    this.accessToken = token;
+  }
+
+  /**
+   * Keeps the login token for POST /2fa/validate and blocks the rest of the API.
+   */
+  beginTwoFactorChallenge(): void {
+    if (this._awaitingTwoFactor()) return;
+    this._setAwaitingTwoFactor(true);
+    this._notifyAccessTokenChange(null);
+  }
+
+  generateTwoFactor(): Observable<TwoFactorSetupResponse> {
+    return this._httpClient.get<TwoFactorSetupResponse>(`${environment.apiBaseUrl}/2fa/generate`);
+  }
+
+  verifyTwoFactor(oneTimePassword: string): Observable<TwoFactorTokenResponse> {
+    return this._httpClient.post<TwoFactorTokenResponse>(`${environment.apiBaseUrl}/2fa/verify`, {
+      one_time_password: oneTimePassword,
+    });
+  }
+
+  validateTwoFactor(oneTimePassword: string): Observable<TwoFactorTokenResponse> {
+    return this._httpClient.post<TwoFactorTokenResponse>(`${environment.apiBaseUrl}/2fa/validate`, {
+      one_time_password: oneTimePassword,
+    });
+  }
+
+  disableTwoFactor(): Observable<TwoFactorTokenResponse> {
+    return this._httpClient.patch<TwoFactorTokenResponse>(`${environment.apiBaseUrl}/2fa/disable`, {});
   }
 
   /**
@@ -155,9 +224,21 @@ export class AuthService {
   }
 
   /**
+   * Unlocks the local inactivity lock with the authenticator code.
+   * Does not replace the current token.
+   */
+  verifyOtp(oneTimePassword: string): Observable<VerifyPasswordResponse> {
+    const url = `${environment.apiBaseUrl}/verify-otp`;
+    return this._httpClient.post<VerifyPasswordResponse>(url, {
+      one_time_password: oneTimePassword,
+    });
+  }
+
+  /**
    * Sign out
    */
   signOut(): Observable<boolean> {
+    this._setAwaitingTwoFactor(false);
     this.accessToken = null;
     this.currentUser = null;
     safeRemoveLocalStorageItem(STORAGE.SESSION_LOCKED);
@@ -174,26 +255,54 @@ export class AuthService {
   }
 
   /**
+   * Token exposed to websocket and other session clients.
+   * Hidden while the login token still needs a TOTP code.
+   */
+  private _sessionTokenForClients(): string | null {
+    if (this._awaitingTwoFactor()) return null;
+    return this._token();
+  }
+
+  private _setAwaitingTwoFactor(awaiting: boolean): void {
+    this._awaitingTwoFactor.set(awaiting);
+    if (awaiting) {
+      safeSetLocalStorageItem(STORAGE.PENDING_2FA, '1');
+    } else {
+      safeRemoveLocalStorageItem(STORAGE.PENDING_2FA);
+    }
+    this.isAuthenticated.set(!!this._user() && !awaiting);
+  }
+
+  /**
    * Load user and token from storage
    */
   private _loadFromStorage(): void {
     const token = this._sessionStorageService.getJwt() || safeGetLocalStorageItem(STORAGE.JWT);
     const userStr = safeGetLocalStorageItem(STORAGE.USER);
+    const awaiting = safeGetLocalStorageItem(STORAGE.PENDING_2FA) === '1';
 
     if (token) {
       this._token.set(token);
+    }
+
+    if (awaiting && token) {
+      this._awaitingTwoFactor.set(true);
+    } else if (awaiting) {
+      safeRemoveLocalStorageItem(STORAGE.PENDING_2FA);
     }
 
     if (userStr) {
       try {
         const user = JSON.parse(userStr) as User;
         this._user.set(user);
-        this.isAuthenticated.set(true);
+        this.isAuthenticated.set(!this._awaitingTwoFactor());
       } catch (error) {
         console.error('Error parsing user from storage:', error);
         safeRemoveLocalStorageItem(STORAGE.USER);
         safeRemoveLocalStorageItem(STORAGE.JWT);
+        safeRemoveLocalStorageItem(STORAGE.PENDING_2FA);
         this._token.set(null);
+        this._awaitingTwoFactor.set(false);
         this._sessionStorageService.removeJwt();
       }
     }

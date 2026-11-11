@@ -1,3 +1,4 @@
+<div class="space-y-6">
 <div class="card bg-base-100 shadow-sm border border-base-content/10">
   <div class="card-body">
     <h2 class="card-title text-xl mb-4">{{ 'securitySettings.title' | transloco }}</h2>
@@ -34,6 +35,34 @@
                 <div class="text-error text-xs font-medium mt-2">{{ 'securitySettings.timeoutError' | transloco }}</div>
               }
             }
+
+            <div class="mt-4 pt-4 border-t border-base-content/10">
+              <p class="text-sm font-semibold text-base-content">{{ 'securitySettings.unlockMethodLabel' | transloco }}</p>
+              <p class="text-sm text-base-content/70 mt-1">{{ 'securitySettings.unlockMethodHint' | transloco }}</p>
+              <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <label class="flex items-center gap-3 rounded-xl border px-4 py-3 cursor-pointer text-base-content"
+                  [class.border-primary]="securityForm.get('session_unlock_method')?.value === 'password'"
+                  [class.bg-primary/10]="securityForm.get('session_unlock_method')?.value === 'password'"
+                  [class.border-base-content/15]="securityForm.get('session_unlock_method')?.value !== 'password'">
+                  <input type="radio" formControlName="session_unlock_method" value="password" class="radio radio-primary radio-sm" />
+                  <span class="text-sm font-semibold">{{ 'securitySettings.methodPassword' | transloco }}</span>
+                </label>
+                <label class="flex items-center gap-3 rounded-xl border px-4 py-3 text-base-content"
+                  [class.cursor-pointer]="twoFactorEnabled()"
+                  [class.cursor-not-allowed]="!twoFactorEnabled()"
+                  [class.pointer-events-none]="!twoFactorEnabled()"
+                  [class.opacity-60]="!twoFactorEnabled()"
+                  [class.border-primary]="twoFactorEnabled() && securityForm.get('session_unlock_method')?.value === 'otp'"
+                  [class.bg-primary/10]="twoFactorEnabled() && securityForm.get('session_unlock_method')?.value === 'otp'"
+                  [class.border-base-content/15]="!(twoFactorEnabled() && securityForm.get('session_unlock_method')?.value === 'otp')">
+                  <input type="radio" formControlName="session_unlock_method" value="otp" class="radio radio-primary radio-sm" [disabled]="!twoFactorEnabled()" />
+                  <span class="text-sm font-semibold">{{ 'securitySettings.methodOtp' | transloco }}</span>
+                </label>
+              </div>
+              @if (!twoFactorEnabled()) {
+                <p class="text-sm text-base-content/80 mt-2">{{ 'securitySettings.otpRequires2fa' | transloco }}</p>
+              }
+            </div>
           </div>
         </div>
       </div>
@@ -63,7 +92,7 @@
       }
 
       <div class="flex justify-end mt-6">
-        <button type="submit" class="btn btn-primary" [disabled]="securityForm.invalid || isSaving()">
+        <button type="submit" class="btn btn-primary btn-sm sm:btn-md normal-case font-bold px-6 rounded-xl" [disabled]="securityForm.invalid || isSaving()">
           @if (isSaving()) {
             <span class="loading loading-spinner loading-sm"></span>
             {{ 'securitySettings.saving' | transloco }}
@@ -75,4 +104,7 @@
 
     </form>
   </div>
+</div>
+
+<app-two-factor-settings />
 </div>

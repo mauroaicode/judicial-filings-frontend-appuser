@@ -1,0 +1,102 @@
+<div class="auth-light-page flex min-h-screen bg-slate-50" data-theme="light">
+  <div class="flex w-full flex-col items-center justify-center p-8 md:w-1/2">
+    <div class="w-full max-w-md animate-in fade-in slide-in-from-bottom duration-500">
+      <app-title-system-auth />
+
+      <p class="mt-1 text-sm mb-8 text-slate-400 text-center font-medium">
+        {{ 'twoFactor.challengeSubtitle' | transloco }}
+      </p>
+
+      <div class="card bg-white shadow-2xl shadow-slate-200/50 border border-slate-100 rounded-3xl overflow-hidden">
+        <div class="card-body p-8 sm:p-10">
+          <h2 class="text-2xl font-black text-slate-800 mb-3 text-center tracking-tight">
+            {{ 'twoFactor.challengeTitle' | transloco }}
+          </h2>
+          <p class="text-sm text-slate-500 text-center mb-8">
+            {{ 'twoFactor.challengeDescription' | transloco }}
+          </p>
+
+          @if (showAlert()) {
+            <div class="mb-6">
+              <app-alert [type]="alertType()" [message]="alertMessage()" [useTranslation]="alertMessage().startsWith('auth.')" />
+            </div>
+          }
+
+          <form [formGroup]="codeForm" (ngSubmit)="submitCode()" class="space-y-6">
+            <div class="form-control">
+              <label class="label !pb-1.5" for="one_time_password">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  {{ 'twoFactor.codeLabel' | transloco }}
+                  <span class="required-asterisk" aria-hidden="true">*</span>
+                </span>
+              </label>
+              <input
+                id="one_time_password"
+                type="text"
+                name="one_time_password"
+                formControlName="one_time_password"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+                autocapitalize="off"
+                autocorrect="off"
+                spellcheck="false"
+                class="input w-full bg-slate-50 border-slate-200 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-xl transition-all font-semibold text-center tracking-[0.4em] text-lg"
+                [class.input-error]="isFieldInvalid()"
+                [placeholder]="'twoFactor.codePlaceholder' | transloco"
+                (input)="onCodeInput($event)" />
+              @if (isFieldInvalid()) {
+                <label class="label mt-1">
+                  <span class="label-text-alt text-error font-bold">
+                    {{ 'twoFactor.codeLength' | transloco }}
+                  </span>
+                </label>
+              }
+              <p class="mt-3 text-xs text-slate-400 text-center">
+                {{ 'twoFactor.codeHint' | transloco }}
+              </p>
+            </div>
+
+            <div class="pt-2 space-y-4">
+              <button
+                type="submit"
+                class="btn btn-primary w-full h-14 rounded-xl shadow-lg shadow-primary/25 text-base font-bold normal-case hover:scale-[1.02] active:scale-[0.98] transition-all"
+                [disabled]="codeForm.invalid || isLoading()">
+                @if (isLoading()) {
+                  <span class="loading loading-spinner"></span>
+                  {{ 'twoFactor.submitting' | transloco }}
+                } @else {
+                  {{ 'twoFactor.submit' | transloco }}
+                }
+              </button>
+
+              <div class="text-center">
+                <button
+                  type="button"
+                  class="cursor-pointer text-sm font-bold text-slate-400 hover:text-primary transition-colors"
+                  (click)="backToSignIn()">
+                  {{ 'twoFactor.backToSignIn' | transloco }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <p class="mt-8 text-center text-slate-400 text-xs font-bold uppercase tracking-[0.2em] opacity-50">
+        &copy; {{ currentYear }} NotiJudicial
+      </p>
+    </div>
+  </div>
+
+  <div class="hidden md:flex w-1/2 relative bg-[#1e1b4b]">
+    <div class="sticky top-0 h-screen w-full overflow-hidden">
+      <app-security-tips-panel
+        imageSrc="/images/ui/bg-sign-in.png"
+        [titleKey]="'twoFactor.securityTitle'"
+        [tip1Key]="'twoFactor.securityTip1'"
+        [tip2Key]="'twoFactor.securityTip2'"
+        [tip3Key]="'twoFactor.securityTip3'" />
+    </div>
+  </div>
+</div>

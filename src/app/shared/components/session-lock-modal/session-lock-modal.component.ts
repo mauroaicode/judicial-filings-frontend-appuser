@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { AuthService } from '@app/core/auth/auth.service';
+import { SessionUnlockMethod } from '@app/core/models/auth/auth.model';
 import { SessionLockService } from '@app/core/services/session-lock/session-lock.service';
 
 @Component({
@@ -15,10 +17,20 @@ import { SessionLockService } from '@app/core/services/session-lock/session-lock
 export class SessionLockModalComponent {
   private _formBuilder = inject(FormBuilder);
   private _sessionLockService = inject(SessionLockService);
+  private _authService = inject(AuthService);
+  private _transloco = inject(TranslocoService);
+  private _wasLocked = false;
 
   public unlockForm = this._formBuilder.group({
     password: ['', [Validators.required]],
   });
+
+  public otpForm = this._formBuilder.group({
+    one_time_password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6), Validators.pattern(/^\d{6}$/)]],
+  });
+
+  public readonly activeMethod = signal<SessionUnlockMethod>('password');
+  public readonly otpDigits = signal('');
 
   public readonly isSubmitting = this._sessionLockService.isUnlocking;
   public readonly errorMessage = signal<string | null>(null);
@@ -30,6 +42,22 @@ export class SessionLockModalComponent {
 
   public readonly isRateLimited = computed(() => this.rateLimitSeconds() > 0);
 
+  constructor() {
+    effect(() => {
+      const locked = this.isLocked();
+      if (locked && !this._wasLocked) {
+        const method = this._authService.user()?.session_unlock_method === 'otp' ? 'otp' : 'password';
+        this.activeMethod.set(method);
+        this.unlockForm.reset();
+        this.otpForm.reset();
+        this.otpDigits.set('');
+        this.errorMessage.set(null);
+        this.globalMessage.set(null);
+      }
+      this._wasLocked = locked;
+    });
+  }
+
   togglePasswordVisibility(): void {
     this.showPassword.update((value) => !value);
   }
@@ -38,7 +66,34 @@ export class SessionLockModalComponent {
     await this._sessionLockService.logoutAndRedirectToSignIn();
   }
 
+  onCodeInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digits = input.value.replace(/\D/g, '').slice(0, 6);
+    this.otpForm.get('one_time_password')?.setValue(digits);
+    this.otpDigits.set(digits);
+    input.value = digits;
+  }
+
+  async unlockWithOtp(): Promise<void> {
+    if (this.otpForm.invalid || this.isRateLimited()) {
+      this.otpForm.markAllAsTouched();
+      return;
+    }
+
+    this.errorMessage.set(null);
+    this.globalMessage.set(null);
+    const code = String(this.otpForm.value.one_time_password ?? '');
+
+    try {
+      await this._sessionLockService.verifyOtpAndUnlock(code);
+      this.otpForm.reset();
+    } catch (error: unknown) {
+      this._handleUnlockError(error, true);
+    }
+  }
+
   async unlockSession(): Promise<void> {
+    if (this.isRateLimited()) return;
     if (this.unlockForm.invalid) {
       this.unlockForm.markAllAsTouched();
       return;
@@ -56,30 +111,41 @@ export class SessionLockModalComponent {
     try {
       await this._sessionLockService.verifyPasswordAndUnlock(password);
       this.unlockForm.reset();
-    } catch (error: any) {
-      const status = error?.status;
-
-      if (status === 422) {
-        const validationMessage = error?.error?.errors?.password?.[0];
-        this.errorMessage.set(validationMessage || 'La contraseña es incorrecta.');
-        return;
-      }
-
-      if (status === 401) {
-        await this._sessionLockService.logoutAndRedirectToSignIn();
-        return;
-      }
-
-      if (status === 429) {
-        const message429 = error?.error?.messages?.[0] || error?.error?.message;
-        this.globalMessage.set(message429 || 'Demasiados intentos. Por favor, inténtalo más tarde.');
-        this._startRateLimitCooldown();
-        return;
-      }
-
-      const genericMessage = error?.error?.messages?.[0] || error?.error?.message;
-      this.globalMessage.set(genericMessage || 'No fue posible desbloquear la sesión.');
+    } catch (error: unknown) {
+      this._handleUnlockError(error, false);
     }
+  }
+
+  private async _handleUnlockError(error: unknown, clearCode: boolean): Promise<void> {
+    const status = (error as { status?: number })?.status;
+    const body = (error as { error?: { messages?: string[]; errors?: Record<string, string[]> } })?.error;
+    const message = body?.messages?.[0]
+      || body?.errors?.['password']?.[0]
+      || body?.errors?.['one_time_password']?.[0]
+      || '';
+
+    if (status === 401) {
+      await this._sessionLockService.logoutAndRedirectToSignIn();
+      return;
+    }
+
+    if (status === 429) {
+      this.globalMessage.set(message || this._transloco.translate('sessionLock.rateLimited'));
+      this._startRateLimitCooldown();
+      return;
+    }
+
+    if (clearCode && status === 422) {
+      this.otpForm.get('one_time_password')?.reset('');
+      this.otpDigits.set('');
+    }
+
+    if (message) {
+      this.errorMessage.set(message);
+      return;
+    }
+
+    this.globalMessage.set(this._transloco.translate('sessionLock.unlockError'));
   }
 
   private _startRateLimitCooldown(): void {

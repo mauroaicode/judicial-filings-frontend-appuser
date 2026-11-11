@@ -80,6 +80,7 @@ export class AuthenticatedLayoutComponent implements OnInit {
     if (path.includes('/palabras-clave')) return 'navigation.keywords';
     if (path.includes('/tareas')) return 'tasks.title';
     if (path.includes('/perfil')) return 'header.profile';
+    if (path.includes('/config')) return 'header.settings';
     if (path.includes('/historial-importaciones')) return 'historialImportaciones.title';
     if (path.includes('/dashboard')) return 'navigation.dashboard';
     return undefined;

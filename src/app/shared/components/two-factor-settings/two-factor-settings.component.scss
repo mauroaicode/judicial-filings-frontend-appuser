@@ -1,0 +1,7 @@
+.two-factor-qr-pad {
+  background-color: #fff;
+}
+
+:host-context([data-theme='dark']) .two-factor-qr-pad {
+  background-color: #fff;
+}
