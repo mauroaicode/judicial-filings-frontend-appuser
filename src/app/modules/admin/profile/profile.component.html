@@ -215,7 +215,7 @@
             </div>
 
             <div class="card-actions justify-end mt-8">
-              <button type="submit" class="btn btn-primary min-w-[160px]" [disabled]="profileForm.invalid || isSaving() || isLoading()">
+              <button type="submit" class="btn btn-primary btn-sm sm:btn-md normal-case font-bold px-6 rounded-xl min-w-[160px]" [disabled]="profileForm.invalid || isSaving() || isLoading()">
                 @if (isSaving()) {
                   <span class="loading loading-spinner"></span>
                   {{ 'profile.updating' | transloco }}

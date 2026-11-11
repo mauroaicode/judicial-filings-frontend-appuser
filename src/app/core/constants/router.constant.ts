@@ -3,6 +3,7 @@ export const ROUTES_ADMIN = {
   GESTION_PROCESOS: '/gestion-procesos',
   SIGN_IN: '/sign-in',
   SIGN_OUT: '/sign-out',
+  TWO_FACTOR_CHALLENGE: '/verificar-2fa',
 } as const;
 
 export type RoleName = 'super_admin' | 'admin' | 'secretary';

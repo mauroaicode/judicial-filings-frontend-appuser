@@ -18,7 +18,11 @@ export interface User {
   organization_id: string;
   session_lock_enabled?: boolean;
   session_lock_timeout?: number | null;
+  session_unlock_method?: SessionUnlockMethod;
+  google_2fa_enabled?: boolean;
 }
+
+export type SessionUnlockMethod = 'password' | 'otp';
 
 export interface Role {
   value: string;
@@ -56,5 +60,15 @@ export interface VerifyPasswordRequest {
 
 export interface VerifyPasswordResponse {
   message: string;
+}
+
+export interface TwoFactorSetupResponse {
+  secret: string;
+  qr_code_url: string;
+  qr_code_svg: string;
+}
+
+export interface TwoFactorTokenResponse {
+  token: string;
 }
 

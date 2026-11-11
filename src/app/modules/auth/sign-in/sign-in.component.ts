@@ -22,10 +22,8 @@ import { TitleSystemAuth } from '@app/shared/components/title-system-auth/title-
 import { AlertComponent } from '@app/shared/components/alert/alert.component';
 import { AuthService } from '@app/core/auth/auth.service';
 import { ROLE_ROUTE_MAP, ROUTES_ADMIN } from '@app/core/constants/router.constant';
-import { STORAGE } from '@app/core/constants/storage.constant';
 import type { RoleName } from '@app/core/constants/router.constant';
 import { ErrorHandlerService } from '@app/core/services/error/error-handler.service';
-import { safeRemoveLocalStorageItem } from '@app/core/utils/local-storage.util';
 import { ThemeService } from '@app/core/services/theme/theme.service';
 
 @Component({
@@ -97,10 +95,15 @@ export class SignInComponent implements OnInit, OnDestroy {
         this._authService.signIn({ identification, password })
       );
 
-      // Save token and user
-      this._authService.accessToken = response.token;
-      this._authService.currentUser = response.user;
-      safeRemoveLocalStorageItem(STORAGE.SESSION_LOCKED);
+      this._authService.acceptLogin(response);
+
+      if (response.requires_2fa) {
+        const returnUrl = this._returnUrl();
+        await this._router.navigate([ROUTES_ADMIN.TWO_FACTOR_CHALLENGE], {
+          queryParams: returnUrl ? { returnUrl } : undefined,
+        });
+        return;
+      }
 
       this.alertType.set('success');
       

@@ -15,6 +15,11 @@ export const redirectGuard: CanActivateFn = async (route, state) => {
   const token = authService.accessToken;
   const user = authService.currentUser;
 
+  if (authService.isAwaitingTwoFactor() && token) {
+    await router.navigate([ROUTES_ADMIN.TWO_FACTOR_CHALLENGE]);
+    return false;
+  }
+
   // If user is authenticated, redirect to their default route (gestión-procesos)
   if (token && user) {
     const userRoles = user?.roles ?? [];

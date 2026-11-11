@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { redirectGuard } from './core/guards/redirect.guard';
+import { twoFactorChallengeGuard } from './core/guards/two-factor-challenge.guard';
 
 export const routes: Routes = [
   // Redirect empty path - will be handled by guards
@@ -29,6 +30,14 @@ export const routes: Routes = [
     canActivate: [guestGuard],
     loadChildren: () =>
       import('./modules/auth/reset-password/reset-password.routes'),
+  },
+  {
+    path: 'verificar-2fa',
+    canActivate: [twoFactorChallengeGuard],
+    loadComponent: () =>
+      import('./modules/auth/two-factor-challenge/two-factor-challenge.component').then(
+        (m) => m.TwoFactorChallengeComponent
+      ),
   },
   {
     path: 'confirmar-correo',

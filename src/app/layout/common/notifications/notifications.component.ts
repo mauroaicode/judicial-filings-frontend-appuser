@@ -62,7 +62,8 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     constructor() {
         effect(() => {
             const user = this._authService.user();
-            if (user) {
+            const awaitingTwoFactor = this._authService.isAwaitingTwoFactor();
+            if (user && !awaitingTwoFactor) {
                 this._websocketService.connect();
                 this._subscribeToChannels(user);
                 this._loadInitialData();

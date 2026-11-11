@@ -2,11 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '@app/core/config/environment.config';
-import { User } from '@app/core/models/auth/auth.model';
+import { SessionUnlockMethod, User } from '@app/core/models/auth/auth.model';
 
 export interface SessionLockUpdatePayload {
   session_lock_enabled: boolean;
   session_lock_timeout: number;
+  session_unlock_method?: SessionUnlockMethod;
 }
 
 @Injectable({

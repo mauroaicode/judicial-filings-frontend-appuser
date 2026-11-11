@@ -28,6 +28,8 @@ export class SessionLockService {
 
   private _idleTimerId: number | null = null;
   private _blockEventsAttached = false;
+  private _activityListenersAttached = false;
+  private _featureEnabled = true;
 
   private readonly _activityEvents: Array<keyof WindowEventMap> = [
     'mousemove',
@@ -44,35 +46,51 @@ export class SessionLockService {
 
   private readonly _defaultLockTimeoutMinutes = 5;
 
+  constructor() {
+    this.initializeFromCurrentUser();
+    window.addEventListener('pageshow', this._onPageShow);
+  }
+
   initializeFromCurrentUser(): void {
-    if (this._isInitialized()) return;
-
-    const user = this._authService.currentUser;
-    const isEnabled = user?.session_lock_enabled !== false; // default to true if undefined
-    const timeoutMinutes = user?.session_lock_timeout;
-
-    if (!isEnabled) {
-      // If feature is disabled explicitly, just mark initialized but don't start timers
-      this._isInitialized.set(true);
+    if (this._isInitialized()) {
+      if (this._isLockPersisted() && !this._isLocked()) {
+        this.lock();
+      }
       return;
     }
 
+    const user = this._authService.currentUser;
+    if (!user || !this._authService.accessToken) return;
+
+    const isEnabled = user.session_lock_enabled !== false;
+    const timeoutMinutes = user.session_lock_timeout;
     const resolvedTimeoutMinutes =
       typeof timeoutMinutes === 'number' && Number.isFinite(timeoutMinutes) && timeoutMinutes > 0
         ? timeoutMinutes
         : this._defaultLockTimeoutMinutes;
 
+    this._featureEnabled = isEnabled;
     this._lockTimeoutMs.set(resolvedTimeoutMinutes * 60_000);
     this._isInitialized.set(true);
-    this._attachActivityListeners();
 
+    // A reload is not an unlock. The saved method is still required.
     if (this._isLockPersisted()) {
       this.lock();
+      if (isEnabled) this._attachActivityListeners();
       return;
     }
 
+    if (!isEnabled) return;
+
+    this._attachActivityListeners();
     this.resetInactivityTimer();
   }
+
+  private readonly _onPageShow = (): void => {
+    if (this._isLockPersisted() && !this._isLocked()) {
+      this.lock();
+    }
+  };
 
   resetInactivityTimer(): void {
     if (!this._isInitialized() || this._isLocked()) return;
@@ -99,7 +117,9 @@ export class SessionLockService {
     this._isLocked.set(false);
     this._persistLockState(false);
     this._detachBlockedInteractionGuards();
-    this.resetInactivityTimer();
+    if (this._featureEnabled) {
+      this.resetInactivityTimer();
+    }
   }
 
   async verifyPasswordAndUnlock(password: string): Promise<void> {
@@ -108,6 +128,21 @@ export class SessionLockService {
     this._isUnlocking.set(true);
     try {
       await firstValueFrom(this._authService.verifyPassword({ password }));
+      this.unlock();
+    } finally {
+      this._isUnlocking.set(false);
+    }
+  }
+
+  /**
+   * Unlocks with the authenticator code. The session token stays the same.
+   */
+  async verifyOtpAndUnlock(oneTimePassword: string): Promise<void> {
+    if (this._isUnlocking()) return;
+
+    this._isUnlocking.set(true);
+    try {
+      await firstValueFrom(this._authService.verifyOtp(oneTimePassword));
       this.unlock();
     } finally {
       this._isUnlocking.set(false);
@@ -131,9 +166,19 @@ export class SessionLockService {
   }
 
   private _attachActivityListeners(): void {
+    if (this._activityListenersAttached) return;
     for (const eventName of this._activityEvents) {
       this._document.addEventListener(eventName, this._onActivityBound, { passive: true });
     }
+    this._activityListenersAttached = true;
+  }
+
+  private _detachActivityListeners(): void {
+    if (!this._activityListenersAttached) return;
+    for (const eventName of this._activityEvents) {
+      this._document.removeEventListener(eventName, this._onActivityBound);
+    }
+    this._activityListenersAttached = false;
   }
 
   private _attachBlockedInteractionGuards(): void {
@@ -231,20 +276,19 @@ export class SessionLockService {
       console.warn('Invalid session lock timeout');
       return;
     }
+    this._featureEnabled = enabled;
     this._lockTimeoutMs.set(timeoutMinutes * 60_000);
-    
+    this._isInitialized.set(true);
+
     if (!enabled) {
-      this.unlock();
       this._clearIdleTimer();
-      // Remove activity listeners if we disable it
-      for (const eventName of this._activityEvents) {
-        this._document.removeEventListener(eventName, this._onActivityBound, { passive: true } as EventListenerOptions);
-      }
-    } else {
-      this._attachActivityListeners();
-      if (!this._isLocked()) {
-        this.resetInactivityTimer();
-      }
+      this._detachActivityListeners();
+      return;
+    }
+
+    this._attachActivityListeners();
+    if (!this._isLocked()) {
+      this.resetInactivityTimer();
     }
   }
 
