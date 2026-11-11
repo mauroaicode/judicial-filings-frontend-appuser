@@ -13,7 +13,7 @@
                         </span>
                         @if (task().type_label || task().type) {
                             <span class="badge badge-sm font-bold uppercase tracking-wider h-6 px-2.5 border-none badge-outline"
-                                [class.badge-warning]="task().type === 'suspension'">
+                                [class.badge-warning]="task().type === 'pending_hearing' || task().type === 'suspension_insolvency' || task().type === 'suspension_payment_agreement' || task().type === 'suspension'">
                                 {{ task().type_label || ('tasks.form.typeOptions.' + task().type | transloco) }}
                             </span>
                         }

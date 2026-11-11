@@ -12,6 +12,7 @@ import { TaskDetailModalComponent } from './components/task-detail-modal/task-de
 import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
 import { getTaskUrgencyClass, getTaskUrgencyInfo, TaskUrgencyInfo } from '@app/core/utils/task-urgency.util';
 import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
+import { isProcessPausingTaskType } from '@app/core/utils/process-paused.util';
 
 type TaskTab = {
     view: TaskView;
@@ -247,10 +248,14 @@ export class TasksComponent implements OnInit, OnDestroy {
 
     public getCompleteConfirmMessageKey(): string {
         const task = this.taskToComplete();
-        if (task?.type === 'suspension' && task.process_id) {
+        if (isProcessPausingTaskType(task?.type) && task?.process_id) {
             return 'tasks.complete.messageSuspension';
         }
         return 'tasks.complete.message';
+    }
+
+    public isProcessPausingTaskType(type: string | null | undefined): boolean {
+        return isProcessPausingTaskType(type);
     }
 
     public onDeleteConfirm(): void {
@@ -271,7 +276,12 @@ export class TasksComponent implements OnInit, OnDestroy {
                 next: () => {
                     this.tasks.update(current => current.filter(t => t.id !== task.id));
                     this.totalTasks.update(total => Math.max(0, total - 1));
-                    this.showAlert('success', 'tasks.messages.movedToTrash');
+                    if (isProcessPausingTaskType(task.type) && task.process_id) {
+                        this._processRefresh.requestRefresh(task.process_id);
+                        this.showAlert('success', 'tasks.messages.completedSuspensionReactivated');
+                    } else {
+                        this.showAlert('success', 'tasks.messages.movedToTrash');
+                    }
                 },
                 error: (error) => {
                     console.error('Error moving task to trash:', error);
@@ -327,7 +337,7 @@ export class TasksComponent implements OnInit, OnDestroy {
                     this.totalTasks.update(total => Math.max(0, total - 1));
 
                     const isSuspension =
-                        (completed?.type ?? task.type) === 'suspension'
+                        isProcessPausingTaskType(completed?.type ?? task.type)
                         && !!(completed?.process_id ?? task.process_id);
 
                     if (isSuspension) {

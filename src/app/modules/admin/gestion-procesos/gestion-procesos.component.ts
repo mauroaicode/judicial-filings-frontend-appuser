@@ -37,6 +37,7 @@ import { ConfirmationDialogComponent } from '@app/shared/components/confirmation
 import { ProcessManualSyncBadgeComponent } from '@app/shared/components/process-manual-sync-badge/process-manual-sync-badge.component';
 import { Observable } from 'rxjs';
 import { isSemaphorePaused, getSemaphorePauseMessage } from '@app/core/utils/process-semaphore.util';
+import { isPausedProcessStatusLabel } from '@app/core/utils/process-paused.util';
 import type { ProcessSemaphore } from '@app/core/models/process/process.model';
 
 @Component({
@@ -1235,7 +1236,7 @@ export class GestionProcesosComponent {
   public getStatusBadgeClass(status: string | null | undefined): string {
     const statusLower = (status ?? '').toLowerCase();
 
-    if (statusLower.includes('suspend')) {
+    if (isPausedProcessStatusLabel(statusLower)) {
       return 'badge-info';
     }
     if (statusLower.includes('inactivo') || statusLower.includes('inactive')) {

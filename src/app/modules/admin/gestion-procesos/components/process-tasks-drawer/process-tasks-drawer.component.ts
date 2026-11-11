@@ -25,6 +25,7 @@ import { IconService } from '@app/core/services/icon/icon.service';
 import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
 import { TranslocoService } from '@jsverse/transloco';
 import { Router } from '@angular/router';
+import { isProcessPausingTaskType } from '@app/core/utils/process-paused.util';
 
 const PER_PAGE = 20;
 const SCROLL_LOAD_THRESHOLD = 200;
@@ -241,7 +242,7 @@ export class ProcessTasksDrawerComponent {
           this.emitPendingCountRefresh();
 
           const isSuspension =
-            (completed?.type ?? task.type) === 'suspension'
+            isProcessPausingTaskType(completed?.type ?? task.type)
             && !!(completed?.process_id ?? task.process_id);
 
           if (isSuspension) {
@@ -262,10 +263,14 @@ export class ProcessTasksDrawerComponent {
 
   getCompleteConfirmMessageKey(): string {
     const task = this.taskPendingComplete();
-    if (task?.type === 'suspension' && task.process_id) {
+    if (isProcessPausingTaskType(task?.type) && task?.process_id) {
       return 'tasks.complete.messageSuspension';
     }
     return 'tasks.complete.message';
+  }
+
+  isProcessPausingTaskType(type: string | null | undefined): boolean {
+    return isProcessPausingTaskType(type);
   }
 
   onDetailComplete(task: Task): void {

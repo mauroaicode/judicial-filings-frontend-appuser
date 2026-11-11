@@ -29,6 +29,7 @@ import {
     nextFiveMinuteSlot,
 } from '@app/core/utils/local-datetime.util';
 import { ProcessRefreshService } from '@app/core/services/process/process-refresh.service';
+import { isProcessPausingTaskType } from '@app/core/utils/process-paused.util';
 
 @Component({
     selector: 'app-task-form-modal',
@@ -257,7 +258,7 @@ export class TaskFormModalComponent implements OnInit, OnDestroy {
     }
 
     public isSuspensionType(): boolean {
-        return this.taskForm.get('type')?.value === 'suspension';
+        return isProcessPausingTaskType(this.taskForm.get('type')?.value);
     }
 
     public hasStatusChanged(): boolean {
@@ -567,11 +568,10 @@ export class TaskFormModalComponent implements OnInit, OnDestroy {
             return;
         }
 
-        if (type === 'suspension') {
+        if (isProcessPausingTaskType(type)) {
             control.setValidators([Validators.required]);
         } else {
             control.clearValidators();
-            // Optional again when switching away from suspension
             control.setErrors(null);
         }
         control.updateValueAndValidity({ emitEvent: false });
@@ -613,7 +613,7 @@ export class TaskFormModalComponent implements OnInit, OnDestroy {
         const processId = this.taskForm.get('process_id')?.value ?? this.task()?.process_id;
 
         if (
-            type === 'suspension'
+            isProcessPausingTaskType(type)
             && status === 'completed'
             && previousStatus !== 'completed'
             && processId

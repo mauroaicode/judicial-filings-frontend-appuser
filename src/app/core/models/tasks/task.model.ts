@@ -1,5 +1,11 @@
 export type TaskStatus = 'pending' | 'draft' | 'completed';
-export type TaskType = 'general' | 'suspension';
+export type TaskType =
+  | 'general'
+  | 'pending_hearing'
+  | 'suspension_insolvency'
+  | 'suspension_payment_agreement'
+  /** @deprecated Prefer a specific pausing type. Kept for existing rows. */
+  | 'suspension';
 export type TaskView = TaskStatus | 'trash';
 export type TaskUrgencyLevelApi = 'normal' | 'alert_1' | 'alert_2' | 'critical';
 
@@ -85,7 +91,9 @@ export interface TaskTypeOption {
 
 export const TASK_TYPE_OPTIONS: TaskTypeOption[] = [
     { value: 'general', labelKey: 'tasks.form.typeOptions.general' },
-    { value: 'suspension', labelKey: 'tasks.form.typeOptions.suspension' },
+    { value: 'pending_hearing', labelKey: 'tasks.form.typeOptions.pending_hearing' },
+    { value: 'suspension_insolvency', labelKey: 'tasks.form.typeOptions.suspension_insolvency' },
+    { value: 'suspension_payment_agreement', labelKey: 'tasks.form.typeOptions.suspension_payment_agreement' },
 ];
 
 export interface ProcessSummary {

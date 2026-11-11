@@ -47,6 +47,7 @@ import { ProcessRefreshService } from '@app/core/services/process/process-refres
 import { ProcessQuotaService } from '@app/core/services/process/process-quota.service';
 import { NotificationService } from '@app/core/services/notification/notification.service';
 import { getSemaphorePauseMessage, isSemaphorePaused } from '@app/core/utils/process-semaphore.util';
+import { isPausedProcessStatusLabel, isProcessPaused } from '@app/core/utils/process-paused.util';
 
 const DETAIL_HEADER_SCROLL_THRESHOLD = 80;
 
@@ -1193,7 +1194,7 @@ export class ProcessDetailComponent {
     const status = this.initialStatusLabel() || this.process()?.status_label;
     const statusCode = this.process()?.status;
     if (statusCode === 'inactive') return true;
-    if (statusCode === 'suspended' || statusCode === 'active') return false;
+    if (isProcessPaused(statusCode) || statusCode === 'active') return false;
     if (!status) return false;
     const statusLower = status.toLowerCase();
     return statusLower.includes('inactivo') || statusLower.includes('inactive');
@@ -1202,10 +1203,10 @@ export class ProcessDetailComponent {
   isProcessSuspended(): boolean {
     const process = this.process();
     if (!process) return false;
-    if (process.status === 'suspended') return true;
-    if (isSemaphorePaused(process.semaphore)) return true;
-    const status = (this.initialStatusLabel() || process.status_label || '').toLowerCase();
-    return status.includes('suspend');
+    if (isProcessPaused(process.status, this.initialStatusLabel() || process.status_label)) {
+      return true;
+    }
+    return isSemaphorePaused(process.semaphore);
   }
 
   isSemaphorePaused(): boolean {
@@ -1385,7 +1386,7 @@ export class ProcessDetailComponent {
   getStatusClass(status: string): string {
     const statusLower = status.toLowerCase();
 
-    if (statusLower.includes('suspend')) {
+    if (isPausedProcessStatusLabel(statusLower)) {
       return 'badge badge-info';
     }
 
