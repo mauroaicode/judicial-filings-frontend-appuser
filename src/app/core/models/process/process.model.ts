@@ -37,7 +37,14 @@ export interface ProcessInstance {
 /**
  * Machine status codes from the API.
  */
-export type ProcessStatusCode = 'active' | 'inactive' | 'suspended' | string;
+export type ProcessStatusCode =
+  | 'active'
+  | 'inactive'
+  | 'pending_hearing'
+  | 'suspended_insolvency'
+  | 'suspended_payment_agreement'
+  | 'suspended'
+  | string;
 
 /**
  * Inactivity semaphore metadata. When `paused` is true, tracking colors are frozen
@@ -100,10 +107,10 @@ export interface ProcessFilter {
   process_class?: string;
   plaintiff?: string;
   defendant?: string;
-  status?: string; // 'active' | 'inactive' | 'suspended'
+  status?: string; // 'active' | 'inactive' | 'pending_hearing' | 'suspended_insolvency' | 'suspended_payment_agreement' | 'suspended'
   has_multiple_instances?: boolean;
   lawyer_role?: string; // 'plaintiff' | 'defendant'
-  severity_color?: string; // 'red' | 'yellow' | 'green' | 'none' | 'suspended'
+  severity_color?: string; // 'red' | 'yellow' | 'green' | 'none' | paused status codes | 'suspended' (any paused)
   /** true: con actuaciones retiradas en Rama; false: sin ellas; omitido: todos */
   removed_from_judicial_branch?: boolean;
   process_date_from?: string;
