@@ -1,0 +1,137 @@
+<div class="w-full space-y-5 animate-fade-in">
+  @if (copiedMessage()) {
+  <div class="toast toast-end toast-bottom z-[10060] pointer-events-none">
+    <div class="alert alert-success shadow-lg border-none bg-success text-success-content rounded-2xl">
+      <span class="font-bold">{{ copiedMessage() }}</span>
+    </div>
+  </div>
+  }
+
+  <div>
+    <h1 class="text-2xl font-bold text-base-content md:text-3xl">
+      {{ 'courtDirectory.title' | transloco }}
+    </h1>
+  </div>
+
+  <div class="space-y-3">
+    <label class="block">
+      <span class="sr-only">{{ 'courtDirectory.searchPlaceholder' | transloco }}</span>
+      <input
+        type="search"
+        class="input input-bordered w-full bg-base-100 text-base-content rounded-xl h-12"
+        [formControl]="searchControl"
+        [placeholder]="'courtDirectory.searchPlaceholder' | transloco"
+        autocomplete="off"
+        autofocus />
+    </label>
+
+    <div>
+      <button
+        type="button"
+        class="btn btn-ghost btn-sm normal-case font-semibold text-base-content/80"
+        (click)="toggleFilters()"
+        [attr.aria-expanded]="filtersOpen()">
+        {{ 'courtDirectory.filtersToggle' | transloco }}
+      </button>
+
+      @if (filtersOpen()) {
+      <div class="mt-2 grid grid-cols-1 gap-3 rounded-2xl border border-base-200 bg-base-100 p-4 sm:grid-cols-3">
+        <label class="form-control w-full">
+          <span class="label-standard mb-1">{{ 'courtDirectory.department' | transloco }}</span>
+          <input type="text" class="input input-bordered w-full bg-base-100 text-base-content" [formControl]="departmentControl" />
+        </label>
+        <label class="form-control w-full">
+          <span class="label-standard mb-1">{{ 'courtDirectory.city' | transloco }}</span>
+          <input type="text" class="input input-bordered w-full bg-base-100 text-base-content" [formControl]="cityControl" />
+        </label>
+        <label class="form-control w-full">
+          <span class="label-standard mb-1">{{ 'courtDirectory.specialty' | transloco }}</span>
+          <input type="text" class="input input-bordered w-full bg-base-100 text-base-content" [formControl]="specialtyControl" />
+        </label>
+        @if (departmentControl.value || cityControl.value || specialtyControl.value) {
+        <div class="sm:col-span-3">
+          <button type="button" class="btn btn-link btn-sm normal-case px-0 text-base-content/70" (click)="clearFilters()">
+            {{ 'courtDirectory.clearFilters' | transloco }}
+          </button>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+  <div class="flex flex-col items-center justify-center gap-4 rounded-2xl border border-base-200 bg-base-100 py-24">
+    <span class="loading loading-spinner loading-lg text-primary"></span>
+    <p class="text-xs font-bold uppercase tracking-widest text-base-content/40">{{ 'courtDirectory.loading' | transloco }}</p>
+  </div>
+  } @else if (error()) {
+  <div class="rounded-2xl border border-base-200 bg-base-100 px-6 py-16 text-center">
+    <p class="text-sm font-semibold text-base-content">{{ 'courtDirectory.error' | transloco }}</p>
+  </div>
+  } @else if (!hasSearched()) {
+  <div class="rounded-2xl border border-dashed border-base-300 bg-base-100 px-6 py-16 text-center">
+    <p class="text-sm font-medium text-base-content/70">{{ 'courtDirectory.hint' | transloco }}</p>
+  </div>
+  } @else if (entries().length === 0) {
+  <div class="rounded-2xl border border-dashed border-base-300 bg-base-100 px-6 py-16 text-center">
+    <p class="text-sm font-semibold text-base-content">{{ 'courtDirectory.empty' | transloco }}</p>
+  </div>
+  } @else {
+  <div class="grid grid-cols-1 gap-3">
+    @for (entry of entries(); track entry.id) {
+    <article class="rounded-2xl border border-base-200 bg-base-100 p-4 shadow-sm sm:p-5">
+      <h2 class="text-base font-bold text-base-content leading-snug">{{ entry.name }}</h2>
+
+      @if (entry.desk_code) {
+      <div class="group/code mt-2 flex items-center gap-2">
+        <p class="font-mono text-sm font-semibold tracking-wide text-base-content">{{ entry.desk_code }}</p>
+        <button
+          type="button"
+          class="radicado-copy-btn btn btn-xs btn-circle btn-ghost shrink-0 text-primary opacity-80 transition-opacity hover:bg-primary/10 hover:text-primary active:scale-90 sm:opacity-20 sm:group-hover/code:opacity-100"
+          [attr.title]="'courtDirectory.copyCode' | transloco"
+          (click)="copyCode(entry.desk_code, $event)">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+          </svg>
+        </button>
+      </div>
+      }
+
+      <div class="group/mail mt-2 flex items-center gap-2">
+        <p class="min-w-0 break-all text-sm font-semibold text-base-content">{{ entry.email }}</p>
+        <button
+          type="button"
+          class="radicado-copy-btn btn btn-xs btn-circle btn-ghost shrink-0 text-primary opacity-80 transition-opacity hover:bg-primary/10 hover:text-primary active:scale-90 sm:opacity-20 sm:group-hover/mail:opacity-100"
+          [attr.title]="'courtDirectory.copyEmail' | transloco"
+          (click)="copyEmail(entry.email, $event)">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+          </svg>
+        </button>
+      </div>
+
+      <p class="mt-2 text-sm text-base-content/70">
+        {{ entry.city || '–' }} · {{ entry.department || '–' }} · {{ entry.specialty || '–' }}
+      </p>
+    </article>
+    }
+  </div>
+
+  @if (pageInfo(); as info) {
+  @if (info.last_page > 1) {
+  <div class="flex items-center justify-between gap-3">
+    <button type="button" class="btn btn-sm normal-case" [disabled]="info.current_page <= 1" (click)="previousPage()">
+      {{ 'courtDirectory.previous' | transloco }}
+    </button>
+    <p class="text-sm text-base-content/70">
+      {{ 'courtDirectory.page' | transloco: { current: info.current_page, last: info.last_page } }}
+    </p>
+    <button type="button" class="btn btn-sm normal-case" [disabled]="info.current_page >= info.last_page" (click)="nextPage()">
+      {{ 'courtDirectory.next' | transloco }}
+    </button>
+  </div>
+  }
+  }
+  }
+</div>

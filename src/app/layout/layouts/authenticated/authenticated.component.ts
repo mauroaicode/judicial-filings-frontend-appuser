@@ -79,6 +79,7 @@ export class AuthenticatedLayoutComponent implements OnInit {
     if (path.includes('/actuaciones-recientes')) return 'actuacionesRecientes.title';
     if (path.includes('/palabras-clave')) return 'navigation.keywords';
     if (path.includes('/tareas')) return 'tasks.title';
+    if (path.includes('/directorio-despachos')) return 'courtDirectory.title';
     if (path.includes('/perfil')) return 'header.profile';
     if (path.includes('/config')) return 'header.settings';
     if (path.includes('/historial-importaciones')) return 'historialImportaciones.title';

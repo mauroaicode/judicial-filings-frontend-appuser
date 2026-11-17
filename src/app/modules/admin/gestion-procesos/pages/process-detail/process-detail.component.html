@@ -328,8 +328,18 @@
                 *ngTemplateOutlet="infoItem; context: { label: 'processDetail.processNumber', value: (process()!.process_number | processNumber), strong: true, isCopyable: true, originalValue: process()!.process_number }"></ng-container>
               <ng-container
                 *ngTemplateOutlet="infoItem; context: { label: 'processDetail.speaker', value: process()!.speaker }"></ng-container>
-              <ng-container
-                *ngTemplateOutlet="infoItem; context: { label: 'processDetail.court', value: process()!.court }"></ng-container>
+              <div class="detail-info-item p-4 bg-base-200/30 border border-base-200/60 rounded-xl hover:bg-base-200/40 hover:border-primary/10 transition-all h-full">
+                <span class="detail-info-label block text-[9px] uppercase font-bold text-base-content/80 tracking-wider mb-1">{{ 'processDetail.court' | transloco }}</span>
+                <p class="text-sm font-semibold text-base-content leading-snug break-words">{{ process()!.court || '–' }}</p>
+                <button type="button"
+                  class="court-more-link mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                  (click)="openCourtDrawer()">
+                  {{ 'courtDirectory.seeMore' | transloco }}
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
               <ng-container
                 *ngTemplateOutlet="infoItem; context: { label: 'processDetail.processType', value: process()!.process_type }"></ng-container>
               <ng-container
@@ -1133,6 +1143,19 @@
   }
 
   @if (process(); as detailProcess) {
+    <app-court-directory-drawer
+      [isOpen]="showCourtDrawer()"
+      [courtName]="detailProcess.court"
+      [processNumber]="detailProcess.process_number | processNumber"
+      [filing]="filingParts()"
+      [entries]="courtEmails()"
+      [loading]="courtEmailsLoading() || (!!filingParts() && !courtEmailsResolved())"
+      [error]="courtEmailsError()"
+      [invalid]="courtEmailsInvalid()"
+      (closed)="closeCourtDrawer()"
+      (copyEmail)="copyToClipboard($event, undefined, 'email')"
+      (copyCode)="copyToClipboard($event, undefined, 'code')">
+    </app-court-directory-drawer>
     <app-process-tasks-drawer
       [isOpen]="showProcessTasksDrawer()"
       [processId]="detailProcess.id"

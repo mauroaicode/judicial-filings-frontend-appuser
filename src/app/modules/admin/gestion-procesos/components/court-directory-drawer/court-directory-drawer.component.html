@@ -1,0 +1,143 @@
+<div
+  class="drawer drawer-end court-directory-drawer-root"
+  [class.court-directory-drawer-visible]="isOpen()"
+>
+  <input
+    id="court-directory-drawer-toggle"
+    type="checkbox"
+    class="drawer-toggle"
+    [checked]="isOpen()"
+    (change)="onToggleChange($event)"
+  />
+  <div class="drawer-content min-w-0 w-0 overflow-visible"></div>
+  <div class="drawer-side">
+    <label
+      for="court-directory-drawer-toggle"
+      aria-label="close sidebar"
+      class="drawer-overlay"
+    ></label>
+    <div
+      class="court-directory-drawer-panel bg-base-100 h-full w-full max-w-[44rem] flex flex-col shadow-2xl overflow-hidden"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="'courtDirectory.seeMore' | transloco"
+    >
+      <header class="court-directory-drawer-header">
+        <div class="min-w-0">
+          <p class="drawer-kicker">{{ 'processDetail.court' | transloco }}</p>
+          <h2 class="drawer-title">{{ courtName() || '–' }}</h2>
+        </div>
+        <button
+          type="button"
+          class="drawer-icon-btn"
+          [attr.aria-label]="'courtDirectory.close' | transloco"
+          (click)="close()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="court-directory-drawer-scroll">
+        @if (filing()) {
+          @if (loading()) {
+          <div class="drawer-status">
+            <span class="loading loading-spinner loading-sm text-primary"></span>
+          </div>
+          } @else if (error()) {
+          <p class="drawer-status-text">{{ 'courtDirectory.error' | transloco }}</p>
+          } @else if (!invalid() && entries().length === 0) {
+          <p class="drawer-status-text">{{ 'courtDirectory.notInDirectory' | transloco }}</p>
+          } @else if (entries().length > 0) {
+          <section class="drawer-mail">
+            <p class="drawer-kicker">{{ 'courtDirectory.emailSection' | transloco }}</p>
+            @for (entry of entries(); track entry.id) {
+            <div class="drawer-mail__item">
+              <p class="drawer-email">{{ entry.email }}</p>
+              <button
+                type="button"
+                class="drawer-icon-btn drawer-icon-btn--primary"
+                [attr.aria-label]="'courtDirectory.copyEmail' | transloco"
+                (click)="copyEmail.emit(entry.email)"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                </svg>
+              </button>
+            </div>
+            @if (!entry.is_active) {
+            <p class="drawer-hint">{{ 'courtDirectory.inactiveEmail' | transloco }}</p>
+            }
+            }
+          </section>
+
+          <dl class="drawer-rows">
+            <div>
+              <dt>{{ 'courtDirectory.directoryName' | transloco }}</dt>
+              <dd>{{ entries()[0].name || '–' }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'courtDirectory.city' | transloco }}</dt>
+              <dd>{{ entries()[0].city || '–' }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'courtDirectory.department' | transloco }}</dt>
+              <dd>{{ entries()[0].department || '–' }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'courtDirectory.specialty' | transloco }}</dt>
+              <dd>{{ entries()[0].specialty || '–' }}</dd>
+            </div>
+            @if (entries()[0].corporation) {
+            <div>
+              <dt>{{ 'courtDirectory.corporation' | transloco }}</dt>
+              <dd>{{ entries()[0].corporation }}</dd>
+            </div>
+            }
+            @if (entries()[0].account_type) {
+            <div>
+              <dt>{{ 'courtDirectory.accountType' | transloco }}</dt>
+              <dd>{{ entries()[0].account_type }}</dd>
+            </div>
+            }
+          </dl>
+          }
+        }
+
+        @if (filing(); as parts) {
+        <section class="drawer-code-block">
+          <div class="drawer-code-line">
+            <div>
+              <p class="drawer-kicker">{{ 'courtDirectory.deskCode' | transloco }}</p>
+              <p class="drawer-code">{{ parts.deskCode }}</p>
+            </div>
+            <button
+              type="button"
+              class="drawer-icon-btn"
+              [attr.aria-label]="'courtDirectory.copyCode' | transloco"
+              (click)="copyCode.emit(parts.deskCode)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+              </svg>
+            </button>
+          </div>
+          <p class="drawer-hint">{{ 'courtDirectory.deskExplainer' | transloco }}</p>
+          <p class="drawer-segments">
+            <span><strong>{{ parts.deskLabel }}</strong> {{ 'courtDirectory.segments.desk' | transloco }}</span>
+            <span><strong>{{ parts.year }}</strong> {{ 'courtDirectory.segments.year' | transloco }}</span>
+            <span><strong>{{ parts.consecutive }}</strong> {{ 'courtDirectory.segments.consecutive' | transloco }}</span>
+            <span><strong>{{ parts.instance }}</strong> {{ 'courtDirectory.segments.instance' | transloco }}</span>
+          </p>
+          @if (processNumber()) {
+          <p class="drawer-filing">{{ processNumber() }}</p>
+          }
+        </section>
+        } @else {
+        <p class="drawer-status-text">{{ 'courtDirectory.noDeskCode' | transloco }}</p>
+        }
+      </div>
+    </div>
+  </div>
+</div>

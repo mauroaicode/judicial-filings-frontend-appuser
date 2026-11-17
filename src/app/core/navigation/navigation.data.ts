@@ -34,6 +34,13 @@ export const DEFAULT_NAVIGATION: NavigationItem[] = [
     link: '/tareas',
   },
   {
+    id: 'directorio-despachos',
+    title: 'courtDirectory.title',
+    type: 'basic',
+    icon: 'court-directory',
+    link: '/directorio-despachos',
+  },
+  {
     id: 'historial-importaciones',
     title: 'navigation.importHistory',
     type: 'basic',
