@@ -15,6 +15,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ProcessNumberPipe } from '@app/shared/pipes/process-number.pipe';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
+import { EMPTY, Subject as RxSubject } from 'rxjs';
+import { catchError, distinctUntilChanged, finalize, switchMap, tap } from 'rxjs/operators';
 import { ProcessService } from '@app/core/services/process/process.service';
 import {
   ProcessDetail,
@@ -38,6 +41,7 @@ import { ProcessAlertTooltipComponent } from '@app/shared/components/process-ale
 import { RoleSelectionModalComponent } from '../../components/role-selection-modal/role-selection-modal.component';
 import { ProcessAiChatComponent } from '../../components/process-ai-chat/process-ai-chat.component';
 import { ProcessTasksDrawerComponent } from '../../components/process-tasks-drawer/process-tasks-drawer.component';
+import { CourtDirectoryDrawerComponent } from '../../components/court-directory-drawer/court-directory-drawer.component';
 import { ProcessTimelineComponent } from '../../components/process-timeline/process-timeline.component';
 import { ProcessManualSyncBadgeComponent } from '@app/shared/components/process-manual-sync-badge/process-manual-sync-badge.component';
 import { ActionDocumentsViewerComponent } from '@app/shared/components/action-documents-viewer/action-documents-viewer.component';
@@ -48,6 +52,9 @@ import { ProcessQuotaService } from '@app/core/services/process/process-quota.se
 import { NotificationService } from '@app/core/services/notification/notification.service';
 import { getSemaphorePauseMessage, isSemaphorePaused } from '@app/core/utils/process-semaphore.util';
 import { isPausedProcessStatusLabel, isProcessPaused } from '@app/core/utils/process-paused.util';
+import { parseFilingNumber } from '@app/core/utils/filing-number.util';
+import { CourtDirectoryEntry } from '@app/core/models/court-directory/court-directory.model';
+import { CourtDirectoryService } from '@app/core/services/court-directory/court-directory.service';
 
 const DETAIL_HEADER_SCROLL_THRESHOLD = 80;
 
@@ -66,6 +73,7 @@ const DETAIL_HEADER_SCROLL_THRESHOLD = 80;
     RoleSelectionModalComponent,
     ProcessAiChatComponent,
     ProcessTasksDrawerComponent,
+    CourtDirectoryDrawerComponent,
     ProcessTimelineComponent,
     ProcessManualSyncBadgeComponent,
     ActionDocumentsViewerComponent,
@@ -88,6 +96,8 @@ export class ProcessDetailComponent {
   private _quotaService = inject(ProcessQuotaService);
   private _notificationService = inject(NotificationService);
   private _transloco = inject(TranslocoService);
+  private _courtDirectory = inject(CourtDirectoryService);
+  private readonly _deskCode$ = new RxSubject<string | null>();
 
   // AI Permission State
   public isAiEnabled = this._aiCoreService.isAiEnabled;
@@ -95,6 +105,7 @@ export class ProcessDetailComponent {
   // State
   public process = signal<ProcessDetail | null>(null);
   public showProcessTasksDrawer = signal(false);
+  public showCourtDrawer = signal(false);
   public processInstances = signal<ProcessDetailInstance[]>([]);
   public loadingInstances = signal<boolean>(false);
   public subjects = signal<Subject[]>([]);
@@ -139,6 +150,15 @@ export class ProcessDetailComponent {
 
   /** Estado del mensaje de copiado (idéntico a Actuaciones Recientes) */
   public copiedMessage = signal<string | null>(null);
+  /** Primeros 12 dígitos del radicado, solo si tiene 23 dígitos. */
+  public filingParts = computed(() => parseFilingNumber(this.process()?.process_number));
+  public courtEmails = signal<CourtDirectoryEntry[]>([]);
+  public courtEmailsLoading = signal(false);
+  public courtEmailsError = signal(false);
+  /** 404 from by-desk-code: the URL is malformed, not an empty directory. */
+  public courtEmailsInvalid = signal(false);
+  /** True only after the desk-code request finishes. Avoids a false “not in directory”. */
+  public courtEmailsResolved = signal(false);
   /** Estado del toast (para otros mensajes) */
   public toastVisible = signal<boolean>(false);
   public toastType = signal<'success' | 'error'>('success');
@@ -204,6 +224,52 @@ export class ProcessDetailComponent {
   private static readonly _PROCESS_DOCS_PER_PAGE = 12;
 
   constructor() {
+    this._deskCode$
+      .pipe(
+        distinctUntilChanged(),
+        switchMap((code) => {
+          if (!code) {
+            this.courtEmails.set([]);
+            this.courtEmailsLoading.set(false);
+            this.courtEmailsError.set(false);
+            this.courtEmailsInvalid.set(false);
+            this.courtEmailsResolved.set(false);
+            return EMPTY;
+          }
+
+          this.courtEmailsLoading.set(true);
+          this.courtEmailsError.set(false);
+          this.courtEmailsInvalid.set(false);
+          this.courtEmailsResolved.set(false);
+
+          return this._courtDirectory.byDeskCode(code).pipe(
+            tap((entries) => {
+              this.courtEmails.set(entries);
+              this.courtEmailsInvalid.set(false);
+              this.courtEmailsResolved.set(true);
+            }),
+            catchError((error: unknown) => {
+              this.courtEmails.set([]);
+              this.courtEmailsResolved.set(true);
+              const status = error instanceof HttpErrorResponse ? error.status : 0;
+              // 401 is an expired session. 404 is a malformed desk-code URL, not a missing court.
+              // An empty 200 is handled as “not in the directory”.
+              this.courtEmailsInvalid.set(status === 404);
+              this.courtEmailsError.set(status === 0 || status >= 500);
+              return EMPTY;
+            }),
+            finalize(() => this.courtEmailsLoading.set(false)),
+          );
+        }),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe();
+
+    effect(() => {
+      const code = this.filingParts()?.deskCode ?? null;
+      queueMicrotask(() => this._deskCode$.next(code));
+    });
+
     // Store reference to formatDate method for use in render functions
     const formatDateFn = (value: string | null | undefined): string => {
       return this.formatDate(value);
@@ -509,18 +575,29 @@ export class ProcessDetailComponent {
   /**
    * Copy text to clipboard (removes spaces and dashes)
    */
-  public copyToClipboard(text: string, event?: MouseEvent): void {
+  public copyToClipboard(
+    text: string,
+    event?: MouseEvent,
+    kind: 'filing' | 'email' | 'code' = 'filing',
+  ): void {
     if (event) {
       event.stopPropagation();
     }
-    
+
     if (!text || text === '–') return;
-    
-    // Remove dashes and spaces as requested
-    const cleanText = text.replace(/[^0-9]/g, '');
-    
-    navigator.clipboard.writeText(cleanText).then(() => {
-      this.copiedMessage.set('Radicado copiado!');
+
+    const value = kind === 'filing' ? text.replace(/[^0-9]/g, '') : text.trim();
+    if (!value) return;
+
+    const message =
+      kind === 'email'
+        ? this._transloco.translate('courtDirectory.emailCopied')
+        : kind === 'code'
+          ? this._transloco.translate('courtDirectory.codeCopied')
+          : 'Radicado copiado!';
+
+    navigator.clipboard.writeText(value).then(() => {
+      this.copiedMessage.set(message);
       setTimeout(() => this.copiedMessage.set(null), 2500);
     });
   }
@@ -610,6 +687,14 @@ export class ProcessDetailComponent {
 
     // if closing chat, unpin it
     if (!newState) this.isChatPinned.set(false);
+  }
+
+  public openCourtDrawer(): void {
+    this.showCourtDrawer.set(true);
+  }
+
+  public closeCourtDrawer(): void {
+    this.showCourtDrawer.set(false);
   }
 
   public openProcessTasksDrawer(): void {

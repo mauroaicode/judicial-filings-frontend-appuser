@@ -575,6 +575,12 @@ app-process-detail .action-data-container td:has(.rama-status-cell) {
     -webkit-text-fill-color: #ffffff;
   }
 
+  .court-more-link {
+    color: #d8c3f7 !important;
+    -webkit-text-fill-color: #d8c3f7;
+    cursor: pointer;
+  }
+
   .detail-header-card {
     .detail-meta-label + p,
     p.text-base-content,
@@ -839,4 +845,8 @@ app-process-detail .action-data-container td:has(.rama-status-cell) {
   -webkit-text-fill-color: #2c2440 !important;
   background-color: color-mix(in srgb, #ffffff 90%, #140f1e) !important;
   border-color: transparent !important;
+}
+
+app-process-detail .court-more-link {
+  cursor: pointer;
 }
