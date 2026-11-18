@@ -137,7 +137,7 @@
           </svg>
         </button>
       </div>
-      <form [formGroup]="filterForm"
+      <form [formGroup]="filterForm" (ngSubmit)="onSearch()"
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4" autocomplete="off">
 
         <!-- Process Number Filter -->
@@ -297,7 +297,7 @@
               (click)="onResetFilters()">
               {{ 'gestionProcesos.filters.reset' | transloco }}
             </button>
-            <button type="button" class="btn-standard-search" (click)="onSearch()">
+            <button type="submit" class="btn-standard-search">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
