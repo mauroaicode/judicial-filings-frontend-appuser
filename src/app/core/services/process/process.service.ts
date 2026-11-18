@@ -61,6 +61,9 @@ export class ProcessService {
     if (filters.defendant) {
       params = params.set('defendant', filters.defendant);
     }
+    if (filters.other_subjects) {
+      params = params.set('other_subjects', filters.other_subjects);
+    }
     if (filters.status) {
       params = params.set('status', filters.status);
     }

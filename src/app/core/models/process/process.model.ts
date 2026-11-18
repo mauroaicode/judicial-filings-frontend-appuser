@@ -107,6 +107,7 @@ export interface ProcessFilter {
   process_class?: string;
   plaintiff?: string;
   defendant?: string;
+  other_subjects?: string;
   status?: string; // 'active' | 'inactive' | 'pending_hearing' | 'suspended_insolvency' | 'suspended_payment_agreement' | 'suspended'
   has_multiple_instances?: boolean;
   lawyer_role?: string; // 'plaintiff' | 'defendant'

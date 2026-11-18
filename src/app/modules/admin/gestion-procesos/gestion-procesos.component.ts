@@ -176,6 +176,7 @@ export class GestionProcesosComponent {
     process_class: [''],
     plaintiff: [''],
     defendant: [''],
+    other_subjects: [''],
     status: [''],
     has_multiple_instances: [null as boolean | null],
     lawyer_role: [''],
@@ -370,6 +371,9 @@ export class GestionProcesosComponent {
     if (isValidValue(queryParams['defendant'])) {
       this.filterForm.patchValue({ defendant: queryParams['defendant'] });
     }
+    if (isValidValue(queryParams['other_subjects'])) {
+      this.filterForm.patchValue({ other_subjects: queryParams['other_subjects'] });
+    }
     if (isValidValue(queryParams['status'])) {
       this.filterForm.patchValue({ status: queryParams['status'] });
     }
@@ -435,6 +439,9 @@ export class GestionProcesosComponent {
     }
     if (filters.defendant && filters.defendant.trim()) {
       queryParams['defendant'] = filters.defendant;
+    }
+    if (filters.other_subjects && filters.other_subjects.trim()) {
+      queryParams['other_subjects'] = filters.other_subjects;
     }
     if (filters.status && filters.status.trim()) {
       queryParams['status'] = filters.status;
@@ -510,6 +517,7 @@ export class GestionProcesosComponent {
       process_class: formValue.process_class?.trim() || undefined,
       plaintiff: formValue.plaintiff?.trim() || undefined,
       defendant: formValue.defendant?.trim() || undefined,
+      other_subjects: formValue.other_subjects?.trim() || undefined,
       status: formValue.status?.trim() || undefined,
       has_multiple_instances: formValue.has_multiple_instances !== null && formValue.has_multiple_instances !== '' ? formValue.has_multiple_instances : undefined,
       lawyer_role: formValue.lawyer_role?.trim() || undefined,
@@ -645,6 +653,7 @@ export class GestionProcesosComponent {
       process_class: '',
       plaintiff: '',
       defendant: '',
+      other_subjects: '',
       status: '',
       has_multiple_instances: null,
       lawyer_role: '',
