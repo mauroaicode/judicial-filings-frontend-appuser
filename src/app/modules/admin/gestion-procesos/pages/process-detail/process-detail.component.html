@@ -626,7 +626,7 @@
                     BÚSQUEDA</span>
                 </div>
 
-                <form [formGroup]="actionFilterForm"
+                <form [formGroup]="actionFilterForm" (ngSubmit)="onSearchActions()"
                   class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-6">
                   <div class="form-control">
                     <label class="label !pt-0 !pb-1"><span class="label-standard">{{
@@ -669,16 +669,15 @@
                       <option value="hide">{{ 'processDetail.actions.filters.removedFromBranchHide' | transloco }}</option>
                     </select>
                   </div>
-                </form>
 
                 <!-- Unified Action Buttons (Filter style) -->
-                <div class="mt-8 flex justify-end items-center gap-6 border-t border-base-200/50 pt-6">
+                <div class="md:col-span-2 lg:col-span-4 mt-2 flex justify-end items-center gap-6 border-t border-base-200/50 pt-6">
                   <button type="button"
                     class="btn btn-link btn-sm normal-case text-base-content/60 no-underline hover:text-base-content font-bold"
                     (click)="onResetActionFilters()">
                     {{ 'processDetail.actions.filters.reset' | transloco }}
                   </button>
-                  <button type="button" class="btn-standard-search" (click)="onSearchActions()">
+                  <button type="submit" class="btn-standard-search">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                       stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -687,6 +686,7 @@
                     {{ 'processDetail.actions.filters.search' | transloco }}
                   </button>
                 </div>
+                </form>
               </div>
 
               <!-- Actions Table/Cards (No rounded corners for table container on desktop) -->

@@ -70,6 +70,11 @@ export class DirectorioDespachosComponent {
       .subscribe();
   }
 
+  onSearchSubmit(): void {
+    this.page = 1;
+    this._refresh$.next('reset');
+  }
+
   toggleFilters(): void {
     this.filtersOpen.update((open) => !open);
   }
