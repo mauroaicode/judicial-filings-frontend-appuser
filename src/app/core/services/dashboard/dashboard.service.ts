@@ -40,6 +40,7 @@ export class DashboardService {
     if (filters.process_class) params = params.set('process_class', filters.process_class);
     if (filters.plaintiff) params = params.set('plaintiff', filters.plaintiff);
     if (filters.defendant) params = params.set('defendant', filters.defendant);
+    if (filters.other_subjects) params = params.set('other_subjects', filters.other_subjects);
     if (filters.status) params = params.set('status', filters.status);
     if (filters.has_multiple_instances !== undefined && filters.has_multiple_instances !== null) {
       params = params.set('has_multiple_instances', String(filters.has_multiple_instances));
