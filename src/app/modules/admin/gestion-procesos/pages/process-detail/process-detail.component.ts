@@ -147,6 +147,10 @@ export class ProcessDetailComponent {
   /** Eliminar proceso (mismo endpoint que gestión) */
   public deleteConfirmOpen = signal(false);
   public deletingProcess = signal(false);
+  /** Descarga del PDF de la instancia abierta. */
+  public downloadingPdf = signal(false);
+  /** Exportación Excel de las actuaciones de esta instancia. */
+  public exportingActions = signal(false);
 
   /** Estado del mensaje de copiado (idéntico a Actuaciones Recientes) */
   public copiedMessage = signal<string | null>(null);
@@ -740,6 +744,37 @@ export class ProcessDetailComponent {
   }
 
   /**
+   * Filtros tal como están en el formulario de Actuaciones, hayan pulsado Buscar o no.
+   */
+  private buildActionFilters(): ActionFilter {
+    const formValue = this.actionFilterForm.value;
+    const actionDateRange: DateRange | null = formValue.action_date_range;
+    const registrationDateRange: DateRange | null = formValue.registration_date_range;
+    const alertSlug = typeof formValue.alert_slug === 'string' ? formValue.alert_slug.trim() : '';
+    const branchFilter = formValue.removed_from_judicial_branch as 'all' | 'only' | 'hide' | null;
+
+    const filters: ActionFilter = {
+      action_date_from: actionDateRange?.from?.trim() || undefined,
+      action_date_to: actionDateRange?.to?.trim() || undefined,
+      registration_date_from: registrationDateRange?.from?.trim() || undefined,
+      registration_date_to: registrationDateRange?.to?.trim() || undefined,
+      alert_slug: alertSlug || undefined,
+      search: formValue.search?.trim() || undefined,
+      removed_from_judicial_branch:
+        branchFilter === 'only' ? true : branchFilter === 'hide' ? false : undefined,
+    };
+
+    Object.keys(filters).forEach((key) => {
+      const value = filters[key as keyof ActionFilter];
+      if (value === '' || value === null || value === undefined) {
+        delete filters[key as keyof ActionFilter];
+      }
+    });
+
+    return filters;
+  }
+
+  /**
    * Load actions with current filters
    */
   loadActions(page: number = 1, perPage: number = 10): void {
@@ -748,32 +783,11 @@ export class ProcessDetailComponent {
 
     this.loadingActions.set(true);
 
-    const formValue = this.actionFilterForm.value;
-    const actionDateRange: DateRange | null = formValue.action_date_range;
-    const registrationDateRange: DateRange | null = formValue.registration_date_range;
-    const alertSlug = formValue.alert_slug?.trim();
-    const branchFilter = formValue.removed_from_judicial_branch as 'all' | 'only' | 'hide' | null;
-
     const filters: ActionFilter = {
-      action_date_from: actionDateRange?.from && actionDateRange.from.trim() ? actionDateRange.from : undefined,
-      action_date_to: actionDateRange?.to && actionDateRange.to.trim() ? actionDateRange.to : undefined,
-      registration_date_from: registrationDateRange?.from && registrationDateRange.from.trim() ? registrationDateRange.from : undefined,
-      registration_date_to: registrationDateRange?.to && registrationDateRange.to.trim() ? registrationDateRange.to : undefined,
-      alert_slug: alertSlug || undefined,
-      search: formValue.search?.trim() || undefined,
-      removed_from_judicial_branch:
-        branchFilter === 'only' ? true : branchFilter === 'hide' ? false : undefined,
+      ...this.buildActionFilters(),
       page,
       per_page: perPage,
     };
-
-    // Remove empty values
-    Object.keys(filters).forEach((key) => {
-      const value = filters[key as keyof ActionFilter];
-      if (value === '' || value === null || value === undefined) {
-        delete filters[key as keyof ActionFilter];
-      }
-    });
 
     this._processService.getProcessActions(process.id, filters).subscribe({
       next: (response) => {
@@ -1449,6 +1463,127 @@ export class ProcessDetailComponent {
     const message =
       error?.error?.messages?.[0] || error?.error?.message || fallback;
     this.showToast('error', message);
+  }
+
+  /**
+   * Descarga el PDF de la instancia abierta. El backend arma el documento;
+   * aquí solo se guarda el blob. El nombre sale de Content-Disposition.
+   */
+  public downloadProcessPdf(): void {
+    const processId = this.process()?.id;
+    if (!processId || this.downloadingPdf()) return;
+
+    this.downloadingPdf.set(true);
+
+    this._processService
+      .exportPdf(processId)
+      .pipe(
+        finalize(() => this.downloadingPdf.set(false)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          const blob = response.body;
+          if (!blob || blob.size === 0 || blob.type?.includes('application/json')) {
+            this.showToast('error', this._transloco.translate('processDetail.downloadPdf.error'));
+            return;
+          }
+
+          const filename =
+            this.parseContentDispositionFilename(response.headers.get('Content-Disposition')) ??
+            'proceso.pdf';
+          this.saveDownloadBlob(blob, filename, 'proceso.pdf');
+        },
+        error: () => {
+          this.showToast('error', this._transloco.translate('processDetail.downloadPdf.error'));
+        },
+      });
+  }
+
+  /**
+   * Excel de las actuaciones de esta instancia. Usa el formulario actual, no la última búsqueda.
+   */
+  public exportActionsExcel(): void {
+    const processId = this.process()?.id;
+    if (!processId || this.exportingActions()) return;
+
+    this.exportingActions.set(true);
+
+    this._processService
+      .exportActions(processId, this.buildActionFilters())
+      .pipe(
+        finalize(() => this.exportingActions.set(false)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          const blob = response.body;
+          if (!blob || blob.size === 0 || blob.type?.includes('application/json')) {
+            this.showToast('error', this._transloco.translate('processDetail.actions.exportExcel.error'));
+            return;
+          }
+
+          const filename =
+            this.parseContentDispositionFilename(
+              response.headers.get('Content-Disposition'),
+              'xlsx',
+            ) ?? 'actuaciones.xlsx';
+          this.saveDownloadBlob(blob, filename, 'actuaciones.xlsx');
+        },
+        error: () => {
+          this.showToast('error', this._transloco.translate('processDetail.actions.exportExcel.error'));
+        },
+      });
+  }
+
+  private parseContentDispositionFilename(header: string | null, extension = 'pdf'): string | null {
+    if (!header) return null;
+
+    const utf8Match = /filename\*=UTF-8''([^;]+)/i.exec(header);
+    if (utf8Match?.[1]) {
+      try {
+        return this.normalizeDownloadFilename(
+          decodeURIComponent(utf8Match[1].trim().replace(/^["']|["']$/g, '')),
+          extension,
+        );
+      } catch {
+        return this.normalizeDownloadFilename(
+          utf8Match[1].trim().replace(/^["']|["']$/g, ''),
+          extension,
+        );
+      }
+    }
+
+    const plainMatch = /filename="?([^";]+)"?/i.exec(header);
+    return this.normalizeDownloadFilename(plainMatch?.[1] ?? '', extension);
+  }
+
+  /** Nombre de archivo seguro. Si no hay uno usable, el llamador usa el fallback (nunca el UUID). */
+  private normalizeDownloadFilename(raw: string, extension: string): string | null {
+    const cleaned = raw
+      .replace(/[/\\]/g, '')
+      .replace(/[\u0000-\u001f]/g, '')
+      .trim();
+    if (!cleaned) return null;
+
+    const withoutExt = cleaned.replace(new RegExp(`\\.${extension}$`, 'i'), '');
+    const looksLikeUuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(withoutExt);
+    if (looksLikeUuid) return null;
+
+    return new RegExp(`\\.${extension}$`, 'i').test(cleaned) ? cleaned : `${cleaned}.${extension}`;
+  }
+
+  private saveDownloadBlob(blob: Blob, filename: string, fallback: string): void {
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = objectUrl;
+    anchor.download = filename || fallback;
+    anchor.rel = 'noopener';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(objectUrl);
   }
 
   /**

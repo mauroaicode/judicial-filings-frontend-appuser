@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
+import { Observable, timeout } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '@app/core/config/environment.config';
 import {
@@ -272,13 +272,40 @@ export class ProcessService {
    * @returns Observable with actions response
    */
   getProcessActions(id: string, filters: ActionFilter = {}): Observable<ActionResponse> {
+    const params = this.actionQueryParams(filters, true);
+    const url = `${environment.apiBaseUrl}/processes/${id}/actions`;
+    return this._http.get<ActionResponse>(url, { params });
+  }
+
+  /**
+   * Excel de las actuaciones de esta instancia, con los filtros de la sección.
+   * GET /processes/{id}/actions/export — la respuesta es el archivo, sin cola.
+   */
+  exportActions(processId: string, filters: ActionFilter = {}): Observable<HttpResponse<Blob>> {
+    const params = this.actionQueryParams(filters, false);
+    const url = `${environment.apiBaseUrl}/processes/${processId}/actions/export`;
+    return this._http
+      .get(url, {
+        headers: new HttpHeaders({
+          Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        }),
+        params,
+        responseType: 'blob',
+        observe: 'response',
+      })
+      .pipe(timeout(60_000));
+  }
+
+  private actionQueryParams(filters: ActionFilter, includePagination: boolean): HttpParams {
     let params = new HttpParams();
 
-    if (filters.page) {
-      params = params.set('page', filters.page.toString());
-    }
-    if (filters.per_page) {
-      params = params.set('per_page', filters.per_page.toString());
+    if (includePagination) {
+      if (filters.page) {
+        params = params.set('page', filters.page.toString());
+      }
+      if (filters.per_page) {
+        params = params.set('per_page', filters.per_page.toString());
+      }
     }
 
     if (filters.action_date_from) {
@@ -309,8 +336,7 @@ export class ProcessService {
       );
     }
 
-    const url = `${environment.apiBaseUrl}/processes/${id}/actions`;
-    return this._http.get<ActionResponse>(url, { params });
+    return params;
   }
 
   /**
@@ -322,6 +348,22 @@ export class ProcessService {
   downloadMedia(mediaId: number): Observable<Blob> {
     const url = `${environment.apiBaseUrl}/media/${mediaId}/download`;
     return this._http.get(url, { responseType: 'blob' });
+  }
+
+  /**
+   * PDF de una instancia del proceso (logo, estado, sujetos, tareas, línea de tiempo y actuaciones).
+   * GET /processes/{id}/export-pdf — el id es el de la instancia abierta.
+   * Timeout 60s: radicados con muchas actuaciones tardan más que un consolidado.
+   */
+  exportPdf(processId: string): Observable<HttpResponse<Blob>> {
+    const url = `${environment.apiBaseUrl}/processes/${processId}/export-pdf`;
+    return this._http
+      .get(url, {
+        headers: new HttpHeaders({ Accept: 'application/pdf' }),
+        responseType: 'blob',
+        observe: 'response',
+      })
+      .pipe(timeout(60_000));
   }
 
   /**
