@@ -850,3 +850,97 @@ app-process-detail .action-data-container td:has(.rama-status-cell) {
 app-process-detail .court-more-link {
   cursor: pointer;
 }
+
+app-process-detail .process-pdf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-error);
+  -webkit-text-fill-color: var(--color-error);
+  background: color-mix(in srgb, var(--color-error) 12%, var(--color-base-100));
+  border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+
+  span {
+    color: inherit;
+    -webkit-text-fill-color: inherit;
+  }
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-error) 18%, var(--color-base-100));
+    border-color: color-mix(in srgb, var(--color-error) 45%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+app-process-detail .process-excel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  height: 2.75rem;
+  padding: 0 1.15rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-success);
+  -webkit-text-fill-color: var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 12%, var(--color-base-100));
+  border: 1px solid color-mix(in srgb, var(--color-success) 35%, transparent);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+
+  span {
+    color: inherit;
+    -webkit-text-fill-color: inherit;
+  }
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-success) 18%, var(--color-base-100));
+    border-color: color-mix(in srgb, var(--color-success) 50%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+[data-theme='dark'] app-process-detail .process-excel-btn {
+  color: color-mix(in srgb, var(--color-success) 88%, white);
+  -webkit-text-fill-color: color-mix(in srgb, var(--color-success) 88%, white);
+  background: color-mix(in srgb, var(--color-success) 18%, var(--color-base-100));
+  border-color: color-mix(in srgb, var(--color-success) 42%, transparent);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-success) 28%, var(--color-base-100));
+    border-color: color-mix(in srgb, var(--color-success) 58%, transparent);
+  }
+}
+
+[data-theme='dark'] app-process-detail .process-pdf-btn {
+  color: color-mix(in srgb, var(--color-error) 92%, white);
+  -webkit-text-fill-color: color-mix(in srgb, var(--color-error) 92%, white);
+  background: color-mix(in srgb, var(--color-error) 18%, var(--color-base-100));
+  border-color: color-mix(in srgb, var(--color-error) 40%, transparent);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-error) 28%, var(--color-base-100));
+    border-color: color-mix(in srgb, var(--color-error) 55%, transparent);
+  }
+}

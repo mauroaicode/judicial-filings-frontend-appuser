@@ -637,6 +637,12 @@
     "actionsMenu": {
       "delete": "Eliminar proceso"
     },
+    "downloadPdf": {
+      "label": "Descargar PDF",
+      "loading": "Generando PDF…",
+      "error": "No se pudo generar el PDF del proceso. Intenta de nuevo.",
+      "hint": "PDF de esta instancia del proceso"
+    },
     "back": "Volver",
     "generalInfo": "Información General",
     "processNumber": "Número de Radicado",
@@ -802,6 +808,11 @@
         "removedFromBranchOnly": "Solo retiradas",
         "removedFromBranchHide": "Ocultar retiradas",
         "reset": "Limpiar Filtros"
+      },
+      "exportExcel": {
+        "label": "Exportar Excel",
+        "loading": "Generando Excel…",
+        "error": "No se pudo generar el Excel de las actuaciones. Intenta de nuevo."
       },
       "removedCount": "{{count}} retiradas",
       "removedCountShort": "retiradas",

@@ -181,9 +181,14 @@
             </div>
           </div>
 
-          <!-- Desktop: menú en la fila de fechas -->
+          <!-- Desktop: descarga + menú en la fila de fechas -->
           <div class="hidden md:flex items-center gap-2 shrink-0 self-start md:pt-0">
+            <ng-container *ngTemplateOutlet="downloadProcessPdfButton" />
             <ng-container *ngTemplateOutlet="processHeaderKebabMenu" />
+          </div>
+          <!-- Mobile: el kebab queda fijo arriba; el PDF va en el flujo del header -->
+          <div class="md:hidden">
+            <ng-container *ngTemplateOutlet="downloadProcessPdfButton" />
           </div>
         </div>
       }
@@ -671,11 +676,27 @@
                   </div>
 
                 <!-- Unified Action Buttons (Filter style) -->
-                <div class="md:col-span-2 lg:col-span-4 mt-2 flex justify-end items-center gap-6 border-t border-base-200/50 pt-6">
+                <div class="md:col-span-2 lg:col-span-4 mt-2 flex flex-wrap justify-end items-center gap-3 sm:gap-6 border-t border-base-200/50 pt-6">
                   <button type="button"
                     class="btn btn-link btn-sm normal-case text-base-content/60 no-underline hover:text-base-content font-bold"
                     (click)="onResetActionFilters()">
                     {{ 'processDetail.actions.filters.reset' | transloco }}
+                  </button>
+                  <button type="button"
+                    class="process-excel-btn"
+                    [disabled]="exportingActions()"
+                    [attr.aria-label]="(exportingActions() ? 'processDetail.actions.exportExcel.loading' : 'processDetail.actions.exportExcel.label') | transloco"
+                    (click)="exportActionsExcel()">
+                    @if (exportingActions()) {
+                      <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
+                      <span>{{ 'processDetail.actions.exportExcel.loading' | transloco }}</span>
+                    } @else {
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 9h16M4 14h16M9 4v16M15 4v16" />
+                      </svg>
+                      <span>{{ 'processDetail.actions.exportExcel.label' | transloco }}</span>
+                    }
                   </button>
                   <button type="submit" class="btn-standard-search">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -810,6 +831,10 @@
                   }
                 </div>
               </div>
+
+              <div class="flex justify-end">
+                <ng-container *ngTemplateOutlet="downloadProcessPdfButton" />
+              </div>
             </div>
           </div>
         </div>
@@ -848,6 +873,28 @@
     </div>
   </div>
   }
+
+  <ng-template #downloadProcessPdfButton>
+    <button
+      type="button"
+      class="process-pdf-btn"
+      [disabled]="downloadingPdf()"
+      [attr.title]="'processDetail.downloadPdf.hint' | transloco"
+      [attr.aria-label]="(downloadingPdf() ? 'processDetail.downloadPdf.loading' : 'processDetail.downloadPdf.label') | transloco"
+      (click)="downloadProcessPdf()">
+      @if (downloadingPdf()) {
+        <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
+        <span>{{ 'processDetail.downloadPdf.loading' | transloco }}</span>
+      } @else {
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+          <path fill="color-mix(in srgb, var(--color-error) 35%, white)" d="M14 2v6h6l-6-6z"/>
+          <text x="12" y="17.25" text-anchor="middle" fill="#fff" font-size="6" font-weight="800" font-family="ui-sans-serif, system-ui, sans-serif">PDF</text>
+        </svg>
+        <span>{{ 'processDetail.downloadPdf.label' | transloco }}</span>
+      }
+    </button>
+  </ng-template>
 
   <ng-template #processHeaderKebabMenu>
     <div class="dropdown dropdown-end">

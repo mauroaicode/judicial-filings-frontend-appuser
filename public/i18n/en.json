@@ -620,6 +620,12 @@
     "actionsMenu": {
       "delete": "Delete process"
     },
+    "downloadPdf": {
+      "label": "Download PDF",
+      "loading": "Generating PDF…",
+      "error": "Could not generate the process PDF. Please try again.",
+      "hint": "PDF of this process instance"
+    },
     "back": "Back",
     "generalInfo": "General Information",
     "processNumber": "Process Number",
@@ -785,6 +791,11 @@
         "removedFromBranchOnly": "Withdrawn only",
         "removedFromBranchHide": "Hide withdrawn",
         "reset": "Clear Filters"
+      },
+      "exportExcel": {
+        "label": "Export Excel",
+        "loading": "Generating Excel…",
+        "error": "Could not generate the actions spreadsheet. Please try again."
       },
       "removedCount": "{{count}} withdrawn",
       "removedCountShort": "withdrawn",
