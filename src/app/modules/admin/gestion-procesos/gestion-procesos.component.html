@@ -209,7 +209,7 @@
           </select>
         </div>
 
-        <!-- Multiple Instances Filter -->
+        <!-- TODO(app-user filters): reactivar Múltiples Instancias
         <div class="form-control">
           <label class="label pt-0 pb-1">
             <span class="label-standard">{{ 'gestionProcesos.filters.hasMultipleInstances' | transloco }}</span>
@@ -220,6 +220,7 @@
             <option [value]="false">{{ 'gestionProcesos.filters.no' | transloco }}</option>
           </select>
         </div>
+        -->
 
         <!-- Lawyer Role Filter -->
         <div class="form-control">
@@ -252,6 +253,7 @@
           </select>
         </div>
 
+        <!-- TODO(app-user filters): reactivar Actuaciones retiradas
         <div class="form-control">
           <label class="label pt-0 pb-1">
             <span class="label-standard">{{ 'gestionProcesos.filters.removedFromRama' | transloco }}</span>
@@ -262,27 +264,31 @@
             <option value="false">{{ 'gestionProcesos.filters.removedFromRamaWithout' | transloco }}</option>
           </select>
         </div>
+        -->
 
-        <!-- Radicación Date Range -->
+        <!-- TODO(app-user filters): reactivar Rango de Fecha de Radicación
         <div class="form-control">
           <app-date-range-picker [label]="'gestionProcesos.filters.createdAtRange' | transloco"
             [placeholder]="'gestionProcesos.filters.createdAtRangePlaceholder' | transloco"
             formControlName="process_date_range"></app-date-range-picker>
         </div>
+        -->
 
-        <!-- Registro Date Range -->
+        <!-- TODO(app-user filters): reactivar Rango de Fecha de Registro
         <div class="form-control">
           <app-date-range-picker [label]="'gestionProcesos.filters.processDateRange' | transloco"
             [placeholder]="'gestionProcesos.filters.processDateRangePlaceholder' | transloco"
             formControlName="created_at_range"></app-date-range-picker>
         </div>
+        -->
 
-        <!-- API Proxy Date Range -->
+        <!-- TODO(app-user filters): reactivar Rango de Última Actualización
         <div class="form-control md:col-span-2 lg:col-span-1">
           <app-date-range-picker [label]="'gestionProcesos.filters.lastApiUpdateRange' | transloco"
             [placeholder]="'gestionProcesos.filters.lastApiUpdateRangePlaceholder' | transloco"
             formControlName="last_api_update_range"></app-date-range-picker>
         </div>
+        -->
 
         <!-- Actions -->
         <div class="md:col-span-2 lg:col-span-3 xl:col-span-4 flex flex-wrap justify-between items-center gap-3 mt-4">
@@ -752,11 +758,11 @@
               <td class="whitespace-nowrap align-middle sticky-col-radicado">
                 <span class="sticky-cell-bg" aria-hidden="true"></span>
                 <div class="sticky-cell-txt">
-                  <div class="flex items-center gap-2">
-                    <span class="font-bold">{{ process.process_number | processNumber }}</span>
-                    <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                  <div class="radicado-row">
+                    <span class="radicado-number font-bold">{{ process.process_number | processNumber }}</span>
+                    <span class="radicado-copy tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
                       <button type="button"
-                        class="radicado-copy-btn btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary"
+                        class="radicado-copy-btn btn btn-ghost btn-xs btn-circle h-6 w-6 min-h-6 min-w-6 text-base-content/20 hover:bg-primary/5 hover:text-primary"
                         (click)="copyToClipboard(process.process_number, $event)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
                           stroke="currentColor">
@@ -968,18 +974,22 @@
               </td>
               <td class="whitespace-nowrap align-middle text-base-content/80 sticky-col-radicado">
                 <span class="sticky-cell-bg" aria-hidden="true"></span>
-                <div class="sticky-cell-txt flex items-center gap-2">
-                  <span>{{ instance.process_number | processNumber }}</span>
-                  <span class="tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
-                    <button type="button" class="radicado-copy-btn btn btn-ghost btn-xs btn-circle text-base-content/20 hover:bg-primary/5 hover:text-primary"
-                      (click)="copyToClipboard(instance.process_number, $event)">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
-                      </svg>
-                    </button>
-                  </span>
+                <div class="sticky-cell-txt">
+                  <div class="radicado-row">
+                    <span class="radicado-number">{{ instance.process_number | processNumber }}</span>
+                    <span class="radicado-copy tooltip tooltip-right" [attr.data-tip]="'gestionProcesos.table.copyTooltip' | transloco">
+                      <button type="button" class="radicado-copy-btn btn btn-ghost btn-xs btn-circle h-6 w-6 min-h-6 min-w-6 text-base-content/20 hover:bg-primary/5 hover:text-primary"
+                        (click)="copyToClipboard(instance.process_number, $event)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3" />
+                        </svg>
+                      </button>
+                    </span>
+                  </div>
                   @if (instance.is_manual_sync) {
-                    <app-process-manual-sync-badge />
+                    <div class="flex items-center mt-1">
+                      <app-process-manual-sync-badge />
+                    </div>
                   }
                 </div>
               </td>

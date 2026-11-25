@@ -172,9 +172,11 @@
   thead th.sticky-col-radicado {
     left: var(--sticky-radicado-left) !important;
     z-index: 12 !important;
-    min-width: 340px !important;
-    max-width: 340px !important;
-    width: 340px !important;
+    width: auto !important;
+    min-width: max-content !important;
+    max-width: none !important;
+    white-space: nowrap !important;
+    padding-inline: 0.5rem !important;
     transform: none !important;
     box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1), 1px 0 0 0 #4B2A7D, 0 0 0 0.5px #4B2A7D !important;
     border: none !important;
@@ -249,10 +251,11 @@
     left: var(--sticky-radicado-left) !important;
     z-index: 2 !important;
     box-shadow: 2px 0 4px rgba(0,0,0,0.18), 1px 0 0 0 var(--process-table-bg) !important;
-    min-width: 340px !important;
-    max-width: 340px !important;
-    width: 340px !important;
+    width: auto !important;
+    min-width: max-content !important;
+    max-width: none !important;
     white-space: nowrap !important;
+    padding-inline: 0.5rem !important;
 
     & .sticky-cell-bg {
       position: absolute !important;
@@ -265,6 +268,26 @@
     & .sticky-cell-txt {
       position: relative !important;
       z-index: 1;
+      width: auto;
+      max-width: none;
+      overflow: visible;
+    }
+
+    .radicado-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.125rem;
+      white-space: nowrap;
+    }
+
+    .radicado-number {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    .radicado-copy {
+      flex: 0 0 auto;
+      line-height: 0;
     }
   }
 

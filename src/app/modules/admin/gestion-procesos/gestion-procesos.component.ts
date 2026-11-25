@@ -20,7 +20,9 @@ import { ProcessRefreshService } from '@app/core/services/process/process-refres
 import { ProcessQuotaService } from '@app/core/services/process/process-quota.service';
 import { Process, ProcessInstance, ProcessFilter, ProcessResponseMeta, CreateProcessResponse, TrashProcessesResponse, isManualReviewResponse, isManualRegistrationRequiredResponse, CreateManualRegistrationRequestResponse } from '@app/core/models/process/process.model';
 import { DataTableColumn } from '@app/shared/components/data-table/data-table.component';
-import { DateRangePickerComponent, DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
+import { DateRange } from '@app/shared/components/date-range-picker/date-range-picker.component';
+// TODO(app-user filters): reactivar DateRangePickerComponent junto con los rangos de fecha
+// import { DateRangePickerComponent } from '@app/shared/components/date-range-picker/date-range-picker.component';
 import { DashboardService } from '@app/core/services/dashboard/dashboard.service';
 import { DashboardStatsCardsComponent } from '../dashboard/components/dashboard-stats-cards/dashboard-stats-cards.component';
 import { NotificationsDrawerComponent } from '@app/shared/components/notifications-drawer/notifications-drawer.component';
@@ -47,7 +49,8 @@ import type { ProcessSemaphore } from '@app/core/models/process/process.model';
     CommonModule,
     ReactiveFormsModule,
     TranslocoPipe,
-    DateRangePickerComponent,
+    // TODO(app-user filters): reactivar DateRangePickerComponent
+    // DateRangePickerComponent,
     DashboardStatsCardsComponent,
     NotificationsDrawerComponent,
     ProcessNumberPipe,
@@ -219,7 +222,7 @@ export class GestionProcesosComponent {
     {
       key: 'process_number',
       label: 'gestionProcesos.table.processNumber',
-      width: '340px',
+      width: 'max-content',
       align: 'left',
       sortable: true,
     },
