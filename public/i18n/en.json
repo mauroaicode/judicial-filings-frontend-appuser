@@ -792,6 +792,7 @@
         "removedFromBranchHide": "Hide withdrawn",
         "reset": "Clear Filters"
       },
+      "downloadHistoryTitle": "Download actions history as:",
       "exportExcel": {
         "label": "Export Excel",
         "loading": "Generating Excel…",

@@ -181,14 +181,9 @@
             </div>
           </div>
 
-          <!-- Desktop: descarga + menú en la fila de fechas -->
+          <!-- Desktop: menú en la fila de fechas -->
           <div class="hidden md:flex items-center gap-2 shrink-0 self-start md:pt-0">
-            <ng-container *ngTemplateOutlet="downloadProcessPdfButton" />
             <ng-container *ngTemplateOutlet="processHeaderKebabMenu" />
-          </div>
-          <!-- Mobile: el kebab queda fijo arriba; el PDF va en el flujo del header -->
-          <div class="md:hidden">
-            <ng-container *ngTemplateOutlet="downloadProcessPdfButton" />
           </div>
         </div>
       }
@@ -675,37 +670,47 @@
                     </select>
                   </div>
 
-                <!-- Unified Action Buttons (Filter style) -->
-                <div class="md:col-span-2 lg:col-span-4 mt-2 flex flex-wrap justify-end items-center gap-3 sm:gap-6 border-t border-base-200/50 pt-6">
-                  <button type="button"
-                    class="btn btn-link btn-sm normal-case text-base-content/60 no-underline hover:text-base-content font-bold"
-                    (click)="onResetActionFilters()">
-                    {{ 'processDetail.actions.filters.reset' | transloco }}
-                  </button>
-                  <button type="button"
-                    class="process-excel-btn"
-                    [disabled]="exportingActions()"
-                    [attr.aria-label]="(exportingActions() ? 'processDetail.actions.exportExcel.loading' : 'processDetail.actions.exportExcel.label') | transloco"
-                    (click)="exportActionsExcel()">
-                    @if (exportingActions()) {
-                      <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
-                      <span>{{ 'processDetail.actions.exportExcel.loading' | transloco }}</span>
-                    } @else {
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 9h16M4 14h16M9 4v16M15 4v16" />
-                      </svg>
-                      <span>{{ 'processDetail.actions.exportExcel.label' | transloco }}</span>
-                    }
-                  </button>
-                  <button type="submit" class="btn-standard-search">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    {{ 'processDetail.actions.filters.search' | transloco }}
-                  </button>
+                <div class="md:col-span-2 lg:col-span-4 mt-2 border-t border-base-200/50 pt-6">
+                  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <button type="button"
+                      class="btn btn-link btn-sm self-start normal-case text-base-content/60 no-underline hover:text-base-content font-bold"
+                      (click)="onResetActionFilters()">
+                      {{ 'processDetail.actions.filters.reset' | transloco }}
+                    </button>
+
+                    <div class="flex flex-col items-stretch sm:items-end gap-2 w-full sm:w-auto">
+                      <p class="actions-download-title">
+                        {{ 'processDetail.actions.downloadHistoryTitle' | transloco }}
+                      </p>
+                      <div class="flex flex-wrap items-center justify-end gap-3">
+                        <ng-container *ngTemplateOutlet="downloadProcessPdfButton" />
+                        <button type="button"
+                          class="process-excel-btn"
+                          [disabled]="exportingActions()"
+                          [attr.aria-label]="(exportingActions() ? 'processDetail.actions.exportExcel.loading' : 'processDetail.actions.exportExcel.label') | transloco"
+                          (click)="exportActionsExcel()">
+                          @if (exportingActions()) {
+                            <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
+                            <span>{{ 'processDetail.actions.exportExcel.loading' | transloco }}</span>
+                          } @else {
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 9h16M4 14h16M9 4v16M15 4v16" />
+                            </svg>
+                            <span>{{ 'processDetail.actions.exportExcel.label' | transloco }}</span>
+                          }
+                        </button>
+                        <button type="submit" class="btn-standard-search">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                          {{ 'processDetail.actions.filters.search' | transloco }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 </form>
               </div>
@@ -830,10 +835,6 @@
                   }
                   }
                 </div>
-              </div>
-
-              <div class="flex justify-end">
-                <ng-container *ngTemplateOutlet="downloadProcessPdfButton" />
               </div>
             </div>
           </div>
