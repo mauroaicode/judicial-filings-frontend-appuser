@@ -809,6 +809,7 @@
         "removedFromBranchHide": "Ocultar retiradas",
         "reset": "Limpiar Filtros"
       },
+      "downloadHistoryTitle": "Descargar histórico de actuaciones en:",
       "exportExcel": {
         "label": "Exportar Excel",
         "loading": "Generando Excel…",
